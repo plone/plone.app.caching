@@ -1,0 +1,8 @@
+Changelog for plone.app.caching
+
+    (name of developer listed in brackets)
+
+plone.app.caching - 1.0a1 Unreleased
+
+    - Initial package structure.
+      [zopeskel]
