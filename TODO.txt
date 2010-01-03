@@ -9,7 +9,8 @@ plone.caching
           install
 
  [ ] Determine if we need a way to split the rule set/operation mapping
-     according to arbitrary predicates, e.g. between anonymous and authenticated.
+     according to arbitrary predicates, e.g. between anonymous and
+     authenticated.
         - determine if we really need this first
         - can be solved in the same way as the chain operation, with a custom
             intermediary operation
@@ -23,12 +24,18 @@ plone.app.caching
 -----------------
  
  [ ] Write IOperationLookup adapter for skin layer resources
-        - look up by resource name and/or portal_type of parent
-        - use custom mapping in plone.registry
+        - Register for ``Products.PageTemplates.PageTemplate.PageTemplate``
+        - Maintain mappings of template name (__name__) to mutators/
+          interceptors
+        - Fall back on looking up ruleset on context (__parent__). This allows
+          us to declare caching rules on content types in general, to apply
+          to their view templates.
+        - Note: could be dangerous e.g. with edit views
+        - Maybe we want this type of 'context' matching in ``plone.caching``?
  
  [ ] Build control panel
         - enable/disable caching
-        - apply profile (search profiles for ICacheProfiles)
+        - apply profile (select from profiles registered for ICacheProfiles)
         - modify mappings
         - modify operation settings (global and per-ruleset)
  
@@ -66,8 +73,8 @@ Page templates
     
 * Register lookup for ``Products.PageTemplates.PageTemplate.PageTemplate``
 * Lookup rule by name (``__name__``)
-* Fall back to lookup rule by context type (``__parent__``)
-* Maybe allow cache rules registered for content types instead of mapping?
+* Fall back to lookup rule by context type (``__parent__.portal_type``) if the
+  view name is a default view for the corresponding content type
 
 Zope 2 style resources
 ----------------------

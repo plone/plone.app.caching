@@ -27,6 +27,9 @@ setup(name='plone.app.caching',
           'setuptools',
           'plone.caching',
           'plone.app.registry',
+          'zope.interface',
+          'zope.component',
+          'zope.pagetemplate',
       ],
       entry_points="""
       [z3c.autoinclude.plugin]

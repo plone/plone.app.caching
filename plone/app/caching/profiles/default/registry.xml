@@ -1,3 +1,9 @@
 <registry>
 
+    <!-- Basic cache settings from plone.caching -->
+    <records interface="plone.caching.interfaces.ICacheSettings" />
+    
+    <!-- Plone-specific settings from this package -->
+    <records interface="plone.app.caching.interfaces.IPloneCacheSettings" />
+    
 </registry>

@@ -15,5 +15,24 @@
         description="Installs plone.app.caching"
         provides="Products.GenericSetup.interfaces.EXTENSION"
         />
-
+        
+    <!-- Out-of-the-box cache profiles -->
+    <genericsetup:registerProfile
+        name="with-caching-proxy"
+        title="With caching proxy"
+        description="Settings useful for setups with a caching proxy such as Squid or Varnish"
+        directory="profiles/with-caching-proxy"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        for="plone.app.caching.interfaces.ICacheProfiles"
+        />
+    
+    <genericsetup:registerProfile
+        name="without-caching-proxy"
+        title="Without caching proxy"
+        description="Settings useful for setups without a caching proxy such as Squid or Varnish"
+        directory="profiles/without-caching-proxy"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        for="plone.app.caching.interfaces.ICacheProfiles"
+        />
+    
 </configure>
