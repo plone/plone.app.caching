@@ -1,0 +1,59 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:cache="http://namespaces.zope.org/cache"
+    i18n_domain="plone.app.caching">
+    
+    <!-- Out-of-the-box cache profiles -->
+    <genericsetup:registerProfile
+        name="with-caching-proxy"
+        title="With caching proxy"
+        description="Settings useful for setups with a caching proxy such as Squid or Varnish"
+        directory="profiles/with-caching-proxy"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        for="plone.app.caching.interfaces.ICacheProfiles"
+        />
+    
+    <genericsetup:registerProfile
+        name="without-caching-proxy"
+        title="Without caching proxy"
+        description="Settings useful for setups without a caching proxy such as Squid or Varnish"
+        directory="profiles/without-caching-proxy"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        for="plone.app.caching.interfaces.ICacheProfiles"
+        />
+    
+    <!-- Default caching ruleset types -->
+    
+    <cache:rulesetType
+        name="zope-resource"
+        title="Zope file and image resources"
+        description="Includes images and files created or customised through the ZMI, as well as those exposed in the portal_skins tool"
+        />
+    
+    <cache:rulesetType
+        name="content-item-view"
+        title="Content item view"
+        description="A public-facing view for a content item that is not a folder or container for other items"
+        />
+    
+    <cache:rulesetType
+        name="content-folder-view"
+        title="Content folder view"
+        description="A public-facing view for a content item that is a folder or container for other items"
+        />
+    
+    <cache:rulesetType
+        name="content-feed"
+        title="Content feed"
+        description="A dynamic feed, e.g. using RSS or ATOM"
+        />
+    
+    <!-- Default caching ruleset assignments -->
+    
+    <cache:ruleset ruleset="zope-resource" for="Products.CMFCore.FSFile.FSFile" />
+    <cache:ruleset ruleset="zope-resource" for="Products.CMFCore.FSImage.FSImage" />
+    <cache:ruleset ruleset="zope-resource" for="OFS.Image.File" />
+    <cache:ruleset ruleset="zope-resource" for="Products.Five.browser.resource.Resource" />
+    
+</configure>
