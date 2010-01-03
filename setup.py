@@ -30,6 +30,7 @@ setup(name='plone.app.caching',
           'zope.interface',
           'zope.component',
           'zope.pagetemplate',
+          'Products.CMFDynamicViewFTI',
       ],
       entry_points="""
       [z3c.autoinclude.plugin]
