@@ -3,6 +3,17 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="plone.app.caching">
     
+    <browser:page
+        name="caching-control-panel"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        class=".controlpanel.ControlPanel"
+        template="controlpanel.pt"
+        permission="cmf.ManagePortal"
+        />
     
-
+    <browser:resource
+        name="plone.app.caching.gif"
+        image="plone.app.caching.gif"
+        />
+    
 </configure>
