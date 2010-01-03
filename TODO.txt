@@ -11,9 +11,10 @@ plone.caching
  [ ] Determine if we need a way to split the rule set/operation mapping
      according to arbitrary predicates, e.g. between anonymous and
      authenticated.
+     
         - determine if we really need this first
         - can be solved in the same way as the chain operation, with a custom
-            intermediary operation
+          intermediary operation
         - possible predicates:
             - anonymous vs. authenticated
             - is item viewable by anonymous?
@@ -24,14 +25,6 @@ plone.app.caching
 -----------------
  
  [ ] Write IOperationLookup adapter for skin layer resources
-        - Register for ``Products.PageTemplates.PageTemplate.PageTemplate``
-        - Maintain mappings of template name (__name__) to mutators/
-          interceptors
-        - Fall back on looking up ruleset on context (__parent__). This allows
-          us to declare caching rules on content types in general, to apply
-          to their view templates.
-        - Note: could be dangerous e.g. with edit views
-        - Maybe we want this type of 'context' matching in ``plone.caching``?
  
  [ ] Build control panel
         - enable/disable caching
