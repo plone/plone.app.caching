@@ -24,8 +24,6 @@ plone.caching
 plone.app.caching
 -----------------
  
- [ ] Write tests for IOperationLookup
- 
  [ ] Build control panel
         - enable/disable caching
         - apply profile (select from profiles registered for ICacheProfiles)
@@ -68,6 +66,12 @@ plone.app.caching
         - content-feed
 
  [ ] Implement ILastModified for Plone content
+        - OFS File/Image -> PersistentModified
+        - ResourceRegistries file/image
+        - CMF content
+        - Archetypes content
+        - Dexterity content
+        - Zope 3 resource
 
 plone.app.cachepurging
 ----------------------

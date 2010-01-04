@@ -50,6 +50,10 @@ class PageTemplateLookup(object):
     implements(IOperationLookup)
     adapts(IPageTemplate, Interface)
     
+    def __init__(self, published, request):
+        self.published = published
+        self.request = request
+    
     def getResponseMutator(self):
         nyet = (None, None, None,)
     

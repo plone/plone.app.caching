@@ -8,6 +8,10 @@
     
     <include package=".browser" />
     
+    <adapter factory=".lookup.PageTemplateLookup" />
+    
+    <adapter factory=".lastmodified.pageTemplateDelegateLastModified" />
+    
     <genericsetup:registerProfile
         name="default"
         title="Plone cache settings"
