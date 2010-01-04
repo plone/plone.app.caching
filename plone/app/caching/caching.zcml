@@ -54,6 +54,6 @@
     <cache:ruleset ruleset="zope-resource" for="Products.CMFCore.FSFile.FSFile" />
     <cache:ruleset ruleset="zope-resource" for="Products.CMFCore.FSImage.FSImage" />
     <cache:ruleset ruleset="zope-resource" for="OFS.Image.File" />
-    <cache:ruleset ruleset="zope-resource" for="Products.Five.browser.resource.Resource" />
+    <cache:ruleset ruleset="zope-resource" for="zope.app.publisher.interfaces.IResource" />
     
 </configure>

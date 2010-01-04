@@ -30,7 +30,7 @@ plone.app.caching
         - modify mappings
         - modify operation settings (global and per-ruleset)
  
- [ ] Build default operations and rules
+ [ ] Build default response mutators
         - CacheFu has the following:
             - no-cache
             - cache-with-etag
@@ -54,7 +54,15 @@ plone.app.caching
                   ResourceRegistries and/or the ZCacheable flags in OFS.Cache.
         - We want a library of helper functions to perform standard checks
           and header operations, in ``plone.app.caching.operations.utils``. 
-
+ 
+ [ ] Build default cache interceptors
+        - check-not-modified
+                - check for If-None-Match and/or If-Modified-Since
+                - set 304 response and return empty
+                - use ILastModified adapter
+        - ram-cached
+                - check if stale
+                - look up in cache manager and return
 
  [ ] Declare default rule types
         - zope-resource
@@ -64,14 +72,6 @@ plone.app.caching
         - content-folder-view
         - content-item-view
         - content-feed
-
- [ ] Implement ILastModified for Plone content
-        - OFS File/Image -> PersistentModified
-        - ResourceRegistries file/image
-        - CMF content
-        - Archetypes content
-        - Dexterity content
-        - Zope 3 resource
 
 plone.app.cachepurging
 ----------------------

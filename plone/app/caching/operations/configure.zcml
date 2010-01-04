@@ -1,0 +1,10 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    i18n_domain="plone.app.caching">
+    
+    <include package="plone.caching" />
+    <include package="plone.app.registry" />
+    
+    
+    
+</configure>

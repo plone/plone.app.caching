@@ -7,10 +7,7 @@
     <include package="plone.app.registry" />
     
     <include package=".browser" />
-    
-    <adapter factory=".lookup.PageTemplateLookup" />
-    
-    <adapter factory=".lastmodified.pageTemplateDelegateLastModified" />
+    <include package=".operations" />
     
     <genericsetup:registerProfile
         name="default"
@@ -22,5 +19,16 @@
     
     <!-- Default caching configuration -->
     <include file="caching.zcml" />
+    
+    <!-- Lookup for page template resources -->
+    <adapter factory=".lookup.PageTemplateLookup" />
+    
+    <!-- ILastModified adapters -->
+    <adapter factory=".lastmodified.pageTemplateDelegateLastModified" />
+    <adapter factory=".lastmodified.OFSFileLastModified" />
+    <adapter factory=".lastmodified.FSObjectLastModified" />
+    <adapter factory=".lastmodified.CatalogableDublinCoreLastModified" />
+    <adapter factory=".lastmodified.DCTimesLastModified" />
+    <adapter factory=".lastmodified.ResourceLastModified" />
     
 </configure>
