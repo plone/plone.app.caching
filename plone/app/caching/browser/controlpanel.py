@@ -193,7 +193,7 @@ class ControlPanel(object):
             portal_setup.createSnapshot(snapshotId)
         
         # Import the new profile
-        portal_setup.runAllImportStepsFromProfile(profile)
+        portal_setup.runAllImportStepsFromProfile("profile-%s" % profile)
         
         IStatusMessage(self.request).addStatusMessage(_(u"Import complete"), "info")
         
