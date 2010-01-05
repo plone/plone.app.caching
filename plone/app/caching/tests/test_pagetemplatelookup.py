@@ -111,11 +111,12 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {'someView': 'notfound'}
+        ploneSettings.templateRulesetMapping = {'someView': 'rule1'}
+        settings.mutatorMapping = {'rule1': 'notfound'}
 
         published = ZopePageTemplate('someView')
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(('someView', 'notfound', None,),
+        self.assertEquals(('rule1', 'notfound', None,),
                 PageTemplateLookup(published, request).getResponseMutator())
     
     def test_getResponseMutator_contenttype_operation_not_found(self):
@@ -128,12 +129,13 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {}
-        ploneSettings.contentTypeMutatorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.mutatorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('defaultView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(('testtype', 'notfound', None,),
+        self.assertEquals(('rule1', 'notfound', None,),
                 PageTemplateLookup(published, request).getResponseMutator())
     
     def test_getResponseMutator_contenttype_not_default_view(self):
@@ -146,8 +148,9 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {}
-        ploneSettings.contentTypeMutatorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.mutatorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('someView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
@@ -164,8 +167,9 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {}
-        ploneSettings.contentTypeMutatorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.mutatorMapping = {'rule1': 'mutator'}
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotContent())
         request = DummyRequest(published, DummyResponse())
@@ -182,12 +186,13 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {}
-        ploneSettings.contentTypeMutatorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.mutatorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/view'))
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(('testtype', 'notfound', None,),
+        self.assertEquals(('rule1', 'notfound', None,),
                 PageTemplateLookup(published, request).getResponseMutator())
     
     def test_getResponseMutator_parent_not_IBrowserDefault_default_method(self):
@@ -200,12 +205,13 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {}
-        ploneSettings.contentTypeMutatorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.mutatorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/'))
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(('testtype', 'notfound', None,),
+        self.assertEquals(('rule1', 'notfound', None,),
                 PageTemplateLookup(published, request).getResponseMutator())
     
     def test_getResponseMutator_parent_not_IBrowserDefault_actiononly(self):
@@ -218,13 +224,14 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {}
-        ploneSettings.contentTypeMutatorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.mutatorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView'))
         request = DummyRequest(published, DummyResponse())
         
-        self.assertEquals(('testtype', 'notfound', None,),
+        self.assertEquals(('rule1', 'notfound', None,),
                 PageTemplateLookup(published, request).getResponseMutator())
     
     def test_getResponseMutator_match_template_only(self):
@@ -237,7 +244,8 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {'someView': 'mutator'}
+        ploneSettings.templateRulesetMapping = {'someView': 'rule1'}
+        settings.mutatorMapping = {'rule1': 'mutator'}
         
         class DummyMutator(object):
             implements(IResponseMutator)
@@ -256,7 +264,7 @@ class TestLookupResponseMutator(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         
         (rule, operation, mutator,) = PageTemplateLookup(published, request).getResponseMutator()
-        self.assertEquals('someView', rule)
+        self.assertEquals('rule1', rule)
         self.assertEquals('mutator', operation)
         self.failUnless(isinstance(mutator, DummyMutator))
     
@@ -270,8 +278,9 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {}
-        ploneSettings.contentTypeMutatorMapping = {'testtype': 'mutator'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.mutatorMapping = {'rule1': 'mutator'}
         
         class DummyMutator(object):
             implements(IResponseMutator)
@@ -290,7 +299,7 @@ class TestLookupResponseMutator(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         
         (rule, operation, mutator,) = PageTemplateLookup(published, request).getResponseMutator()
-        self.assertEquals('testtype', rule)
+        self.assertEquals('rule1', rule)
         self.assertEquals('mutator', operation)
         self.failUnless(isinstance(mutator, DummyMutator))
     
@@ -304,8 +313,9 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {'defaultView': 'mutator1'}
-        ploneSettings.contentTypeMutatorMapping = {'testtype': 'mutator2'}
+        ploneSettings.templateRulesetMapping = {'defaultView': 'rule1'}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule2'}
+        settings.mutatorMapping = {'rule1': 'mutator1', 'rule2': 'mutator2'}
         
         class DummyMutator1(object):
             implements(IResponseMutator)
@@ -337,7 +347,7 @@ class TestLookupResponseMutator(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         
         (rule, operation, mutator,) = PageTemplateLookup(published, request).getResponseMutator()
-        self.assertEquals('defaultView', rule)
+        self.assertEquals('rule1', rule)
         self.assertEquals('mutator1', operation)
         self.failUnless(isinstance(mutator, DummyMutator1))
 
@@ -351,8 +361,9 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {'defaultView': 'mutator1'}
-        ploneSettings.contentTypeMutatorMapping = {'testtype': 'mutator2'}
+        ploneSettings.templateRulesetMapping = {'defaultView': 'rule1'}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule2'}
+        settings.mutatorMapping = {'rule1': 'mutator1', 'rule2': 'mutator2'}
         
         class DummyMutator2(object):
             implements(IResponseMutator)
@@ -376,7 +387,7 @@ class TestLookupResponseMutator(unittest.TestCase):
         # mapped, but the mutator not found. This allows conditionally
         # disabling mutation for individual templates even if the content item
         # is mapped generally.
-        self.assertEquals('defaultView', rule)
+        self.assertEquals('rule1', rule)
         self.assertEquals('mutator1', operation)
         self.failUnless(mutator is None)
 
@@ -390,8 +401,9 @@ class TestLookupResponseMutator(unittest.TestCase):
         settings.enabled = False
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateMutatorMapping = {}
-        ploneSettings.contentTypeMutatorMapping = {'testtype': 'mutator'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.mutatorMapping = {'rule1': 'mutator'}
         
         class DummyMutator(object):
             implements(IResponseMutator)
@@ -451,11 +463,12 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {'someView': 'notfound'}
-
+        ploneSettings.templateRulesetMapping = {'someView': 'rule1'}
+        settings.interceptorMapping = {'rule1': 'notfound'}
+        
         published = ZopePageTemplate('someView')
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(('someView', 'notfound', None,),
+        self.assertEquals(('rule1', 'notfound', None,),
                 PageTemplateLookup(published, request).getCacheInterceptor())
     
     def test_getCacheInterceptor_contenttype_operation_not_found(self):
@@ -468,12 +481,13 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {}
-        ploneSettings.contentTypeInterceptorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.interceptorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('defaultView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(('testtype', 'notfound', None,),
+        self.assertEquals(('rule1', 'notfound', None,),
                 PageTemplateLookup(published, request).getCacheInterceptor())
     
     def test_getCacheInterceptor_contenttype_not_default_view(self):
@@ -486,8 +500,9 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {}
-        ploneSettings.contentTypeInterceptorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.interceptorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('someView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
@@ -504,8 +519,9 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {}
-        ploneSettings.contentTypeInterceptorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.interceptorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotContent())
         request = DummyRequest(published, DummyResponse())
@@ -522,12 +538,13 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {}
-        ploneSettings.contentTypeInterceptorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.interceptorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/view'))
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(('testtype', 'notfound', None,),
+        self.assertEquals(('rule1', 'notfound', None,),
                 PageTemplateLookup(published, request).getCacheInterceptor())
     
     def test_getCacheInterceptor_parent_not_IBrowserDefault_default_method(self):
@@ -540,12 +557,13 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {}
-        ploneSettings.contentTypeInterceptorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.interceptorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/'))
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(('testtype', 'notfound', None,),
+        self.assertEquals(('rule1', 'notfound', None,),
                 PageTemplateLookup(published, request).getCacheInterceptor())
     
     def test_getCacheInterceptor_parent_not_IBrowserDefault_actiononly(self):
@@ -558,13 +576,14 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {}
-        ploneSettings.contentTypeInterceptorMapping = {'testtype': 'notfound'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.interceptorMapping = {'rule1': 'notfound'}
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView'))
         request = DummyRequest(published, DummyResponse())
         
-        self.assertEquals(('testtype', 'notfound', None,),
+        self.assertEquals(('rule1', 'notfound', None,),
                 PageTemplateLookup(published, request).getCacheInterceptor())
     
     def test_getCacheInterceptor_match_template_only(self):
@@ -577,7 +596,8 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {'someView': 'interceptor'}
+        ploneSettings.templateRulesetMapping = {'someView': 'rule1'}
+        settings.interceptorMapping = {'rule1': 'interceptor'}
         
         class DummyInterceptor(object):
             implements(ICacheInterceptor)
@@ -596,7 +616,7 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         
         (rule, operation, interceptor,) = PageTemplateLookup(published, request).getCacheInterceptor()
-        self.assertEquals('someView', rule)
+        self.assertEquals('rule1', rule)
         self.assertEquals('interceptor', operation)
         self.failUnless(isinstance(interceptor, DummyInterceptor))
     
@@ -610,8 +630,9 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {}
-        ploneSettings.contentTypeInterceptorMapping = {'testtype': 'interceptor'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.interceptorMapping = {'rule1': 'interceptor'}
         
         class DummyInterceptor(object):
             implements(ICacheInterceptor)
@@ -630,7 +651,7 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         
         (rule, operation, interceptor,) = PageTemplateLookup(published, request).getCacheInterceptor()
-        self.assertEquals('testtype', rule)
+        self.assertEquals('rule1', rule)
         self.assertEquals('interceptor', operation)
         self.failUnless(isinstance(interceptor, DummyInterceptor))
     
@@ -644,8 +665,10 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {'defaultView': 'interceptor1'}
-        ploneSettings.contentTypeInterceptorMapping = {'testtype': 'interceptor2'}
+        ploneSettings.templateRulesetMapping = {'defaultView': 'rule1'}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule2'}
+        settings.interceptorMapping = {'rule1': 'interceptor1',
+                                       'rule2': 'interceptor2'}
         
         class DummyInterceptor1(object):
             implements(ICacheInterceptor)
@@ -677,7 +700,7 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         
         (rule, operation, interceptor,) = PageTemplateLookup(published, request).getCacheInterceptor()
-        self.assertEquals('defaultView', rule)
+        self.assertEquals('rule1', rule)
         self.assertEquals('interceptor1', operation)
         self.failUnless(isinstance(interceptor, DummyInterceptor1))
 
@@ -691,8 +714,10 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = True
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {'defaultView': 'interceptor1'}
-        ploneSettings.contentTypeInterceptorMapping = {'testtype': 'interceptor2'}
+        ploneSettings.templateRulesetMapping = {'defaultView': 'rule1'}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule2'}
+        settings.interceptorMapping = {'rule1': 'interceptor1',
+                                       'rule2': 'interceptor2'}
         
         class DummyInterceptor2(object):
             implements(ICacheInterceptor)
@@ -716,7 +741,7 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         # mapped, but the interceptor not found. This allows conditionally
         # disabling mutation for individual templates even if the content item
         # is mapped generally.
-        self.assertEquals('defaultView', rule)
+        self.assertEquals('rule1', rule)
         self.assertEquals('interceptor1', operation)
         self.failUnless(interceptor is None)
 
@@ -730,8 +755,9 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         settings.enabled = False
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.templateInterceptorMapping = {}
-        ploneSettings.contentTypeInterceptorMapping = {'testtype': 'interceptor'}
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
+        settings.interceptorMapping = {'rule1': 'interceptor'}
         
         class DummyInterceptor(object):
             implements(ICacheInterceptor)

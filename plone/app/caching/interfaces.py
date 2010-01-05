@@ -33,30 +33,16 @@ class IPloneCacheSettings(Interface):
     Plone-specific settings.
     """
     
-    templateMutatorMapping = schema.Dict(
-            title=_(u"Page template/response mutator mapping"),
-            description=_(u"Maps skin layer page template names to response mutator operation names"),
+    templateRulesetMapping = schema.Dict(
+            title=_(u"Page template/ruleset mapping"),
+            description=_(u"Maps skin layer page template names to ruleset names"),
             key_type=schema.DottedName(title=_(u"Page template name")),
-            value_type=schema.DottedName(title=_(u"Response mutator name")),
+            value_type=schema.DottedName(title=_(u"Ruleset name")),
         )
     
-    templateInterceptorMapping = schema.Dict(
-            title=_(u"Page template/interceptor mapping"),
-            description=_(u"Maps skin layer page template names to cache interceptor operation names"),
-            key_type=schema.DottedName(title=_(u"Page template name")),
-            value_type=schema.DottedName(title=_(u"Interceptor name")),
-        )
-
-    contentTypeMutatorMapping = schema.Dict(
-            title=_(u"Content type/response mutator mapping"),
-            description=_(u"Maps content type names to response mutator operation names"),
+    contentTypeRulesetMapping = schema.Dict(
+            title=_(u"Content type/ruleset mapping"),
+            description=_(u"Maps content type names to ruleset names"),
             key_type=schema.DottedName(title=_(u"Content type name")),
-            value_type=schema.DottedName(title=_(u"Response mutator name")),
-        )
-    
-    contentTypeInterceptorMapping = schema.Dict(
-            title=_(u"Content type/interceptor mapping"),
-            description=_(u"Maps contnet type names to cache interceptor operation names"),
-            key_type=schema.DottedName(title=_(u"Content type name")),
-            value_type=schema.DottedName(title=_(u"Interceptor name")),
+            value_type=schema.DottedName(title=_(u"Ruleset name")),
         )

@@ -25,6 +25,247 @@
         cached.
     </p>
     
+    <form name="settings" tal:attributes="action request/URL" method="post" class="enableFormTabbing">
+        
+        <fieldset id="fieldset-global-settings">
+            <legend
+                id="fieldsetlegend-global-settings" 
+                i18n:translate="legend_globalsettings">Global settings</legend>
+            
+            <div class="field">
+                <input type="hidden" value="" name="enabled:boolean:default" />
+                <input type="checkbox" value="1" name="enabled:boolean" id="enabled"
+                    tal:attributes="checked python:'checked' if view.settings.enabled else None"
+                    />
+                <label for="enabled" i18n:translate="label_enable">Enable caching</label>
+                <div class="formHelp">
+                    If this option is disabled, no caching will take place.
+                </div>
+            </div>
+            
+        </fieldset>
+        
+        <fieldset id="fieldset-mappings">
+            <legend
+                id="fieldsetlegend-mappings"
+                i18n:translate="legend_mappings">Mappings</legend>
+            
+            <div class="discreet" i18n:translate="description_mappings">
+                <p>
+                Caching can be controlled by mapping <em>rulesets</em> to
+                <em>cache interceptors</em> and <em>response mutators</em>.
+                </p>
+                <p>
+                A <strong>ruleset</strong> is a name given to a resource
+                published by Plone, such as a view. Rulesets are declared by
+                the developers who write those views. You can think of them as
+                a way to give hints about how something should be cached,
+                without actually implementing the caching operations. The
+                exact caching operations that will take place are mapped to
+                rules in two different ways:
+                </p>
+                <p>
+                A <strong>cache interceptor</strong> is a caching operation
+                which can intercept the response <em>before</em>
+                Plone renders a particular view. One example may be to return
+                a <code>304 NOT MODIFIED</code> response. Another may be to
+                return a full page that has been cached in memory, rather than
+                ask Plone to render the view. Most cache interceptors will be
+                conditional, i.e. they will only intercept the response in
+                some cases.
+                </p>
+                <p>
+                A <strong>response mutator</strong> is a caching operation
+                that changes the response <em>after</em> Plone is finished
+                with it. The most common type of response mutator is one
+                which conditionally sets cache headers, instructing a
+                user's web browser or a reverse caching proxy such as
+                Squid or Varnish how to cache the page.
+                </p>
+                <p>
+                    
+                </p>
+            </div>
+            
+            <label i18n:translate="label_mappings">Ruleset mappings</label>
+            <div class="formHelp" i18:translate="help_main_mappings">
+                Use the table below to map caching rules to interceptors
+                and mutators.
+            </div>
+            
+            <table class="listing nosort" id="rulesetMappingsTable">
+                <thead>
+                    <tr>
+                        <th i18n:translate="heading_ruleset">Ruleset</th>
+                        <th i18n:translate="heading_interceptor">Interceptor</th>
+                        <th i18n:translate="heading_mutator">Mutator</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:repeat="ruleType view/ruleTypes">
+                        <td>
+                            <div tal:content="ruleType/title" />
+                            <p class="discreet" tal:content="ruleType/description" />
+                        </td>
+                        <td>
+                            <select
+                                size="1"
+                                tal:attributes="id   string:interceptor-${ruleType/name};
+                                                name string:interceptor.${ruleType/name}:records;">
+                                <option
+                                    value=""
+                                    tal:attributes="selected python:'selected' if not view.interceptorMapping.get(ruleType.name) else None"
+                                    i18n:translate="value_not_used"
+                                    >(Not used)</option>
+                                <option
+                                    tal:repeat="interceptorType view/interceptorTypes"
+                                    tal:attributes="value    interceptorType/name;
+                                                    title    interceptorType/description;
+                                                    selected python:'selected' if view.interceptorMapping.get(ruleType.name) == interceptorType['name'] else None;"
+                                    tal:content="interceptorType/title"
+                                    />
+                            </select>
+                        </td>
+                        <td>
+                            <select
+                                size="1"
+                                tal:attributes="id   string:mutator-${ruleType/name};
+                                                name string:mutator.${ruleType/name}:records;">
+                                <option
+                                    value=""
+                                    tal:attributes="selected python:'selected' if not view.mutatorMapping.get(ruleType.name) else None"
+                                    i18n:translate="value_not_used"
+                                    >(Not used)</option>
+                                <option
+                                    tal:repeat="mutatorType view/mutatorTypes"
+                                    tal:attributes="value    mutatorType/name;
+                                                    title    mutatorType/description;
+                                                    selected python:'selected' if view.mutatorMapping.get(ruleType.name) == mutatorType['name'] else None;"
+                                    tal:content="mutatorType/title"
+                                    />
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <label i18n:translate="label_template_mappings">Legacy template mappings</label>
+            <div class="formHelp" i18:translate="help_template_mappings">
+                Legacy page templates defined in the <em>portal_skins</em>
+                tool or created or customised through the web cannot be
+                associated with rulesets in the usual way. Instead, the
+                association is maintained here. Enter template names (one per
+                line) and/or choose content types below. If you choose a
+                content type name, the corresponding caching rule will be
+                associated with the default view of that content type.
+                <strong>Note:</strong> You can only use each template name or
+                content type once!
+            </div>
+            
+            <table class="listing nosort" id="templateMappingsTable">
+                <thead>
+                    <tr>
+                        <th i18n:translate="heading_ruleset">Ruleset</th>
+                        <th i18n:translate="heading_templates">Templates</th>
+                        <th i18n:translate="heading_content_types">Content types</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:repeat="ruleType view/ruleTypes">
+                        <td>
+                            <div tal:content="ruleType/title" />
+                            <p class="discreet" tal:content="ruleType/description" />
+                        </td>
+                        <td>
+                            <textarea
+                                cols="40"
+                                tal:attributes="id   string:template-${ruleType/name};
+                                                name string:template.${ruleType/name}:records"
+                                tal:content="python:'\n'.join(view.templatesFor(ruleType.name))"
+                                ></textarea>
+                        </td>
+                        <td>
+                            <select
+                                size="5"
+                                multiple="multiple"
+                                tal:attributes="id   string:contenttype-${ruleType/name};
+                                                name string:contenttype.${ruleType/name}:records;"
+                                tal:define="selected python:view.contentTypesFor(ruleType.name)">
+                                <option
+                                    tal:repeat="contentType view/contentTypes"
+                                    tal:attributes="value    contentType/name;
+                                                    title    contentType/description;
+                                                    selected python:'selected' if contentType['name'] in selected else None;"
+                                    tal:content="contentType/title"
+                                    />
+                            </select>
+                        </td>
+                        
+                    </tr>
+                </tbody>
+            </table>
+            
+        </fieldset>
+        
+        <div class="formControls">
+            <input
+                type="submit"
+                name="form.button.Save"
+                class="context"
+                value="Save"
+                i18n:attributes="value">
+
+            <input
+                type="submit"
+                name="form.button.Cancel"
+                class="context"
+                value="Cancel"
+                i18n:attributes="value">
+        </div>
+        
+    </form>
+    
+    <h2 i18n:translate="heading_profile_management">Import settings</h2>
+    
+    <p class="discreet" i18n:translate="help_profiles">
+        Choose a profile below to import cache settings.
+        <strong>Warning:</strong> This may overwrite existing
+        settings.
+    </p>
+    
+    <form name="profiles" tal:attributes="action request/URL" method="post">
+
+        <div class="field">
+            <div tal:repeat="profile view/profiles">
+                
+                <input
+                    type="radio"
+                    name="profile"
+                    tal:attributes="id string:profile-${repeat/profile/index};
+                                    value profile/id"
+                    />
+                
+                <label
+                    tal:attributes="for string:profile-${repeat/profile/index}"
+                    tal:content="profile/title"
+                    />
+                
+                <p class="discreet" tal:content="profile/description" />
+                
+            </div>
+        </div>
+        
+        <div class="formControls">
+            <input
+                type="submit"
+                name="form.button.ApplyProfile"
+                class="destructive"
+                value="Import"
+                i18n:attributes="value">
+        </div>
+        
+    </form>
+    
 </div>
 
 </body>

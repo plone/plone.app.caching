@@ -31,16 +31,15 @@ class PageTemplateLookup(object):
     meaningful per-resource interface or class. Therefore, we implement
     different lookup semantics for these objects when published:
     
-    * First, look up the page template name in the registry, under the keys
-      ``templateMutatorMapping`` or ``templateInterceptorMapping`` as
-      appropriate, under the prefix
-      ``plone.app.caching.interfaces.IPloneCacheSettings``. If found, return
-      the corresponding operation.
+    * First, look up the page template name in the registry under the key
+      ``plone.app.caching.interfaces.IPloneCacheSettings.templateRulesetMapping``.
+      If this is found, look up the corresponding interceptor or mutator as
+      normal.
     * If no template-specific mapping is found, find the ``__parent__`` of the
       template. If this is a content type, check whether the template is one
-      of its default views. If so, look up a cache rule under the keys
-      ``contentTypeMutatorMapping`` or ``contentTypeInterceptorMapping`` as
-      appropriate. If found, return the corresponding operation.
+      of its default views. If so, look up a cache ruleset under the key
+      ``plone.app.caching.interfaces.IPloneCacheSettings.contentTypeRulesetMapping``. 
+      If found, look up the corresponding interceptor or mutator as normal.
     * Otherwise, abort.
     
     Note that this lookup is *not* invoked for a view which happens to use a
@@ -67,38 +66,19 @@ class PageTemplateLookup(object):
         
         ploneCacheSettings = registry.forInterface(IPloneCacheSettings, check=False)
         
-        # First, try to look up the template name in the appropriate mapping
-        templateName = getattr(self.published, '__name__', None)
-        if templateName is None:
+        rule = self._getRuleset(cacheSettings, ploneCacheSettings)
+        if rule is None:
             return nyet
         
-        if ploneCacheSettings.templateMutatorMapping is not None:
-            name = ploneCacheSettings.templateMutatorMapping.get(templateName, None)
-            if name is not None:
-                mutator = queryMultiAdapter((self.published, self.request), IResponseMutator, name=name)
-                return templateName, name, mutator
-        
-        # Next, check if this is the default view of the context, and if so
-        # try to look up the name of the context in the appropriate mapping
-        if ploneCacheSettings.contentTypeMutatorMapping is None:
+        if cacheSettings.mutatorMapping is None:
             return nyet
-        
-        parent = getattr(self.published, '__parent__', None)
-        if parent is None:
+    
+        name = cacheSettings.mutatorMapping.get(rule, None)
+        if name is None:
             return nyet
-        
-        parentPortalType = getattr(aq_base(parent), 'portal_type', None)
-        if parentPortalType is None:
-            return nyet
-        
-        defaultView = self._getObjectDefaultView(parent)
-        if defaultView == templateName:
-            name = ploneCacheSettings.contentTypeMutatorMapping.get(parentPortalType, None)
-            if name is not None:
-                mutator = queryMultiAdapter((self.published, self.request), IResponseMutator, name=name)
-                return parentPortalType, name, mutator
-        
-        return nyet
+    
+        mutator = queryMultiAdapter((self.published, self.request), IResponseMutator, name=name)
+        return rule, name, mutator
     
     def getCacheInterceptor(self):
         nyet = (None, None, None,)
@@ -113,38 +93,54 @@ class PageTemplateLookup(object):
         
         ploneCacheSettings = registry.forInterface(IPloneCacheSettings, check=False)
         
+        rule = self._getRuleset(cacheSettings, ploneCacheSettings)
+        if rule is None:
+            return nyet
+        
+        if cacheSettings.interceptorMapping is None:
+            return nyet
+    
+        name = cacheSettings.interceptorMapping.get(rule, None)
+        if name is None:
+            return nyet
+    
+        interceptor = queryMultiAdapter((self.published, self.request), ICacheInterceptor, name=name)
+        return rule, name, interceptor
+    
+    def _getRuleset(self, cacheSettings, ploneCacheSettings):
+        """Helper method to look up a ruleset for the published template.
+        """
+        
         # First, try to look up the template name in the appropriate mapping
         templateName = getattr(self.published, '__name__', None)
         if templateName is None:
-            return nyet
+            return None
         
-        if ploneCacheSettings.templateInterceptorMapping is not None:
-            name = ploneCacheSettings.templateInterceptorMapping.get(templateName, None)
+        if ploneCacheSettings.templateRulesetMapping is not None:
+            name = ploneCacheSettings.templateRulesetMapping.get(templateName, None)
             if name is not None:
-                interceptor = queryMultiAdapter((self.published, self.request), ICacheInterceptor, name=name)
-                return templateName, name, interceptor
+                return name
         
         # Next, check if this is the default view of the context, and if so
         # try to look up the name of the context in the appropriate mapping
-        if ploneCacheSettings.contentTypeInterceptorMapping is None:
-            return nyet
+        if ploneCacheSettings.contentTypeRulesetMapping is None:
+            return None
         
         parent = getattr(self.published, '__parent__', None)
         if parent is None:
-            return nyet
+            return None
         
         parentPortalType = getattr(aq_base(parent), 'portal_type', None)
         if parentPortalType is None:
-            return nyet
+            return None
         
         defaultView = self._getObjectDefaultView(parent)
         if defaultView == templateName:
-            name = ploneCacheSettings.contentTypeInterceptorMapping.get(parentPortalType, None)
+            name = ploneCacheSettings.contentTypeRulesetMapping.get(parentPortalType, None)
             if name is not None:
-                interceptor = queryMultiAdapter((self.published, self.request), ICacheInterceptor, name=name)
-                return parentPortalType, name, interceptor
+                return name
         
-        return nyet
+        return None
     
     def _getObjectDefaultView(self, context):
         """Get the id of an object's default view
