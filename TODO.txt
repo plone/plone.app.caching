@@ -20,11 +20,11 @@ plone.caching
 plone.app.caching
 -----------------
  
- [ ] Build control panel
-        - enable/disable caching
-        - apply profile (select from profiles registered for ICacheProfiles)
-        - modify mappings
-        - modify operation settings (global and per-ruleset)
+ [ ] Build UI for cache operation settings
+        - view operations
+        - view/edit default settings
+        - view/edit per-ruleset settings
+        - use z3c.form
  
  [ ] Build default response mutators
         - CacheFu has the following:
@@ -74,7 +74,9 @@ plone.app.caching
         - content-feed
             - e.g. an RSS feed
         - ...
-1
+
+ [ ] Functional tests
+
 plone.app.cachepurging
 ----------------------
 

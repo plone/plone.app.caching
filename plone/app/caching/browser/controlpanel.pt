@@ -32,15 +32,19 @@
                 id="fieldsetlegend-global-settings" 
                 i18n:translate="legend_globalsettings">Global settings</legend>
             
-            <div class="field">
+            <div
+                class="field"
+                tal:define="selected python:request.get('enabled', view.settings.enabled)">
+                
                 <input type="hidden" value="" name="enabled:boolean:default" />
                 <input type="checkbox" value="1" name="enabled:boolean" id="enabled"
-                    tal:attributes="checked python:'checked' if view.settings.enabled else None"
+                    tal:attributes="checked python:'checked' if selected else None"
                     />
                 <label for="enabled" i18n:translate="label_enable">Enable caching</label>
                 <div class="formHelp">
                     If this option is disabled, no caching will take place.
                 </div>
+                
             </div>
             
         </fieldset>
@@ -107,40 +111,40 @@
                             <div tal:content="ruleType/title" />
                             <p class="discreet" tal:content="ruleType/description" />
                         </td>
-                        <td>
+                        <td tal:define="selected python:request.get('interceptors', view.interceptorMapping).get(ruleType.name, None)">
                             <select
                                 size="1"
                                 tal:attributes="id   string:interceptor-${ruleType/name};
-                                                name string:interceptor.${ruleType/name}:records;">
+                                                name string:interceptors.${ruleType/name}:record;">
                                 <option
                                     value=""
-                                    tal:attributes="selected python:'selected' if not view.interceptorMapping.get(ruleType.name) else None"
+                                    tal:attributes="selected python:'selected' if selected is None else None"
                                     i18n:translate="value_not_used"
                                     >(Not used)</option>
                                 <option
                                     tal:repeat="interceptorType view/interceptorTypes"
                                     tal:attributes="value    interceptorType/name;
                                                     title    interceptorType/description;
-                                                    selected python:'selected' if view.interceptorMapping.get(ruleType.name) == interceptorType['name'] else None;"
+                                                    selected python:'selected' if interceptorType['name'] == selected else None;"
                                     tal:content="interceptorType/title"
                                     />
                             </select>
                         </td>
-                        <td>
+                        <td tal:define="selected python:request.get('mutators', view.mutatorMapping).get(ruleType.name, None)">
                             <select
                                 size="1"
                                 tal:attributes="id   string:mutator-${ruleType/name};
-                                                name string:mutator.${ruleType/name}:records;">
+                                                name string:mutators.${ruleType/name}:record;">
                                 <option
                                     value=""
-                                    tal:attributes="selected python:'selected' if not view.mutatorMapping.get(ruleType.name) else None"
+                                    tal:attributes="selected python:'selected' if selected is None else None"
                                     i18n:translate="value_not_used"
                                     >(Not used)</option>
                                 <option
                                     tal:repeat="mutatorType view/mutatorTypes"
                                     tal:attributes="value    mutatorType/name;
                                                     title    mutatorType/description;
-                                                    selected python:'selected' if view.mutatorMapping.get(ruleType.name) == mutatorType['name'] else None;"
+                                                    selected python:'selected' if mutatorType['name'] == selected else None;"
                                     tal:content="mutatorType/title"
                                     />
                             </select>
@@ -166,42 +170,52 @@
                 <thead>
                     <tr>
                         <th i18n:translate="heading_ruleset">Ruleset</th>
-                        <th i18n:translate="heading_templates">Templates</th>
                         <th i18n:translate="heading_content_types">Content types</th>
+                        <th i18n:translate="heading_templates">Templates</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr tal:repeat="ruleType view/ruleTypes">
-                        <td>
-                            <div tal:content="ruleType/title" />
-                            <p class="discreet" tal:content="ruleType/description" />
-                        </td>
-                        <td>
-                            <textarea
-                                cols="40"
-                                tal:attributes="id   string:template-${ruleType/name};
-                                                name string:template.${ruleType/name}:records"
-                                tal:content="python:'\n'.join(view.templatesFor(ruleType.name))"
-                                ></textarea>
-                        </td>
-                        <td>
-                            <select
-                                size="5"
-                                multiple="multiple"
-                                tal:attributes="id   string:contenttype-${ruleType/name};
-                                                name string:contenttype.${ruleType/name}:records;"
-                                tal:define="selected python:view.contentTypesFor(ruleType.name)">
-                                <option
-                                    tal:repeat="contentType view/contentTypes"
-                                    tal:attributes="value    contentType/name;
-                                                    title    contentType/description;
-                                                    selected python:'selected' if contentType['name'] in selected else None;"
-                                    tal:content="contentType/title"
-                                    />
-                            </select>
-                        </td>
+                    <tal:block repeat="ruleType view/ruleTypes">
+                        <tr tal:define="contentTypeError python:request.get('errors', {}).get('contenttypes', {}).get(ruleType.name, None);
+                                        templateError    python:request.get('errors', {}).get('templates', {}).get(ruleType.name, None);">
+                            <td>
+                                <div tal:content="ruleType/title" />
+                                <p class="discreet" tal:content="ruleType/description" />
+                                <div class="error" tal:condition="python:contentTypeError or templateError">
+                                    <div tal:content="contentTypeError" tal:condition="contentTypeError" />
+                                    <div tal:content="templateError" tal:condition="templateError" />
+                                </div>
+                            </td>
+                            <td tal:define="selected python:request.get('contenttypes', view.reverseContentTypeMapping).get(ruleType.name, [])">
+                                <div class="error" tal:omit-tag="not:contentTypeError">
+                                    <select
+                                        size="6"
+                                        multiple="multiple"
+                                        tal:attributes="id   string:contenttypes-${ruleType/name};
+                                                        name string:contenttypes.${ruleType/name}:record:list;">
+                                        <option
+                                            tal:repeat="contentType view/contentTypes"
+                                            tal:attributes="value    contentType/name;
+                                                            title    contentType/description;
+                                                            selected python:'selected' if contentType['name'] in selected else None;"
+                                            tal:content="contentType/title"
+                                            />
+                                    </select>
+                                </div>
+                            </td>
+                            <td tal:define="selected python:request.get('templates', view.reverseTemplateMappingAsStrings).get(ruleType.name, '')">
+                                <div class="error" tal:omit-tag="not:templateError">
+                                    <textarea
+                                        cols="40" rows="4"
+                                        tal:attributes="id   string:templates-${ruleType/name};
+                                                        name string:templates.${ruleType/name}:record"
+                                        tal:content="selected"
+                                        ></textarea>
+                                </div>
+                            </td>
                         
-                    </tr>
+                        </tr>
+                    </tal:block>
                 </tbody>
             </table>
             
@@ -225,46 +239,82 @@
         
     </form>
     
-    <h2 i18n:translate="heading_profile_management">Import settings</h2>
     
-    <p class="discreet" i18n:translate="help_profiles">
-        Choose a profile below to import cache settings.
-        <strong>Warning:</strong> This may overwrite existing
-        settings.
-    </p>
+    <form name="profiles" tal:attributes="action request/URL" method="post"
+        tal:define="errors request/errors | python:{}">
     
-    <form name="profiles" tal:attributes="action request/URL" method="post">
-
-        <div class="field">
-            <div tal:repeat="profile view/profiles">
+        <fieldset id="fieldset-import">
+            <legend i18n:translate="legend_import">Import</legend>
+    
+            <label i18n:translate="label_management">Import settings</label>
+    
+            <p class="discreet" i18n:translate="help_profiles">
+                Choose a profile below to import cache settings. Additional
+                profiles may be installed by third party products.
+                <strong>Warning:</strong> This may overwrite existing
+                settings.
+            </p>
+            
+            <div class="field">
                 
-                <input
-                    type="radio"
-                    name="profile"
-                    tal:attributes="id string:profile-${repeat/profile/index};
-                                    value profile/id"
+                <div
+                    class="error"
+                    tal:condition="errors/profile | nothing"
+                    tal:content="errors/profile"
                     />
                 
-                <label
-                    tal:attributes="for string:profile-${repeat/profile/index}"
-                    tal:content="profile/title"
-                    />
+                <div tal:repeat="profile view/profiles">
                 
-                <p class="discreet" tal:content="profile/description" />
+                    <input
+                        type="radio"
+                        name="profile"
+                        tal:attributes="id string:profile-${repeat/profile/index};
+                                        value profile/id"
+                        />
                 
+                    <label
+                        tal:attributes="for string:profile-${repeat/profile/index}"
+                        tal:content="profile/title"
+                        />
+                
+                    <p class="discreet" tal:content="profile/description" />
+                
+                </div>
             </div>
-        </div>
+            
+            <div class="field">
+                <input type="hidden" name="snapshot:boolean:default" value="" />
+                <input
+                    type="checkbox"
+                    name="snapshot:boolean"
+                    id="snapshot"
+                    value="1"
+                    tal:attributes="checked python:'checked' if request.get('snapshot', True) else None"
+                    />
+                
+                <label for="snapshot" i18n:translate="label_snapshot">
+                    Take a snapshot of the site prior to importing new
+                    setting.
+                </label>
+                <div class="formHelp" i18n:translate="help_snapshot">
+                    This allows rollback to a previous state via the
+                    <em>portal_setup</em> tool.
+                </div>
+            </div>
         
-        <div class="formControls">
-            <input
-                type="submit"
-                name="form.button.ApplyProfile"
-                class="destructive"
-                value="Import"
-                i18n:attributes="value">
-        </div>
-        
+            <div class="formControls">
+                <input
+                    type="submit"
+                    name="form.button.Import"
+                    class="destructive"
+                    value="Import"
+                    i18n:attributes="value">
+            </div>
+            
+        </fieldset>
     </form>
+    
+    
     
 </div>
 
