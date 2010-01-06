@@ -37,10 +37,10 @@ class ControlPanel(object):
     
     def update(self):
         
-        registry = getUtility(IRegistry)
+        self.registry = getUtility(IRegistry)
         
-        self.settings = registry.forInterface(ICacheSettings)
-        self.ploneSettings = registry.forInterface(IPloneCacheSettings)
+        self.settings = self.registry.forInterface(ICacheSettings)
+        self.ploneSettings = self.registry.forInterface(IPloneCacheSettings)
         
         if self.request.method != 'POST':
             return
@@ -206,6 +206,16 @@ class ControlPanel(object):
         return [profile for profile in portal_setup.listProfileInfo(ICacheProfiles) 
                   if profile.get('type', BASE) == EXTENSION and profile.get('for') is not None]
     
+    # Rule types - used as the index column
+    
+    @property
+    @memoize
+    def ruleTypes(self):
+        return list(enumerateTypes())
+    
+    # Safe access to the main mappings, which may be None - we want to treat
+    # that as {} to make TAL expressions simpler
+    
     @property
     def interceptorMapping(self):
         return self.settings.interceptorMapping or {}
@@ -221,6 +231,84 @@ class ControlPanel(object):
     @property
     def contentTypeMapping(self):
         return self.ploneSettings.contentTypeRulesetMapping or {}
+    
+    # Type lookups (for accessing settings)
+    
+    @property
+    @memoize
+    def interceptorTypesLookup(self):
+        lookup = {}
+        for name, type_ in getUtilitiesFor(ICacheInterceptorType):
+            lookup[name] = dict(
+                name=name,
+                title=type_.title,
+                description=type_.description,
+                prefix=type_.prefix,
+                options=type_.options,
+                hasOptions=(type_.options and len(type_.options) > 0),
+                type=type_,
+            )
+        return lookup
+    
+    @property
+    @memoize
+    def mutatorTypesLookup(self):
+        lookup = {}
+        for name, type_ in getUtilitiesFor(IResponseMutatorType):
+            lookup[name] = dict(
+                name=name,
+                title=type_.title,
+                description=type_.description,
+                prefix=type_.prefix,
+                options=type_.options,
+                hasOptions=(type_.options and len(type_.options) > 0),
+                type=type_,
+            )
+        return lookup
+    
+    @property
+    @memoize
+    def contentTypesLookup(self):
+        types = {}
+        portal_types = getToolByName(self.context, 'portal_types')
+        for fti in portal_types.objectValues():
+            types[fti.id] = dict(title=fti.title or fti.id, description=fti.description)
+        return types
+    
+    # Sorted lists (e.g. for drop-downs)
+    
+    @property
+    @memoize
+    def interceptorTypes(self):
+        interceptors = [v for k, v in self.interceptorTypesLookup.items()]
+        interceptors.sort(lambda x,y: cmp(x['title'], y['title']))
+        return interceptors
+
+    @property
+    @memoize
+    def mutatorTypes(self):
+        mutators = [v for k, v in self.mutatorTypesLookup.items()]
+        mutators.sort(lambda x,y: cmp(x['title'], y['title']))
+        return mutators
+    
+    @property
+    @memoize
+    def contentTypes(self):
+        types = [
+            dict(
+                name=name,
+                title=info['title'],
+                description=info['description']
+            ) for name, info in self.contentTypesLookup.items()
+        ]
+        types.sort(lambda x,y: cmp(x['title'], y['title']))
+        return types
+
+    # We store template and content type mappings as template -> ruleset and
+    # content type -> ruleset. In the UI, we reverse this, so that the user
+    # enters a list of templates and selects a set of content types for each
+    # ruleset. This is more natural (whereas the storage is more efficient).
+    # These mappings support that UI
     
     @property
     @memoize
@@ -238,6 +326,9 @@ class ControlPanel(object):
             mapping.setdefault(ruleset, []).append(template)
         return mapping
     
+    # Since the widget for the templates is a textarea with one item per line,
+    # pre-calculate the default output here
+    
     @property
     @memoize
     def reverseTemplateMappingAsStrings(self):
@@ -245,60 +336,33 @@ class ControlPanel(object):
         for key, values in self.reverseTemplateMapping.items():
             mapping[key] = '\n'.join(values)
         return mapping
-    
-    @property
-    @memoize
-    def ruleTypes(self):
-        return list(enumerateTypes())
-    
-    @property
-    @memoize
-    def interceptorTypes(self):
-        interceptors = [
-            dict(
-                name=name,
-                title=type_.title,
-                description=type_.description,
-                prefx=type_.prefix,
-                options=type_.options,
-            ) for name, type_ in getUtilitiesFor(ICacheInterceptorType)
-        ]
-        interceptors.sort(lambda x,y: cmp(x['title'], y['title']))
-        return interceptors
 
-    @property
-    @memoize
-    def mutatorTypes(self):
-        mutators = [
-            dict(
-                name=name,
-                title=type_.title,
-                description=type_.description,
-                prefx=type_.prefix,
-                options=type_.options,
-            ) for name, type_ in getUtilitiesFor(IResponseMutatorType)
-        ]
-        mutators.sort(lambda x,y: cmp(x['title'], y['title']))
-        return mutators
+    # For the ruleset mappings page, we need to know whether a particular
+    # operation has global and per-ruleset parameters. If there is at least
+    # one option set, we consider it to have options.
     
-    @property
-    @memoize
-    def contentTypesLookup(self):
-        types = {}
-        portal_types = getToolByName(self.context, 'portal_types')
-        for fti in portal_types.objectValues():
-            types[fti.id] = dict(title=fti.title or fti.id, description=fti.description)
-        return types
+    def hasGlobalOptions(self, operationType):
+        prefix = operationType.prefix
+        options = operationType.options
+        
+        if not options or not prefix:
+            return False
+        
+        for option in options:
+            if '%s.%s' % (prefix, option,) in self.registry.records:
+                return True
+        
+        return False
     
-    @property
-    @memoize
-    def contentTypes(self):
-        types = [
-            dict(
-                name=name,
-                title=info['title'],
-                description=info['description']
-            ) for name, info in self.contentTypesLookup.items()
-        ]
-        types.sort(lambda x,y: cmp(x['title'], y['title']))
-        return types
+    def hasRulesetOptions(self, operationType, ruleset):
+        prefix = operationType.prefix
+        options = operationType.options
+        
+        if not options or not prefix:
+            return False
+        
+        for option in options:
+            if '%s.%s.%s' % (prefix, ruleset, option,) in self.registry.records:
+                return True
+        
+        return False

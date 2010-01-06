@@ -26,6 +26,8 @@ plone.app.caching
         - view/edit per-ruleset settings
         - use z3c.form
  
+ [ ] Update README
+ 
  [ ] Build default response mutators
         - CacheFu has the following:
             - no-cache

@@ -25,7 +25,11 @@
         cached.
     </p>
     
-    <form name="settings" tal:attributes="action request/URL" method="post" class="enableFormTabbing">
+    <form
+        name="settings"
+        method="post" 
+        class="enableFormTabbing enableUnloadProtection"
+        tal:attributes="action request/URL">
         
         <fieldset id="fieldset-global-settings">
             <legend
@@ -85,9 +89,6 @@
                 which conditionally sets cache headers, instructing a
                 user's web browser or a reverse caching proxy such as
                 Squid or Varnish how to cache the page.
-                </p>
-                <p>
-                    
                 </p>
             </div>
             
@@ -216,6 +217,146 @@
                         
                         </tr>
                     </tal:block>
+                </tbody>
+            </table>
+            
+        </fieldset>
+        <fieldset id="fieldset-detailed-settings">
+            <legend
+                id="fieldsetlegend-detailed-settings" 
+                i18n:translate="legend_detailedsettings">Detailed settings</legend>
+            
+            <div class="discreet" i18n:translate="description_detailed_settings">
+                <p>
+                Many caching operations accept parameters to influence their
+                behaviour. For example, an interceptor which returns a page
+                cached in RAM may accept a parameter specifying the timeout
+                period before pages are re-calculated. Most operations,
+                however, will have "sensible defaults", so that  they work
+                acceptably even when no parameters have been set. Note also 
+                that not all operations support parameters.
+                </p>
+                <p>
+                Parameters can be set at two levels. By default, parameters
+                apply to all uses of particular operation. Thus, if you have
+                assigned an operation to more than one ruleset, the
+                <em>same</em> parameters will be used. However, you can also
+                override the parameters for a particular ruleset.
+                </p>
+                <p>
+                Use the table below to access parameters for a particular
+                operation or ruleset. <strong>Warning:</strong> If you have
+                made changes elsewhere in this form, you should save them
+                before configuring any operation parameters. Otherwise, you
+                will lose your changes.
+                </p>
+            </div>
+            
+            <label i18n:translate="label_operation_parameters">Operation parameters</label>
+            <div class="formHelp" i18:translate="help_operation_parameters">
+                Use the table below to create, clear and edit operation
+                parameters. If you clear the ruleset-specific parameters for
+                a given operation, it will fall back on the global operation
+                parameters. If you clear those, it will fall back on the
+                defaults built into the operation itself.
+            </div>
+            
+            <table class="listing nosort" id="operationParametersTable">
+                <thead>
+                    <tr>
+                        <th i18n:translate="heading_ruleset">Ruleset</th>
+                        <th i18n:translate="heading_interceptor">Interceptor</th>
+                        <th i18n:translate="heading_mutator">Mutator</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:repeat="ruleType view/ruleTypes">
+                        <td>
+                            <div tal:content="ruleType/title" />
+                            <p class="discreet" tal:content="ruleType/description" />
+                        </td>
+                        <td tal:define="operationName python:view.interceptorMapping.get(ruleType.name, None)">
+                            <tal:block condition="not:operationName" i18n:translate="help_not_mapped">
+                                Not mapped
+                            </tal:block>
+                            <tal:block condition="operationName">
+                                <tal:block
+                                    define="operationInfo python:view.interceptorTypesLookup.get(operationName, None)"
+                                    condition="operationInfo">
+                                    <div tal:content="operationInfo/title" />
+                                    <div
+                                        class="discreet" 
+                                        tal:condition="not:operationInfo/hasOptions"
+                                        i18n:translate="help_no_options">
+                                        No parameters
+                                    </div>
+                                    <div class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
+                                        <tal:block define="hasGlobalOptions python:view.hasGlobalOptions(operationInfo['type'])">
+                                            <a  tal:condition="hasGlobalOptions"
+                                                i18n:translate="link_view_edit_clear"
+                                                href="#">View/edit/clear</a>
+                                            <a  tal:condition="not:hasGlobalOptions"
+                                                i18n:translate="link_create"
+                                                href="#">Create</a>
+                                        </tal:block>
+                                        <span i18n:translate="label_global">global parameters</span>
+                                    </div>
+                                    <div class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
+                                        <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType.name)">
+                                            <a  tal:condition="hasRulesetOptions"
+                                                i18n:translate="link_view_edit_clear"
+                                                href="#">View/edit/clear</a>
+                                            <a  tal:condition="not:hasRulesetOptions"
+                                                i18n:translate="link_create"
+                                                href="#">Create</a>
+                                        </tal:block>
+                                        <span i18:translate="label_ruleset">per-ruleset parameters</span>
+                                    </div>
+                                </tal:block>
+                            </tal:block>
+                        </td>
+                        <td tal:define="operationName python:view.mutatorMapping.get(ruleType.name, None)">
+                            <tal:block condition="not:operationName" i18n:translate="help_not_mapped">
+                                Not mapped
+                            </tal:block>
+                            <tal:block condition="operationName">
+                                <tal:block
+                                    define="operationInfo python:view.mutatorTypesLookup.get(operationName, None)"
+                                    condition="operationInfo">
+                                    
+                                    <div tal:content="operationInfo/title" />
+                                    <div
+                                        class="discreet" 
+                                        tal:condition="not:operationInfo/hasOptions"
+                                        i18n:translate="help_no_options">
+                                        No parameters
+                                    </div>
+                                    <div class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
+                                        <tal:block define="hasGlobalOptions python:view.hasGlobalOptions(operationInfo['type'])">
+                                            <a  tal:condition="hasGlobalOptions"
+                                                i18n:translate="link_view_edit_clear"
+                                                href="#">View/edit/clear</a>
+                                            <a  tal:condition="not:hasGlobalOptions"
+                                                i18n:translate="link_create"
+                                                href="#">Create</a>
+                                        </tal:block>
+                                        <span i18n:translate="label_global">global parameters</span>
+                                    </div>
+                                    <div class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
+                                        <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType.name)">
+                                            <a  tal:condition="hasRulesetOptions"
+                                                i18n:translate="link_view_edit_clear"
+                                                href="#">View/edit/clear</a>
+                                            <a  tal:condition="not:hasRulesetOptions"
+                                                i18n:translate="link_create"
+                                                href="#">Create</a>
+                                        </tal:block>
+                                        <span i18:translate="label_ruleset">per-ruleset parameters</span>
+                                    </div>
+                                </tal:block>
+                            </tal:block>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             
