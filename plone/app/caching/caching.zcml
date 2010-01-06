@@ -26,34 +26,34 @@
     <!-- Default caching ruleset types -->
     
     <cache:rulesetType
-        name="zope-resource"
-        title="Zope file and image resources"
-        description="Includes images and files created or customised through the ZMI, as well as those exposed in the portal_skins tool"
+        name="plone.resource"
+        title="File and image resources"
+        description="Includes images and files created or customised through the ZMI, those exposed in the portal_skins tool, and images registered in resource directories on the filesystem."
         />
     
     <cache:rulesetType
-        name="content-item-view"
+        name="plone.content.itemView"
         title="Content item view"
         description="A public-facing view for a content item that is not a folder or container for other items"
         />
     
     <cache:rulesetType
-        name="content-folder-view"
+        name="plone.content.folderView"
         title="Content folder view"
         description="A public-facing view for a content item that is a folder or container for other items"
         />
     
     <cache:rulesetType
-        name="content-feed"
+        name="plone.content.feed"
         title="Content feed"
         description="A dynamic feed, e.g. using RSS or ATOM"
         />
     
     <!-- Default caching ruleset assignments -->
     
-    <cache:ruleset ruleset="zope-resource" for="Products.CMFCore.FSFile.FSFile" />
-    <cache:ruleset ruleset="zope-resource" for="Products.CMFCore.FSImage.FSImage" />
-    <cache:ruleset ruleset="zope-resource" for="OFS.Image.File" />
-    <cache:ruleset ruleset="zope-resource" for="zope.app.publisher.interfaces.IResource" />
+    <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSFile.FSFile" />
+    <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSImage.FSImage" />
+    <cache:ruleset ruleset="plone.resource" for="OFS.Image.File" />
+    <cache:ruleset ruleset="plone.resource" for="zope.app.publisher.interfaces.IResource" />
     
 </configure>

@@ -1,29 +1,45 @@
 import datetime
 
+from zope.interface import implements
 from zope.component import getUtility
 from zope.component import getUtilitiesFor
+from zope.component import queryUtility
+
+from zope.publisher.interfaces import IPublishTraverse
+from zope.publisher.interfaces import NotFound
+
+from plone.memoize.instance import memoize
 
 from plone.registry.interfaces import IRegistry
 
+from z3c.caching.interfaces import IRulesetType
 from z3c.caching.registry import enumerateTypes
-from plone.caching.interfaces import ICacheSettings
-from plone.app.caching.interfaces import IPloneCacheSettings
 
-from plone.app.caching.interfaces import ICacheProfiles
+from plone.caching.interfaces import ICacheSettings
+from plone.caching.interfaces import ICacheOperationType
 from plone.caching.interfaces import IResponseMutatorType
 from plone.caching.interfaces import ICacheInterceptorType
 
-from plone.memoize.instance import memoize
+from plone.app.caching.interfaces import IPloneCacheSettings
+from plone.app.caching.interfaces import ICacheProfiles
+from plone.app.caching.interfaces import _
+from plone.app.caching.browser.edit import EditForm
 
 from Products.GenericSetup.interfaces import BASE, EXTENSION
 from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
 
-from plone.app.caching.interfaces import _
-
 class ControlPanel(object):
     """Control panel view
     """
+    
+    implements(IPublishTraverse)
+    
+    # Used by the publishTraverse() adapter - see below
+    editGlobal = False
+    editRuleset = False
+    editOperationName = None
+    editRulesetName = None
     
     def __init__(self, context, request):
         self.context = context
@@ -35,6 +51,63 @@ class ControlPanel(object):
             return self.render()
         return ''
     
+    def publishTraverse(self, request, name):
+        """Allow the following types of URLs:
+        
+        /
+            Render the standard control panel (no publish traverse invoked)
+            
+        /edit-operation-global/${operation-name}
+            Render an edit form for global operation parameters
+            
+        /edit-operation-rulset/${operation-name}/${ruleset-name}
+            Render an edit form for per-ruleset operation parameters
+        """
+        
+        # Step 1 - find which type of editing we want to do
+        if not self.editGlobal and not self.editRuleset:
+            if name == 'edit-operation-global':
+                self.editGlobal = True  
+            elif name == 'edit-operation-ruleset':
+                self.editRuleset = True
+            else:
+                raise NotFound(self, name)
+            return self # traverse again to get operation name
+
+        # Step 2a - get operation name
+        if (self.editGlobal or self.editRuleset) and not self.editOperationName:
+            self.editOperationName = name
+            
+            if self.editGlobal:
+                
+                operation = queryUtility(ICacheOperationType, name=self.editOperationName)
+                if operation is None:
+                    raise NotFound(self, operation)
+                
+                return EditForm(self.context, self.request, self.editOperationName, operation)
+            elif self.editRuleset:
+                return self # traverse again to get ruleset name
+            else:
+                raise NotFound(self, name)
+            
+        # Step 3 - if this is ruleset traversal, get the ruleset name
+        if self.editRuleset and self.editOperationName and not self.editRulesetName:
+            self.editRulesetName = name
+            
+            operation = queryUtility(ICacheOperationType, name=self.editOperationName)
+            if operation is None:
+                raise NotFound(self, self.operationName)
+            
+            rulesetType = queryUtility(IRulesetType, name=self.editRulesetName)
+            if rulesetType is None:
+                raise NotFound(self, self.editRulesetName)
+            
+            return EditForm(self.context, self.request,
+                            self.editOperationName, operation,
+                            self.editRulesetName, rulesetType)
+        
+        raise NotFound(self, name)
+        
     def update(self):
         
         self.registry = getUtility(IRegistry)
@@ -89,6 +162,7 @@ class ControlPanel(object):
             if isinstance(interceptor, unicode): # should be ASCII
                 interceptor = interceptor.encode('utf-8')
             
+            ruleset = ruleset.replace('-', '.')
             interceptorMapping[ruleset] = interceptor
         
         for ruleset, mutator in mutators.items():
@@ -102,6 +176,7 @@ class ControlPanel(object):
             if isinstance(mutator, unicode): # should be ASCII
                 mutator = mutator.encode('utf-8')
             
+            ruleset = ruleset.replace('-', '.')
             mutatorMapping[ruleset] = mutator
 
         for ruleset, contentTypes in contentTypesMap.items():
@@ -111,6 +186,8 @@ class ControlPanel(object):
             
             if isinstance(ruleset, unicode): # should be ASCII
                 ruleset = ruleset.encode('utf-8')
+            
+            ruleset = ruleset.replace('-', '.')
             
             for contentType in contentTypes:
                 
@@ -135,6 +212,8 @@ class ControlPanel(object):
             
             if isinstance(ruleset, unicode): # should be ASCII
                 ruleset = ruleset.encode('utf-8')
+            
+            ruleset = ruleset.replace('-', '.')
             
             for template in templates.split('\n'):
                 
@@ -211,7 +290,13 @@ class ControlPanel(object):
     @property
     @memoize
     def ruleTypes(self):
-        return list(enumerateTypes())
+        types = []
+        for type_ in enumerateTypes():
+            types.append(dict(name=type_.name,
+                              title=type_.title or type_.name,
+                              description=type_.description,
+                              safeName=type_.name.replace('.', '-')))
+        return types
     
     # Safe access to the main mappings, which may be None - we want to treat
     # that as {} to make TAL expressions simpler
@@ -245,7 +330,7 @@ class ControlPanel(object):
                 description=type_.description,
                 prefix=type_.prefix,
                 options=type_.options,
-                hasOptions=(type_.options and len(type_.options) > 0),
+                hasOptions=self.hasGlobalOptions(type_),
                 type=type_,
             )
         return lookup
@@ -261,7 +346,7 @@ class ControlPanel(object):
                 description=type_.description,
                 prefix=type_.prefix,
                 options=type_.options,
-                hasOptions=(type_.options and len(type_.options) > 0),
+                hasOptions=self.hasGlobalOptions(type_),
                 type=type_,
             )
         return lookup

@@ -1,5 +1,14 @@
 from Products.CMFCore.utils import getToolByName
 
+def enableExplicitMode():
+    """ZCML startup hook to put the ruleset registry into explict mode.
+    This means we require people to declare ruleset types before using them.
+    """
+    from z3c.caching.registry import getGlobalRulesetRegistry
+    registry = getGlobalRulesetRegistry()
+    if registry is not None:
+        registry.explicit = True
+
 def importVarious(context):
     
     if not context.readDataFile('plone.app.caching.txt'):
@@ -12,11 +21,8 @@ def importVarious(context):
     properties = error_log.getProperties()
     ignored = properties.get('ignored_exceptions', ())
     
-    # These exception types are used for common statuses. Others may get
-    # logged.
-    
     modified = False
-    for exceptionName in ('OK', 'MovedPermanently', 'MovedTemporarily', 'NotModified'):
+    for exceptionName in ('Interceptor',):
         if exceptionName not in ignored:
             ignored += (exceptionName,)
             modified = True

@@ -37,12 +37,12 @@ class IPloneCacheSettings(Interface):
             title=_(u"Page template/ruleset mapping"),
             description=_(u"Maps skin layer page template names to ruleset names"),
             key_type=schema.ASCIILine(title=_(u"Page template name")),
-            value_type=schema.ASCIILine(title=_(u"Ruleset name")),
+            value_type=schema.DottedName(title=_(u"Ruleset name")),
         )
     
     contentTypeRulesetMapping = schema.Dict(
             title=_(u"Content type/ruleset mapping"),
             description=_(u"Maps content type names to ruleset names"),
             key_type=schema.ASCIILine(title=_(u"Content type name")),
-            value_type=schema.ASCIILine(title=_(u"Ruleset name")),
+            value_type=schema.DottedName(title=_(u"Ruleset name")),
         )

@@ -112,11 +112,11 @@
                             <div tal:content="ruleType/title" />
                             <p class="discreet" tal:content="ruleType/description" />
                         </td>
-                        <td tal:define="selected python:request.get('interceptors', view.interceptorMapping).get(ruleType.name, None)">
+                        <td tal:define="selected python:request.get('interceptors', view.interceptorMapping).get(ruleType['name'], None)">
                             <select
                                 size="1"
                                 tal:attributes="id   string:interceptor-${ruleType/name};
-                                                name string:interceptors.${ruleType/name}:record;">
+                                                name string:interceptors.${ruleType/safeName}:record;">
                                 <option
                                     value=""
                                     tal:attributes="selected python:'selected' if selected is None else None"
@@ -131,11 +131,11 @@
                                     />
                             </select>
                         </td>
-                        <td tal:define="selected python:request.get('mutators', view.mutatorMapping).get(ruleType.name, None)">
+                        <td tal:define="selected python:request.get('mutators', view.mutatorMapping).get(ruleType['name'], None)">
                             <select
                                 size="1"
                                 tal:attributes="id   string:mutator-${ruleType/name};
-                                                name string:mutators.${ruleType/name}:record;">
+                                                name string:mutators.${ruleType/safeName}:record;">
                                 <option
                                     value=""
                                     tal:attributes="selected python:'selected' if selected is None else None"
@@ -177,8 +177,8 @@
                 </thead>
                 <tbody>
                     <tal:block repeat="ruleType view/ruleTypes">
-                        <tr tal:define="contentTypeError python:request.get('errors', {}).get('contenttypes', {}).get(ruleType.name, None);
-                                        templateError    python:request.get('errors', {}).get('templates', {}).get(ruleType.name, None);">
+                        <tr tal:define="contentTypeError python:request.get('errors', {}).get('contenttypes', {}).get(ruleType['name'], None);
+                                        templateError    python:request.get('errors', {}).get('templates', {}).get(ruleType['name'], None);">
                             <td>
                                 <div tal:content="ruleType/title" />
                                 <p class="discreet" tal:content="ruleType/description" />
@@ -187,13 +187,13 @@
                                     <div tal:content="templateError" tal:condition="templateError" />
                                 </div>
                             </td>
-                            <td tal:define="selected python:request.get('contenttypes', view.reverseContentTypeMapping).get(ruleType.name, [])">
+                            <td tal:define="selected python:request.get('contenttypes', view.reverseContentTypeMapping).get(ruleType['name'], [])">
                                 <div class="error" tal:omit-tag="not:contentTypeError">
                                     <select
                                         size="6"
                                         multiple="multiple"
                                         tal:attributes="id   string:contenttypes-${ruleType/name};
-                                                        name string:contenttypes.${ruleType/name}:record:list;">
+                                                        name string:contenttypes.${ruleType/safeName}:record:list;">
                                         <option
                                             tal:repeat="contentType view/contentTypes"
                                             tal:attributes="value    contentType/name;
@@ -204,12 +204,12 @@
                                     </select>
                                 </div>
                             </td>
-                            <td tal:define="selected python:request.get('templates', view.reverseTemplateMappingAsStrings).get(ruleType.name, '')">
+                            <td tal:define="selected python:request.get('templates', view.reverseTemplateMappingAsStrings).get(ruleType['name'], '')">
                                 <div class="error" tal:omit-tag="not:templateError">
                                     <textarea
                                         cols="40" rows="4"
                                         tal:attributes="id   string:templates-${ruleType/name};
-                                                        name string:templates.${ruleType/name}:record"
+                                                        name string:templates.${ruleType/safeName}:record"
                                         tal:content="selected"
                                         ></textarea>
                                 </div>
@@ -275,7 +275,7 @@
                             <div tal:content="ruleType/title" />
                             <p class="discreet" tal:content="ruleType/description" />
                         </td>
-                        <td tal:define="operationName python:view.interceptorMapping.get(ruleType.name, None)">
+                        <td tal:define="operationName python:view.interceptorMapping.get(ruleType['name'], None)">
                             <tal:block condition="not:operationName" i18n:translate="help_not_mapped">
                                 Not mapped
                             </tal:block>
@@ -290,32 +290,29 @@
                                         i18n:translate="help_no_options">
                                         No parameters
                                     </div>
-                                    <div class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
-                                        <tal:block define="hasGlobalOptions python:view.hasGlobalOptions(operationInfo['type'])">
-                                            <a  tal:condition="hasGlobalOptions"
-                                                i18n:translate="link_view_edit_clear"
-                                                href="#">View/edit/clear</a>
-                                            <a  tal:condition="not:hasGlobalOptions"
-                                                i18n:translate="link_create"
-                                                href="#">Create</a>
-                                        </tal:block>
+                                    <div style="white-space: nowrap" class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
+                                        <a  i18n:translate="link_view_edit_clear"
+                                            tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-global/${operationName}"
+                                            >View/edit</a>
                                         <span i18n:translate="label_global">global parameters</span>
                                     </div>
-                                    <div class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
-                                        <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType.name)">
+                                    <div style="white-space: nowrap" class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
+                                        <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType['name'])">
                                             <a  tal:condition="hasRulesetOptions"
                                                 i18n:translate="link_view_edit_clear"
-                                                href="#">View/edit/clear</a>
+                                                tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
+                                                >View/edit/clear</a>
                                             <a  tal:condition="not:hasRulesetOptions"
                                                 i18n:translate="link_create"
-                                                href="#">Create</a>
+                                                tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
+                                                >Create</a>
                                         </tal:block>
                                         <span i18:translate="label_ruleset">per-ruleset parameters</span>
                                     </div>
                                 </tal:block>
                             </tal:block>
                         </td>
-                        <td tal:define="operationName python:view.mutatorMapping.get(ruleType.name, None)">
+                        <td tal:define="operationName python:view.mutatorMapping.get(ruleType['name'], None)">
                             <tal:block condition="not:operationName" i18n:translate="help_not_mapped">
                                 Not mapped
                             </tal:block>
@@ -323,7 +320,6 @@
                                 <tal:block
                                     define="operationInfo python:view.mutatorTypesLookup.get(operationName, None)"
                                     condition="operationInfo">
-                                    
                                     <div tal:content="operationInfo/title" />
                                     <div
                                         class="discreet" 
@@ -331,25 +327,22 @@
                                         i18n:translate="help_no_options">
                                         No parameters
                                     </div>
-                                    <div class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
-                                        <tal:block define="hasGlobalOptions python:view.hasGlobalOptions(operationInfo['type'])">
-                                            <a  tal:condition="hasGlobalOptions"
-                                                i18n:translate="link_view_edit_clear"
-                                                href="#">View/edit/clear</a>
-                                            <a  tal:condition="not:hasGlobalOptions"
-                                                i18n:translate="link_create"
-                                                href="#">Create</a>
-                                        </tal:block>
+                                    <div style="white-space: nowrap" class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
+                                        <a  i18n:translate="link_view_edit_clear"
+                                            tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-global/${operationName}"
+                                            >View/edit</a>
                                         <span i18n:translate="label_global">global parameters</span>
                                     </div>
-                                    <div class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
-                                        <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType.name)">
+                                    <div style="white-space: nowrap" class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
+                                        <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType['name'])">
                                             <a  tal:condition="hasRulesetOptions"
                                                 i18n:translate="link_view_edit_clear"
-                                                href="#">View/edit/clear</a>
+                                                tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
+                                                >View/edit/clear</a>
                                             <a  tal:condition="not:hasRulesetOptions"
                                                 i18n:translate="link_create"
-                                                href="#">Create</a>
+                                                tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
+                                                >Create</a>
                                         </tal:block>
                                         <span i18:translate="label_ruleset">per-ruleset parameters</span>
                                     </div>

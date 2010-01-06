@@ -20,12 +20,6 @@ plone.caching
 plone.app.caching
 -----------------
  
- [ ] Build UI for cache operation settings
-        - view operations
-        - view/edit default settings
-        - view/edit per-ruleset settings
-        - use z3c.form
- 
  [ ] Update README
  
  [ ] Build default response mutators
