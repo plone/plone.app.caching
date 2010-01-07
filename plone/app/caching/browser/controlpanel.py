@@ -74,7 +74,7 @@ class ControlPanel(object):
                 raise NotFound(self, name)
             return self # traverse again to get operation name
 
-        # Step 2a - get operation name
+        # Step 2 - get operation name
         if (self.editGlobal or self.editRuleset) and not self.editOperationName:
             self.editOperationName = name
             

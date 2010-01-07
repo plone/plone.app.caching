@@ -21,6 +21,7 @@ plone.app.caching
 -----------------
  
  [ ] Update README
+ [ ] Update KGS
  
  [ ] Build default response mutators
         - CacheFu has the following:
@@ -55,21 +56,6 @@ plone.app.caching
         - ram-cached
                 - check if stale
                 - look up in cache manager and return
-
- [ ] Declare default rule types
-        - zope-resource
-            - includes OFS resources, CMF FS resources and items in
-              ResourceRegistries (which use OFS Files when merged, or the
-              original file when not merged/in debug mode)
-            - Note: File objects created by RR have no last-modified date,
-              because they are generated on the fly and not persisted
-        - content-folder-view
-            - A user-facing view of a folderish content item
-        - content-item-view
-            - A user-facing view of a non-folderish content item
-        - content-feed
-            - e.g. an RSS feed
-        - ...
 
  [ ] Functional tests
 
