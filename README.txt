@@ -136,4 +136,36 @@ Cache purging
 
 TODO
 
+Debug logging
+-------------
+
+It can sometimes be useful to see which rulesets and operations (if any)
+are being applied to published resources. If you enable the DEBUG logging
+level for the ``plone.caching`` logger, you will get this output in your
+event log. One way to do that is to set the global Zope logging level to
+DEBUG in ``zope.conf``::
+
+    <eventlog>
+        level DEBUG
+        <logfile>
+            path <file path here>
+            level DEBUG
+        </logfile>
+    </eventlog>    
+
+If you are using `plone.recipe.zope2instance`_ to create your Zope instances,
+you can set the logging level with the ``event-log-level`` option.
+
+You should see output in the log like::
+
+    2010-01-11 16:44:10 DEBUG plone.caching Published: <ATImage at /test/i> Ruleset: plone.download Interceptor: None
+    2010-01-11 16:44:10 DEBUG plone.caching Published: <ATImage at /test/i> Ruleset: plone.download Mutator: plone.caching.operations.chain
+
+The ``None`` indicates that no ruleset or operation was mapped.
+
+It is probably not a good idea to leave debug logging on for production use,
+as it can produce a lot of output, filling up log files and adding unnecessary
+load to your disks.
+
 .. _plone.caching: http://pypi.python.org/pypi/plone.caching
+.. _plone.recipe.zope2instance: http://pypi.python.org/pypi/plone.recipe.zope2instance

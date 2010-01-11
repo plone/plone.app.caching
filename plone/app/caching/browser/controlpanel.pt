@@ -212,7 +212,7 @@
                                         cols="40" rows="4"
                                         tal:attributes="id   string:templates-${ruleType/name};
                                                         name string:templates.${ruleType/safeName}:record:lines"
-                                        tal:content="python:'\n'.join(selected)"
+                                        tal:content="python:'\n'.join(selected or [])"
                                         ></textarea>
                                 </div>
                             </td>
@@ -396,7 +396,7 @@
                 
                 <textarea
                     cols="40" rows="4" id="cachingProxies" name="cachingProxies:lines"
-                    tal:content="python:'\n'.join(selected)"
+                    tal:content="python:'\n'.join(selected or [])"
                     ></textarea>
                 
             </div>
@@ -475,7 +475,7 @@
                 
                 <textarea
                     cols="40" rows="4" id="domains" name="domains:lines"
-                    tal:content="python:'\n'.join(selected)"
+                    tal:content="python:'\n'.join(selected or [])"
                     ></textarea>
                 
             </div>

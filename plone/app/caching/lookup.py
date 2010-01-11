@@ -54,55 +54,53 @@ class PageTemplateLookup(object):
         self.request = request
     
     def getResponseMutator(self):
-        nyet = (None, None, None,)
-    
+        
         registry = queryUtility(IRegistry)
         if registry is None:
-            return nyet
+            return None, None, None
     
         cacheSettings = registry.forInterface(ICacheSettings, check=False)
         if not cacheSettings.enabled:
-            return nyet
+            return None, None, None
         
         ploneCacheSettings = registry.forInterface(IPloneCacheSettings, check=False)
         
         rule = self._getRuleset(cacheSettings, ploneCacheSettings)
         if rule is None:
-            return nyet
+            return None, None, None
         
         if cacheSettings.mutatorMapping is None:
-            return nyet
+            return rule, None, None
     
         name = cacheSettings.mutatorMapping.get(rule, None)
         if name is None:
-            return nyet
+            return rule, None, None
     
         mutator = queryMultiAdapter((self.published, self.request), IResponseMutator, name=name)
         return rule, name, mutator
     
     def getCacheInterceptor(self):
-        nyet = (None, None, None,)
-    
+        
         registry = queryUtility(IRegistry)
         if registry is None:
-            return nyet
+            return None, None, None
     
         cacheSettings = registry.forInterface(ICacheSettings, check=False)
         if not cacheSettings.enabled:
-            return nyet
+            return None, None, None
         
         ploneCacheSettings = registry.forInterface(IPloneCacheSettings, check=False)
         
         rule = self._getRuleset(cacheSettings, ploneCacheSettings)
         if rule is None:
-            return nyet
+            return None, None, None
         
         if cacheSettings.interceptorMapping is None:
-            return nyet
+            return rule, None, None
     
         name = cacheSettings.interceptorMapping.get(rule, None)
         if name is None:
-            return nyet
+            return rule, None, None
     
         interceptor = queryMultiAdapter((self.published, self.request), ICacheInterceptor, name=name)
         return rule, name, interceptor
