@@ -1,17 +1,23 @@
 Plone caching to-do
 ===================
 
+Zope 2
+------
+
+ [ ] Send ObjectModifiedEvent for OFS File/Image
+
 plone.app.caching
 -----------------
  
  [ ] Add IPurgePaths for ...
         - /view
-        - default view
+        - default view(s)
         - object fields
+        - image scales
         - parent
         - parent default view if set as default page
  
- [ ] Add event handlers for purging
+ [ ] Add manual purge to UI
  
  [ ] Document purging
  

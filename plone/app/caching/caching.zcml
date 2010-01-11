@@ -5,7 +5,9 @@
     xmlns:zcml="http://namespaces.zope.org/cache"
     i18n_domain="plone.app.caching">
     
-    <!-- Out-of-the-box cache profiles -->
+    <!-- Out-of-the-box cache profiles 
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    
     <genericsetup:registerProfile
         name="with-caching-proxy"
         title="With caching proxy"
@@ -24,7 +26,8 @@
         for="plone.app.caching.interfaces.ICacheProfiles"
         />
     
-    <!-- Default caching ruleset types -->
+    <!-- Default caching ruleset types 
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     
     <cache:rulesetType
         name="plone.resource"
@@ -62,27 +65,67 @@
         description="A dynamic feed, e.g. using RSS or ATOM"
         />
     
-    <!-- Default caching ruleset assignments -->
+    <!-- Default caching ruleset assignments 
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     
-    <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSFile.FSFile" />
-    <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSImage.FSImage" />
-    <cache:ruleset ruleset="plone.resource" for="OFS.Image.File" />
-    <cache:ruleset ruleset="plone.resource" for="zope.app.publisher.interfaces.IResource" />
+    <!-- CMF filesystem (skin layer) files and images -->
+    <configure zcml:condition="installed Products.CMFCore">
     
-    <!-- Set up ResourceRegistries if we have it -->
-    <configure zcml:condition="installed Products.ResourceRegistries">
-        <cache:ruleset ruleset="plone.stableResource" for="Products.ResourceRegistries.interfaces.ICookedFile" />
+        <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSFile.FSFile" />
+        <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSImage.FSImage" />
+    
     </configure>
     
-    <!-- Set up ATContentTypes if we have it -->
+    <!-- OFS (in-ZODB) files and images -->
+    <configure zcml:condition="installed OFS.Image">
+    
+        <cache:ruleset ruleset="plone.resource" for="OFS.Image.File" />
+        
+        <class class="OFS.Image.File">
+            <implements interface="plone.cachepurging.interfaces.IPurgeable" />
+        </class>
+        
+    </configure>
+    
+    <!-- Zope 3 style resources (including those in resource directories) -->
+    <configure zcml:condition="installed zope.app.publisher">
+        
+        <cache:ruleset ruleset="plone.resource" for="zope.app.publisher.interfaces.IResource" />
+        
+    </configure>
+    
+    <!-- Resources cooked in ResourceRegistries -->
+    <configure zcml:condition="installed Products.ResourceRegistries">
+        
+        <cache:ruleset ruleset="plone.stableResource" for="Products.ResourceRegistries.interfaces.ICookedFile" />
+        
+    </configure>
+    
+    <!-- Standard Plone (non-blob) file and image content objects -->
     <configure zcml:condition="installed Products.ATContentTypes">
+        
         <cache:ruleset ruleset="plone.download" for="Products.ATContentTypes.interfaces.IATFile" />
         <cache:ruleset ruleset="plone.download" for="Products.ATContentTypes.interfaces.IATImage" />
+        
+        <class class="Products.ATContentTypes.content.file.ATFile">
+            <implements interface="plone.cachepurging.interfaces.IPurgeable" />
+        </class>
+        
+        <class class="Products.ATContentTypes.content.image.ATImage">
+            <implements interface="plone.cachepurging.interfaces.IPurgeable" />
+        </class>
+            
     </configure>
     
-    <!-- Set up plone.app.blob if we have it -->
-    <configure zcml:condition="installed Products.ATContentTypes">
+    <!-- plone.app.blob content -->
+    <configure zcml:condition="installed plone.app.blob">
+        
         <cache:ruleset ruleset="plone.download" for="plone.app.blob.interfaces.IATBlob" />
+        
+        <class class="plone.app.blob.content.ATBlob">
+            <implements interface="plone.cachepurging.interfaces.IPurgeable" />
+        </class>
+        
     </configure>
     
 </configure>
