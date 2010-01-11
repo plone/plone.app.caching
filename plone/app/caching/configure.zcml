@@ -7,6 +7,7 @@
     <include package="z3c.zcmlhook" file="meta.zcml" />
     
     <include package="plone.caching" />
+    <include package="plone.cachepurging" />
     <include package="plone.app.registry" />
     
     <include package=".browser" />

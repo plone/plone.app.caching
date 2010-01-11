@@ -3,11 +3,13 @@
     <!-- Basic cache settings from plone.caching -->
     <records interface="plone.caching.interfaces.ICacheSettings" />
     
+    <!-- Purge settings -->
+    <records interface="plone.cachepurging.interfaces.ICachePurgingSettings" />
+    
     <!-- Plone-specific settings from this package -->
     <records interface="plone.app.caching.interfaces.IPloneCacheSettings" />
     
-    <!-- Settings for default operations 
-      -->
+    <!-- Settings for default operations  -->
     
     <!-- Chain -->
     <record name="plone.caching.operations.chain.operations">

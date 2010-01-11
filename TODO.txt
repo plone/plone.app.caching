@@ -17,10 +17,25 @@ plone.caching
             - is debug mode enabled?
             - request values (e.g. status message, SearchableText)
 
+plone.cachepurging
+------------------
+
+ [ ] Tests
+
 plone.app.caching
 -----------------
  
- [ ] Update README
+ [ ] Add IPurgePaths for ...
+        - /view
+        - default view
+        - object fields
+        - parent
+        - parent default view if set as default page
+ 
+ [ ] Add event handlers for purging
+ 
+ [ ] Document purging
+ 
  [ ] Update KGS
  
  [ ] Build default response mutators

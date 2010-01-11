@@ -131,4 +131,9 @@ implementations of the default caching operations in the package
 ``plone.app.caching.operations``. The ``utils`` module contains helper
 functions which you may find useful.
 
+Cache purging
+-------------
+
+TODO
+
 .. _plone.caching: http://pypi.python.org/pypi/plone.caching

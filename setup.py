@@ -26,6 +26,7 @@ setup(name='plone.app.caching',
       install_requires=[
           'setuptools',
           'plone.caching',
+          'plone.cachepurging',
           'plone.app.registry',
           'zope.interface',
           'zope.component',

@@ -1,3 +1,4 @@
+import re
 import datetime
 
 from zope.interface import implements
@@ -20,6 +21,8 @@ from plone.caching.interfaces import ICacheOperationType
 from plone.caching.interfaces import IResponseMutatorType
 from plone.caching.interfaces import ICacheInterceptorType
 
+from plone.cachepurging.interfaces import ICachePurgingSettings
+
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.interfaces import ICacheProfiles
 from plone.app.caching.interfaces import _
@@ -29,13 +32,19 @@ from Products.GenericSetup.interfaces import BASE, EXTENSION
 from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
 
+# Borrowed from zope.schema to avoid an import of a private name
+_isuri = re.compile(
+    r"[a-zA-z0-9+.-]+:"   # scheme
+    r"\S*$"               # non space (should be pickier)
+    ).match
+
 class ControlPanel(object):
     """Control panel view
     """
     
     implements(IPublishTraverse)
     
-    # Used by the publishTraverse() adapter - see below
+    # Used by the publishTraverse() method - see below
     editGlobal = False
     editRuleset = False
     editOperationName = None
@@ -110,10 +119,11 @@ class ControlPanel(object):
         
     def update(self):
         
+        self.errors = {}
         self.registry = getUtility(IRegistry)
-        
         self.settings = self.registry.forInterface(ICacheSettings)
         self.ploneSettings = self.registry.forInterface(IPloneCacheSettings)
+        self.purgingSettings = self.registry.forInterface(ICachePurgingSettings)
         
         if self.request.method != 'POST':
             return
@@ -138,6 +148,11 @@ class ControlPanel(object):
         templatesMap    = form.get('templates', {})
         interceptors    = form.get('interceptors', {})
         mutators        = form.get('mutators', {})
+        
+        purgingEnabled  = form.get('purgingEnabled', False)
+        cachingProxies  = tuple(form.get('cachingProxies', ()))
+        virtualHosting  = form.get('virtualHosting', False)
+        domains         = tuple(form.get('domains', ()))
         
         # Settings
         
@@ -215,7 +230,7 @@ class ControlPanel(object):
             
             ruleset = ruleset.replace('-', '.')
             
-            for template in templates.split('\n'):
+            for template in templates:
                 
                 template = template.strip()
                 
@@ -233,10 +248,20 @@ class ControlPanel(object):
                 else:
                     templateRulesetMapping[template] = ruleset
         
+        # Validate purging settings
+        
+        for cachingProxy in cachingProxies:
+            if not _isuri(cachingProxy):
+                errors['cachingProxies'] = _(u"Invalid URL: ${url}", mapping={'url': cachingProxy})
+        
+        for domain in domains:
+            if not _isuri(domain):
+                errors['domain'] = _(u"Invalid URL: ${url}", mapping={'url': domain})
+        
         # Check for errors
         if errors:
             IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
-            self.request.set('errors', errors)
+            self.errors = errors
             return
         
         # Save settings
@@ -246,6 +271,11 @@ class ControlPanel(object):
         
         self.ploneSettings.templateRulesetMapping = templateRulesetMapping
         self.ploneSettings.contentTypeRulesetMapping = contentTypeRulesetMapping
+        
+        self.purgingSettings.enabled = purgingEnabled
+        self.purgingSettings.cachingProxies = cachingProxies
+        self.purgingSettings.virtualHosting = virtualHosting
+        self.purgingSettings.domains = domains
         
         IStatusMessage(self.request).addStatusMessage(_(u"Changes saved"), "info")
     
@@ -299,23 +329,44 @@ class ControlPanel(object):
         return types
     
     # Safe access to the main mappings, which may be None - we want to treat
-    # that as {} to make TAL expressions simpler
+    # that as {} to make TAL expressions simpler. We also need the safeName
+    # equivalent name for the key
     
     @property
     def interceptorMapping(self):
-        return self.settings.interceptorMapping or {}
+        return dict(
+            [
+                (k.replace('.', '-'), v,)
+                    for k, v in (self.settings.interceptorMapping or {}).items()
+            ]
+        )
     
     @property
     def mutatorMapping(self):
-        return self.settings.mutatorMapping or {}
+        return dict(
+            [
+                (k.replace('.', '-'), v,)
+                    for k, v in (self.settings.mutatorMapping or {}).items()
+            ]
+        )
     
     @property
     def templateMapping(self):
-        return self.ploneSettings.templateRulesetMapping or {}
+        return dict(
+            [
+                (k, v.replace('.', '-'),)
+                    for k, v in (self.ploneSettings.templateRulesetMapping or {}).items()
+            ]
+        )
     
     @property
     def contentTypeMapping(self):
-        return self.ploneSettings.contentTypeRulesetMapping or {}
+        return dict(
+            [
+                (k, v.replace('.', '-'),)
+                    for k, v in (self.ploneSettings.contentTypeRulesetMapping or {}).items()
+            ]
+        )
     
     # Type lookups (for accessing settings)
     
@@ -411,17 +462,6 @@ class ControlPanel(object):
             mapping.setdefault(ruleset, []).append(template)
         return mapping
     
-    # Since the widget for the templates is a textarea with one item per line,
-    # pre-calculate the default output here
-    
-    @property
-    @memoize
-    def reverseTemplateMappingAsStrings(self):
-        mapping = {}
-        for key, values in self.reverseTemplateMapping.items():
-            mapping[key] = '\n'.join(values)
-        return mapping
-
     # For the ruleset mappings page, we need to know whether a particular
     # operation has global and per-ruleset parameters. If there is at least
     # one option set, we consider it to have options.

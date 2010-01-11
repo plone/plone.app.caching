@@ -31,10 +31,11 @@
         class="enableFormTabbing enableUnloadProtection"
         tal:attributes="action request/URL">
         
+        <!-- Field set: global settings -->
         <fieldset id="fieldset-global-settings">
             <legend
                 id="fieldsetlegend-global-settings" 
-                i18n:translate="legend_globalsettings">Global settings</legend>
+                i18n:translate="legend_global_settings">Global settings</legend>
             
             <div
                 class="field"
@@ -44,8 +45,8 @@
                 <input type="checkbox" value="1" name="enabled:boolean" id="enabled"
                     tal:attributes="checked python:'checked' if selected else None"
                     />
-                <label for="enabled" i18n:translate="label_enable">Enable caching</label>
-                <div class="formHelp">
+                <label for="enabled" i18n:translate="label_enabled">Enable caching</label>
+                <div class="formHelp" i18n:translate="help_enabled">
                     If this option is disabled, no caching will take place.
                 </div>
                 
@@ -53,6 +54,7 @@
             
         </fieldset>
         
+        <!-- Field set: mappings -->
         <fieldset id="fieldset-mappings">
             <legend
                 id="fieldsetlegend-mappings"
@@ -112,7 +114,7 @@
                             <div tal:content="ruleType/title" />
                             <p class="discreet" tal:content="ruleType/description" />
                         </td>
-                        <td tal:define="selected python:request.get('interceptors', view.interceptorMapping).get(ruleType['name'], None)">
+                        <td tal:define="selected python:request.get('interceptors', view.interceptorMapping).get(ruleType['safeName'], None)">
                             <select
                                 size="1"
                                 tal:attributes="id   string:interceptor-${ruleType/name};
@@ -131,7 +133,7 @@
                                     />
                             </select>
                         </td>
-                        <td tal:define="selected python:request.get('mutators', view.mutatorMapping).get(ruleType['name'], None)">
+                        <td tal:define="selected python:request.get('mutators', view.mutatorMapping).get(ruleType['safeName'], None)">
                             <select
                                 size="1"
                                 tal:attributes="id   string:mutator-${ruleType/name};
@@ -187,7 +189,7 @@
                                     <div tal:content="templateError" tal:condition="templateError" />
                                 </div>
                             </td>
-                            <td tal:define="selected python:request.get('contenttypes', view.reverseContentTypeMapping).get(ruleType['name'], [])">
+                            <td tal:define="selected python:request.get('contenttypes', view.reverseContentTypeMapping).get(ruleType['safeName'], [])">
                                 <div class="error" tal:omit-tag="not:contentTypeError">
                                     <select
                                         size="6"
@@ -204,13 +206,13 @@
                                     </select>
                                 </div>
                             </td>
-                            <td tal:define="selected python:request.get('templates', view.reverseTemplateMappingAsStrings).get(ruleType['name'], '')">
+                            <td tal:define="selected python:request.get('templates', view.reverseTemplateMapping).get(ruleType['safeName'], '')">
                                 <div class="error" tal:omit-tag="not:templateError">
                                     <textarea
                                         cols="40" rows="4"
                                         tal:attributes="id   string:templates-${ruleType/name};
-                                                        name string:templates.${ruleType/safeName}:record"
-                                        tal:content="selected"
+                                                        name string:templates.${ruleType/safeName}:record:lines"
+                                        tal:content="python:'\n'.join(selected)"
                                         ></textarea>
                                 </div>
                             </td>
@@ -221,10 +223,12 @@
             </table>
             
         </fieldset>
+        
+        <!-- Field set: detailed settings -->
         <fieldset id="fieldset-detailed-settings">
             <legend
                 id="fieldsetlegend-detailed-settings" 
-                i18n:translate="legend_detailedsettings">Detailed settings</legend>
+                i18n:translate="legend_detailed_settings">Detailed settings</legend>
             
             <div class="discreet" i18n:translate="description_detailed_settings">
                 <p>
@@ -355,6 +359,129 @@
             
         </fieldset>
         
+        <!-- Field set: caching proxies -->
+        <fieldset id="fieldset-caching-proxies">
+            <legend
+                id="fieldsetlegend-caching-proxies" 
+                i18n:translate="legend_caching_proxies">Caching proxies</legend>
+            
+            <div class="discreet" i18n:translate="description_caching_proxies">
+                High-performance sites will often place a caching reverse
+                proxy such as Varnish or Squid in front of Zope. The caching
+                operations configured elsewhere on this screen can often take
+                advantage of such a proxy by instructing it to cache certain
+                content in a certain way, whilst passing requests for other
+                content through to Plone always. Plone can also send so-called
+                <code>PURGE</code> requests to a caching proxy when content
+                changes, reducing the risk of a stale response from a cached
+                copy.
+            </div>
+            
+            <div
+                tal:define="error errors/cachingProxies | nothing;
+                            selected python:request.get('cachingProxies', view.purgingSettings.cachingProxies)"
+                tal:attributes="class python:'field error' if error else 'field'">
+                
+                <label for="cachingProxies" i18n:translate="label_caching_proxies">Caching proxies</label>
+                <div class="formHelp" i18n:translate="help_caching_proxies">
+                    Enter the domain name of each caching proxy, one per
+                    line. For example, if you have Varnish running on the
+                    local machine on port 1234, you could enter
+                    <code>http://localhost:1234</code>. The domain name must
+                    be reachable by the Zope process, but does not need to
+                    be reachable from users' local machines.
+                </div>
+                
+                <div tal:replace="error" tal:condition="error" />
+                
+                <textarea
+                    cols="40" rows="4" id="cachingProxies" name="cachingProxies:lines"
+                    tal:content="python:'\n'.join(selected)"
+                    ></textarea>
+                
+            </div>
+            
+            <div
+                class="field"
+                tal:define="selected python:request.get('purgingEnabled', view.purgingSettings.enabled)">
+                
+                <input type="hidden" value="" name="purgingEnabled:boolean:default" />
+                <input type="checkbox" value="1" name="purgingEnabled:boolean" id="purgingEnabled"
+                    tal:attributes="checked python:'checked' if selected else None"
+                    />
+                <label for="purgingEnabled" i18n:translate="label_purging_enabled">Enable purging</label>
+                <div class="formHelp" i18n:translate="help_purging_enabled">
+                    Enable this option if you have configured a caching proxy
+                    in front of Plone, and the proxy supports HTTP
+                    <code>PURGE</code> requests.
+                </div>
+                
+            </div>
+            
+            <div
+                class="field"
+                tal:define="selected python:request.get('virtualHosting', view.purgingSettings.virtualHosting)">
+                
+                <input type="hidden" value="" name="virtualHosting:boolean:default" />
+                <input type="checkbox" value="1" name="virtualHosting:boolean" id="virtualHosting"
+                    tal:attributes="checked python:'checked' if selected else None"
+                    />
+                <label for="virtualHosting" i18n:translate="label_virtual_hosting">Virtual host rewriting takes place front of the caching proxy</label>
+                <div class="formHelp" i18n:translate="help_virtual_hosting">
+                    Enable this if you are using virtual hosting with Zope's
+                    VirtualHostMonster and you perform URL rewriting (to
+                    incorporate the special virtual hosting tokens such as
+                    <code>VirtualHostBase</code> and
+                    <code>VirtualHostRoot</code> in the URL) <em>before</em>
+                    the request is passed to the caching proxy, e.g. in an
+                    Apache web server that receives requests and passes them
+                    on to a Varnish caching proxy. Disable this option if you
+                    are not using virtual hosting, or if the caching proxy is
+                    in front of whatever performs the rewrite (or is itself
+                    performing the rewrites), disable this option.
+                </div>
+                
+            </div>
+            
+            <div
+                tal:define="error errors/domains | nothing;
+                            selected python:request.get('domains', view.purgingSettings.domains)"
+                tal:attributes="class python:'field error' if error else 'field'">
+                
+                <label for="domains" i18n:translate="label_domains">Externally facing domains</label>
+                <div class="formHelp" i18n:translate="help_domains">
+                    <p>
+                    If you have enabled <em>Virtual host rewriting takes place
+                    front of the caching proxy</em> above, and your site is
+                    reachable via multiple domains (e.g.
+                    <code>http://example.com</code> vs.
+                    <code>http://www.example.com</code>), enter all available
+                    domains here, one per line. This will ensure that purge
+                    requests are sent for all domains where applicable. Note
+                    that it is more efficient to configure the front-most web
+                    server to simply redirect all requests to a single domain,
+                    so that Zope only "sees" a single domain.
+                    </p>
+                    <p>
+                    It is safe to leave this list blank if you are not using
+                    a caching proxy, if you are not using virtual hosting,
+                    if virtual host rewriting takes place behind the caching
+                    proxy, or if you only have a single virtually hosted
+                    domain name.
+                    </p>
+                </div>
+                
+                <div tal:replace="error" tal:condition="error" />
+                
+                <textarea
+                    cols="40" rows="4" id="domains" name="domains:lines"
+                    tal:content="python:'\n'.join(selected)"
+                    ></textarea>
+                
+            </div>
+            
+        </fieldset>
+        
         <div class="formControls">
             <input
                 type="submit"
@@ -375,7 +502,7 @@
     
     
     <form name="profiles" tal:attributes="action request/URL" method="post"
-        tal:define="errors request/errors | python:{}">
+        tal:define="errors view/errors">
     
         <fieldset id="fieldset-import">
             <legend i18n:translate="legend_import">Import</legend>
