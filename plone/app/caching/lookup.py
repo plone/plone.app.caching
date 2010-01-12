@@ -1,13 +1,10 @@
 from zope.interface import implements, Interface
-from zope.component import adapts, queryUtility, queryMultiAdapter
+from zope.component import adapts, queryUtility
 from zope.pagetemplate.interfaces import IPageTemplate
 
 from plone.registry.interfaces import IRegistry
 
-from plone.caching.interfaces import ICacheInterceptor, IResponseMutator
-from plone.caching.interfaces import IOperationLookup
-from plone.caching.interfaces import ICacheSettings
-
+from plone.caching.interfaces import IRulesetLookup
 from plone.app.caching.interfaces import IPloneCacheSettings
 
 from Acquisition import aq_base
@@ -29,85 +26,35 @@ class PageTemplateLookup(object):
     
     All of these implement ``IPageTemplate``, but there is typically not a
     meaningful per-resource interface or class. Therefore, we implement
-    different lookup semantics for these objects when published:
+    different ruleset lookup semantics for these objects when published:
     
     * First, look up the page template name in the registry under the key
       ``plone.app.caching.interfaces.IPloneCacheSettings.templateRulesetMapping``.
-      If this is found, look up the corresponding interceptor or mutator as
-      normal.
+      If this is found, return the corresponding ruleset.
     * If no template-specific mapping is found, find the ``__parent__`` of the
       template. If this is a content type, check whether the template is one
       of its default views. If so, look up a cache ruleset under the key
       ``plone.app.caching.interfaces.IPloneCacheSettings.contentTypeRulesetMapping``. 
-      If found, look up the corresponding interceptor or mutator as normal.
     * Otherwise, abort.
     
     Note that this lookup is *not* invoked for a view which happens to use a
     page template to render itself.
     """
     
-    implements(IOperationLookup)
+    implements(IRulesetLookup)
     adapts(IPageTemplate, Interface)
     
     def __init__(self, published, request):
         self.published = published
         self.request = request
     
-    def getResponseMutator(self):
+    def __call__(self):
         
         registry = queryUtility(IRegistry)
         if registry is None:
-            return None, None, None
+            return None
     
-        cacheSettings = registry.forInterface(ICacheSettings, check=False)
-        if not cacheSettings.enabled:
-            return None, None, None
-        
         ploneCacheSettings = registry.forInterface(IPloneCacheSettings, check=False)
-        
-        rule = self._getRuleset(cacheSettings, ploneCacheSettings)
-        if rule is None:
-            return None, None, None
-        
-        if cacheSettings.mutatorMapping is None:
-            return rule, None, None
-    
-        name = cacheSettings.mutatorMapping.get(rule, None)
-        if name is None:
-            return rule, None, None
-    
-        mutator = queryMultiAdapter((self.published, self.request), IResponseMutator, name=name)
-        return rule, name, mutator
-    
-    def getCacheInterceptor(self):
-        
-        registry = queryUtility(IRegistry)
-        if registry is None:
-            return None, None, None
-    
-        cacheSettings = registry.forInterface(ICacheSettings, check=False)
-        if not cacheSettings.enabled:
-            return None, None, None
-        
-        ploneCacheSettings = registry.forInterface(IPloneCacheSettings, check=False)
-        
-        rule = self._getRuleset(cacheSettings, ploneCacheSettings)
-        if rule is None:
-            return None, None, None
-        
-        if cacheSettings.interceptorMapping is None:
-            return rule, None, None
-    
-        name = cacheSettings.interceptorMapping.get(rule, None)
-        if name is None:
-            return rule, None, None
-    
-        interceptor = queryMultiAdapter((self.published, self.request), ICacheInterceptor, name=name)
-        return rule, name, interceptor
-    
-    def _getRuleset(self, cacheSettings, ploneCacheSettings):
-        """Helper method to look up a ruleset for the published template.
-        """
         
         # First, try to look up the template name in the appropriate mapping
         templateName = getattr(self.published, '__name__', None)

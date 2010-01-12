@@ -4,10 +4,21 @@ Plone caching to-do
 plone.caching
 -------------
 
+ [ ] Refactor operation look to become ruleset lookup
+
  [ ] Consider moving mutator handler to plone.transformchain
+        - Should come "late" so that we can cache
+        - Possibly even after gzip
+
+ [ ] Add GZip option
+        - Use plone.transformchain
+        - Do this at the very end
+        - Set option and then re-set the response body
 
 plone.app.caching
 -----------------
+
+ [ ] Add list of content types to purge with event handler
 
  [ ] Add IPurgePaths for ...
         - /view
@@ -16,13 +27,11 @@ plone.app.caching
         - image scales
         - parent
         - parent default view if set as default page
- 
- [ ] Add list of content types to purge with event handler
-  
+   
  [ ] Document purging
- 
- [ ] Add GZip option
-        - Use plone.transformchain
+
+ [ ] Either integrate PageCacheManager or find an alternative
+        - look at plone.memoize
  
  [ ] Update KGS
  
