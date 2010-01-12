@@ -21,7 +21,12 @@ from plone.caching.interfaces import ICacheOperationType
 from plone.caching.interfaces import IResponseMutatorType
 from plone.caching.interfaces import ICacheInterceptorType
 
+from plone.cachepurging.interfaces import IPurger
 from plone.cachepurging.interfaces import ICachePurgingSettings
+
+from plone.cachepurging.utils import isCachePurgingEnabled
+from plone.cachepurging.utils import getPathsToPurge
+from plone.cachepurging.utils import getURLsToPurge
 
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.interfaces import ICacheProfiles
@@ -120,6 +125,9 @@ class ControlPanel(object):
     def update(self):
         
         self.errors = {}
+        self.importErrors = {}
+        self.purgeErrors = {}
+        
         self.registry = getUtility(IRegistry)
         self.settings = self.registry.forInterface(ICacheSettings)
         self.ploneSettings = self.registry.forInterface(IPloneCacheSettings)
@@ -134,6 +142,8 @@ class ControlPanel(object):
             self.request.response.redirect("%s/plone_control_panel" % self.context.absolute_url())
         elif 'form.button.Import' in self.request.form:
             self.processImport()
+        elif 'form.button.Purge' in self.request.form:
+            self.processPurge()
         
     def render(self):
         return self.index()
@@ -160,9 +170,6 @@ class ControlPanel(object):
         mutatorMapping            = {}
         contentTypeRulesetMapping = {}
         templateRulesetMapping    = {}
-        
-        # Errors
-        errors = {}
         
         # Process mappings and validate
         
@@ -213,7 +220,7 @@ class ControlPanel(object):
                     contentType = contentType.encode('utf-8')
                 
                 if contentType in contentTypeRulesetMapping:
-                    errors.setdefault('contenttypes', {})[ruleset] = \
+                    self.errors.setdefault('contenttypes', {})[ruleset] = \
                         _(u"Content type ${contentType} is already mapped to the rule ${ruleset}", 
                             mapping={'contentType': self.contentTypesLookup.get(contentType, {}).get('title', contentType), 
                                      'ruleset': contentTypeRulesetMapping[contentType]})
@@ -241,7 +248,7 @@ class ControlPanel(object):
                     template = template.encode('utf-8')
                 
                 if template in templateRulesetMapping:
-                    errors.setdefault('templates', {})[ruleset] = \
+                    self.errors.setdefault('templates', {})[ruleset] = \
                         _(u"Template ${template} is already mapped to the rule ${ruleset}", 
                             mapping={'template': template,
                                       'ruleset': templateRulesetMapping[template]})
@@ -252,16 +259,15 @@ class ControlPanel(object):
         
         for cachingProxy in cachingProxies:
             if not _isuri(cachingProxy):
-                errors['cachingProxies'] = _(u"Invalid URL: ${url}", mapping={'url': cachingProxy})
+                self.errors['cachingProxies'] = _(u"Invalid URL: ${url}", mapping={'url': cachingProxy})
         
         for domain in domains:
             if not _isuri(domain):
-                errors['domain'] = _(u"Invalid URL: ${url}", mapping={'url': domain})
+                self.errors['domain'] = _(u"Invalid URL: ${url}", mapping={'url': domain})
         
         # Check for errors
-        if errors:
+        if self.errors:
             IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
-            self.errors = errors
             return
         
         # Save settings
@@ -283,14 +289,11 @@ class ControlPanel(object):
         profile = self.request.form.get('profile', None)
         snapshot = self.request.form.get('snapshot', True)
         
-        errors = {}
-        
         if not profile:
-            errors['profile'] = _(u"You must select a profile to import")
+            self.importErrors['profile'] = _(u"You must select a profile to import")
         
-        if errors:
+        if self.importErrors:
             IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
-            self.request.set('errors', errors)
             return
         
         portal_setup = getToolByName(self.context, 'portal_setup')
@@ -305,7 +308,71 @@ class ControlPanel(object):
         portal_setup.runAllImportStepsFromProfile("profile-%s" % profile)
         
         IStatusMessage(self.request).addStatusMessage(_(u"Import complete"), "info")
+    
+    def processPurge(self):
         
+        urls = self.request.form.get('urls', [])
+        sync = self.request.form.get('synchronous', True)
+        
+        purger = getUtility(IPurger)
+        self.purgeLog = []
+        
+        serverURL = self.request['SERVER_URL']
+        
+        def purge(url):
+            if sync:
+                status, xcache, xerror = purger.purgeSync(url)
+                
+                log = "Purged " + url
+                if xcache:
+                    log += " X-Cache: " + xcache
+                if xerror:
+                    log += " Error " + xerror
+                self.purgeLog.append(log)
+            else:
+                purger.purgeAsync(url)
+                self.purgeLog.append("Purged " + url)
+        
+        portal_url = getToolByName(self.context, 'portal_url')
+        portal = portal_url.getPortalObject()
+        portalPath = '/'.join(portal.getPhysicalPath())
+        
+        proxies = self.purgingSettings.cachingProxies
+        
+        for inputURL in urls:
+            if not inputURL.startswith(serverURL): # not in the site
+                if '://' in inputURL: # Full URL?
+                    purge(inputURL)
+                else:                 # Path?
+                    for newURL in getURLsToPurge(inputURL, proxies):
+                        purge(newURL)
+                continue
+            
+            physicalPath = relativePath = None
+            try:
+                physicalPath = self.request.physicalPathFromURL(inputURL)
+            except ValueError:
+                purge(inputURL)
+                continue
+            
+            if not physicalPath:
+                purge(inputURL)
+                continue
+            
+            relativePath = physicalPath[len(portalPath):]
+            if not relativePath:
+                purge(inputURL)
+                continue
+            
+            obj = portal.unrestrictedTraverse(relativePath, None)
+            if obj is None:
+                purge(inputURL)
+                continue
+            
+            for path in getPathsToPurge(obj, self.request):
+                for newURL in getURLsToPurge(path, proxies):
+                    purge(newURL)
+    
     # Properties accessed in the template
     
     @property
@@ -491,3 +558,9 @@ class ControlPanel(object):
                 return True
         
         return False
+    
+    @property
+    @memoize
+    def purgingEnabled(self):
+        return isCachePurgingEnabled()
+

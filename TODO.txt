@@ -1,14 +1,14 @@
 Plone caching to-do
 ===================
 
-Zope 2
-------
+plone.caching
+-------------
 
- [ ] Send ObjectModifiedEvent for OFS File/Image
+ [ ] Consider moving mutator handler to plone.transformchain
 
 plone.app.caching
 -----------------
- 
+
  [ ] Add IPurgePaths for ...
         - /view
         - default view(s)
@@ -17,9 +17,12 @@ plone.app.caching
         - parent
         - parent default view if set as default page
  
- [ ] Add manual purge to UI
- 
+ [ ] Add list of content types to purge with event handler
+  
  [ ] Document purging
+ 
+ [ ] Add GZip option
+        - Use plone.transformchain
  
  [ ] Update KGS
  

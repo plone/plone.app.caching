@@ -179,8 +179,8 @@
                 </thead>
                 <tbody>
                     <tal:block repeat="ruleType view/ruleTypes">
-                        <tr tal:define="contentTypeError python:request.get('errors', {}).get('contenttypes', {}).get(ruleType['name'], None);
-                                        templateError    python:request.get('errors', {}).get('templates', {}).get(ruleType['name'], None);">
+                        <tr tal:define="contentTypeError python:view.errors.get('contenttypes', {}).get(ruleType['name'], None);
+                                        templateError    python:view.errors.get('templates', {}).get(ruleType['name'], None);">
                             <td>
                                 <div tal:content="ruleType/title" />
                                 <p class="discreet" tal:content="ruleType/description" />
@@ -500,83 +500,160 @@
         
     </form>
     
+    <h2 i18n:translate="heading_tools">Tools</h2>
     
-    <form name="profiles" tal:attributes="action request/URL" method="post"
-        tal:define="errors view/errors">
+    <p i18n:translate="description_tools">
+        Use the tools below to perform maintenance and bulk configuration
+        tasks. Note that you must save any settings modified above before
+        using one of the forms below, otherwise you will lose your changes!
+    </p>
+
     
-        <fieldset id="fieldset-import">
-            <legend i18n:translate="legend_import">Import</legend>
-    
-            <label i18n:translate="label_management">Import settings</label>
-    
-            <p class="discreet" i18n:translate="help_profiles">
-                Choose a profile below to import cache settings. Additional
-                profiles may be installed by third party products.
-                <strong>Warning:</strong> This may overwrite existing
-                settings.
-            </p>
-            
-            <div class="field">
-                
-                <div
-                    class="error"
-                    tal:condition="errors/profile | nothing"
-                    tal:content="errors/profile"
-                    />
-                
-                <div tal:repeat="profile view/profiles">
-                
-                    <input
-                        type="radio"
-                        name="profile"
-                        tal:attributes="id string:profile-${repeat/profile/index};
-                                        value profile/id"
-                        />
-                
-                    <label
-                        tal:attributes="for string:profile-${repeat/profile/index}"
-                        tal:content="profile/title"
-                        />
-                
-                    <p class="discreet" tal:content="profile/description" />
-                
-                </div>
-            </div>
-            
-            <div class="field">
-                <input type="hidden" name="snapshot:boolean:default" value="" />
-                <input
-                    type="checkbox"
-                    name="snapshot:boolean"
-                    id="snapshot"
-                    value="1"
-                    tal:attributes="checked python:'checked' if request.get('snapshot', True) else None"
-                    />
-                
-                <label for="snapshot" i18n:translate="label_snapshot">
-                    Take a snapshot of the site prior to importing new
-                    setting.
-                </label>
-                <div class="formHelp" i18n:translate="help_snapshot">
-                    This allows rollback to a previous state via the
-                    <em>portal_setup</em> tool.
-                </div>
-            </div>
+    <dl class="enableFormTabbing">
         
-            <div class="formControls">
-                <input
-                    type="submit"
-                    name="form.button.Import"
-                    class="destructive"
-                    value="Import"
-                    i18n:attributes="value">
-            </div>
+        <dt id="fieldsetlegend-import" i18n:translate="legend_import">Import</dt>
+        <dd id="fieldset-import">
             
-        </fieldset>
-    </form>
+            <form name="profiles" tal:attributes="action request/URL" method="post"
+                tal:define="errors view/importErrors">
     
+                <p class="discreet" i18n:translate="help_profiles">
+                    Choose a profile below to import cache settings. Additional
+                    profiles may be installed by third party products.
+                    <strong>Warning:</strong> This may overwrite existing
+                    settings.
+                </p>
+        
+                <div class="field">
+            
+                    <div
+                        class="error"
+                        tal:condition="errors/profile | nothing"
+                        tal:content="errors/profile"
+                        />
+            
+                    <div tal:repeat="profile view/profiles">
+            
+                        <input
+                            type="radio"
+                            name="profile"
+                            tal:attributes="id string:profile-${repeat/profile/index};
+                                            value profile/id"
+                            />
+            
+                        <label
+                            tal:attributes="for string:profile-${repeat/profile/index}"
+                            tal:content="profile/title"
+                            />
+            
+                        <p class="discreet" tal:content="profile/description" />
+            
+                    </div>
+                </div>
+        
+                <div class="field">
+                    <input type="hidden" name="snapshot:boolean:default" value="" />
+                    <input
+                        type="checkbox"
+                        name="snapshot:boolean"
+                        id="snapshot"
+                        value="1"
+                        tal:attributes="checked python:'checked' if request.get('snapshot', True) else None"
+                        />
+            
+                    <label for="snapshot" i18n:translate="label_snapshot">
+                        Take a snapshot of the site prior to importing new
+                        setting.
+                    </label>
+                    <div class="formHelp" i18n:translate="help_snapshot">
+                        This allows rollback to a previous state via the
+                        <em>portal_setup</em> tool.
+                    </div>
+                </div>
     
+                <div class="formControls">
+                    <input
+                        type="submit"
+                        name="form.button.Import"
+                        class="destructive"
+                        value="Import"
+                        i18n:attributes="value">
+                </div>
+        
+            </form>            
+            
+        </dd>
+        
+        <dt tal:condition="view/purgingEnabled" id="fieldsetlegend-purge" i18n:translate="legend_purge">Purge</dt>
+        <dd tal:condition="view/purgingEnabled" id="fieldset-purge">
+            
+            <form name="purge" tal:attributes="action string:${request/URL}#fieldsetlegend-purge" method="post"
+                tal:define="errors view/purgeErrors">
     
+                <p class="discreet" i18n:translate="help_purge">
+                    If you have enabled a caching proxy, it may end up caching
+                    objects which are no longer current. Plone will attempt
+                    to automatically purge objects when they change, but if
+                    you are seeing stale objects in your cache, you can purge
+                    them manually below.
+                </p>
+                
+                <div tal:condition="view/purgeLog | nothing">
+                    <h5 i18n:translate="heading_purged">Purged</h5>
+                    <ul>
+                        <li tal:repeat="log view/purgeLog" tal:content="log" />
+                    </ul>
+                </div>
+        
+                <div class="field">
+            
+                    <label for="purgeURLs" i18n:translate="label_urls">URLs to purge</label>
+                    
+                    <div class="formHelp" i18n:translate="help_urls">
+                        Enter URLs to purge, one per line, below. You can
+                        either enter a full URL including a domain, or a path
+                        relative to the site root, starting with a <em>/</em>.
+                    </div>
+                    
+                    <textarea id="purgeURLs" name="urls:lines" cols="40" rows="4"></textarea>
+                    
+                </div>
+        
+                <div class="field">
+                    <input type="hidden" name="synchronous:boolean:default" value="" />
+                    <input
+                        type="checkbox"
+                        name="synchronous:boolean"
+                        id="purgeSynchronous"
+                        value="1"
+                        checked="checked"
+                        />
+            
+                    <label for="purgeSynchronous" i18n:translate="label_synchronous">
+                        Purge synchronously
+                    </label>
+                    <div class="formHelp" i18n:translate="help_synchronous">
+                        Select this option to wait while the purge completes.
+                        This allows you to see the results of the purges.
+                        Purging asynchronously will return immediately, but
+                        you will need to check your caching proxy's log files
+                        to see if the purge actually succeeded.
+                    </div>
+                </div>
+                
+                <div class="formControls">
+                    <input
+                        type="submit"
+                        name="form.button.Purge"
+                        class="destructive"
+                        value="Purge"
+                        i18n:attributes="value">
+                </div>
+        
+            </form>
+        </dd>
+    </dl>
+
 </div>
 
 </body>
