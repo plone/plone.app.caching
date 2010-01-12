@@ -42,6 +42,12 @@
     <!-- Add GZip compression: plone.transformchain order 10000 -->
     <adapter factory=".gzip.GZipTransform" name="plone.app.caching.gzip" />
     
+    <!-- Purging -->
+    <subscriber handler=".purge.purgeOnModified" />
+    <subscriber handler=".purge.purgeOnMovedOrRemoved" />
+    
+    
+    
     <!-- ILastModified adapters -->
     <adapter factory=".lastmodified.pageTemplateDelegateLastModified" />
     <adapter factory=".lastmodified.OFSFileLastModified" />

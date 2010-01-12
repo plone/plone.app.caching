@@ -54,3 +54,10 @@ class IPloneCacheSettings(Interface):
             key_type=schema.ASCIILine(title=_(u"Content type name")),
             value_type=schema.DottedName(title=_(u"Ruleset name")),
         )
+    
+    purgedContentTypes = schema.Tuple(
+            title=_(u"Content types to purge"),
+            description=_(u"List content types which should be purged when modified"),
+            value_type=schema.ASCIILine(title=_(u"Content type name")),
+            default=('File', 'Image',),
+        )

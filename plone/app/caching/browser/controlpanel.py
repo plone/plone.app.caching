@@ -162,6 +162,7 @@ class ControlPanel(object):
         
         purgingEnabled     = form.get('purgingEnabled', False)
         cachingProxies     = tuple(form.get('cachingProxies', ()))
+        purgedContentTypes = tuple(form.get('purgedContentTypes', ()))
         virtualHosting     = form.get('virtualHosting', False)
         domains            = tuple(form.get('domains', ()))
         
@@ -279,6 +280,7 @@ class ControlPanel(object):
         self.ploneSettings.enableCompression = enableCompression
         self.ploneSettings.templateRulesetMapping = templateRulesetMapping
         self.ploneSettings.contentTypeRulesetMapping = contentTypeRulesetMapping
+        self.ploneSettings.purgedContentTypes = purgedContentTypes
         
         self.purgingSettings.enabled = purgingEnabled
         self.purgingSettings.cachingProxies = cachingProxies

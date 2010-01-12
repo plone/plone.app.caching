@@ -4,8 +4,6 @@ Plone caching to-do
 plone.app.caching
 -----------------
 
- [ ] Add list of content types to purge with event handler
-
  [ ] Add IPurgePaths for ...
         - /view
         - default view(s)

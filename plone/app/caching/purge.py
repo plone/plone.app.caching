@@ -3,13 +3,15 @@ from zope.component import adapts, adapter
 from zope.event import notify
 
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
-from zope.lifecycleevent.interfaces import IObjectRemovedEvent
+from zope.lifecycleevent.interfaces import IObjectMovedEvent
 
 from plone.cachepurging import Purge
 from plone.cachepurging.interfaces import IPurgePaths
 
-from Products.CMFCore.interfaces import IDiscussionItem
+from Products.CMFCore.interfaces import IDiscussionResponse
 from Products.CMFCore.interfaces import IContentish
+
+from plone.app.caching.utils import isPurged
 
 try:
     from Products.Archetypes.interfaces import IBaseObject
@@ -22,7 +24,7 @@ class DiscussionItemPurgePaths(object):
     """
     
     implements(IPurgePaths)
-    adapts(IDiscussionItem)
+    adapts(IDiscussionResponse)
     
     def __init__(self, context):
         self.context = context
@@ -60,3 +62,18 @@ if HAVE_AT:
         
         def getAbsolutePaths(self):
             return []
+
+# Event redispatch for content items - we check the list of content items
+# instead of the marker interface
+
+@adapter(IContentish, IObjectModifiedEvent)
+def purgeOnModified(object, event):
+    if isPurged(object):
+        notify(Purge(object))
+
+@adapter(IContentish, IObjectMovedEvent)
+def purgeOnMovedOrRemoved(object, event):
+    # Don't purge when added
+    if event.oldName is not None and event.oldParent is not None:
+        if isPurged(object):
+            notify(Purge(object))

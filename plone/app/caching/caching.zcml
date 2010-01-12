@@ -106,25 +106,13 @@
         
         <cache:ruleset ruleset="plone.download" for="Products.ATContentTypes.interfaces.IATFile" />
         <cache:ruleset ruleset="plone.download" for="Products.ATContentTypes.interfaces.IATImage" />
-        
-        <class class="Products.ATContentTypes.content.file.ATFile">
-            <implements interface="plone.cachepurging.interfaces.IPurgeable" />
-        </class>
-        
-        <class class="Products.ATContentTypes.content.image.ATImage">
-            <implements interface="plone.cachepurging.interfaces.IPurgeable" />
-        </class>
-            
+                    
     </configure>
     
     <!-- plone.app.blob content -->
     <configure zcml:condition="installed plone.app.blob">
         
         <cache:ruleset ruleset="plone.download" for="plone.app.blob.interfaces.IATBlob" />
-        
-        <class class="plone.app.blob.content.ATBlob">
-            <implements interface="plone.cachepurging.interfaces.IPurgeable" />
-        </class>
         
     </configure>
     
