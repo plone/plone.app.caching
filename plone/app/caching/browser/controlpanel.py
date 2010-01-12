@@ -153,16 +153,17 @@ class ControlPanel(object):
         form = self.request.form
         
         # Form data
-        enabled         = form.get('enabled', False)
-        contentTypesMap = form.get('contenttypes', {})
-        templatesMap    = form.get('templates', {})
-        interceptors    = form.get('interceptors', {})
-        mutators        = form.get('mutators', {})
+        enabled            = form.get('enabled', False)
+        enableCompression = form.get('enableCompression', False)
+        contentTypesMap    = form.get('contenttypes', {})
+        templatesMap       = form.get('templates', {})
+        interceptors       = form.get('interceptors', {})
+        mutators           = form.get('mutators', {})
         
-        purgingEnabled  = form.get('purgingEnabled', False)
-        cachingProxies  = tuple(form.get('cachingProxies', ()))
-        virtualHosting  = form.get('virtualHosting', False)
-        domains         = tuple(form.get('domains', ()))
+        purgingEnabled     = form.get('purgingEnabled', False)
+        cachingProxies     = tuple(form.get('cachingProxies', ()))
+        virtualHosting     = form.get('virtualHosting', False)
+        domains            = tuple(form.get('domains', ()))
         
         # Settings
         
@@ -275,6 +276,7 @@ class ControlPanel(object):
         self.settings.interceptorMapping = interceptorMapping
         self.settings.mutatorMapping = mutatorMapping
         
+        self.ploneSettings.enableCompression = enableCompression
         self.ploneSettings.templateRulesetMapping = templateRulesetMapping
         self.ploneSettings.contentTypeRulesetMapping = contentTypeRulesetMapping
         

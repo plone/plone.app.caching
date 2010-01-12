@@ -33,6 +33,14 @@ class IPloneCacheSettings(Interface):
     Plone-specific settings.
     """
     
+    enableCompression = schema.Bool(
+            title=_(u"Enable GZip compression"),
+            description=_(u"Determine whether GZip compression should be "
+                          u"enabled for standard responses"),
+            default=False,
+            required=True,
+        )
+    
     templateRulesetMapping = schema.Dict(
             title=_(u"Page template/ruleset mapping"),
             description=_(u"Maps skin layer page template names to ruleset names"),
