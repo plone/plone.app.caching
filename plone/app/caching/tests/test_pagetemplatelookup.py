@@ -16,10 +16,11 @@ from plone.app.caching.lookup import PageTemplateLookup
 
 from Acquisition import Explicit
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+from Products.CMFCore.interfaces import IDynamicType
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
 
 class DummyContent(Explicit):
-    implements(IBrowserDefault)
+    implements(IBrowserDefault, IDynamicType)
     
     def __init__(self, portal_type='testtype', defaultView='defaultView'):
         self.portal_type = portal_type
@@ -50,6 +51,7 @@ class DummyFTI(object):
         return default
 
 class DummyNotBrowserDefault(Explicit):
+    implements(IDynamicType)
     
     def __init__(self, portal_type='testtype', viewAction=''):
         self.portal_type = portal_type
@@ -142,7 +144,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         self.assertEquals(None, PageTemplateLookup(published, request)())
     
-    def test_getResponseMutator_parent_not_IBrowserDefault_methodid(self):
+    def test_parent_not_IBrowserDefault_methodid(self):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(IPloneCacheSettings)
@@ -155,7 +157,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         self.assertEquals('rule1', PageTemplateLookup(published, request)())
     
-    def test_getResponseMutator_parent_not_IBrowserDefault_default_method(self):
+    def test_parent_not_IBrowserDefault_default_method(self):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(IPloneCacheSettings)
@@ -168,7 +170,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         self.assertEquals('rule1', PageTemplateLookup(published, request)())
     
-    def test_getResponseMutator_parent_not_IBrowserDefault_actiononly(self):
+    def test_parent_not_IBrowserDefault_actiononly(self):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(IPloneCacheSettings)
@@ -182,7 +184,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         
         self.assertEquals('rule1', PageTemplateLookup(published, request)())
     
-    def test_getResponseMutator_match_template_and_content(self):
+    def test_match_template_and_content(self):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(IPloneCacheSettings)

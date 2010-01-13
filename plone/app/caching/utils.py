@@ -4,6 +4,7 @@ from plone.registry.interfaces import IRegistry
 from plone.app.caching.interfaces import IPloneCacheSettings
 
 from Acquisition import aq_base
+from Products.CMFCore.interfaces import IDynamicType
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
 
 def isPurged(object):
@@ -40,7 +41,10 @@ def getObjectDefaultView(context):
         except AttributeError:
             # Might happen if FTI didn't migrate yet.
             pass
-
+    
+    if not IDynamicType.providedBy(context):
+        return None
+    
     fti = context.getTypeInfo()
     try:
         # XXX: This isn't quite right since it assumes the action starts with ${object_url}
@@ -61,4 +65,5 @@ def getObjectDefaultView(context):
     if action and action.startswith('@@'):
         action = action[2:]
     return action
+
 

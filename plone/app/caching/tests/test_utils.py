@@ -1,7 +1,7 @@
 import unittest
-
 import zope.component.testing
 
+from zope.interface import implements
 from zope.component import provideUtility, provideAdapter, getUtility
 
 from plone.registry.interfaces import IRegistry
@@ -11,13 +11,54 @@ from plone.registry.fieldfactory import persistentFieldAdapter
 
 from plone.app.caching.interfaces import IPloneCacheSettings
 
+from Acquisition import Explicit
+from Products.CMFCore.interfaces import IDynamicType
+from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
+
 from plone.app.caching.utils import isPurged
+from plone.app.caching.utils import getObjectDefaultView
 
-class FauxContentObject(object):
-    portal_type = 'testtype'
 
-class NotContentObject(object):
+class DummyContent(Explicit):
+    implements(IBrowserDefault, IDynamicType)
+    
+    def __init__(self, portal_type='testtype', defaultView='defaultView'):
+        self.portal_type = portal_type
+        self._defaultView = defaultView
+    
+    def defaultView(self):
+        return self._defaultView
+
+class DummyNotContent(Explicit):
     pass
+
+class DummyFTI(object):
+    
+    def __init__(self, portal_type, viewAction=''):
+        self.id = portal_type
+        self._actions = {
+                'object/view': {'url': viewAction},
+            }
+    
+    def getActionInfo(self, name):
+        return self._actions[name]
+    
+    def queryMethodID(self, id, default=None, context=None):
+        if id == '(Default)':
+            return 'defaultView'
+        elif id == 'view': 
+            return '@@defaultView'
+        return default
+
+class DummyNotBrowserDefault(Explicit):
+    implements(IDynamicType)
+    
+    def __init__(self, portal_type='testtype', viewAction=''):
+        self.portal_type = portal_type
+        self._viewAction = viewAction
+    
+    def getTypeInfo(self):
+        return DummyFTI(self.portal_type, self._viewAction)
 
 class TestIsPurged(unittest.TestCase):
     
@@ -28,12 +69,12 @@ class TestIsPurged(unittest.TestCase):
         zope.component.testing.tearDown()
     
     def test_no_registry(self):
-        content = FauxContentObject()
+        content = DummyContent()
         self.assertEquals(False, isPurged(content))
         
     def test_no_settings(self):
         provideUtility(Registry(), IRegistry)
-        content = FauxContentObject()
+        content = DummyContent()
         self.assertEquals(False, isPurged(content))
     
     def test_no_portal_type(self):
@@ -44,7 +85,7 @@ class TestIsPurged(unittest.TestCase):
         ploneSettings = registry.forInterface(IPloneCacheSettings)
         ploneSettings.purgedContentTypes = ('testtype',)
         
-        content = NotContentObject()
+        content = DummyNotContent()
         self.assertEquals(False, isPurged(content))
     
     def test_not_listed(self):
@@ -55,7 +96,7 @@ class TestIsPurged(unittest.TestCase):
         ploneSettings = registry.forInterface(IPloneCacheSettings)
         ploneSettings.purgedContentTypes = ('File', 'Image',)
         
-        content = FauxContentObject()
+        content = DummyContent()
         self.assertEquals(False, isPurged(content))
     
     def test_listed(self):
@@ -66,8 +107,33 @@ class TestIsPurged(unittest.TestCase):
         ploneSettings = registry.forInterface(IPloneCacheSettings)
         ploneSettings.purgedContentTypes = ('File', 'Image', 'testtype',)
         
-        content = FauxContentObject()
+        content = DummyContent()
         self.assertEquals(True, isPurged(content))
+
+class TestGetObjectDefaultPath(unittest.TestCase):
     
+    def tearDown(self):
+        zope.component.testing.tearDown()
+    
+    def test_not_content(self):
+        context = DummyNotContent()
+        self.assertEquals(None, getObjectDefaultView(context))
+    
+    def test_browserdefault(self):
+        context = DummyContent()
+        self.assertEquals('defaultView', getObjectDefaultView(context))
+    
+    def test_not_IBrowserDefault_methodid(self):
+        context = DummyNotBrowserDefault('testtype', 'string:${object_url}/view')
+        self.assertEquals('defaultView', getObjectDefaultView(context))
+    
+    def test_not_IBrowserDefault_default_method(self):
+        context = DummyNotBrowserDefault('testtype', 'string:${object_url}/')
+        self.assertEquals('defaultView', getObjectDefaultView(context))
+    
+    def test_not_IBrowserDefault_actiononly(self):
+        context = DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView')
+        self.assertEquals('defaultView', getObjectDefaultView(context))
+
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)

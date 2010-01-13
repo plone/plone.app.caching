@@ -140,6 +140,3 @@ def purgeOnMovedOrRemoved(object, event):
     if event.oldName is not None and event.oldParent is not None:
         if isPurged(object):
             notify(Purge(object))
-
-
-
