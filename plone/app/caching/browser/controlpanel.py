@@ -9,6 +9,8 @@ from zope.component import queryUtility
 from zope.publisher.interfaces import IPublishTraverse
 from zope.publisher.interfaces import NotFound
 
+from zope.ramcache.interfaces.ram import IRAMCache
+
 from plone.memoize.instance import memoize
 
 from plone.registry.interfaces import IRegistry
@@ -63,6 +65,7 @@ class BaseView(object):
         self.settings = self.registry.forInterface(ICacheSettings)
         self.ploneSettings = self.registry.forInterface(IPloneCacheSettings)
         self.purgingSettings = self.registry.forInterface(ICachePurgingSettings)
+        self.ramCache = queryUtility(IRAMCache)
         
         if self.request.method != 'POST':
             return False
@@ -171,6 +174,10 @@ class ControlPanel(BaseView):
         virtualHosting     = form.get('virtualHosting', False)
         domains            = tuple(form.get('domains', ()))
         
+        ramCacheMaxEntries      = form.get('ramCacheMaxEntries', None)
+        ramCacheMaxAge          = form.get('ramCacheMaxAge', None)
+        ramCacheCleanupInterval = form.get('ramCacheCleanupInterval', None)
+        
         # Settings
         
         interceptorMapping        = {}
@@ -272,6 +279,32 @@ class ControlPanel(BaseView):
             if not _isuri(domain):
                 self.errors['domain'] = _(u"Invalid URL: ${url}", mapping={'url': domain})
         
+        # RAM cache settings
+        
+        try:
+            ramCacheMaxEntries = int(ramCacheMaxEntries)
+        except (ValueError, TypeError,):
+            self.errors['ramCacheMaxEntries'] = _(u"An integer is required")
+        else:
+            if ramCacheMaxEntries < 0:
+                self.errors['ramCacheMaxEntries'] = _(u"A positive number is required")
+        
+        try:
+            ramCacheMaxAge = int(ramCacheMaxAge)
+        except (ValueError, TypeError,):
+            self.errors['ramCacheMaxAge'] = _(u"An integer is required")
+        else:
+            if ramCacheMaxAge < 0:
+                self.errors['ramCacheMaxAge'] = _(u"A positive number is required")
+        
+        try:
+            ramCacheCleanupInterval = int(ramCacheCleanupInterval)
+        except (ValueError, TypeError,):
+            self.errors['ramCacheCleanupInterval'] = _(u"An integer is required")
+        else:
+            if ramCacheMaxAge < 0:
+                self.errors['ramCacheCleanupInterval'] = _(u"A positive number is required")
+        
         # Check for errors
         if self.errors:
             IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
@@ -291,6 +324,8 @@ class ControlPanel(BaseView):
         self.purgingSettings.cachingProxies = cachingProxies
         self.purgingSettings.virtualHosting = virtualHosting
         self.purgingSettings.domains = domains
+        
+        self.ramCache.update(ramCacheMaxEntries, ramCacheMaxAge, ramCacheCleanupInterval)
         
         IStatusMessage(self.request).addStatusMessage(_(u"Changes saved"), "info")
 

@@ -5,9 +5,10 @@ plone.app.caching
 -----------------
 
  [ ] Either integrate PageCacheManager or find an alternative
-        - set up an IRAMCache persistent utility
-        - edit settings via control panel
-        - borrow ICacheChooser from plone.memoize
+        - use ICacheChooser from plone.memoize
+        - Implement operation + helper (to cache) and interceptor
+        - Add event-based content purging?
+        - Document
  
  [ ] Update KGS
  

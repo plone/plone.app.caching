@@ -265,12 +265,111 @@
                         </div>
             
                     </fieldset>
+                    
+                    <!-- Field set: memory -->
+                    <fieldset id="fieldset-ram">
+                        <legend
+                            id="fieldsetlegend-ram" 
+                            i18n:translate="legend_ram">In-memory cache</legend>
+            
+                        <div class="discreet" i18n:translate="description_ram">
+                            Plone maintains a cache of certain pages and
+                            fragments of pages in memory to speed up
+                            rendering. Certain caching operations, when
+                            mapped, can be used to place entire pages into the
+                            RAM cache. Using the RAM cache may allow you to
+                            gain some speed (and reduce CPU usage), at the
+                            cost of using more memory. Note that the default
+                            RAM cache is shared among threads in the same
+                            Zope instance, but is not shared between Zope
+                            instances. Thus, if you are running a
+                            multi-instance ZEO setup, you may find it more
+                            efficient to segment your users using a front-end
+                            load balancer so that they always reach the same
+                            back-end instance. As an alternative, you can
+                            integrate a shared cache such as
+                            <em>memcached</em>. See the documentation for
+                            details.
+                        </div>
+                        
+                        <div
+                            tal:define="error errors/ramCacheMaxEntries | nothing"
+                            tal:attributes="class python:'field error' if error else 'field'">
+                        
+                            <label
+                                for="ramCacheMaxEntries"
+                                i18n:translate="label_ram_max_entries">Maximum entries in the cache</label>
+                            
+                            <span class="fieldRequired" i18n:translate="">(Required)</span>
+                            
+                            <div class="formHelp" i18n:translate="help_ram_max_entries">
+                                Use this to control how many items can be
+                                placed in the cache. The more items you allow,
+                                the higher the potential memory consumption.
+                            </div>
+                            
+                            <div tal:condition="error" tal:content="error" />
+                            
+                            <input name="ramCacheMaxEntries" id="ramCacheMaxEntries" size="6"
+                                tal:attributes="value request/ramCacheMaxEntries | view/ramCache/maxEntries | nothing" />
+                        
+                        </div>
+                        
+                        <div
+                            tal:define="error errors/ramCacheMaxAge | nothing"
+                            tal:attributes="class python:'field error' if error else 'field'">
+                        
+                            <label
+                                for="ramCacheMaxAge"
+                                i18n:translate="label_ram_max_age">Maximum age of entries in the cache</label>
+                            
+                            <span class="fieldRequired" i18n:translate="">(Required)</span>
+                            
+                            <div class="formHelp" i18n:translate="help_ram_max_age">
+                                Enter the maximum time, in seconds, that an item
+                                may remain in the cache before being purged.
+                            </div>
+                            
+                            
+                            <div tal:condition="error" tal:content="error" />
+                            
+                            <input name="ramCacheMaxAge" id="ramCacheMaxAge" size="6"
+                                tal:attributes="value request/ramCacheMaxAge | view/ramCache/maxAge | nothing" />
+                        
+                        </div>
+                        
+                        <div
+                            tal:define="error errors/ramCacheCleanupInterval | nothing"
+                            tal:attributes="class python:'field error' if error else 'field'">
+                        
+                            <label
+                                for="ramCacheCleanupInterval"
+                                i18n:translate="label_ram_cleanup_interval">Cleanup interval</label>
+                            
+                            <span class="fieldRequired" i18n:translate="">(Required)</span>
+                            
+                            <div class="formHelp" i18n:translate="help_ram_cleanup_interval">
+                                Enter the time, in seconds, before attempts
+                                to clean up the cache. A lower value may reduce
+                                memory consumption by purging items frequently,
+                                but can also slow down the system by tying up
+                                the cache with maintenance tasks for too long.
+                            </div>
+                            
+                            <div tal:condition="error" tal:content="error" />
+                            
+                            <input name="ramCacheCleanupInterval" id="ramCacheCleanupInterval" size="6"
+                                tal:attributes="value request/ramCacheCleanupInterval | view/ramCache/cleanupInterval | nothing" />
+                        
+                        </div>
+                    
+                    </fieldset>
         
                     <!-- Field set: mappings -->
                     <fieldset id="fieldset-mappings">
                         <legend
                             id="fieldsetlegend-mappings"
-                            i18n:translate="legend_mappings">Ruleset mappings</legend>
+                            i18n:translate="legend_mappings">Caching operation mappings</legend>
             
                         <div class="discreet" i18n:translate="description_mappings">
                             <p>
@@ -435,7 +534,7 @@
                         </table>
             
                     </fieldset>
-        
+                    
                     <!-- Field set: detailed settings -->
                     <fieldset id="fieldset-detailed-settings">
                         <legend
