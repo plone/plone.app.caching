@@ -64,11 +64,11 @@
                 <label for="enableCompression" i18n:translate="label_compression_enabled">Enable GZip compression</label>
                 <div class="formHelp" i18n:translate="help_compression_enabled">
                     Enable this to compress content before sending it to the
-                    client, if supported by the client. (Almost all
-                    modern web browsers support GZip compression.) Compression
-                    places marginally more load on the server, but can make
-                    the site appear faster to end users by reducing the amount
-                    of data that has to be sent over the network.
+                    client, if supported. (Almost all modern web browsers
+                    support GZip compression.) Compression places marginally
+                    more load on the server, but can make the site appear
+                    faster to end users by reducing the amount of data that
+                    has to be sent over the network.
                 </div>
                 
             </div>
