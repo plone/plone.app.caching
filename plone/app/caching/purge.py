@@ -1,5 +1,5 @@
 from zope.interface import implements
-from zope.component import adapts, adapter
+from zope.component import adapts, adapter, getAdapters
 from zope.event import notify
 from zope.globalrequest import getRequest
 
@@ -8,7 +8,7 @@ from zope.lifecycleevent.interfaces import IObjectMovedEvent
 
 from plone.cachepurging import Purge
 from plone.cachepurging.interfaces import IPurgePaths
-from plone.cachepurging.utils import getPathsToPurge
+from plone.cachepurging.interfaces import IPurgePathRewriter
 
 from Products.CMFCore.interfaces import IDiscussionResponse
 from Products.CMFCore.interfaces import IContentish
@@ -18,6 +18,8 @@ from Products.CMFCore.utils import getToolByName
 from plone.app.caching.utils import isPurged
 from plone.app.caching.utils import getObjectDefaultView
 
+from plone.memoize.instance import memoize
+
 from Acquisition import aq_parent
 
 try:
@@ -26,7 +28,7 @@ try:
     HAVE_AT = True
 except:
     HAVE_AT = False
-    
+  
 
 class ContentPurgePaths(object):
     """Paths to purge for content items
@@ -46,6 +48,9 @@ class ContentPurgePaths(object):
     implements(IPurgePaths)
     adapts(IDynamicType)
     
+    def __init__(self, context):
+        self.context = context
+    
     def getRelativePaths(self):
         prefix = self.context.absolute_url_path()
         
@@ -63,6 +68,7 @@ class ContentPurgePaths(object):
                 parentPrefix = parent.absolute_url_path()
                 yield parentPrefix
                 yield parentPrefix + '/'
+                yield parentPrefix + '/view'
     
     def getAbsolutePaths(self):
         return []
@@ -80,20 +86,56 @@ class DiscussionItemPurgePaths(object):
         self.context = context
 
     def getRelativePaths(self):
-        plone_utils = getToolByName(self.context, 'plone_utils', None)
-        if plone_utils is None:
+        root = self._getRoot()
+        if root is None:
             return
         
         request = getRequest()
         if request is None:
             return
         
-        root = plone_utils.getDiscussionThread(self.context)[0]
-        for path in getPathsToPurge(root, request):
-            yield path
+        rewriter = IPurgePathRewriter(request, None)
+        for name, pathProvider in getAdapters((root,), IPurgePaths):
+            # add relative paths, which are rewritten
+            relativePaths = pathProvider.getRelativePaths()
+            if relativePaths:
+                for relativePath in relativePaths:
+                    if rewriter is None:
+                        yield relativePath
+                    else:
+                        rewrittenPaths = rewriter(relativePath) or [] # None -> []
+                        for rewrittenPath in rewrittenPaths:
+                            yield rewrittenPath
+        
         
     def getAbsolutePaths(self):
-        return []
+        root = self._getRoot()
+        if root is None:
+            return
+        
+        request = getRequest()
+        if request is None:
+            return
+        
+        for name, pathProvider in getAdapters((root,), IPurgePaths):
+            # add absoute paths, which are not
+            absolutePaths = pathProvider.getAbsolutePaths()
+            if absolutePaths:
+                for absolutePath in absolutePaths:
+                    yield absolutePath
+    
+    @memoize
+    def _getRoot(self):
+        
+        plone_utils = getToolByName(self.context, 'plone_utils', None)
+        if plone_utils is None:
+            return None
+        
+        thread = plone_utils.getDiscussionThread(self.context)
+        if not thread:
+            return None
+        
+        return thread[0]
 
 if HAVE_AT:
 
@@ -103,22 +145,31 @@ if HAVE_AT:
     
         implements(IPurgePaths)
         adapts(IBaseObject)
-    
+        
+        def __init__(self, context):
+            self.context = context
+        
         def getRelativePaths(self):
             prefix = self.context.absolute_url_path()
             schema = self.context.Schema()
 
             def fieldFilter(field):
                 return IFileField.providedBy(field) or IImageField.providedBy(field)
-
+            
+            seenDownloads = False
+            
             for field in schema.filterFields(fieldFilter):
-                yield prefix + '/download'
-                yield prefix + '/at_download'
-                yield prefix + '/at_download/' + field.getName()
                 
+                if not seenDownloads:
+                    yield prefix + '/download'
+                    yield prefix + '/at_download'
+                    seenDownloads = True
+                
+                yield prefix + '/at_download/' + field.getName()
+                    
                 fieldURL = "%s/%s" % (prefix, field.getName(),)
                 yield fieldURL
-
+                
                 if IImageField.providedBy(field):
                     for size in field.getAvailableSizes(self.context).keys():
                         yield "%s_%s" % (fieldURL, size,)
@@ -140,3 +191,4 @@ def purgeOnMovedOrRemoved(object, event):
     if event.oldName is not None and event.oldParent is not None:
         if isPurged(object):
             notify(Purge(object))
+

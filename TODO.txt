@@ -4,8 +4,6 @@ Plone caching to-do
 plone.app.caching
 -----------------
 
- [ ] Test purge paths
- 
  [ ] Document purging
 
  [ ] Either integrate PageCacheManager or find an alternative
