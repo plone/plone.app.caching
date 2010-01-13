@@ -1,9 +1,13 @@
-plone.app.caching
-=================
+plone.app.caching - HTTP caching support for Plone
+==================================================
 
-Plone UI and default rules for plone.caching/z3c.caching
+This package provides Plone UI and default rules for managing HTTP response
+caching in Plone. It builds on ``z3c.caching``, ``plone.caching`` and
+``plone.cachepurging``. 
 
-Requires Plone 4.
+``plone.app.caching`` requires Plone 4 or later.
+
+.. contents:: Table of Contents
 
 Installation
 ------------
@@ -32,30 +36,32 @@ The caching control panel
 -------------------------
 
 After installation, you will find a Caching control panel in Plone's site
-setup. This consists of three main tabs:
+setup. This consists of four main tabs:
 
-* *Cache settings*, where you can control caching behaviour
+* *Change settings*, where you can control caching behaviour
 * *Import settings*, where you can import pre-defined profiles of cache
   settings
-* *Purge*, where you can manually purge content from a caching proxy. This
-  tab only appears if you have purging enabled under *Cache settings*.
+* *Purge caching proxy*, where you can manually purge content from a caching
+  proxy. This tab only appears if you have purging enabled under
+  *Change settings*.
+* *RAM cache*, where you can view statistics about and purge the RAM cache.
 
 Under the settings tab, you will find four fieldsets:
 
 * *General settings*, for global options such as turning caching on or off.
 * *Caching proxies*, where you can control Plone's use of a caching proxy
   such as Squid or Varnish.
-* *Mappings*, where caching rulesets (hints about views and resources used for
-  caching purposes) can be associated with caching operations (which either
-  intercept a request to return a cached response, or mutates a response to
-  add cache control headers). This is also where rulesets for legacy page
-  templates (created through the web or the portal_skins tool) are
-  configured.
+* *Caching operation mappings*, where caching rulesets (hints about views
+  and resources used for caching purposes) can be associated with caching
+  operations (which either intercept a request to return a cached response, or
+  mutates a response to add cache control headers). This is also where
+  rulesets for legacy page templates (created through the web or the
+  portal_skins tool) are configured.
 * *Detailed settings*, where you can configure parameters for individual
   caching operations.
 
-Declaring cache rules and writing caching operations
-----------------------------------------------------
+Rulesets and caching operations
+-------------------------------
 
 The caching infrastructure works on the principle of *rulesets* mapped to
 *cache interceptors* and *response mutators*, collectively known as
@@ -80,20 +86,59 @@ Once ruleset and caching operation types have been registered, they will
 appear in the caching control panel.
 
 Default cache ruleset types
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``plone.app.caching`` declares a few default ruleset types, which you map in
 its control panel and use in ``<cache:ruleset />`` directives in your own
 code. They are listed with descriptions in the control panel.
 
 Default cache operations
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``plone.app.caching`` also declares a number of default operation types,
 most of which can be configured via the GUI or through the configuration
 registry directly (see below). These are listed in the control panel as
 available operations for the various ruleset types. Hover your mouse over
 an operation in the drop-down list to view its description.
+
+Caching operation helper functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are writing a custom caching operation, you will find the
+implementations of the default caching operations in the package
+``plone.app.caching.operations``. The ``utils`` module contains helper
+functions which you may find useful.
+
+Debug logging
+~~~~~~~~~~~~~
+
+It can sometimes be useful to see which rulesets and operations (if any)
+are being applied to published resources. If you enable the DEBUG logging
+level for the ``plone.caching`` logger, you will get this output in your
+event log. One way to do that is to set the global Zope logging level to
+DEBUG in ``zope.conf``::
+
+    <eventlog>
+        level DEBUG
+        <logfile>
+            path <file path here>
+            level DEBUG
+        </logfile>
+    </eventlog>    
+
+If you are using `plone.recipe.zope2instance`_ to create your Zope instances,
+you can set the logging level with the ``event-log-level`` option.
+
+You should see output in the log like::
+
+    2010-01-11 16:44:10 DEBUG plone.caching Published: <ATImage at /test/i> Ruleset: plone.download Interceptor: None
+    2010-01-11 16:44:10 DEBUG plone.caching Published: <ATImage at /test/i> Ruleset: plone.download Mutator: plone.caching.operations.chain
+
+The ``None`` indicates that no ruleset or operation was mapped.
+
+It is probably not a good idea to leave debug logging on for production use,
+as it can produce a lot of output, filling up log files and adding unnecessary
+load to your disks.
 
 Managing caching profiles
 -------------------------
@@ -131,14 +176,6 @@ Typically, ``registry.xml`` is all that is required, but you are free to add
 additional import steps if required. You can also add a ``metadata.xml`` and
 use the GenericSetup dependency mechanism to install other profiles on the
 fly.
-
-Caching operation helper functions
-----------------------------------
-
-If you are writing a custom caching operation, you will find the
-implementations of the default caching operations in the package
-``plone.app.caching.operations``. The ``utils`` module contains helper
-functions which you may find useful.
 
 Caching proxies and purging
 ---------------------------
@@ -230,36 +267,83 @@ a quick solution for the awkward situation where your boss walks in and
 wonders why the "about us" page is still showing that old picture of him,
 before he had a new haircut.
 
-Debug logging
+The RAM cache
 -------------
 
-It can sometimes be useful to see which rulesets and operations (if any)
-are being applied to published resources. If you enable the DEBUG logging
-level for the ``plone.caching`` logger, you will get this output in your
-event log. One way to do that is to set the global Zope logging level to
-DEBUG in ``zope.conf``::
+In addition to caching content in users' browsers (through setting appropriate
+response headers) and a caching proxy, Plone can cache certain information in
+memory. This is done in two main ways:
 
-    <eventlog>
-        level DEBUG
-        <logfile>
-            path <file path here>
-            level DEBUG
-        </logfile>
-    </eventlog>    
+* Developers may use the ``plone.memoize`` package's ``ram`` module to cache
+  the results of certain functions in RAM. For example, some viewlets and
+  portlets cache their rendered output in RAM for a time, alleviating the need
+  to calculate them every time.
+* Some caching operations may cache an entire response in memory. A caching
+  interceptor can then return the cached version provided it is valid.
 
-If you are using `plone.recipe.zope2instance`_ to create your Zope instances,
-you can set the logging level with the ``event-log-level`` option.
+Caching in RAM in Zope is not as efficient as caching in a proxy, for a number
+of reasons:
 
-You should see output in the log like::
+* Zope still has to perform traversal, security, transaction management and so
+  on before serving a request with a RAM-cached response.
+* Zope's use of memory is not as efficient as that of a finely optimised
+  caching proxy.
+* Storing lots of content in RAM may compete with the standard ZODB object
+  cache and other memory pools used by Zope, thus slowing down Zope overall.
+* In multi-client ZEO setups, the RAM cache is (by default at least) not
+  shared among instances (though it is shared among threads in that instance).
+  Thus, each ZEO client process will maintain its own cache.
 
-    2010-01-11 16:44:10 DEBUG plone.caching Published: <ATImage at /test/i> Ruleset: plone.download Interceptor: None
-    2010-01-11 16:44:10 DEBUG plone.caching Published: <ATImage at /test/i> Ruleset: plone.download Mutator: plone.caching.operations.chain
+You can use the *RAM cache* tab in the caching control panel to view
+statistics about the use of the RAM cache. On the *Change settings* tab, you
+can also control the size of the cache, and the frequency with which it is
+purged of old items.
 
-The ``None`` indicates that no ruleset or operation was mapped.
+Alternative RAM cache implementations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It is probably not a good idea to leave debug logging on for production use,
-as it can produce a lot of output, filling up log files and adding unnecessary
-load to your disks.
+The RAM cache exposed through ``plone.memoize.ram`` is looked up via an
+``ICacheChoser`` utility. The default implementation looks up a
+``zope.ramcache.interfaces.ram.IRAMCache`` utility. Plone installs a local
+such utility (to allows its settings to be persisted - the cache itself is
+not persistent), which is shared by all users of the cache.
+
+You can provide your own ``ICacheChooser`` utility to change this policy,
+by installing this as a local utility or overriding it in ``overrides.zcml``.
+One reason to do this may be to back the cache with a `memcached`_ server,
+which would allow a single cache to be shared among multiple Zope clients.
+
+Below is a sketch of such a cache chooser, courtesy of Wojciech Lichota::
+
+    from threading import local
+    from pylibmc import Client
+    from plone.memoize.ram import MemcacheAdapter
+    from plone.memoize.interfaces import ICacheChooser
+    
+    class MemcachedCacheChooser(object):
+        implements(ICacheChooser)
+        _v_thread_local = local()
+        
+        def getClient(self):
+            """
+            Return thread local connection to memcached.
+            """
+            connection = getattr(self._v_thread_local, 'connection', None)
+            if connection is None:
+                connection = Client(['127.0.0.1:11211'])
+                self._v_thread_local.connection = connection
+
+            return connection
+
+        def __call__(self, fun_name):
+            """
+            Create new adapter for plone.memoize.ram.
+            """
+            return MemcacheAdapter(client=self.getClient(), globalkey=fun_name)
+
+You could install this with the following lines in an overrides.zcml::
+
+    <utility factory=".memcached.MemcachedCacheChooser" />
 
 .. _plone.caching: http://pypi.python.org/pypi/plone.caching
 .. _plone.cachepurging: http://pypi.python.org/pypi/plone.cachepurging
@@ -267,6 +351,7 @@ load to your disks.
 .. _Varnish: http://varnish-cache.org
 .. _Squid: http://squid-cache.org
 .. _Enfold Proxy: http://enfoldsystems.com/software/proxy/
+.. _memcached: http://memcached.org
 
 .. [1] It is important to realise that whilst ``plone.app.caching`` provides
        some functionality for controlling how Plone interacts with a caching
