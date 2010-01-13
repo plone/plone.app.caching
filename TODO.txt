@@ -4,20 +4,18 @@ Plone caching to-do
 plone.app.caching
 -----------------
 
- [ ] Add IPurgePaths for ...
-        - /view
-        - default view(s)
-        - object fields
-        - image scales
-        - parent
-        - parent default view if set as default page
-   
+ [ ] Test purge paths
+ 
  [ ] Document purging
 
  [ ] Either integrate PageCacheManager or find an alternative
         - look at plone.memoize
  
  [ ] Update KGS
+ 
+ [ ] Add caching declarations to plone.namedfile
+        - Download view should declare ruleset plone.download
+        - IPurgeURL adapter should include full path to view plus sub-paths
  
  [ ] Build default response mutators
         - CacheFu has the following:

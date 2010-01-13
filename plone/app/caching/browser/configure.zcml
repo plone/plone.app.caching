@@ -10,6 +10,23 @@
         template="controlpanel.pt"
         permission="cmf.ManagePortal"
         />
+
+    <browser:page
+        name="caching-control-panel-import"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        class=".controlpanel.Import"
+        template="import.pt"
+        permission="cmf.ManagePortal"
+        />
+
+    <browser:page
+        name="caching-control-panel-purge"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        class=".controlpanel.Purge"
+        template="purge.pt"
+        permission="cmf.ManagePortal"
+        />
+
     
     <browser:resource
         name="plone.app.caching.gif"

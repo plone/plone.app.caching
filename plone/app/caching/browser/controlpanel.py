@@ -43,17 +43,7 @@ _isuri = re.compile(
     r"\S*$"               # non space (should be pickier)
     ).match
 
-class ControlPanel(object):
-    """Control panel view
-    """
-    
-    implements(IPublishTraverse)
-    
-    # Used by the publishTraverse() method - see below
-    editGlobal = False
-    editRuleset = False
-    editOperationName = None
-    editRulesetName = None
+class BaseView(object):
     
     def __init__(self, context, request):
         self.context = context
@@ -64,6 +54,40 @@ class ControlPanel(object):
         if self.request.response.getStatus() not in (301, 302):
             return self.render()
         return ''
+
+    def update(self):
+        
+        self.errors = {}
+        
+        self.registry = getUtility(IRegistry)
+        self.settings = self.registry.forInterface(ICacheSettings)
+        self.ploneSettings = self.registry.forInterface(IPloneCacheSettings)
+        self.purgingSettings = self.registry.forInterface(ICachePurgingSettings)
+        
+        if self.request.method != 'POST':
+            return False
+        
+        return True
+
+    def render(self):
+        return self.index()
+
+    @property
+    @memoize
+    def purgingEnabled(self):
+        return isCachePurgingEnabled()
+
+class ControlPanel(BaseView):
+    """Control panel view
+    """
+    
+    implements(IPublishTraverse)
+    
+    # Used by the publishTraverse() method - see below
+    editGlobal = False
+    editRuleset = False
+    editOperationName = None
+    editRulesetName = None
     
     def publishTraverse(self, request, name):
         """Allow the following types of URLs:
@@ -123,30 +147,11 @@ class ControlPanel(object):
         raise NotFound(self, name)
         
     def update(self):
-        
-        self.errors = {}
-        self.importErrors = {}
-        self.purgeErrors = {}
-        
-        self.registry = getUtility(IRegistry)
-        self.settings = self.registry.forInterface(ICacheSettings)
-        self.ploneSettings = self.registry.forInterface(IPloneCacheSettings)
-        self.purgingSettings = self.registry.forInterface(ICachePurgingSettings)
-        
-        if self.request.method != 'POST':
-            return
-        
-        if 'form.button.Save' in self.request.form:
-            self.processSave()
-        elif 'form.button.Cancel' in self.request.form:
-            self.request.response.redirect("%s/plone_control_panel" % self.context.absolute_url())
-        elif 'form.button.Import' in self.request.form:
-            self.processImport()
-        elif 'form.button.Purge' in self.request.form:
-            self.processPurge()
-        
-    def render(self):
-        return self.index()
+        if super(ControlPanel, self).update():
+            if 'form.button.Save' in self.request.form:
+                self.processSave()
+            elif 'form.button.Cancel' in self.request.form:
+                self.request.response.redirect("%s/plone_control_panel" % self.context.absolute_url())
     
     def processSave(self):
         
@@ -288,103 +293,7 @@ class ControlPanel(object):
         self.purgingSettings.domains = domains
         
         IStatusMessage(self.request).addStatusMessage(_(u"Changes saved"), "info")
-    
-    def processImport(self):
-        profile = self.request.form.get('profile', None)
-        snapshot = self.request.form.get('snapshot', True)
-        
-        if not profile:
-            self.importErrors['profile'] = _(u"You must select a profile to import")
-        
-        if self.importErrors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
-            return
-        
-        portal_setup = getToolByName(self.context, 'portal_setup')
-        
-        # Create a snapshot
-        if snapshot:
-            snapshotId = "plone.app.caching.beforeimport.%s" % \
-                            datetime.datetime.now().isoformat().replace(':', '.')
-            portal_setup.createSnapshot(snapshotId)
-        
-        # Import the new profile
-        portal_setup.runAllImportStepsFromProfile("profile-%s" % profile)
-        
-        IStatusMessage(self.request).addStatusMessage(_(u"Import complete"), "info")
-    
-    def processPurge(self):
-        
-        urls = self.request.form.get('urls', [])
-        sync = self.request.form.get('synchronous', True)
-        
-        purger = getUtility(IPurger)
-        self.purgeLog = []
-        
-        serverURL = self.request['SERVER_URL']
-        
-        def purge(url):
-            if sync:
-                status, xcache, xerror = purger.purgeSync(url)
-                
-                log = "Purged " + url
-                if xcache:
-                    log += " X-Cache: " + xcache
-                if xerror:
-                    log += " Error " + xerror
-                self.purgeLog.append(log)
-            else:
-                purger.purgeAsync(url)
-                self.purgeLog.append("Purged " + url)
-        
-        portal_url = getToolByName(self.context, 'portal_url')
-        portal = portal_url.getPortalObject()
-        portalPath = '/'.join(portal.getPhysicalPath())
-        
-        proxies = self.purgingSettings.cachingProxies
-        
-        for inputURL in urls:
-            if not inputURL.startswith(serverURL): # not in the site
-                if '://' in inputURL: # Full URL?
-                    purge(inputURL)
-                else:                 # Path?
-                    for newURL in getURLsToPurge(inputURL, proxies):
-                        purge(newURL)
-                continue
-            
-            physicalPath = relativePath = None
-            try:
-                physicalPath = self.request.physicalPathFromURL(inputURL)
-            except ValueError:
-                purge(inputURL)
-                continue
-            
-            if not physicalPath:
-                purge(inputURL)
-                continue
-            
-            relativePath = physicalPath[len(portalPath):]
-            if not relativePath:
-                purge(inputURL)
-                continue
-            
-            obj = portal.unrestrictedTraverse(relativePath, None)
-            if obj is None:
-                purge(inputURL)
-                continue
-            
-            for path in getPathsToPurge(obj, self.request):
-                for newURL in getURLsToPurge(path, proxies):
-                    purge(newURL)
-    
-    # Properties accessed in the template
-    
-    @property
-    @memoize
-    def profiles(self):
-        portal_setup = getToolByName(self.context, 'portal_setup')
-        return [profile for profile in portal_setup.listProfileInfo(ICacheProfiles) 
-                  if profile.get('type', BASE) == EXTENSION and profile.get('for') is not None]
+
     
     # Rule types - used as the index column
     
@@ -568,3 +477,123 @@ class ControlPanel(object):
     def purgingEnabled(self):
         return isCachePurgingEnabled()
 
+class Import(BaseView):
+    """The import control panel
+    """
+
+    def update(self):
+        if super(Import, self).update():
+            if 'form.button.Import' in self.request.form:
+                self.processImport()
+    
+    def processImport(self):
+        profile = self.request.form.get('profile', None)
+        snapshot = self.request.form.get('snapshot', True)
+        
+        if not profile:
+            self.errors['profile'] = _(u"You must select a profile to import")
+        
+        if self.errors:
+            IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
+            return
+        
+        portal_setup = getToolByName(self.context, 'portal_setup')
+        
+        # Create a snapshot
+        if snapshot:
+            snapshotId = "plone.app.caching.beforeimport.%s" % \
+                            datetime.datetime.now().isoformat().replace(':', '.')
+            portal_setup.createSnapshot(snapshotId)
+        
+        # Import the new profile
+        portal_setup.runAllImportStepsFromProfile("profile-%s" % profile)
+        
+        IStatusMessage(self.request).addStatusMessage(_(u"Import complete"), "info")
+
+    @property
+    @memoize
+    def profiles(self):
+        portal_setup = getToolByName(self.context, 'portal_setup')
+        return [profile for profile in portal_setup.listProfileInfo(ICacheProfiles) 
+                  if profile.get('type', BASE) == EXTENSION and profile.get('for') is not None]
+
+class Purge(BaseView):
+    """The purge control panel
+    """
+    def update(self):
+        self.purgeLog = []
+        
+        if super(Purge, self).update():
+            if 'form.button.Purge' in self.request.form:
+                self.processPurge()
+        
+    
+    def processPurge(self):
+        
+        urls = self.request.form.get('urls', [])
+        sync = self.request.form.get('synchronous', True)
+        
+        if not urls:
+            self.errors['urls'] = _(u"No URLs or paths entered")
+        
+        if self.errors:
+            IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
+            return
+        
+        purger = getUtility(IPurger)
+        
+        serverURL = self.request['SERVER_URL']
+        
+        def purge(url):
+            if sync:
+                status, xcache, xerror = purger.purgeSync(url)
+                
+                log = url
+                if xcache:
+                    log += " (X-Cache header: " + xcache + ")"
+                if xerror:
+                    log += " -- " + xerror
+                self.purgeLog.append(log)
+            else:
+                purger.purgeAsync(url)
+                self.purgeLog.append(url)
+        
+        portal_url = getToolByName(self.context, 'portal_url')
+        portal = portal_url.getPortalObject()
+        portalPath = '/'.join(portal.getPhysicalPath())
+        
+        proxies = self.purgingSettings.cachingProxies
+        
+        for inputURL in urls:
+            if not inputURL.startswith(serverURL): # not in the site
+                if '://' in inputURL: # Full URL?
+                    purge(inputURL)
+                else:                 # Path?
+                    for newURL in getURLsToPurge(inputURL, proxies):
+                        purge(newURL)
+                continue
+            
+            physicalPath = relativePath = None
+            try:
+                physicalPath = self.request.physicalPathFromURL(inputURL)
+            except ValueError:
+                purge(inputURL)
+                continue
+            
+            if not physicalPath:
+                purge(inputURL)
+                continue
+            
+            relativePath = physicalPath[len(portalPath):]
+            if not relativePath:
+                purge(inputURL)
+                continue
+            
+            obj = portal.unrestrictedTraverse(relativePath, None)
+            if obj is None:
+                purge(inputURL)
+                continue
+            
+            for path in getPathsToPurge(obj, self.request):
+                for newURL in getURLsToPurge(path, proxies):
+                    purge(newURL)    

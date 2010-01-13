@@ -81,6 +81,7 @@
     
         <cache:ruleset ruleset="plone.resource" for="OFS.Image.File" />
         
+        <!-- Automatically purge these always -->
         <class class="OFS.Image.File">
             <implements interface="plone.cachepurging.interfaces.IPurgeable" />
         </class>
@@ -114,6 +115,19 @@
         
         <cache:ruleset ruleset="plone.download" for="plone.app.blob.interfaces.IATBlob" />
         
+    </configure>
+    
+    <!-- Paths to purge -->
+    
+    <!-- Standard CMF content -->
+    <adapter factory=".purge.ContentPurgePaths" name="plone.content" />
+    
+    <!-- Discussion items -->
+    <adapter factory=".purge.DiscussionItemPurgePaths" name="plone.content" />
+    
+    <!-- Archetypes object fields -->
+    <configure zcml:condition="installed Products.Archetypes">
+        <adapter factory=".purge.ObjectFieldPurgePaths" name="plone.atobjectfields" />
     </configure>
     
 </configure>
