@@ -228,12 +228,12 @@ class EditForm(form.Form):
             return
         self.applyChanges(data)
         IStatusMessage(self.request).addStatusMessage(_(u"Changes saved"), "info")
-        self.request.response.redirect("%s/@@caching-control-panel#detailed-settings" % self.context.absolute_url())
+        self.request.response.redirect("%s/@@caching-controlpanel#detailed-settings" % self.context.absolute_url())
     
     @button.buttonAndHandler(_(u"Cancel"), name="cancel")
     def cancel(self, action):
         IStatusMessage(self.request).addStatusMessage(_(u"Edit cancelled"), type="info")
-        self.request.response.redirect("%s/@@caching-control-panel#detailed-settings" % self.context.absolute_url())
+        self.request.response.redirect("%s/@@caching-controlpanel#detailed-settings" % self.context.absolute_url())
         return ''
     
     @button.buttonAndHandler(_(u"Delete settings (use defaults)"), name="clear")
@@ -245,7 +245,7 @@ class EditForm(form.Form):
                 del self.registry.records[key]
         
         IStatusMessage(self.request).addStatusMessage(_(u"Ruleset-specific settings removed"), type="info")
-        self.request.response.redirect("%s/@@caching-control-panel#detailed-settings" % self.context.absolute_url())
+        self.request.response.redirect("%s/@@caching-controlpanel#detailed-settings" % self.context.absolute_url())
         return ''
 
     

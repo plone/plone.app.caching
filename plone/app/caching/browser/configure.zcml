@@ -4,7 +4,7 @@
     i18n_domain="plone.app.caching">
     
     <browser:page
-        name="caching-control-panel"
+        name="caching-controlpanel"
         for="Products.CMFPlone.interfaces.IPloneSiteRoot"
         class=".controlpanel.ControlPanel"
         template="controlpanel.pt"
@@ -12,7 +12,7 @@
         />
 
     <browser:page
-        name="caching-control-panel-import"
+        name="caching-controlpanel-import"
         for="Products.CMFPlone.interfaces.IPloneSiteRoot"
         class=".controlpanel.Import"
         template="import.pt"
@@ -20,7 +20,7 @@
         />
 
     <browser:page
-        name="caching-control-panel-purge"
+        name="caching-controlpanel-purge"
         for="Products.CMFPlone.interfaces.IPloneSiteRoot"
         class=".controlpanel.Purge"
         template="purge.pt"

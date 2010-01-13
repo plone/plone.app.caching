@@ -5,7 +5,9 @@ plone.app.caching
 -----------------
 
  [ ] Either integrate PageCacheManager or find an alternative
-        - look at plone.memoize
+        - set up an IRAMCache persistent utility
+        - edit settings via control panel
+        - borrow ICacheChooser from plone.memoize
  
  [ ] Update KGS
  

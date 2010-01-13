@@ -16,17 +16,17 @@
             <ul class="contentViews" id="content-views">
               <li class="selected">
                 <a href=""
-                   tal:attributes="href string:${portal_url}/@@caching-control-panel"
+                   tal:attributes="href string:${portal_url}/@@caching-controlpanel"
                    i18n:translate="label_settings">Change settings</a>
               </li>
               <li>
                 <a href=""
-                   tal:attributes="href string:${portal_url}/@@caching-control-panel-import"
+                   tal:attributes="href string:${portal_url}/@@caching-controlpanel-import"
                    i18n:translate="label_import">Import settings</a>
               </li>
               <li tal:condition="view/purgingEnabled">
                 <a href=""
-                   tal:attributes="href string:${portal_url}/@@caching-control-panel-purge"
+                   tal:attributes="href string:${portal_url}/@@caching-controlpanel-purge"
                    i18n:translate="label_purging">Purge</a>
               </li>
             </ul>
