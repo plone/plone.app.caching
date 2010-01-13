@@ -27,7 +27,12 @@
               <li class="selected">
                 <a href=""
                    tal:attributes="href string:${portal_url}/@@caching-controlpanel-purge"
-                   i18n:translate="label_purging">Purge</a>
+                   i18n:translate="label_purging">Purge caching proxy</a>
+              </li>
+              <li>
+                <a href=""
+                   tal:attributes="href string:${portal_url}/@@caching-controlpanel-ramcache"
+                   i18n:translate="label_ramcache">RAM cache</a>
               </li>
             </ul>
         </div>
@@ -121,6 +126,8 @@
                             value="Purge"
                             i18n:attributes="value">
                     </div>
+                    
+                    <input tal:replace="structure context/@@authenticator/authenticator" />
 
                 </form>
             </div>

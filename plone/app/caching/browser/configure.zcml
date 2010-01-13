@@ -26,7 +26,14 @@
         template="purge.pt"
         permission="cmf.ManagePortal"
         />
-
+    
+    <browser:page
+        name="caching-controlpanel-ramcache"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        class=".controlpanel.RAMCache"
+        template="ramcache.pt"
+        permission="cmf.ManagePortal"
+        />
     
     <browser:resource
         name="plone.app.caching.gif"

@@ -9,6 +9,8 @@
     <include package="plone.caching" />
     <include package="plone.cachepurging" />
     <include package="plone.app.registry" />
+    <include package="plone.memoize" />
+    <include package="plone.protect" />
     
     <include package=".browser" />
     <include package=".operations" />

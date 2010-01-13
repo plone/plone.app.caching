@@ -18,6 +18,8 @@ from plone.registry.interfaces import IRegistry
 from z3c.caching.interfaces import IRulesetType
 from z3c.caching.registry import enumerateTypes
 
+from plone.protect import CheckAuthenticator
+
 from plone.caching.interfaces import ICacheSettings
 from plone.caching.interfaces import ICacheOperationType
 from plone.caching.interfaces import IResponseMutatorType
@@ -58,7 +60,6 @@ class BaseView(object):
         return ''
 
     def update(self):
-        
         self.errors = {}
         
         self.registry = getUtility(IRegistry)
@@ -67,11 +68,11 @@ class BaseView(object):
         self.purgingSettings = self.registry.forInterface(ICachePurgingSettings)
         self.ramCache = queryUtility(IRAMCache)
         
-        if self.request.method != 'POST':
-            return False
+        if self.request.method == 'POST':
+            CheckAuthenticator(self.request)
+            return True
+        return False
         
-        return True
-
     def render(self):
         return self.index()
 
@@ -632,3 +633,24 @@ class Purge(BaseView):
             for path in getPathsToPurge(obj, self.request):
                 for newURL in getURLsToPurge(path, proxies):
                     purge(newURL)    
+
+class RAMCache(BaseView):
+    """The RAM cache control panel
+    """
+    
+    def update(self):
+        if super(RAMCache, self).update():
+            if 'form.button.Purge' in self.request.form:
+                self.processPurge()
+    
+    def processPurge(self):
+        
+        if self.ramCache is None:
+            IStatusMessage(self.request).addStatusMessage(_(u"RAM cache not installed"), "error")
+        
+        if self.errors:
+            IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
+            return
+        
+        self.ramCache.invalidateAll()
+        IStatusMessage(self.request).addStatusMessage(_(u"Cache purged"), "info")
