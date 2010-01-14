@@ -25,12 +25,6 @@
 
     <adapter factory=".mutators.StableResources" name="plone.app.caching.stableresources" />
     <utility component=".mutators.StableResources" name="plone.app.caching.stableresources" />
-
-    <!-- some examples for testing ... delete when the above works -->
-    <adapter factory=".testing.Always304" name="plone.app.caching.always304" />
-    <utility component=".testing.Always304" name="plone.app.caching.always304" />
-    <adapter factory=".testing.MaxAge" name="plone.app.caching.maxage" />
-    <utility component=".testing.MaxAge" name="plone.app.caching.maxage" />
     
     <!-- RAM page cache -->
     <adapter   factory=".pagecache.PageCache" name="plone.app.caching.operations.pagecache" />
