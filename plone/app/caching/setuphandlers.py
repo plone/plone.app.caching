@@ -22,7 +22,7 @@ def importVarious(context):
     ignored = properties.get('ignored_exceptions', ())
     
     modified = False
-    for exceptionName in ('Interceptor',):
+    for exceptionName in ('Intercepted',):
         if exceptionName not in ignored:
             ignored += (exceptionName,)
             modified = True
