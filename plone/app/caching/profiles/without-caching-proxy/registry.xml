@@ -1,3 +1,14 @@
 <registry>
 
+  <record field="mutatorMapping" interface="plone.caching.interfaces.ICacheSettings" name="plone.caching.interfaces.ICacheSettings.mutatorMapping">
+    <value>
+      <element key="plone.resource">plone.app.caching.resources</element>
+      <element key="plone.stableResource">plone.app.caching.stableresources</element>
+      <element key="plone.content.itemView">plone.app.caching.compositeviews</element>
+      <element key="plone.content.feed">plone.app.caching.contentfeeds</element>
+      <element key="plone.content.folderView">plone.app.caching.compositeviews</element>
+      <element key="plone.download">plone.app.caching.downloads</element>
+    </value>
+  </record>
+
 </registry>
