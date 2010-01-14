@@ -92,7 +92,7 @@ def getRAMCacheKey(published, request):
             return content.absolute_url_path()
     return request['ACTUAL_URL']
 
-def getEtag(published, request, keys, extraTokens):
+def getEtag(published, request, keys, extraTokens=()):
     """Calculate an Etag.
     
     ``keys`` is a list of types of items to include in the ETag. Valid values
@@ -183,10 +183,10 @@ def getEtag(published, request, keys, extraTokens):
         if registry is not None:
             settings = registry.forInterface(IPloneCacheSettings, check=False)
             gzip_capable = request.get('HTTP_ACCEPT_ENCODING', '').find('gzip') != -1
-            etags.append(int(settings.enableCompression and gzip_capable))
+            etags.append(str(int(settings.enableCompression and gzip_capable)))
     
     if 'last_modified' in keys:
-        etags.append(ILastModified(published)())
+        etags.append(ILastModified(published)().isoformat())
     
     if 'catalog_modified' in keys:
         # CacheFu kept a counter for catalog modifications.
@@ -195,7 +195,7 @@ def getEtag(published, request, keys, extraTokens):
         pass
     
     if 'object_locked' in keys:
-        etags.append(context_state.is_locked())
+        etags.append(str(context_state.is_locked()))
     
     for token in extraTokens:
         etags.append(token)

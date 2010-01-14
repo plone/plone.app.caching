@@ -45,6 +45,7 @@ class CompositeViews(object):
     def __call__(self, rulename, response):
         portal_state = getMultiAdapter((self.published, self.request), name=u'plone_portal_state')
         options = lookupOptions(self.__class__, rulename)
+        
         etag = getEtag(self.published, self.request, options['etags'] or self.etags)
         cacheInBrowser(self.published, self.request, response, etag=etag)
         
