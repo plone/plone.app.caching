@@ -394,9 +394,9 @@ class ControlPanel(BaseView):
             lookup[name] = dict(
                 name=name,
                 title=type_.title,
-                description=type_.description,
-                prefix=type_.prefix,
-                options=type_.options,
+                description=getattr(type_, 'description', ''),
+                prefix=getattr(type_, 'prefix', None),
+                options=getattr(type_, 'options', ()),
                 hasOptions=self.hasGlobalOptions(type_),
                 type=type_,
             )
@@ -410,9 +410,9 @@ class ControlPanel(BaseView):
             lookup[name] = dict(
                 name=name,
                 title=type_.title,
-                description=type_.description,
-                prefix=type_.prefix,
-                options=type_.options,
+                description=getattr(type_, 'description', ''),
+                prefix=getattr(type_, 'prefix', None),
+                options=getattr(type_, 'options', ()),
                 hasOptions=self.hasGlobalOptions(type_),
                 type=type_,
             )
@@ -483,8 +483,8 @@ class ControlPanel(BaseView):
     # one option set, we consider it to have options.
     
     def hasGlobalOptions(self, operationType):
-        prefix = operationType.prefix
-        options = operationType.options
+        prefix = getattr(operationType, 'prefix', None)
+        options = getattr(operationType, 'options', ())
         
         if not options or not prefix:
             return False
