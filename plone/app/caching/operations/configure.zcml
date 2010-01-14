@@ -5,6 +5,35 @@
     <include package="plone.caching" />
     <include package="plone.app.registry" />
     
-    
+
+<!-- XXX These don't work yet  :(
+
+    <adapter factory=".mutators.CompositeViews" name="plone.app.caching.compositeviews" />
+    <utility component=".mutators.CompositeViews" name="plone.app.caching.compositeviews" />
+
+    <adapter factory=".mutators.ContentFeeds" name="plone.app.caching.contentfeeds" />
+    <utility component=".mutators.ContentFeeds" name="plone.app.caching.contentfeeds" />
+
+    <adapter factory=".mutators.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
+    <utility component=".mutators.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
+
+    <adapter factory=".mutators.Downloads" name="plone.app.caching.downloads" />
+    <utility component=".mutators.Downloads" name="plone.app.caching.downloads" />
+
+    <adapter factory=".mutators.DownloadsWithProxy" name="plone.app.caching.downloadswithproxy" />
+    <utility component=".mutators.DownloadsWithProxy" name="plone.app.caching.downloadswithproxy" />
+
+    <adapter factory=".mutators.Resources" name="plone.app.caching.resources" />
+    <utility component=".mutators.Resources" name="plone.app.caching.resources" />
+
+    <adapter factory=".mutators.StableResources" name="plone.app.caching.stableresources" />
+    <utility component=".mutators.StableResources" name="plone.app.caching.stableresources" />
+-->
+
+<!-- some examples for testing ... delete when the above works -->
+    <adapter factory=".testing.Always304" name="plone.app.caching.always304" />
+    <utility component=".testing.Always304" name="plone.app.caching.always304" />
+    <adapter factory=".testing.MaxAge" name="plone.app.caching.maxage" />
+    <utility component=".testing.MaxAge" name="plone.app.caching.maxage" />
     
 </configure>
