@@ -8,8 +8,6 @@ from zope.component import getMultiAdapter
 
 from zope.publisher.interfaces.http import IHTTPRequest
 
-from z3c.caching.interfaces import ILastModified
-
 from plone.caching.interfaces import IResponseMutator
 from plone.caching.interfaces import IResponseMutatorType
 from plone.caching.utils import lookupOptions
@@ -20,6 +18,8 @@ from plone.app.caching.operations.utils import cacheInProxy
 from plone.app.caching.operations.utils import cacheEverywhere
 from plone.app.caching.operations.utils import cacheInRAM
 from plone.app.caching.operations.utils import getEtag
+from plone.app.caching.operations.utils import safeLastModified
+
 from plone.app.caching.interfaces import _
 
 class CompositeViews(object):
@@ -132,7 +132,7 @@ class Downloads(object):
     
     def __call__(self, rulename, response):
         if 'Anonymous' in rolesForPermissionOn('View', self.published):
-            lastmodified = ILastModified(self.published)()
+            lastmodified = safeLastModified(self.published)
             cacheInBrowser(self.published, self.request, response, lastmodified=lastmodified)
         else:
             doNotCache(self.published, self.request, response)
@@ -163,7 +163,7 @@ class DownloadsWithProxy(object):
             options = lookupOptions(self.__class__, rulename)
             smaxage = options['smaxage'] or self.smaxage
             vary = options['vary']
-            lastmodified = ILastModified(self.published)()
+            lastmodified = safeLastModified(self.published)
             cacheInProxy(self.published, self.request, response, smaxage, lastmodified=lastmodified, vary=vary)
         else:
             doNotCache(self.published, self.request, response)
@@ -191,7 +191,7 @@ class Resources(object):
         options = lookupOptions(self.__class__, rulename)
         maxage = options['max-age'] or self.maxage
         vary = options['vary']
-        lastmodified = ILastModified(self.published)()
+        lastmodified = safeLastModified(self.published)
         cacheEverywhere(self.published, self.request, response, maxage, lastmodified=lastmodified, vary=vary)
 
 class StableResources(object):
@@ -220,7 +220,7 @@ class StableResources(object):
             maxage = options['max-age'] or self.maxage
             etag = getEtag(self.published, self.request, options['etags'])
             vary = options['vary']
-            lastmodified = ILastModified(self.published)()
+            lastmodified = safeLastModified(self.published)
             cacheEverywhere(self.published, self.request, response, maxage, lastmodified=lastmodified, etag=etag, vary=vary)
         else:
             doNotCache(self.published, self.request, response)

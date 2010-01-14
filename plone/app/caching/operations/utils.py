@@ -53,6 +53,16 @@ def formatDateTime(dt):
     
     return wsgiref.handlers.format_date_time(time.mktime(dt.timetuple()))
 
+def safeLastModified(published):
+    """Get a last modified date or None
+    """
+    
+    lastModified = ILastModified(published, None)
+    if lastModified is None:
+        return None
+    
+    return lastModified()
+
 def getExpiration(maxage):
     """Get an expiration date as a datetime.
     
@@ -186,7 +196,9 @@ def getEtag(published, request, keys, extraTokens=()):
             etags.append(str(int(settings.enableCompression and gzip_capable)))
     
     if 'last_modified' in keys:
-        etags.append(ILastModified(published)().isoformat())
+        lastModified = safeLastModified(published)
+        if lastModified is not None:
+            etags.append(lastModified.isoformat())
     
     if 'catalog_modified' in keys:
         # CacheFu kept a counter for catalog modifications.
