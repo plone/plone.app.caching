@@ -106,7 +106,6 @@ class Store(object):
         return None
     
     def transformBytes(self, result, encoding):
-        import pdb; pdb.set_trace( )
         status = self.request.response.getStatus()
         if status != 200:
             return
@@ -115,7 +114,6 @@ class Store(object):
         return None
     
     def transformIterable(self, result, encoding):
-        import pdb; pdb.set_trace( )
         status = self.request.response.getStatus()
         if status != 200:
             return
