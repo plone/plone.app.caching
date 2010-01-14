@@ -222,6 +222,10 @@ def getEtag(published, request, keys, extraTokens=()):
 def doNotCache(published, request, response):
     """Set response headers to ensure that the response is not cached by
     web browsers or caching proxies.
+    
+    This is an IE-safe operation. Under certain conditions, IE chokes on
+    ``no-cache`` and ``no-store`` cache-control tokens so instead we just
+    expire immediately and disable validation.
     """
     
     response.unsetHeader('Last-Modified')
@@ -230,14 +234,16 @@ def doNotCache(published, request, response):
 
 def cacheInBrowser(published, request, response, etag=None, lastmodified=None):
     """Set response headers to indicate that browsers should cache the
-    response.
+    response but expire immediately and revalidate the cache on every
+    subsequent request.
     
     ``etag`` is a string value indicating an Etag to use.
     ``lastmodified`` is a datetime object
+    
+    If neither etag nor lastmodified is given then no validation is
+    possible and this becomes equivalent to doNotCache()
     """
     
-    # Note: if neither etag nor lastmodified is given
-    # then this is the same as doNotCache()
     if etag is not None:
         response.setHeader('ETag', etag)
     if lastmodified is not None:
@@ -269,7 +275,7 @@ def cacheInProxy(published, request, response, smaxage, lastmodified=None, etag=
     if vary is not None:
         response.setHeader('Vary', vary)
 
-def cacheEverywhere(pupblished, request, response, maxage, lastmodified=None, etag=None, vary=None):
+def cacheEverywhere(published, request, response, maxage, lastmodified=None, etag=None, vary=None):
     """Set headers to cache the response in the browser and caching proxy if
     applicable.
     
