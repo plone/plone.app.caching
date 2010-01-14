@@ -50,7 +50,7 @@ class CompositeViews(object):
         cacheInBrowser(self.published, self.request, response, etag=etag)
         
         if portal_state.anonymous():            
-            cacheInRAM(response, etag)
+            cacheInRAM(self.published, self.request, response, etag)
 
 class ContentFeeds(object):
     implements(IResponseMutator)
@@ -77,7 +77,7 @@ class ContentFeeds(object):
         etag = getEtag(self.published, self.request, options['etags'] or self.etags)
         cacheInBrowser(self.published, self.request, response, etag=etag)
         if portal_state.anonymous():            
-            cacheInRAM(response, etag)
+            cacheInRAM(self.published, self.request, response, etag)
 
 class ContentFeedsWithProxy(object):
     implements(IResponseMutator)
@@ -109,7 +109,7 @@ class ContentFeedsWithProxy(object):
         vary = options['vary']
         if portal_state.anonymous():            
             cacheInProxy(self.published, self.request, response, smaxage, etag=etag, vary=vary)
-            cacheInRAM(response, etag)
+            cacheInRAM(self.published, self.request, response, etag)
         else:
             cacheInBrowser(self.published, self.request, response, etag=etag)
 
