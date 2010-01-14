@@ -5,6 +5,8 @@ from DateTime import DateTime
 from zope.component import getMultiAdapter
 from zope.component import queryUtility
 
+from plone.memoize.interfaces import ICacheChooser
+
 from z3c.caching.interfaces import ILastModified
 from plone.registry.interfaces import IRegistry
 from plone.app.caching.interfaces import IPloneCacheSettings
@@ -137,3 +139,20 @@ def getEtag(published, request, values, *extras):
            etags.append(token)
        etag = '|' + '|'.join(etags)
        return etag.replace(',',';')  # commas are bad in etags
+
+def getRAMCache(key):
+    """Get a RAM cache instance for the given key. The return value is ``None``
+    if no RAM cache can be found, or a mapping object supporting at least
+    ``__getitem__()``, ``__setitem__()`` and ``get()`` that can be used to get
+    or set cache values.
+    
+    ``key`` is the global cache key, which must be unique site-wide. Most
+    commonly, this will be the operation dotted name.
+    """
+    
+    chooser = queryUtility(ICacheChooser)
+    if chooser is None:
+        return None
+    
+    return chooser(key)
+

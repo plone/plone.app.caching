@@ -32,7 +32,7 @@ class CompositeViews(object):
 
     title = _(u"Cache composite views")
     description = _(u"""Composite views (content item views and templates) can
-        include dependancies that are difficult to track in the general case so
+        include dependencies that are difficult to track in the general case so
         we cache these in the browser but expire immediately and enable ETag 
         validation checks. If anonymous then also cache in Zope RAM""")
     prefix = 'plone.app.caching.compositeviews'

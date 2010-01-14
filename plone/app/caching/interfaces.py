@@ -61,3 +61,9 @@ class IPloneCacheSettings(Interface):
             value_type=schema.ASCIILine(title=_(u"Content type name")),
             default=('File', 'Image',),
         )
+
+class IRAMCached(Interface):
+    """Marker interface applied to the request if it should be RAM cached.
+    
+    The cache key will be stored in request annotations.
+    """

@@ -4,8 +4,7 @@ Plone caching to-do
 plone.app.caching
 -----------------
 
- [ ] Either integrate PageCacheManager or find an alternative
-        - use ICacheChooser from plone.memoize
+ [ ] Add full-page cache
         - Implement operation + helper (to cache) and interceptor
         - Add event-based content purging?
         - Document
