@@ -4,7 +4,6 @@ from zope.interface import implements
 from zope.interface import classProvides
 from zope.interface import Interface
 from zope.component import adapts
-from zope.component import queryMultiAdapter
 from zope.component import getMultiAdapter
 
 from zope.publisher.interfaces.http import IHTTPRequest
@@ -46,8 +45,9 @@ class CompositeViews(object):
     def __call__(self, rulename, response):
         portal_state = getMultiAdapter((self.published, self.request), name=u'plone_portal_state')
         options = lookupOptions(self.__class__, rulename)
-        etag = getEtag(self.published, self.request, options['etags'] or etags)
-        cacheInBrowser(response, etag=etag)
+        etag = getEtag(self.published, self.request, options['etags'] or self.etags)
+        cacheInBrowser(self.published, self.request, response, etag=etag)
+        
         if portal_state.anonymous():            
             cacheInRAM(response, etag)
 
@@ -73,8 +73,8 @@ class ContentFeeds(object):
     def __call__(self, rulename, response):
         portal_state = getMultiAdapter((self.published, self.request), name=u'plone_portal_state')
         options = lookupOptions(self.__class__, rulename)
-        etag = getEtag(self.published, self.request, options['etags'] or etags)
-        cacheInBrowser(response, etag=etag)
+        etag = getEtag(self.published, self.request, options['etags'] or self.etags)
+        cacheInBrowser(self.published, self.request, response, etag=etag)
         if portal_state.anonymous():            
             cacheInRAM(response, etag)
 
@@ -103,14 +103,14 @@ class ContentFeedsWithProxy(object):
     def __call__(self, rulename, response):
         portal_state = getMultiAdapter((self.published, self.request), name=u'plone_portal_state')
         options = lookupOptions(self.__class__, rulename)
-        etag = getEtag(self.published, self.request, options['etags'] or etags)
-        smaxage = options['s-maxage'] or smaxage
+        etag = getEtag(self.published, self.request, options['etags'] or self.etags)
+        smaxage = options['s-maxage'] or self.smaxage
         vary = options['vary']
         if portal_state.anonymous():            
-            cacheInProxy(response, smaxage, etag=etag, vary=vary)
+            cacheInProxy(self.published, self.request, response, smaxage, etag=etag, vary=vary)
             cacheInRAM(response, etag)
         else:
-            cacheInBrowser(response, etag=etag)
+            cacheInBrowser(self.published, self.request, response, etag=etag)
 
 class Downloads(object):
     implements(IResponseMutator)
@@ -132,9 +132,9 @@ class Downloads(object):
     def __call__(self, rulename, response):
         if 'Anonymous' in rolesForPermissionOn('View', self.published):
             lastmodified = ILastModified(self.published)()
-            cacheInBrowser(response, lastmodified=lastmodified)
+            cacheInBrowser(self.published, self.request, response, lastmodified=lastmodified)
         else:
-            doNotCache(response)
+            doNotCache(self.published, self.request, response)
 
 class DownloadsWithProxy(object):
     implements(IResponseMutator)
@@ -160,12 +160,12 @@ class DownloadsWithProxy(object):
     def __call__(self, rulename, response):
         if 'Anonymous' in rolesForPermissionOn('View', self.published):
             options = lookupOptions(self.__class__, rulename)
-            smaxage = options['smaxage'] or smaxage
+            smaxage = options['smaxage'] or self.smaxage
             vary = options['vary']
             lastmodified = ILastModified(self.published)()
-            cacheInProxy(response, smaxage, lastmodified=lastmodified, vary=vary)
+            cacheInProxy(self.published, self.request, response, smaxage, lastmodified=lastmodified, vary=vary)
         else:
-            doNotCache(response)
+            doNotCache(self.published, self.request, response)
     
 class Resources(object):
     implements(IResponseMutator)
@@ -188,10 +188,10 @@ class Resources(object):
     
     def __call__(self, rulename, response):
         options = lookupOptions(self.__class__, rulename)
-        maxage = options['max-age'] or maxage
+        maxage = options['max-age'] or self.maxage
         vary = options['vary']
         lastmodified = ILastModified(self.published)()
-        cacheEverywhere(response, maxage, lastmodified=lastmodified, vary=vary)
+        cacheEverywhere(self.published, self.request, response, maxage, lastmodified=lastmodified, vary=vary)
 
 class StableResources(object):
     implements(IResponseMutator)
@@ -216,11 +216,10 @@ class StableResources(object):
         rr = None  # XXX get the Resource Registry for this item or return None if this is a non-RR item
         if rr is None or (rr.isCacheable(self.published.getId()) and not rr.getDebugMode()):
             options = lookupOptions(self.__class__, rulename)
-            maxage = options['max-age'] or maxage
+            maxage = options['max-age'] or self.maxage
             etag = getEtag(self.published, self.request, options['etags'])
             vary = options['vary']
             lastmodified = ILastModified(self.published)()
-            cacheEverywhere(response, maxage, lastmodified=lastmodified, etag=etag, vary=vary)
+            cacheEverywhere(self.published, self.request, response, maxage, lastmodified=lastmodified, etag=etag, vary=vary)
         else:
-            doNotCache(response)
-
+            doNotCache(self.published, self.request, response)

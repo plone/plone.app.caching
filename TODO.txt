@@ -3,6 +3,8 @@ Plone caching to-do
 
 plone.app.caching
 -----------------
+ 
+ [ ] Provide better framework for etag building
 
  [ ] Update KGS
  

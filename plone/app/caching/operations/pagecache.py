@@ -1,11 +1,8 @@
 from zope.interface import implements
 from zope.interface import classProvides
-from zope.interface import alsoProvides
 from zope.interface import Interface
 
 from zope.component import adapts
-
-from zope.annotation.interfaces import IAnnotations
 
 from plone.transformchain.interfaces import ITransform
 
@@ -15,7 +12,9 @@ from plone.caching.interfaces import ICacheInterceptorType
 from plone.app.caching.interfaces import _
 from plone.app.caching.interfaces import IRAMCached
 
-from plone.app.caching.operations.utils import getRAMCache
+from plone.app.caching.operations.utils import fetchFromRAMCache
+from plone.app.caching.operations.utils import cachedResponse
+from plone.app.caching.operations.utils import storeResponseInRAMCache
 
 GLOBAL_KEY = 'plone.app.caching.operations.pagecache'
 
@@ -30,8 +29,8 @@ class PageCache(object):
     # Type metadata
     classProvides(ICacheInterceptorType)
     
-    title = _(u"Cache in memory")
-    description = _(u"Allows a page to be cached in memory")
+    title = _(u"Fetch from RAM cache")
+    description = _(u"Allow a RAM-cached page to be fetched")
     prefix = GLOBAL_KEY
     options = ()
     
@@ -41,44 +40,11 @@ class PageCache(object):
         
     def __call__(self, rulename, response):
         
-        key = self._getKey()
-        if key is None:
-            return None
-        
-        cache = getRAMCache(GLOBAL_KEY)
-        if cache is None:
-            return
-        
-        cached = cache.get(key)
-        
-        # We don't have a cached value - save the key and enable the transform
-        # to cache later
+        cached = fetchFromRAMCache(self.published, self.request, response)
         if cached is None:
-            annotations = IAnnotations(self.request, None)
-            if annotations is None:
-                return None
+            return None
             
-            annotations[GLOBAL_KEY + '.key'] = key
-            alsoProvides(self.request, IRAMCached)
-        else:
-            status, headers, body = cached
-            self.request.response.setStatus(status)
-            
-            for k, v in headers.items():
-                if k == 'ETag':
-                    self.request.response.setHeader(k, v, literal=1)
-                else:
-                    self.request.response.setHeader(k, v)
-            
-            return body
-
-    def _getKey(self):
-        # TODO: This needs to be made a lot smarter
-        #   - calculate an ETag and only set if one can be prepared
-        #   - only cache if we have an ETag
-        #   - only cache 200 responses
-        
-        return self.request.get('ACTUAL_URL')
+        return cachedResponse(self.published, self.request, response, cached)
 
 class Store(object):
     """Transform chain element which actually saves the page in RAM.
@@ -100,42 +66,23 @@ class Store(object):
     def transformUnicode(self, result, encoding):
         status = self.request.response.getStatus()
         if status != 200:
-            return
+            return None
         
-        self.cache(result.encode(encoding))
+        storeResponseInRAMCache(self.published, self.request, self.request.response, result.encode(encoding))
         return None
     
     def transformBytes(self, result, encoding):
         status = self.request.response.getStatus()
         if status != 200:
-            return
+            return None
         
-        self.cache(result)
+        storeResponseInRAMCache(self.published, self.request, self.request.response, result)
         return None
     
     def transformIterable(self, result, encoding):
         status = self.request.response.getStatus()
         if status != 200:
-            return
+            return None
         
-        self.cache(''.join(result))
+        storeResponseInRAMCache(self.published, self.request, self.request.response,''.join(result))
         return None
-    
-    def cache(self, result):
-        
-        annotations = IAnnotations(self.request, None)
-        if annotations is None:
-            return
-        
-        key = annotations.get(GLOBAL_KEY + '.key')
-        if not key:
-            return
-        
-        cache = getRAMCache(GLOBAL_KEY)
-        if cache is None:
-            return
-        
-        status = self.request.response.getStatus()
-        headers = dict(self.request.response.headers)
-                
-        cache[key] = (status, headers, result)
