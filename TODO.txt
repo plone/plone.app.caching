@@ -3,51 +3,23 @@ Plone caching to-do
 
 plone.app.caching
 -----------------
- 
- [ ] Provide better framework for etag building
 
+ [ ] Set RAM cache key
+
+ [ ] Tests for utils
+ 
+ [ ] Tests for ETag components
+ 
+ [ ] Tests for basic operations
+ 
+ [ ] Integration tests
+ 
  [ ] Update KGS
  
  [ ] Add caching declarations to plone.namedfile
         - Download view should declare ruleset plone.download
         - IPurgeURL adapter should include full path to view plus sub-paths
  
- [ ] Build default response mutators
-        - CacheFu has the following:
-            - no-cache
-            - cache-with-etag
-            - cache-with-last-modified
-            - cache-in-proxy (configurable length)
-            - cache-in-browser (configurable length)
-            - cache-in-memory (like an interceptor)
-        - We probably want more semantic types:
-            - no-cache
-            - content-item
-                - assume some personalisation
-            - content-folder
-                - assume dynamic rendering
-            - content-feed
-                - e.g. RSS feed template
-            - static-resources
-                - e.g. OFS File/Image, FS File/FSImage, Z3-style resources
-                - can implement differently for each type with overloaded
-                  adapter
-                - may need a special check for the isCacheable() flag in
-                  ResourceRegistries and/or the ZCacheable flags in OFS.Cache.
-        - We want a library of helper functions to perform standard checks
-          and header operations, in ``plone.app.caching.operations.utils``. 
- 
- [ ] Build default cache interceptors
-        - check-not-modified
-                - check for If-None-Match and/or If-Modified-Since
-                - set 304 response and return empty
-                - use ILastModified adapter
-        - ram-cached
-                - check if stale
-                - look up in cache manager and return
-
- [ ] Functional tests
-
 Cache lookup investigations
 ===========================
 

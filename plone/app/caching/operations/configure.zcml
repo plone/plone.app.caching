@@ -1,34 +1,54 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="plone.app.caching">
     
     <include package="plone.caching" />
     <include package="plone.app.registry" />
     
-    <adapter factory=".mutators.CompositeViews" name="plone.app.caching.compositeviews" />
-    <utility component=".mutators.CompositeViews" name="plone.app.caching.compositeviews" />
+    <!-- Response mutators -->
+    <adapter   factory=".mutators.CompositeViews"        name="plone.app.caching.compositeviews" />
+    <utility component=".mutators.CompositeViews"        name="plone.app.caching.compositeviews" />
 
-    <adapter factory=".mutators.ContentFeeds" name="plone.app.caching.contentfeeds" />
-    <utility component=".mutators.ContentFeeds" name="plone.app.caching.contentfeeds" />
+    <adapter   factory=".mutators.ContentFeeds"          name="plone.app.caching.contentfeeds" />
+    <utility component=".mutators.ContentFeeds"          name="plone.app.caching.contentfeeds" />
 
-    <adapter factory=".mutators.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
+    <adapter   factory=".mutators.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
     <utility component=".mutators.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
 
-    <adapter factory=".mutators.Downloads" name="plone.app.caching.downloads" />
-    <utility component=".mutators.Downloads" name="plone.app.caching.downloads" />
+    <adapter   factory=".mutators.Downloads"             name="plone.app.caching.downloads" />
+    <utility component=".mutators.Downloads"             name="plone.app.caching.downloads" />
 
-    <adapter factory=".mutators.DownloadsWithProxy" name="plone.app.caching.downloadswithproxy" />
-    <utility component=".mutators.DownloadsWithProxy" name="plone.app.caching.downloadswithproxy" />
+    <adapter   factory=".mutators.DownloadsWithProxy"    name="plone.app.caching.downloadswithproxy" />
+    <utility component=".mutators.DownloadsWithProxy"    name="plone.app.caching.downloadswithproxy" />
 
-    <adapter factory=".mutators.Resources" name="plone.app.caching.resources" />
-    <utility component=".mutators.Resources" name="plone.app.caching.resources" />
+    <adapter   factory=".mutators.Resources"             name="plone.app.caching.resources" />
+    <utility component=".mutators.Resources"             name="plone.app.caching.resources" />
 
-    <adapter factory=".mutators.StableResources" name="plone.app.caching.stableresources" />
-    <utility component=".mutators.StableResources" name="plone.app.caching.stableresources" />
+    <adapter   factory=".mutators.StableResources"       name="plone.app.caching.stableresources" />
+    <utility component=".mutators.StableResources"       name="plone.app.caching.stableresources" />
     
-    <!-- RAM page cache -->
-    <adapter   factory=".pagecache.PageCache" name="plone.app.caching.operations.pagecache" />
-    <utility component=".pagecache.PageCache" name="plone.app.caching.operations.pagecache" />
-    <adapter   factory=".pagecache.Store"     name="plone.app.caching.operations.pagecache" />
-
+    <!-- Special handling for content in Plone's ResourceRegistries, if installed -->
+    <adapter
+        zcml:condition="installed Products.ResourceRegistries"
+        factory=".mutators.ResourceRegistriesStableResources"
+        name="plone.app.caching.stableresources"
+        />
+    
+    <!-- RAM page cache interceptor -->
+    <adapter   factory=".pagecache.PageCache"            name="plone.app.caching.operations.pagecache" />
+    <utility component=".pagecache.PageCache"            name="plone.app.caching.operations.pagecache" />
+    <adapter   factory=".pagecache.Store"                name="plone.app.caching.operations.pagecache" />
+    
+    <!-- ETag components -->
+    <adapter factory=".etags.UserID"                     name="userid" />
+    <adapter factory=".etags.Roles"                      name="roles" />
+    <adapter factory=".etags.Language"                   name="language" />
+    <adapter factory=".etags.UserLanguage"               name="userLanguage" />
+    <adapter factory=".etags.GZip"                       name="gzip" />
+    <adapter factory=".etags.LastModified"               name="lastModified" />
+    <adapter factory=".etags.CatalogCounter"             name="catalogCounter" />
+    <adapter factory=".etags.ObjectLocked"               name="locked" />
+    <adapter factory=".etags.Skin"                       name="skin" />
+    
 </configure>

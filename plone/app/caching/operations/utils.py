@@ -1,33 +1,36 @@
 import wsgiref.handlers
 import time
 import datetime
+import logging
 
-from AccessControl.User import nobody
 from OFS.interfaces import ITraversable
 
 from zope.interface import alsoProvides
-from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 
 from zope.annotation.interfaces import IAnnotations
 
 from plone.memoize.interfaces import ICacheChooser
+
 from plone.app.caching.interfaces import IRAMCached
+from plone.app.caching.interfaces import IETagValue
 
 from z3c.caching.interfaces import ILastModified
-from plone.registry.interfaces import IRegistry
-from plone.app.caching.interfaces import IPloneCacheSettings
 
 from Products.CMFCore.interfaces import IContentish
+from Products.CMFCore.interfaces import ISiteRoot
 
 PAGE_CACHE_KEY = 'plone.app.caching.operations.pagecache'
 PAGE_CACHE_ANNOTATION_KEY = 'plone.app.caching.operations.pagecache.key'
+
+logger = logging.getLogger('plone.app.caching')
 
 #
 # Basic helper functions
 # 
 
-def getContext(published, marker=IContentish):
+def getContext(published, marker=(IContentish, ISiteRoot,)):
     """Given a published object, attempt to look up a context
     
     ``published`` is the object that was published.
@@ -36,12 +39,24 @@ def getContext(published, marker=IContentish):
     Returns an item providing ``marker`` or None, if it cannot be found.
     """
     
+    if not isinstance(marker, (list, tuple,)):
+        marker = (marker,)
+    
+    def checkType(context):
+        for m in marker:
+            if m.providedBy(context):
+                return True
+        return False
+    
     while (
         published is not None
-        and not marker.providedBy(published)
+        and not checkType(published)
         and hasattr(published, '__parent__',)
     ):
         published = published.__parent__
+    
+    if not checkType(published):
+        return None
     
     return published
 
@@ -102,117 +117,33 @@ def getRAMCacheKey(published, request):
             return content.absolute_url_path()
     return request['ACTUAL_URL']
 
-def getEtag(published, request, keys, extraTokens=()):
-    """Calculate an Etag.
+def getETag(published, request, keys=(), extraTokens=()):
+    """Calculate an ETag.
     
-    ``keys`` is a list of types of items to include in the ETag. Valid values
-    include:
+    ``keys`` is a list of types of items to include in the ETag. These must
+    match named multi-adapters on (published, request) providing
+    ``IETagValue``.
     
-    * member, the 
-    * roles
-    * permissions
-    * skin
-    * language
-    * user_language
-    * gzip
-    * last_modified
-    * catalog_modified
-    * object_locked
+    ``extraTokens`` is a list of additional ETag tokens to include, verbatim
+    as strings.
     
-    ``extraTokens`` is a list of additional Etag tokens to include, verbatim.
-    
-    All tokens will be concatenated into an Etag string, separated by pipes.
+    All tokens will be concatenated into an ETag string, separated by pipes.
     """
     
-    if not keys:
-        return None
-    
-    context = getContext(published)
-    if context is None:
-        return None
-    
-    portal_state = getMultiAdapter((context, request), name=u'plone_portal_state')
-    context_state = getMultiAdapter((context, request), name=u'plone_context_state')
-    tools = getMultiAdapter((context, request), name=u'plone_tools')
-    
-    member = portal_state.member()
-    etags = []
-    
-    if 'member' in keys:
-        if member is not None:
-            username = member.getUserName()
+    tokens = []
+    for key in keys:
+        component = queryMultiAdapter((published, request), IETagValue, name=key)
+        if component is None:
+            logger.warning("Could not find value adapter for ETag component %s", key)
         else:
-            username = ''
-        etags.append(username)
-    
-    if 'roles' in keys or 'permissions' in keys:
-        
-        if member is None:
-            mtool = tools.membership()
-            member = mtool.wrapUser(nobody)
-        
-        roles = list(member.getRolesInContext(context))
-        roles.sort()
-        etags.append(';'.join(roles))
-        
-        if 'permissions' in keys:
-            # CacheFu kept a global counter for permissions modifications.
-            # Do we need to add something equivalent?
-            # Perhaps this is a usecase for a "purge all content views" action instead?
-            # XXX etag.append(????.get_permissions_counter())
-            pass
-    
-    if 'skin' in keys:
-        # In CacheFu we lookup and add the skin name here.
-        # Another "purge all content views" usecase?
-        pass
-    
-    if 'language' in keys:
-        # Does anyone really need this?  I've heard good arguments
-        # that server-negotiated content based on HTTP_ACCEPT_LANGUAGE
-        # is just plain unworkable.  It's better to allow users to select
-        # their language and have the choice reflected in the url.
-        # In which case, there is no need to track this with etags.
-        pass
-    
-    if 'user_language' in keys:
-        # But... if cookie negotiation is used for language binding
-        # we still need to get the current language selection.
-        # Note, I don't know enough about how the language tool works
-        # so I'm not sure if the following makes sense.
-        ltool = tools.languages()   # is this right?
-        if ltool is None:
-            ptool = tools.properties()  # is this right?
-            lang = ptool.site_properties.default_language
-        else:
-            lang = ltool.getPreferredLanguage()
-        etags.append(lang)
-    
-    if 'gzip' in keys:
-        registry = queryUtility(IRegistry)
-        if registry is not None:
-            settings = registry.forInterface(IPloneCacheSettings, check=False)
-            gzip_capable = request.get('HTTP_ACCEPT_ENCODING', '').find('gzip') != -1
-            etags.append(str(int(settings.enableCompression and gzip_capable)))
-    
-    if 'last_modified' in keys:
-        lastModified = safeLastModified(published)
-        if lastModified is not None:
-            etags.append(lastModified.isoformat())
-    
-    if 'catalog_modified' in keys:
-        # CacheFu kept a counter for catalog modifications.
-        # Do we need to add something equivalent?
-        # XXX etags.append(????.get_catalog_modified_counter())
-        pass
-    
-    if 'object_locked' in keys:
-        etags.append(str(context_state.is_locked()))
+            value = component()
+            if value is not None:
+                tokens.append(value)
     
     for token in extraTokens:
-        etags.append(token)
+        tokens.append(token)
     
-    etag = '|' + '|'.join(etags)
+    etag = '|' + '|'.join(tokens)
     return etag.replace(',',';')  # commas are bad in etags
 
 #
@@ -228,7 +159,9 @@ def doNotCache(published, request, response):
     expire immediately and disable validation.
     """
     
-    response.unsetHeader('Last-Modified')
+    if 'last-modified' in response.headers:
+        del response.headers['last-modified']
+    
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, must-revalidate, private')
 
@@ -237,7 +170,7 @@ def cacheInBrowser(published, request, response, etag=None, lastmodified=None):
     response but expire immediately and revalidate the cache on every
     subsequent request.
     
-    ``etag`` is a string value indicating an Etag to use.
+    ``etag`` is a string value indicating an ETag to use.
     ``lastmodified`` is a datetime object
     
     If neither etag nor lastmodified is given then no validation is

@@ -17,10 +17,19 @@ from plone.app.caching.operations.utils import cacheInBrowser
 from plone.app.caching.operations.utils import cacheInProxy
 from plone.app.caching.operations.utils import cacheEverywhere
 from plone.app.caching.operations.utils import cacheInRAM
-from plone.app.caching.operations.utils import getEtag
+
+from plone.app.caching.operations.utils import getETag
+from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import safeLastModified
 
 from plone.app.caching.interfaces import _
+
+try:
+    from Products.ResourceRegistries.interfaces import ICookedFile
+    from Products.ResourceRegistries.interfaces import IResourceRegistry
+    HAVE_RESOURCE_REGISTRIES = True
+except ImportError:
+    HAVE_RESOURCE_REGISTRIES = False
 
 class CompositeViews(object):
     implements(IResponseMutator)
@@ -30,23 +39,28 @@ class CompositeViews(object):
     classProvides(IResponseMutatorType)
 
     title = _(u"Cache composite views")
-    description = _(u"""Composite views (content item views and templates) can
-        include dependencies that are difficult to track in the general case so
-        we cache these in the browser but expire immediately and enable ETag 
-        validation checks. If anonymous then also cache in Zope RAM""")
+    description = _(u"Composite views (content item views and templates) can "
+                    u"include dependencies that are difficult to track in "
+                    u"the general case, so we cache these in the browser but "
+                    u"expire immediately and enable ETag validation checks. "
+                    u"If anonymous, then also cache in memory in Zope")
     prefix = 'plone.app.caching.compositeviews'
     options = ('etags',)
-    etags = ('member','catalog_modified','language','gzip','skin','object_locked')
+    
+    # Fallback option values
+    etags = ('userid', 'catalogCounter', 'language', 'gzip', 'skin', 'locked')
 
     def __init__(self, published, request):
         self.published = published
         self.request = request
     
     def __call__(self, rulename, response):
-        portal_state = getMultiAdapter((self.published, self.request), name=u'plone_portal_state')
-        options = lookupOptions(self.__class__, rulename)
+        context = getContext(self.published)
         
-        etag = getEtag(self.published, self.request, options['etags'] or self.etags)
+        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
+        options = lookupOptions(CompositeViews, rulename)
+        
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
         cacheInBrowser(self.published, self.request, response, etag=etag)
         
         if portal_state.anonymous():            
@@ -60,12 +74,15 @@ class ContentFeeds(object):
     classProvides(IResponseMutatorType)
 
     title = _(u"Cache content feeds")
-    description = _(u"""Content feeds can change so we cache these in the 
-        browser but expire immediately and enable ETag validation checks. 
-        If anonymous then also cache in Zope RAM""")
+    description = _(u"Content feeds can change so we cache these in the "
+                    u"browser but expire immediately and enable ETag "
+                    u"validation checks. If anonymous then also cache in "
+                    u"memory in Zope")
     prefix = 'plone.app.caching.contentfeeds'
     options = ('etags',)
-    etags = ('member','catalog_modified','language','gzip','skin')
+    
+    # Fallback option values
+    etags = ('userid', 'catalogCounter', 'language', 'gzip', 'skin')
 
     def __init__(self, published, request):
         self.published = published
@@ -73,9 +90,12 @@ class ContentFeeds(object):
     
     def __call__(self, rulename, response):
         portal_state = getMultiAdapter((self.published, self.request), name=u'plone_portal_state')
-        options = lookupOptions(self.__class__, rulename)
-        etag = getEtag(self.published, self.request, options['etags'] or self.etags)
+        options = lookupOptions(ContentFeeds, rulename)
+        
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        
         cacheInBrowser(self.published, self.request, response, etag=etag)
+        
         if portal_state.anonymous():            
             cacheInRAM(self.published, self.request, response, etag)
 
@@ -87,15 +107,19 @@ class ContentFeedsWithProxy(object):
     classProvides(IResponseMutatorType)
 
     title = _(u"Cache content feeds with proxy")
-    description = _(u"""Content feeds can change so we cache these in the 
-        browser but expire immediately and enable ETag validation checks. 
-        If anonymous then also cache in Zope RAM.  We also cache in proxy 
-        for 'maxage' seconds (default 24 hours) since staleness is not 
-        critical in this case.""")
+    description = _(u"Content feeds can change so we cache these in the "
+                    u"browser but expire immediately and enable ETag "
+                    u"validation checks. If anonymous then also cache in "
+                    u"Zope RAM.  We also cache in proxy for 'maxage' seconds "
+                    u"(default 24 hours) since staleness is not critical in "
+                    u"this case.")
     prefix = 'plone.app.caching.contentfeedswithproxy'
-    options = ('etags','s-maxage','vary')
-    etags = ('member','catalog_modified','language','gzip','skin')
+    options = ('etags', 'smaxage', 'vary')
+    
+    # Fallback option values
+    etags = ('userid', 'catalogCounter', 'language', 'gzip', 'skin')
     smaxage = 86400
+    vary = ''
 
     def __init__(self, published, request):
         self.published = published
@@ -103,10 +127,12 @@ class ContentFeedsWithProxy(object):
     
     def __call__(self, rulename, response):
         portal_state = getMultiAdapter((self.published, self.request), name=u'plone_portal_state')
-        options = lookupOptions(self.__class__, rulename)
-        etag = getEtag(self.published, self.request, options['etags'] or self.etags)
-        smaxage = options['s-maxage'] or self.smaxage
-        vary = options['vary']
+        options = lookupOptions(ContentFeedsWithProxy, rulename)
+        
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        smaxage = options['smaxage'] or self.smaxage
+        vary = options['vary'] or self.vary
+        
         if portal_state.anonymous():            
             cacheInProxy(self.published, self.request, response, smaxage, etag=etag, vary=vary)
             cacheInRAM(self.published, self.request, response, etag)
@@ -121,17 +147,20 @@ class Downloads(object):
     classProvides(IResponseMutatorType)
 
     title = _(u"Cache downloads")
-    description = _(u"""Downloads (like File and Image content items) can 
-        change so we cache these in the browser but expire immediately and 
-        enable Last-Modified validation checks""")
+    description = _(u"Downloads (like File and Image content items) can "
+                    u"change so we cache these in the browser but expire "
+                    u"immediately and enable Last-Modified validation checks")
     prefix = 'plone.app.caching.downloads'
-
+    options = ()
+    
     def __init__(self, published, request):
         self.published = published
         self.request = request
     
     def __call__(self, rulename, response):
-        if 'Anonymous' in rolesForPermissionOn('View', self.published):
+        context = getContext(self.published)
+        
+        if 'Anonymous' in rolesForPermissionOn('View', context):
             lastmodified = safeLastModified(self.published)
             cacheInBrowser(self.published, self.request, response, lastmodified=lastmodified)
         else:
@@ -145,24 +174,32 @@ class DownloadsWithProxy(object):
     classProvides(IResponseMutatorType)
 
     title = _(u"Cache downloads with proxy")
-    description = _(u"""Downloads (like File and Image content items) can 
-        change so we cache these in the browser but expire immediately and 
-        enable Last-Modified validation checks. We also cache in proxy for 
-        'maxage' seconds since we can purge this cache if it changes 
-        (default maxage is 24 hours).""")
+    description = _(u"Downloads (like File and Image content items) can "
+                    u"change so we cache these in the browser but expire "
+                    u"immediately and enable Last-Modified validation "
+                    u"checks. We also cache in proxy for 'maxage' seconds "
+                    u"since we can purge this cache if it changes (default "
+                    u"maxage is 24 hours).")
     prefix = 'plone.app.caching.downloadswithproxy'
-    options = ('s-maxage','vary')
+    options = ('smaxage','vary')
+    
+    # Fallback option values
     smaxage = 86400
-
+    vary = ''
+    
     def __init__(self, published, request):
         self.published = published
         self.request = request
     
     def __call__(self, rulename, response):
-        if 'Anonymous' in rolesForPermissionOn('View', self.published):
-            options = lookupOptions(self.__class__, rulename)
+        context = getContext(self.published)
+        
+        if 'Anonymous' in rolesForPermissionOn('View', context):
+            options = lookupOptions(DownloadsWithProxy, rulename)
+            
             smaxage = options['smaxage'] or self.smaxage
-            vary = options['vary']
+            vary = options['vary'] or self.vary
+            
             lastmodified = safeLastModified(self.published)
             cacheInProxy(self.published, self.request, response, smaxage, lastmodified=lastmodified, vary=vary)
         else:
@@ -176,21 +213,27 @@ class Resources(object):
     classProvides(IResponseMutatorType)
 
     title = _(u"Cache resources")
-    description = _(u"""Standard resources (like skin images and 
-        Zope 3 resources) don't change often so it's often safe to cache 
-        these everywhere for a short while (default maxage is 24 hours)""")
+    description = _(u"Standard resources (like skin images and filesystem "
+                    u"resources) don't change often so it's often safe to "
+                    u"cache these everywhere for a short while (default "
+                    u"maxage is 24 hours)""")
     prefix = 'plone.app.caching.resources'
-    options = ('max-age','vary')
+    options = ('maxage','vary')
+    
+    # Fallback option values
     maxage = 86400
+    vary = ''
 
     def __init__(self, published, request):
         self.published = published
         self.request = request
     
     def __call__(self, rulename, response):
-        options = lookupOptions(self.__class__, rulename)
-        maxage = options['max-age'] or self.maxage
-        vary = options['vary']
+        options = lookupOptions(Resources, rulename)
+        
+        maxage = options['maxage'] or self.maxage
+        vary = options['vary'] or self.vary
+        
         lastmodified = safeLastModified(self.published)
         cacheEverywhere(self.published, self.request, response, maxage, lastmodified=lastmodified, vary=vary)
 
@@ -202,25 +245,47 @@ class StableResources(object):
     classProvides(IResponseMutatorType)
 
     title = _(u"Cache stable resources")
-    description = _(u"""Stable resources (like ResourceRegistry-maintained 
-        css and js files) never change without changing their URL so it's safe
-        to cache these forever (maxage defaults to 1 year)""")
+    description = _(u"Stable resources (like ResourceRegistry-maintained "
+                    u"css and js files) never change without changing their "
+                    u"URL so it's safe to cache these 'forever' (maxage "
+                    u"defaults to 1 year)")
     prefix = 'plone.app.caching.stableresources'
-    options = ('max-age','etags','vary')
+    options = ('maxage', 'etags', 'vary')
+    
+    # Fallback option values
+    
     maxage = 31536000
+    etags = ()
+    vary = ''
 
     def __init__(self, published, request):
         self.published = published
         self.request = request
     
     def __call__(self, rulename, response):
-        rr = None  # XXX get the Resource Registry for this item or return None if this is a non-RR item
-        if rr is None or (rr.isCacheable(self.published.getId()) and not rr.getDebugMode()):
-            options = lookupOptions(self.__class__, rulename)
-            maxage = options['max-age'] or self.maxage
-            etag = getEtag(self.published, self.request, options['etags'])
-            vary = options['vary']
-            lastmodified = safeLastModified(self.published)
-            cacheEverywhere(self.published, self.request, response, maxage, lastmodified=lastmodified, etag=etag, vary=vary)
-        else:
-            doNotCache(self.published, self.request, response)
+        options = lookupOptions(StableResources, rulename)
+        
+        maxage = options['maxage'] or self.maxage
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        vary = options['vary'] or self.vary
+        
+        lastmodified = safeLastModified(self.published)
+        cacheEverywhere(self.published, self.request, response, maxage, lastmodified=lastmodified, etag=etag, vary=vary)
+
+if HAVE_RESOURCE_REGISTRIES:
+
+    class ResourceRegistriesStableResources(StableResources):
+        """Override for StableResources which checks ResourceRegistries
+        cacheability
+        """
+        
+        adapts(ICookedFile, IHTTPRequest)
+
+        def __call__(self, rulename, response):
+            registry = getContext(self.published, IResourceRegistry)
+            if registry is not None:
+                if registry.getDebugMode() or not registry.isCacheable(self.published.__name__):
+                    doNotCache(self.published, self.request, response)
+                    return
+            
+            super(ResourceRegistriesStableResources, self).__call__(rulename, response)

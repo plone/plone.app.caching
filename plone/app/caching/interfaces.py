@@ -62,6 +62,19 @@ class IPloneCacheSettings(Interface):
             default=('File', 'Image',),
         )
 
+class IETagValue(Interface):
+    """ETag component builder
+    
+    Register a named multi-adapter from ``(published, request)`` to this 
+    interface to provide the values for ETag compnents. Various caching
+    operations will look up such adapters to compose an ETag value. The
+    adapter name is used in options configuring those components.
+    """
+    
+    def __call__():
+        """Return the ETag component, as a string.
+        """
+
 class IRAMCached(Interface):
     """Marker interface applied to the request if it should be RAM cached.
     
