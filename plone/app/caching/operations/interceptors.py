@@ -1,5 +1,5 @@
 from zope.interface import implements, classProvides, Interface
-from zope.component import adapts, queryMultiAdapter
+from zope.component import adapts
 
 from zope.publisher.interfaces.http import IHTTPRequest
 
