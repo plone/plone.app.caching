@@ -4,11 +4,6 @@ Plone caching to-do
 plone.app.caching
 -----------------
 
- [ ] Add full-page cache
-        - Implement operation + helper (to cache) and interceptor
-        - Add event-based content purging?
-        - Document
- 
  [ ] Update KGS
  
  [ ] Add caching declarations to plone.namedfile
