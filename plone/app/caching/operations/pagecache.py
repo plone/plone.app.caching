@@ -40,7 +40,6 @@ class PageCache(object):
         self.request = request
         
     def __call__(self, rulename, response):
-        import pdb; pdb.set_trace( )
         
         key = self._getKey()
         if key is None:
@@ -99,7 +98,6 @@ class Store(object):
         self.request = request
     
     def transformUnicode(self, result, encoding):
-        import pdb; pdb.set_trace( )
         status = self.request.response.getStatus()
         if status != 200:
             return
