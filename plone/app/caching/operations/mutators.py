@@ -35,7 +35,7 @@ class CompositeViews(object):
         include dependancies that are difficult to track in the general case so
         we cache these in the browser but expire immediately and enable ETag 
         validation checks. If anonymous then also cache in Zope RAM""")
-    prefix = 'plone.app.caching.operations.mutators.compositeviews'
+    prefix = 'plone.app.caching.compositeviews'
     options = ('etags',)
     etags = ('member','catalog_modified','language','gzip','skin','object_locked')
 
@@ -62,7 +62,7 @@ class ContentFeeds(object):
     description = _(u"""Content feeds can change so we cache these in the 
         browser but expire immediately and enable ETag validation checks. 
         If anonymous then also cache in Zope RAM""")
-    prefix = 'plone.app.caching.operations.mutators.contentfeeds'
+    prefix = 'plone.app.caching.contentfeeds'
     options = ('etags',)
     etags = ('member','catalog_modified','language','gzip','skin')
 
@@ -91,7 +91,7 @@ class ContentFeedsWithProxy(object):
         If anonymous then also cache in Zope RAM.  We also cache in proxy 
         for 'maxage' seconds (default 24 hours) since staleness is not 
         critical in this case.""")
-    prefix = 'plone.app.caching.operations.mutators.contentfeedswithproxy'
+    prefix = 'plone.app.caching.contentfeedswithproxy'
     options = ('etags','s-maxage','vary')
     etags = ('member','catalog_modified','language','gzip','skin')
     smaxage = 86400
@@ -123,7 +123,7 @@ class Downloads(object):
     description = _(u"""Downloads (like File and Image content items) can 
         change so we cache these in the browser but expire immediately and 
         enable Last-Modified validation checks""")
-    prefix = 'plone.app.caching.operations.mutators.downloads'
+    prefix = 'plone.app.caching.downloads'
 
     def __init__(self, published, request):
         self.published = published
@@ -149,7 +149,7 @@ class DownloadsWithProxy(object):
         enable Last-Modified validation checks. We also cache in proxy for 
         'maxage' seconds since we can purge this cache if it changes 
         (default maxage is 24 hours).""")
-    prefix = 'plone.app.caching.operations.mutators.downloadswithproxy'
+    prefix = 'plone.app.caching.downloadswithproxy'
     options = ('s-maxage','vary')
     smaxage = 86400
 
@@ -178,7 +178,7 @@ class Resources(object):
     description = _(u"""Standard resources (like skin images and 
         Zope 3 resources) don't change often so it's often safe to cache 
         these everywhere for a short while (default maxage is 24 hours)""")
-    prefix = 'plone.app.caching.operations.mutators.resources'
+    prefix = 'plone.app.caching.resources'
     options = ('max-age','vary')
     maxage = 86400
 
@@ -204,7 +204,7 @@ class StableResources(object):
     description = _(u"""Stable resources (like ResourceRegistry-maintained 
         css and js files) never change without changing their URL so it's safe
         to cache these forever (maxage defaults to 1 year)""")
-    prefix = 'plone.app.caching.operations.mutators.stableresources'
+    prefix = 'plone.app.caching.stableresources'
     options = ('max-age','etags','vary')
     maxage = 31536000
 
