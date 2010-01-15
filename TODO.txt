@@ -6,11 +6,7 @@ plone.app.caching
 
  [ ] Tests for utils
  
- [ ] Tests for ETag components
- 
- [ ] Tests for basic operations
- 
- [ ] Integration tests
+ [ ] Integration tests (mainly aimed at testing the default caching operations)
  
  [ ] Update KGS
  
