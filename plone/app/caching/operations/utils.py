@@ -145,7 +145,7 @@ def cacheInRAM(published, request, response, etag=None, annotationsKey=PAGE_CACH
     caching key when storing the response in the cache. It should match that
     passed to ``storeResponseInRAMCache()``.
     """
-
+    
     annotations = IAnnotations(request, None)
     if annotations is None:
         return None
@@ -165,7 +165,7 @@ def cachedResponse(published, request, response, status, headers, body):
     """
     
     response.setStatus(status)
-
+    
     for k, v in headers.items():
         if k.lower() == 'etag':
             response.setHeader(k, v, literal=1)
@@ -193,6 +193,7 @@ def notModified(published, request, response, etag=None, lastmodified=None):
     response.setStatus(304)
     return u""
 
+
 #
 # Cache checks
 # 
@@ -210,30 +211,30 @@ def isModified(request, etag=None, lastmodified=None):
     
     ifModifiedSince = request.getHeader('If-Modified-Since', None)
     ifNoneMatch = request.getHeader('If-None-Match', None)
-
+    
     if ifModifiedSince is None and ifNoneMatch is None:
         return True
-
+        
     etagMatched = False
-
+    
     # Check etags
     if ifNoneMatch and etag is not None:
         if not etag:
             return True
-
+            
         clientETags = parseETags(ifNoneMatch)
         if not clientETags:
             return True
-
+            
         # is the current etag in the list of client-side etags?
         if etag not in clientETags and '*' not in clientETags:
             return True
         
         etagMatched = True
-
+        
     # Check the modification date
     if ifModifiedSince and lastmodified is not None:
-
+        
         # Attempt to get a date
         
         try:
@@ -255,10 +256,19 @@ def isModified(request, etag=None, lastmodified=None):
         if etag is not None:
             if not etagMatched:
                 return True
-
+                
     return False
 
-def fetchFromRAMCache(request, etag, globalKey=PAGE_CACHE_KEY):
+def visibleToRole(published, role, permission='View'):
+    """Determine if the published object would be visible to the given
+    role.
+    
+    ``role`` is a role name, e.g. ``Anonymous``.
+    ``permission`` is the permission to check for.
+    """
+    return role in rolesForPermissionOn(permission, published)
+
+def fetchFromRAMCache(request, etag=None, globalKey=PAGE_CACHE_KEY):
     """Return a page cached in RAM, or None if it cannot be found.
     
     ``etag`` is an ETag for the content, and is used as a basis for the
@@ -272,50 +282,14 @@ def fetchFromRAMCache(request, etag, globalKey=PAGE_CACHE_KEY):
     cache = getRAMCache(globalKey)
     if cache is None:
         return None
-
-    key = getRAMCacheKey(request, etag)
+    
+    key = getRAMCacheKey(request, etag=etag)
     if key is None:
         return None
     
     return cache.get(key)
 
-def visibleToRole(published, role, permission='View'):
-    """Determine if the published object would be visible to the given
-    role.
-    
-    ``role`` is a role name, e.g. ``Anonymous``.
-    ``permission`` is the permission to check for.
-    """
-    return role in rolesForPermissionOn(permission, published)
 
-def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
-    """Store the given response in the RAM cache.
-    
-    ``result`` should be the response body as a string.
-
-    ``globalKey`` is the global cache key. This needs to be the same key
-    as the one used to fetch the data.
-
-    ``annotationsKey`` is the key in annotations on the request from which 
-    the (resource-identifying) caching key should be retrieved. The default
-    is that used by the ``cacheInRAM()`` helper function.
-    """
-    
-    annotations = IAnnotations(request, None)
-    if annotations is None:
-        return
-    
-    key = annotations.get(annotationsKey)
-    if not key:
-        return
-    
-    cache = getRAMCache(globalKey)
-    if cache is None:
-        return
-    
-    status = response.getStatus()
-    headers = dict(request.response.headers)
-    cache[key] = (status, headers, result)
 
 #
 # Basic helper functions
@@ -411,34 +385,6 @@ def getExpiration(maxage):
     else:
         return now - datetime.timedelta(seconds=10*365*24*3600)
 
-def getRAMCache(globalKey=PAGE_CACHE_KEY):
-    """Get a RAM cache instance for the given key. The return value is ``None``
-    if no RAM cache can be found, or a mapping object supporting at least
-    ``__getitem__()``, ``__setitem__()`` and ``get()`` that can be used to get
-    or set cache values.
-    
-    ``key`` is the global cache key, which must be unique site-wide. Most
-    commonly, this will be the operation dotted name.
-    """
-    
-    chooser = queryUtility(ICacheChooser)
-    if chooser is None:
-        return None
-    
-    return chooser(globalKey)
-
-def getRAMCacheKey(request, etag=None):
-    """Calculate the cache key for pages cached in RAM.
-    
-    ``etag`` is a unique etag string. The cache key is a combination of the
-    resource's path and the etag.
-    """
-    
-    resourceKey = request['PATH_INFO'] + '?' + request['QUERY_STRING']
-    if etag:
-        resourceKey = etag + '||' + resourceKey
-    return resourceKey
-
 def getETag(published, request, keys=(), extraTokens=()):
     """Calculate an ETag.
     
@@ -468,15 +414,13 @@ def getETag(published, request, keys=(), extraTokens=()):
     etag = '|' + '|'.join(tokens)
     return etag.replace(',',';')  # commas are bad in etags
 
-# Adapted from Products.CMFCore.utils
-
 def parseETags(text, result=None):
     """Parse a header value into a list of etags. Handles fishy quoting and
     other browser quirks.
     
     Returns a list of strings.
     """
-
+    
     if result is None:
         result = []
     
@@ -501,9 +445,70 @@ def parseETags(text, result=None):
                 return result
     finally:
         parseETagLock.release()
-
+        
     if value:
         result.append(value)
     
     return parseETags(text[l:], result)
 
+
+#
+# RAM cache management
+# 
+
+def getRAMCache(globalKey=PAGE_CACHE_KEY):
+    """Get a RAM cache instance for the given key. The return value is ``None``
+    if no RAM cache can be found, or a mapping object supporting at least
+    ``__getitem__()``, ``__setitem__()`` and ``get()`` that can be used to get
+    or set cache values.
+    
+    ``key`` is the global cache key, which must be unique site-wide. Most
+    commonly, this will be the operation dotted name.
+    """
+    
+    chooser = queryUtility(ICacheChooser)
+    if chooser is None:
+        return None
+    
+    return chooser(globalKey)
+
+def getRAMCacheKey(request, etag=None):
+    """Calculate the cache key for pages cached in RAM.
+    
+    ``etag`` is a unique etag string. The cache key is a combination of the
+    resource's path and the etag.
+    """
+    
+    resourceKey = request['PATH_INFO'] + '?' + request['QUERY_STRING']
+    if etag:
+        resourceKey = etag + '||' + resourceKey
+    return resourceKey
+
+def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
+    """Store the given response in the RAM cache.
+    
+    ``result`` should be the response body as a string.
+    
+    ``globalKey`` is the global cache key. This needs to be the same key
+    as the one used to fetch the data.
+    
+    ``annotationsKey`` is the key in annotations on the request from which 
+    the (resource-identifying) caching key should be retrieved. The default
+    is that used by the ``cacheInRAM()`` helper function.
+    """
+    
+    annotations = IAnnotations(request, None)
+    if annotations is None:
+        return
+    
+    key = annotations.get(annotationsKey)
+    if not key:
+        return
+    
+    cache = getRAMCache(globalKey)
+    if cache is None:
+        return
+    
+    status = response.getStatus()
+    headers = dict(request.response.headers)
+    cache[key] = (status, headers, result)

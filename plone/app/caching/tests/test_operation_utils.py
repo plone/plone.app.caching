@@ -399,6 +399,137 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         self.assertEquals(etag, response.getHeader('ETag', literal=1))
         self.assertEquals(nowFormatted, response.getHeader('Last-Modified'))
         self.assertEquals(304, response.getStatus())
+
+class CacheCheckHelpersTest(unittest.TestCase):
     
+    def setUp(self):
+        provideAdapter(AttributeAnnotations)
+        classImplements(HTTPRequest, IAttributeAnnotatable)
+    
+    def tearDown(self):
+        zope.component.testing.tearDown()
+
+    # isModified()
+    
+    def test_isModified_minimal(self):
+        pass
+
+    def test_isModified_full(self):
+        pass
+    
+    # visibleToRole()
+    
+    def test_visible_to_role(self):
+        pass
+    
+    # fetchFromRAMCache()
+    
+    def test_fetchFromRAMCache_minimal(self):
+        pass
+    
+    def test_fetchFromRAMCache_full(self):
+        pass
+
+class MiscHelpersTest(unittest.TestCase):
+    
+    def setUp(self):
+        provideAdapter(AttributeAnnotations)
+        classImplements(HTTPRequest, IAttributeAnnotatable)
+    
+    def tearDown(self):
+        zope.component.testing.tearDown()
+    
+    # getContext()
+    
+    def test_getContext(self):
+        pass
+
+    def test_getContext_custom_marker(self):
+        pass
+    
+    # formatDateTime()
+    
+    def test_formatDateTime(self):
+        pass
+
+    # parseDateTime()
+    
+    def test_parseDateTime(self):
+        pass
+    
+    def test_formatDateTime_no_timezone(self):
+        pass
+    
+    # getLastModified()
+
+    def test_getLastModified_no_adaper(self):
+        pass
+    
+    def test_getLastModified_none(self):
+        pass
+    
+    def test_getLastModified_missing_timezone(self):
+        pass
+    
+    def test_getLastModified_timezone(self):
+        pass
+    
+    # getExpiration()
+    
+    def test_getExpiration_0(self):
+        pass
+    
+    def test_getExpiration_past(self):
+        pass
+    
+    def test_getExpiration_future(self):
+        pass
+    
+    # getETag()
+    
+    def test_getETag_minimal(self):
+        pass
+
+    def test_getETag_full(self):
+        pass
+
+    # parseETags()
+
+    def test_parseETags(self):
+        pass
+
+class RAMCacheTest(unittest.TestCase):
+    
+    def setUp(self):
+        provideAdapter(AttributeAnnotations)
+        classImplements(HTTPRequest, IAttributeAnnotatable)
+    
+    def tearDown(self):
+        zope.component.testing.tearDown()
+    
+    # getRAMCache()
+
+    def test_getRAMCache_no_chooser(self):
+        pass
+    
+    def test_getRAMCache_normal(self):
+        pass
+    
+    # getRAMCacheKey()
+    
+    def test_getRAMCacheKey_no_etag(self):
+        pass
+    
+    def test_getRAMCacheKey_etag(self):
+        pass
+    
+    # storeResponseInRAMCache()
+
+    def test_storeResponseInRAMCache_minimal(self):
+        pass
+    
+    def test_storeResponseInRAMCache_full(self):
+        pass
+
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
