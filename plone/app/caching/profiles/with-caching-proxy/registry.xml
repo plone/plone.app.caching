@@ -1,7 +1,7 @@
 <registry>
 
-  <record field="mutatorMapping" interface="plone.caching.interfaces.ICacheSettings" name="plone.caching.interfaces.ICacheSettings.mutatorMapping">
-    <value>
+  <record name="plone.caching.interfaces.ICacheSettings.operationMapping">
+    <value purge="False">
       <element key="plone.resource">plone.app.caching.resources</element>
       <element key="plone.stableResource">plone.app.caching.stableresources</element>
       <element key="plone.content.itemView">plone.app.caching.compositeviews</element>

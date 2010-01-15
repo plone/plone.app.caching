@@ -9,7 +9,39 @@
     <!-- Plone-specific settings from this package -->
     <records interface="plone.app.caching.interfaces.IPloneCacheSettings" />
     
-    <!-- Settings for default operations  -->
+    <!-- Default content type/template mappings
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    
+    <record name="plone.app.caching.interfaces.IPloneCacheSettings.contentTypeRulesetMapping">
+        <value purge="False">
+          <element key="News Item">plone.content.itemView</element>
+          <element key="Image">plone.content.itemView</element>
+          <element key="Topic">plone.content.folderView</element>
+          <element key="Link">plone.content.itemView</element>
+          <element key="File">plone.content.itemView</element>
+          <element key="Large Plone Folder">plone.content.folderView</element>
+          <element key="Folder">plone.content.folderView</element>
+          <element key="Document">plone.content.itemView</element>
+          <element key="Event">plone.content.itemView</element>
+        </value>
+    </record>
+    
+    <record name="plone.app.caching.interfaces.IPloneCacheSettings.templateRulesetMapping">
+        <value purge="False">
+          <element key="search">plone.content.feed</element>
+          <element key="RSS">plone.content.feed</element>
+        </value>
+    </record>
+    
+    <record name="plone.app.caching.interfaces.IPloneCacheSettings.purgedContentTypes">
+        <value purge="False">
+          <element>File</element>
+          <element>Image</element>
+        </value>
+    </record>
+    
+    <!-- Settings for default operations
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     
     <!-- Chain -->
     <record name="plone.caching.operations.chain.operations">
