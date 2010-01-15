@@ -70,7 +70,7 @@ class CompositeViews(object):
         if portal_state.anonymous():
             cached = fetchFromRAMCache(self.request, etag=etag)
             if cached is not None:
-                return cachedResponse(self.published, self.request, response, cached=cached)
+                return cachedResponse(self.published, self.request, response, *cached)
         
         if not isModified(self.request, etag=etag):
             return notModified(self.published, self.request, response, etag=etag)
@@ -122,7 +122,7 @@ class ContentFeeds(object):
         if portal_state.anonymous():
             cached = fetchFromRAMCache(self.request, etag=etag)
             if cached is not None:
-                return cachedResponse(self.published, self.request, response, cached=cached)
+                return cachedResponse(self.published, self.request, response, *cached)
         
         if not isModified(self.request, etag=etag):
             return notModified(self.published, self.request, response, etag=etag)
@@ -179,7 +179,7 @@ class ContentFeedsWithProxy(object):
         if portal_state.anonymous():
             cached = fetchFromRAMCache(self.request, etag=etag)
             if cached is not None:
-                return cachedResponse(self.published, self.request, response, cached=cached)
+                return cachedResponse(self.published, self.request, response, *cached)
         else:
             if not isModified(self.request, etag=etag):
                 return notModified(self.published, self.request, response, etag=etag)

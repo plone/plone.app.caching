@@ -101,8 +101,7 @@ def cacheInProxy(published, request, response, smaxage, lastmodified=None, etag=
         response.setHeader('Vary', vary)
     
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
-    response.setHeader('Cache-Control', 'max-age=0, s-maxage=%s, must-revalidate' %smaxage)
-    
+    response.setHeader('Cache-Control', 'max-age=0, s-maxage=%d, must-revalidate' % smaxage)
 
 def cacheInBrowserAndProxy(published, request, response, maxage, lastmodified=None, etag=None, vary=None):
     """Set headers to cache the response in the browser and caching proxy if
@@ -126,7 +125,7 @@ def cacheInBrowserAndProxy(published, request, response, maxage, lastmodified=No
         response.setHeader('Vary', vary)
     
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
-    response.setHeader('Cache-Control', 'max-age=%s, must-revalidate, public' %maxage)
+    response.setHeader('Cache-Control', 'max-age=%s, must-revalidate, public' % maxage)
 
 def cacheInRAM(published, request, response, etag=None, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
     """Set a flag indicating that the response for the given request
@@ -156,16 +155,15 @@ def cacheInRAM(published, request, response, etag=None, annotationsKey=PAGE_CACH
     annotations[annotationsKey] = key
     alsoProvides(request, IRAMCached)
 
-def cachedResponse(published, request, response, cached):
+def cachedResponse(published, request, response, status, headers, body):
     """Returned a cached page. Modifies the response (status and headers)
     and returns the cached body.
     
-    ``cached`` is an object as returned by ``fetchFromRAMCache()`` and stored
-    by ``storeResponseInRAMCache()``, i.e. a triple of
-    ``(status, header, body)``.
+    ``status`` is the cached HTTP status
+    ``headers`` is a dictionary of cached HTTP headers
+    ``body`` is a cached response body
     """
     
-    status, headers, body = cached
     response.setStatus(status)
 
     for k, v in headers.items():
