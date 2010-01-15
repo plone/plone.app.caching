@@ -21,9 +21,7 @@ from z3c.caching.registry import enumerateTypes
 from plone.protect import CheckAuthenticator
 
 from plone.caching.interfaces import ICacheSettings
-from plone.caching.interfaces import ICacheOperationType
-from plone.caching.interfaces import IResponseMutatorType
-from plone.caching.interfaces import ICacheInterceptorType
+from plone.caching.interfaces import ICachingOperationType
 
 from plone.cachepurging.interfaces import IPurger
 from plone.cachepurging.interfaces import ICachePurgingSettings
@@ -52,13 +50,13 @@ class BaseView(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
-
+    
     def __call__(self):
         self.update()
         if self.request.response.getStatus() not in (301, 302):
             return self.render()
         return ''
-
+    
     def update(self):
         self.errors = {}
         
@@ -75,7 +73,7 @@ class BaseView(object):
         
     def render(self):
         return self.index()
-
+    
     @property
     @memoize
     def purgingEnabled(self):
@@ -122,7 +120,7 @@ class ControlPanel(BaseView):
             
             if self.editGlobal:
                 
-                operation = queryUtility(ICacheOperationType, name=self.editOperationName)
+                operation = queryUtility(ICachingOperationType, name=self.editOperationName)
                 if operation is None:
                     raise NotFound(self, operation)
                 
@@ -136,7 +134,7 @@ class ControlPanel(BaseView):
         if self.editRuleset and self.editOperationName and not self.editRulesetName:
             self.editRulesetName = name
             
-            operation = queryUtility(ICacheOperationType, name=self.editOperationName)
+            operation = queryUtility(ICachingOperationType, name=self.editOperationName)
             if operation is None:
                 raise NotFound(self, self.operationName)
             
@@ -163,11 +161,10 @@ class ControlPanel(BaseView):
         
         # Form data
         enabled            = form.get('enabled', False)
-        enableCompression = form.get('enableCompression', False)
+        enableCompression  = form.get('enableCompression', False)
         contentTypesMap    = form.get('contenttypes', {})
         templatesMap       = form.get('templates', {})
-        interceptors       = form.get('interceptors', {})
-        mutators           = form.get('mutators', {})
+        operations         = form.get('operations', {})
         
         purgingEnabled     = form.get('purgingEnabled', False)
         cachingProxies     = tuple(form.get('cachingProxies', ()))
@@ -181,41 +178,26 @@ class ControlPanel(BaseView):
         
         # Settings
         
-        interceptorMapping        = {}
-        mutatorMapping            = {}
+        operationMapping          = {}
         contentTypeRulesetMapping = {}
         templateRulesetMapping    = {}
         
         # Process mappings and validate
         
-        for ruleset, interceptor in interceptors.items():
+        for ruleset, operation in operations.items():
             
-            if not ruleset or not interceptor:
+            if not ruleset or not operation:
                 continue
             
             if isinstance(ruleset, unicode): # should be ASCII
                 ruleset = ruleset.encode('utf-8')
             
-            if isinstance(interceptor, unicode): # should be ASCII
-                interceptor = interceptor.encode('utf-8')
+            if isinstance(operation, unicode): # should be ASCII
+                operation = operation.encode('utf-8')
             
             ruleset = ruleset.replace('-', '.')
-            interceptorMapping[ruleset] = interceptor
+            operationMapping[ruleset] = operation
         
-        for ruleset, mutator in mutators.items():
-            
-            if not ruleset or not mutator:
-                continue
-            
-            if isinstance(ruleset, unicode): # should be ASCII
-                ruleset = ruleset.encode('utf-8')
-            
-            if isinstance(mutator, unicode): # should be ASCII
-                mutator = mutator.encode('utf-8')
-            
-            ruleset = ruleset.replace('-', '.')
-            mutatorMapping[ruleset] = mutator
-
         for ruleset, contentTypes in contentTypesMap.items():
             
             if not ruleset:
@@ -313,8 +295,7 @@ class ControlPanel(BaseView):
         
         # Save settings
         self.settings.enabled = enabled
-        self.settings.interceptorMapping = interceptorMapping
-        self.settings.mutatorMapping = mutatorMapping
+        self.settings.operationMapping = operationMapping
         
         self.ploneSettings.enableCompression = enableCompression
         self.ploneSettings.templateRulesetMapping = templateRulesetMapping
@@ -342,6 +323,7 @@ class ControlPanel(BaseView):
                               title=type_.title or type_.name,
                               description=type_.description,
                               safeName=type_.name.replace('.', '-')))
+        types.sort(lambda x,y: cmp(x['title'], y['title']))
         return types
     
     # Safe access to the main mappings, which may be None - we want to treat
@@ -349,20 +331,11 @@ class ControlPanel(BaseView):
     # equivalent name for the key
     
     @property
-    def interceptorMapping(self):
+    def operationMapping(self):
         return dict(
             [
                 (k.replace('.', '-'), v,)
-                    for k, v in (self.settings.interceptorMapping or {}).items()
-            ]
-        )
-    
-    @property
-    def mutatorMapping(self):
-        return dict(
-            [
-                (k.replace('.', '-'), v,)
-                    for k, v in (self.settings.mutatorMapping or {}).items()
+                    for k, v in (self.settings.operationMapping or {}).items()
             ]
         )
     
@@ -385,28 +358,12 @@ class ControlPanel(BaseView):
         )
     
     # Type lookups (for accessing settings)
-    
+
     @property
     @memoize
-    def interceptorTypesLookup(self):
+    def operationTypesLookup(self):
         lookup = {}
-        for name, type_ in getUtilitiesFor(ICacheInterceptorType):
-            lookup[name] = dict(
-                name=name,
-                title=type_.title,
-                description=getattr(type_, 'description', ''),
-                prefix=getattr(type_, 'prefix', None),
-                options=getattr(type_, 'options', ()),
-                hasOptions=self.hasGlobalOptions(type_),
-                type=type_,
-            )
-        return lookup
-    
-    @property
-    @memoize
-    def mutatorTypesLookup(self):
-        lookup = {}
-        for name, type_ in getUtilitiesFor(IResponseMutatorType):
+        for name, type_ in getUtilitiesFor(ICachingOperationType):
             lookup[name] = dict(
                 name=name,
                 title=type_.title,
@@ -431,18 +388,11 @@ class ControlPanel(BaseView):
     
     @property
     @memoize
-    def interceptorTypes(self):
-        interceptors = [v for k, v in self.interceptorTypesLookup.items()]
-        interceptors.sort(lambda x,y: cmp(x['title'], y['title']))
-        return interceptors
+    def operationTypes(self):
+        operations = [v for k, v in self.operationTypesLookup.items()]
+        operations.sort(lambda x,y: cmp(x['title'], y['title']))
+        return operations
 
-    @property
-    @memoize
-    def mutatorTypes(self):
-        mutators = [v for k, v in self.mutatorTypesLookup.items()]
-        mutators.sort(lambda x,y: cmp(x['title'], y['title']))
-        return mutators
-    
     @property
     @memoize
     def contentTypes(self):
@@ -508,15 +458,10 @@ class ControlPanel(BaseView):
         
         return False
     
-    @property
-    @memoize
-    def purgingEnabled(self):
-        return isCachePurgingEnabled()
-
 class Import(BaseView):
     """The import control panel
     """
-
+    
     def update(self):
         if super(Import, self).update():
             if 'form.button.Import' in self.request.form:
@@ -545,7 +490,7 @@ class Import(BaseView):
         portal_setup.runAllImportStepsFromProfile("profile-%s" % profile)
         
         IStatusMessage(self.request).addStatusMessage(_(u"Import complete"), "info")
-
+    
     @property
     @memoize
     def profiles(self):

@@ -374,54 +374,41 @@
                     <fieldset id="fieldset-mappings">
                         <legend
                             id="fieldsetlegend-mappings"
-                            i18n:translate="legend_mappings">Caching operation mappings</legend>
+                            i18n:translate="legend_mappings">Caching operations</legend>
             
                         <div class="discreet" i18n:translate="description_mappings">
                             <p>
                             Caching can be controlled by mapping <em>rulesets</em> to
-                            <em>cache interceptors</em> and <em>response mutators</em>.
+                            <em>caching operations</em>.
                             </p>
                             <p>
                             A <strong>ruleset</strong> is a name given to a resource
                             published by Plone, such as a view. Rulesets are declared by
                             the developers who write those views. You can think of them as
                             a way to give hints about how something should be cached,
-                            without actually implementing the caching operations. The
-                            exact caching operations that will take place are mapped to
-                            rules in two different ways:
+                            without actually implementing the caching operations.
                             </p>
                             <p>
-                            A <strong>cache interceptor</strong> is a caching operation
-                            which can intercept the response <em>before</em>
-                            Plone renders a particular view. One example may be to return
-                            a <code>304 NOT MODIFIED</code> response. Another may be to
-                            return a full page that has been cached in memory, rather than
-                            ask Plone to render the view. Most cache interceptors will be
-                            conditional, i.e. they will only intercept the response in
-                            some cases.
-                            </p>
-                            <p>
-                            A <strong>response mutator</strong> is a caching operation
-                            that changes the response <em>after</em> Plone is finished
-                            with it. The most common type of response mutator is one
-                            which conditionally sets cache headers, instructing a
-                            user's web browser or a reverse caching proxy such as
-                            Squid or Varnish how to cache the page.
+                            The exact caching operations to use are mapped to
+                            rulesets in the table below. Caching operations will often
+                            set response headers to tell the users's web browser and/or
+                            a caching proxy how to cache content. They may also intercept
+                            a response to return a cached copy or instruct the browser to use
+                            its own cached copy, if it is considered to be current.
                             </p>
                         </div>
             
                         <label i18n:translate="label_mappings">Ruleset mappings</label>
                         <div class="formHelp" i18:translate="help_main_mappings">
-                            Use the table below to map caching rules to interceptors
-                            and mutators.
+                            Use the table below to map rulesets to caching
+                            operations.
                         </div>
             
                         <table class="listing nosort" id="rulesetMappingsTable">
                             <thead>
                                 <tr>
                                     <th i18n:translate="heading_ruleset">Ruleset</th>
-                                    <th i18n:translate="heading_interceptor">Interceptor</th>
-                                    <th i18n:translate="heading_mutator">Mutator</th>
+                                    <th i18n:translate="heading_operation">Operation</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -430,41 +417,22 @@
                                         <div tal:content="ruleType/title" />
                                         <p class="discreet" tal:content="ruleType/description" />
                                     </td>
-                                    <td tal:define="selected python:request.get('interceptors', view.interceptorMapping).get(ruleType['safeName'], None)">
+                                    <td tal:define="selected python:request.get('operations', view.operationMapping).get(ruleType['safeName'], None)">
                                         <select
                                             size="1"
-                                            tal:attributes="id   string:interceptor-${ruleType/name};
-                                                            name string:interceptors.${ruleType/safeName}:record;">
+                                            tal:attributes="id   string:operation-${ruleType/name};
+                                                            name string:operations.${ruleType/safeName}:record;">
                                             <option
                                                 value=""
                                                 tal:attributes="selected python:'selected' if selected is None else None"
                                                 i18n:translate="value_not_used"
                                                 >(Not used)</option>
                                             <option
-                                                tal:repeat="interceptorType view/interceptorTypes"
-                                                tal:attributes="value    interceptorType/name;
-                                                                title    interceptorType/description;
-                                                                selected python:'selected' if interceptorType['name'] == selected else None;"
-                                                tal:content="interceptorType/title"
-                                                />
-                                        </select>
-                                    </td>
-                                    <td tal:define="selected python:request.get('mutators', view.mutatorMapping).get(ruleType['safeName'], None)">
-                                        <select
-                                            size="1"
-                                            tal:attributes="id   string:mutator-${ruleType/name};
-                                                            name string:mutators.${ruleType/safeName}:record;">
-                                            <option
-                                                value=""
-                                                tal:attributes="selected python:'selected' if selected is None else None"
-                                                i18n:translate="value_not_used"
-                                                >(Not used)</option>
-                                            <option
-                                                tal:repeat="mutatorType view/mutatorTypes"
-                                                tal:attributes="value    mutatorType/name;
-                                                                title    mutatorType/description;
-                                                                selected python:'selected' if mutatorType['name'] == selected else None;"
-                                                tal:content="mutatorType/title"
+                                                tal:repeat="operationType view/operationTypes"
+                                                tal:attributes="value    operationType/name;
+                                                                title    operationType/description;
+                                                                selected python:'selected' if operationType['name'] == selected else None;"
+                                                tal:content="operationType/title"
                                                 />
                                         </select>
                                     </td>
@@ -475,7 +443,7 @@
                         <label i18n:translate="label_template_mappings">Legacy template mappings</label>
                         <div class="formHelp" i18:translate="help_template_mappings">
                             Legacy page templates defined in the <em>portal_skins</em>
-                            tool or created or customised through the web cannot be
+                            tool in the ZMI, or created or customised through the web cannot be
                             associated with rulesets in the usual way. Instead, the
                             association is maintained here. Enter template names (one per
                             line) and/or choose content types below. If you choose a
@@ -532,7 +500,6 @@
                                                     ></textarea>
                                             </div>
                                         </td>
-                        
                                     </tr>
                                 </tal:block>
                             </tbody>
@@ -549,7 +516,7 @@
                         <div class="discreet" i18n:translate="description_detailed_settings">
                             <p>
                             Many caching operations accept parameters to influence their
-                            behaviour. For example, an interceptor which returns a page
+                            behaviour. For example, an operation which returns a page
                             cached in RAM may accept a parameter specifying the timeout
                             period before pages are re-calculated. Most operations,
                             however, will have "sensible defaults", so that  they work
@@ -577,16 +544,14 @@
                             Use the table below to create, clear and edit operation
                             parameters. If you clear the ruleset-specific parameters for
                             a given operation, it will fall back on the global operation
-                            parameters. If you clear those, it will fall back on the
-                            defaults built into the operation itself.
+                            parameters.
                         </div>
             
                         <table class="listing nosort" id="operationParametersTable">
                             <thead>
                                 <tr>
                                     <th i18n:translate="heading_ruleset">Ruleset</th>
-                                    <th i18n:translate="heading_interceptor">Interceptor</th>
-                                    <th i18n:translate="heading_mutator">Mutator</th>
+                                    <th i18n:translate="heading_operation">Operation</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -595,50 +560,13 @@
                                         <div tal:content="ruleType/title" />
                                         <p class="discreet" tal:content="ruleType/description" />
                                     </td>
-                                    <td tal:define="operationName python:view.interceptorMapping.get(ruleType['name'], None)">
+                                    <td tal:define="operationName python:view.operationMapping.get(ruleType['safeName'], None)">
                                         <tal:block condition="not:operationName" i18n:translate="help_not_mapped">
                                             Not mapped
                                         </tal:block>
                                         <tal:block condition="operationName">
                                             <tal:block
-                                                define="operationInfo python:view.interceptorTypesLookup.get(operationName, None)"
-                                                condition="operationInfo">
-                                                <div tal:content="operationInfo/title" />
-                                                <div
-                                                    class="discreet" 
-                                                    tal:condition="not:operationInfo/hasOptions"
-                                                    i18n:translate="help_no_options">
-                                                    No parameters
-                                                </div>
-                                                <div style="white-space: nowrap" class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
-                                                    <a  i18n:translate="link_view_edit_clear"
-                                                        tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-global/${operationName}"
-                                                        >View/edit</a>
-                                                    <span i18n:translate="label_global">global parameters</span>
-                                                </div>
-                                                <div style="white-space: nowrap" class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
-                                                    <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType['name'])">
-                                                        <a  tal:condition="hasRulesetOptions"
-                                                            i18n:translate="link_view_edit_clear"
-                                                            tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
-                                                            >View/edit/clear</a>
-                                                        <a  tal:condition="not:hasRulesetOptions"
-                                                            i18n:translate="link_create"
-                                                            tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
-                                                            >Create</a>
-                                                    </tal:block>
-                                                    <span i18:translate="label_ruleset">per-ruleset parameters</span>
-                                                </div>
-                                            </tal:block>
-                                        </tal:block>
-                                    </td>
-                                    <td tal:define="operationName python:view.mutatorMapping.get(ruleType['name'], None)">
-                                        <tal:block condition="not:operationName" i18n:translate="help_not_mapped">
-                                            Not mapped
-                                        </tal:block>
-                                        <tal:block condition="operationName">
-                                            <tal:block
-                                                define="operationInfo python:view.mutatorTypesLookup.get(operationName, None)"
+                                                define="operationInfo python:view.operationTypesLookup.get(operationName, None)"
                                                 condition="operationInfo">
                                                 <div tal:content="operationInfo/title" />
                                                 <div

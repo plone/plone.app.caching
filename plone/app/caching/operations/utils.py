@@ -3,8 +3,6 @@ import time
 import datetime
 import logging
 
-from OFS.interfaces import ITraversable
-
 from zope.interface import alsoProvides
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
@@ -21,133 +19,17 @@ from z3c.caching.interfaces import ILastModified
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import ISiteRoot
 
-PAGE_CACHE_KEY = 'plone.app.caching.operations.pagecache'
-PAGE_CACHE_ANNOTATION_KEY = 'plone.app.caching.operations.pagecache.key'
+PAGE_CACHE_KEY = 'plone.app.caching.operations.ramcache'
+PAGE_CACHE_ANNOTATION_KEY = 'plone.app.caching.operations.ramcache.key'
 
 logger = logging.getLogger('plone.app.caching')
 
 #
-# Basic helper functions
+# Operation helpers, used in the implementations of interceptResponse() and
+# modifyResponse().
 # 
-
-def getContext(published, marker=(IContentish, ISiteRoot,)):
-    """Given a published object, attempt to look up a context
-    
-    ``published`` is the object that was published.
-    ``marker`` is a marker interface to look for
-    
-    Returns an item providing ``marker`` or None, if it cannot be found.
-    """
-    
-    if not isinstance(marker, (list, tuple,)):
-        marker = (marker,)
-    
-    def checkType(context):
-        for m in marker:
-            if m.providedBy(context):
-                return True
-        return False
-    
-    while (
-        published is not None
-        and not checkType(published)
-        and hasattr(published, '__parent__',)
-    ):
-        published = published.__parent__
-    
-    if not checkType(published):
-        return None
-    
-    return published
-
-def formatDateTime(dt):
-    """Format a Python datetime object as an RFC1123 date.
-    
-    Returns a string.
-    """
-    
-    return wsgiref.handlers.format_date_time(time.mktime(dt.timetuple()))
-
-def safeLastModified(published):
-    """Get a last modified date or None
-    """
-    
-    lastModified = ILastModified(published, None)
-    if lastModified is None:
-        return None
-    
-    return lastModified()
-
-def getExpiration(maxage):
-    """Get an expiration date as a datetime.
-    
-    ``maxage`` is the maximum age of the item, in seconds.
-    """
-    
-    now = datetime.datetime.now()
-    if maxage > 0:
-        return now + datetime.timedelta(seconds=maxage)
-    else:
-        return now - datetime.timedelta(seconds=10*365*24*3600)
-
-def getRAMCache(globalKey=PAGE_CACHE_KEY):
-    """Get a RAM cache instance for the given key. The return value is ``None``
-    if no RAM cache can be found, or a mapping object supporting at least
-    ``__getitem__()``, ``__setitem__()`` and ``get()`` that can be used to get
-    or set cache values.
-    
-    ``key`` is the global cache key, which must be unique site-wide. Most
-    commonly, this will be the operation dotted name.
-    """
-    
-    chooser = queryUtility(ICacheChooser)
-    if chooser is None:
-        return None
-    
-    return chooser(globalKey)
-
-def getRAMCacheKey(published, request):
-    """Calculate the cache key for pages cached in RAM
-    """
-    
-    # XXX: improve
-    if hasattr(published, '__parent__'):
-        content = published.__parent__
-        if ITraversable.providedBy(content):
-            return content.absolute_url_path()
-    return request['ACTUAL_URL']
-
-def getETag(published, request, keys=(), extraTokens=()):
-    """Calculate an ETag.
-    
-    ``keys`` is a list of types of items to include in the ETag. These must
-    match named multi-adapters on (published, request) providing
-    ``IETagValue``.
-    
-    ``extraTokens`` is a list of additional ETag tokens to include, verbatim
-    as strings.
-    
-    All tokens will be concatenated into an ETag string, separated by pipes.
-    """
-    
-    tokens = []
-    for key in keys:
-        component = queryMultiAdapter((published, request), IETagValue, name=key)
-        if component is None:
-            logger.warning("Could not find value adapter for ETag component %s", key)
-        else:
-            value = component()
-            if value is not None:
-                tokens.append(value)
-    
-    for token in extraTokens:
-        tokens.append(token)
-    
-    etag = '|' + '|'.join(tokens)
-    return etag.replace(',',';')  # commas are bad in etags
-
-#
-# Mutator helpers
+# These all take three parameters, published, request and response, as well
+# as any additional keyword parameters required.
 # 
 
 def doNotCache(published, request, response):
@@ -233,69 +115,41 @@ def cacheEverywhere(published, request, response, maxage, lastmodified=None, eta
     if vary is not None:
         response.setHeader('Vary', vary)
 
-def cacheInRAM(published, request, response, key=None, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
+def cacheInRAM(published, request, response, etag=None, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
     """Set a flag indicating that the response for the given request
     should be cached in RAM.
     
     This will signal to a transform chain step after the response has been
     generated to store the result in the RAM cache.
     
-    To actually use the cached response, you will need to configure the
-    'plone.app.caching.operations.pagecache' mutator.
+    To actually use the cached response, you can implement
+    ``interceptResponse()`` in your caching operation to call
+    ``fetchFromRAMCache()`` and then return the value of the
+    ``cachedResponse()`` helper.
     
-    ``key`` is the caching key to use. If not set, it is calculated by
-    calling getRAMCacheKey(published, request). Note that this needs to be
-    the same key that is used by the interceptor, so passing a custom key
-    implies using a custom interceptor as well.
+    ``etag`` is a string identifying the resource.
     
     ``annotationsKey`` is the key used by the transform to look up the
-    caching key.
+    caching key when storing the response in the cache. It should match that
+    passed to ``storeResponseInRAMCache()``.
     """
 
     annotations = IAnnotations(request, None)
     if annotations is None:
         return None
     
-    if key is None:
-        key = getRAMCacheKey(published, request)
+    key = getRAMCacheKey(request, etag=etag)
     
     annotations[annotationsKey] = key
     alsoProvides(request, IRAMCached)
-
-#
-# RAM cache management
-# 
-
-def fetchFromRAMCache(published, request, response, key=None, globalKey=PAGE_CACHE_KEY):
-    """Return a page cached in RAM, or None if it cannot be found.
-    
-    ``key`` is the cache key. If not given, it will be calculated by calling
-    ``getRAMCacheKey()``
-    
-    ``globalKey`` is the global cache key. This needs to be the same key
-    as the one used to store the data, so changing it assumes using a
-    different storage mechanism than the default
-    ``plone.app.caching.operations.pagecache` transform chain step.
-    """
-    
-    cache = getRAMCache(globalKey)
-    if cache is None:
-        return None
-
-    if key is None:
-        key = getRAMCacheKey(published, request)
-    
-    if not key:
-        return None
-    
-    return cache.get(key)
 
 def cachedResponse(published, request, response, cached):
     """Returned a cached page. Modifies the request (status and headers)
     and returns the cached body.
     
     ``cached`` is an object as returned by ``fetchFromRAMCache()`` and stored
-    by ``storeResponseInRAMCache()``, i.e. a triple of (status, header, body).
+    by ``storeResponseInRAMCache()``, i.e. a triple of
+    ``(status, header, body)``.
     """
     
     status, headers, body = cached
@@ -309,19 +163,42 @@ def cachedResponse(published, request, response, cached):
     
     return body
 
-def storeResponseInRAMCache(published, request, response, result, globalKey=PAGE_CACHE_KEY, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
+#
+# RAM cache management
+# 
+
+def fetchFromRAMCache(request, etag, globalKey=PAGE_CACHE_KEY):
+    """Return a page cached in RAM, or None if it cannot be found.
+    
+    ``etag`` is an ETag for the content, and is used as a basis for the
+    cache key.
+    
+    ``globalKey`` is the global cache key. This needs to be the same key
+    as the one used to store the data, i.e. it must correspond to the one
+    used when calling ``storeResponseInRAMCache()``.
+    """
+    
+    cache = getRAMCache(globalKey)
+    if cache is None:
+        return None
+
+    key = getRAMCacheKey(request, etag)
+    if key is None:
+        return None
+    
+    return cache.get(key)
+
+def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
     """Store the given response in the RAM cache.
     
     ``result`` should be the response body as a string.
 
     ``globalKey`` is the global cache key. This needs to be the same key
-    as the one used to fetch the data, so changing it assumes using a
-    different interceptor than the default
-    ``plone.app.caching.operations.pagecache``
+    as the one used to fetch the data.
 
     ``annotationsKey`` is the key in annotations on the request from which 
-    the caching key should be retrieved. The default is that used by the
-    ``cacheInRAM()`` helper function.
+    the (resource-identifying) caching key should be retrieved. The default
+    is that used by the ``cacheInRAM()`` helper function.
     """
     
     annotations = IAnnotations(request, None)
@@ -339,3 +216,124 @@ def storeResponseInRAMCache(published, request, response, result, globalKey=PAGE
     status = response.getStatus()
     headers = dict(request.response.headers)
     cache[key] = (status, headers, result)
+
+#
+# Basic helper functions
+# 
+
+def getContext(published, marker=(IContentish, ISiteRoot,)):
+    """Given a published object, attempt to look up a context
+    
+    ``published`` is the object that was published.
+    ``marker`` is a marker interface to look for
+    
+    Returns an item providing ``marker`` or None, if it cannot be found.
+    """
+    
+    if not isinstance(marker, (list, tuple,)):
+        marker = (marker,)
+    
+    def checkType(context):
+        for m in marker:
+            if m.providedBy(context):
+                return True
+        return False
+    
+    while (
+        published is not None
+        and not checkType(published)
+        and hasattr(published, '__parent__',)
+    ):
+        published = published.__parent__
+    
+    if not checkType(published):
+        return None
+    
+    return published
+
+def formatDateTime(dt):
+    """Format a Python datetime object as an RFC1123 date.
+    
+    Returns a string.
+    """
+    
+    return wsgiref.handlers.format_date_time(time.mktime(dt.timetuple()))
+
+def safeLastModified(published):
+    """Get a last modified date or None
+    """
+    
+    lastModified = ILastModified(published, None)
+    if lastModified is None:
+        return None
+    
+    return lastModified()
+
+def getExpiration(maxage):
+    """Get an expiration date as a datetime.
+    
+    ``maxage`` is the maximum age of the item, in seconds.
+    """
+    
+    now = datetime.datetime.now()
+    if maxage > 0:
+        return now + datetime.timedelta(seconds=maxage)
+    else:
+        return now - datetime.timedelta(seconds=10*365*24*3600)
+
+def getRAMCache(globalKey=PAGE_CACHE_KEY):
+    """Get a RAM cache instance for the given key. The return value is ``None``
+    if no RAM cache can be found, or a mapping object supporting at least
+    ``__getitem__()``, ``__setitem__()`` and ``get()`` that can be used to get
+    or set cache values.
+    
+    ``key`` is the global cache key, which must be unique site-wide. Most
+    commonly, this will be the operation dotted name.
+    """
+    
+    chooser = queryUtility(ICacheChooser)
+    if chooser is None:
+        return None
+    
+    return chooser(globalKey)
+
+def getRAMCacheKey(request, etag=None):
+    """Calculate the cache key for pages cached in RAM.
+    
+    ``etag`` is a unique etag string. The cache key is a combination of the
+    resource's path and the etag.
+    """
+    
+    resourceKey = request['PATH_INFO'] + '?' + request['QUERY_STRING']
+    if etag:
+        resourceKey = etag + '||' + resourceKey
+    return resourceKey
+
+def getETag(published, request, keys=(), extraTokens=()):
+    """Calculate an ETag.
+    
+    ``keys`` is a list of types of items to include in the ETag. These must
+    match named multi-adapters on (published, request) providing
+    ``IETagValue``.
+    
+    ``extraTokens`` is a list of additional ETag tokens to include, verbatim
+    as strings.
+    
+    All tokens will be concatenated into an ETag string, separated by pipes.
+    """
+    
+    tokens = []
+    for key in keys:
+        component = queryMultiAdapter((published, request), IETagValue, name=key)
+        if component is None:
+            logger.warning("Could not find value adapter for ETag component %s", key)
+        else:
+            value = component()
+            if value is not None:
+                tokens.append(value)
+    
+    for token in extraTokens:
+        tokens.append(token)
+    
+    etag = '|' + '|'.join(tokens)
+    return etag.replace(',',';')  # commas are bad in etags

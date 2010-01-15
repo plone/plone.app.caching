@@ -8,8 +8,8 @@ from zope.component import getMultiAdapter
 
 from zope.publisher.interfaces.http import IHTTPRequest
 
-from plone.caching.interfaces import IResponseMutator
-from plone.caching.interfaces import IResponseMutatorType
+from plone.caching.interfaces import ICachingOperation
+from plone.caching.interfaces import ICachingOperationType
 from plone.caching.utils import lookupOptions
 
 from plone.app.caching.operations.utils import doNotCache
@@ -17,10 +17,12 @@ from plone.app.caching.operations.utils import cacheInBrowser
 from plone.app.caching.operations.utils import cacheInProxy
 from plone.app.caching.operations.utils import cacheEverywhere
 from plone.app.caching.operations.utils import cacheInRAM
+from plone.app.caching.operations.utils import cachedResponse
 
 from plone.app.caching.operations.utils import getETag
 from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import safeLastModified
+from plone.app.caching.operations.utils import fetchFromRAMCache
 
 from plone.app.caching.interfaces import _
 
@@ -32,11 +34,11 @@ except ImportError:
     HAVE_RESOURCE_REGISTRIES = False
 
 class CompositeViews(object):
-    implements(IResponseMutator)
+    implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
 
     # Type metadata
-    classProvides(IResponseMutatorType)
+    classProvides(ICachingOperationType)
 
     title = _(u"Cache composite views")
     description = _(u"Composite views (content item views and templates) can "
@@ -54,24 +56,36 @@ class CompositeViews(object):
         self.published = published
         self.request = request
     
-    def __call__(self, rulename, response):
-        context = getContext(self.published)
-        
-        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
+    def interceptResponse(self, rulename, response):
         options = lookupOptions(CompositeViews, rulename)
+        
+        context = getContext(self.published)
+        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
+        
+        if portal_state.anonymous():
+            etag = getETag(self.published, self.request, options['etags'] or self.etags)
+            cached = fetchFromRAMCache(self.request, etag=etag)
+            if cached is not None:
+                return cachedResponse(self.published, self.request, response, cached=cached)
+    
+    def modifyResponse(self, rulename, response):
+        options = lookupOptions(CompositeViews, rulename)
+        
+        context = getContext(self.published)
+        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
         
         etag = getETag(self.published, self.request, options['etags'] or self.etags)
         cacheInBrowser(self.published, self.request, response, etag=etag)
         
-        if portal_state.anonymous():            
-            cacheInRAM(self.published, self.request, response, etag)
+        if portal_state.anonymous():
+            cacheInRAM(self.published, self.request, response, etag=etag)
 
 class ContentFeeds(object):
-    implements(IResponseMutator)
+    implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
 
     # Type metadata
-    classProvides(IResponseMutatorType)
+    classProvides(ICachingOperationType)
 
     title = _(u"Cache content feeds")
     description = _(u"Content feeds can change so we cache these in the "
@@ -88,23 +102,36 @@ class ContentFeeds(object):
         self.published = published
         self.request = request
     
-    def __call__(self, rulename, response):
-        portal_state = getMultiAdapter((self.published, self.request), name=u'plone_portal_state')
+    def interceptResponse(self, rulename, response):
         options = lookupOptions(ContentFeeds, rulename)
         
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        context = getContext(self.published)
+        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
         
+        if portal_state.anonymous():
+            etag = getETag(self.published, self.request, options['etags'] or self.etags)
+            cached = fetchFromRAMCache(self.request, etag=etag)
+            if cached is not None:
+                return cachedResponse(self.published, self.request, response, cached=cached)
+    
+    def modifyResponse(self, rulename, response):
+        options = lookupOptions(ContentFeeds, rulename)
+        
+        context = getContext(self.published)
+        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
+        
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
         cacheInBrowser(self.published, self.request, response, etag=etag)
         
         if portal_state.anonymous():            
-            cacheInRAM(self.published, self.request, response, etag)
+            cacheInRAM(self.published, self.request, response, etag=etag)
 
 class ContentFeedsWithProxy(object):
-    implements(IResponseMutator)
+    implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
 
     # Type metadata
-    classProvides(IResponseMutatorType)
+    classProvides(ICachingOperationType)
 
     title = _(u"Cache content feeds with proxy")
     description = _(u"Content feeds can change so we cache these in the "
@@ -125,26 +152,31 @@ class ContentFeedsWithProxy(object):
         self.published = published
         self.request = request
     
-    def __call__(self, rulename, response):
-        portal_state = getMultiAdapter((self.published, self.request), name=u'plone_portal_state')
+    def interceptResponse(self, rulename, response):
+        return None
+    
+    def modifyResponse(self, rulename, response):
         options = lookupOptions(ContentFeedsWithProxy, rulename)
+        
+        context = getContext(self.published)
+        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
         
         etag = getETag(self.published, self.request, options['etags'] or self.etags)
         smaxage = options['smaxage'] or self.smaxage
         vary = options['vary'] or self.vary
         
         if portal_state.anonymous():            
-            cacheInProxy(self.published, self.request, response, smaxage, etag=etag, vary=vary)
-            cacheInRAM(self.published, self.request, response, etag)
+            cacheInProxy(self.published, self.request, response, smaxage=smaxage, etag=etag, vary=vary)
+            cacheInRAM(self.published, self.request, response, etag=etag)
         else:
             cacheInBrowser(self.published, self.request, response, etag=etag)
 
 class Downloads(object):
-    implements(IResponseMutator)
+    implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
 
     # Type metadata
-    classProvides(IResponseMutatorType)
+    classProvides(ICachingOperationType)
 
     title = _(u"Cache downloads")
     description = _(u"Downloads (like File and Image content items) can "
@@ -157,7 +189,10 @@ class Downloads(object):
         self.published = published
         self.request = request
     
-    def __call__(self, rulename, response):
+    def interceptResponse(self, rulename, response):
+        return None
+    
+    def modifyResponse(self, rulename, response):
         context = getContext(self.published)
         
         if 'Anonymous' in rolesForPermissionOn('View', context):
@@ -167,11 +202,11 @@ class Downloads(object):
             doNotCache(self.published, self.request, response)
 
 class DownloadsWithProxy(object):
-    implements(IResponseMutator)
+    implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
 
     # Type metadata
-    classProvides(IResponseMutatorType)
+    classProvides(ICachingOperationType)
 
     title = _(u"Cache downloads with proxy")
     description = _(u"Downloads (like File and Image content items) can "
@@ -191,26 +226,29 @@ class DownloadsWithProxy(object):
         self.published = published
         self.request = request
     
-    def __call__(self, rulename, response):
+    def interceptResponse(self, rulename, response):
+        return None
+    
+    def modifyResponse(self, rulename, response):
+        options = lookupOptions(DownloadsWithProxy, rulename)
+        
         context = getContext(self.published)
         
+        smaxage = options['smaxage'] or self.smaxage
+        vary = options['vary'] or self.vary
+        
         if 'Anonymous' in rolesForPermissionOn('View', context):
-            options = lookupOptions(DownloadsWithProxy, rulename)
-            
-            smaxage = options['smaxage'] or self.smaxage
-            vary = options['vary'] or self.vary
-            
             lastmodified = safeLastModified(self.published)
-            cacheInProxy(self.published, self.request, response, smaxage, lastmodified=lastmodified, vary=vary)
+            cacheInProxy(self.published, self.request, response, smaxage=smaxage, lastmodified=lastmodified, vary=vary)
         else:
             doNotCache(self.published, self.request, response)
-    
+
 class Resources(object):
-    implements(IResponseMutator)
+    implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
 
     # Type metadata
-    classProvides(IResponseMutatorType)
+    classProvides(ICachingOperationType)
 
     title = _(u"Cache resources")
     description = _(u"Standard resources (like skin images and filesystem "
@@ -228,21 +266,24 @@ class Resources(object):
         self.published = published
         self.request = request
     
-    def __call__(self, rulename, response):
+    def interceptResponse(self, rulename, response):
+        return None
+    
+    def modifyResponse(self, rulename, response):
         options = lookupOptions(Resources, rulename)
         
         maxage = options['maxage'] or self.maxage
         vary = options['vary'] or self.vary
         
         lastmodified = safeLastModified(self.published)
-        cacheEverywhere(self.published, self.request, response, maxage, lastmodified=lastmodified, vary=vary)
+        cacheEverywhere(self.published, self.request, response, maxage=maxage, lastmodified=lastmodified, vary=vary)
 
 class StableResources(object):
-    implements(IResponseMutator)
+    implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
 
     # Type metadata
-    classProvides(IResponseMutatorType)
+    classProvides(ICachingOperationType)
 
     title = _(u"Cache stable resources")
     description = _(u"Stable resources (like ResourceRegistry-maintained "
@@ -262,7 +303,10 @@ class StableResources(object):
         self.published = published
         self.request = request
     
-    def __call__(self, rulename, response):
+    def interceptResponse(self, rulename, response):
+        return None
+    
+    def modifyResponse(self, rulename, response):
         options = lookupOptions(StableResources, rulename)
         
         maxage = options['maxage'] or self.maxage
@@ -270,7 +314,7 @@ class StableResources(object):
         vary = options['vary'] or self.vary
         
         lastmodified = safeLastModified(self.published)
-        cacheEverywhere(self.published, self.request, response, maxage, lastmodified=lastmodified, etag=etag, vary=vary)
+        cacheEverywhere(self.published, self.request, response, maxage=maxage, lastmodified=lastmodified, etag=etag, vary=vary)
 
 if HAVE_RESOURCE_REGISTRIES:
 
@@ -281,8 +325,12 @@ if HAVE_RESOURCE_REGISTRIES:
         
         adapts(ICookedFile, IHTTPRequest)
 
-        def __call__(self, rulename, response):
+        def interceptResponse(self, rulename, response):
+            return None
+    
+        def modifyResponse(self, rulename, response):
             registry = getContext(self.published, IResourceRegistry)
+            
             if registry is not None:
                 if registry.getDebugMode() or not registry.isCacheable(self.published.__name__):
                     doNotCache(self.published, self.request, response)

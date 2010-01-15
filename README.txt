@@ -54,7 +54,7 @@ Under the settings tab, you will find four fieldsets:
 * *Caching operation mappings*, where caching rulesets (hints about views
   and resources used for caching purposes) can be associated with caching
   operations (which either intercept a request to return a cached response, or
-  mutates a response to add cache control headers). This is also where
+  modifies a response to add cache control headers). This is also where
   rulesets for legacy page templates (created through the web or the
   portal_skins tool) are configured.
 * *Detailed settings*, where you can configure parameters for individual
@@ -64,23 +64,22 @@ Rulesets and caching operations
 -------------------------------
 
 The caching infrastructure works on the principle of *rulesets* mapped to
-*cache interceptors* and *response mutators*, collectively known as
 *caching operations*. A ruleset is basically just a name, and is normally
 applied in ZCML by the author of a particular view. There are also some
 default rulesets applied to general resources - see below.
 
-Caching operations are components written in Python which either interrupt
-rendering to provide a cached response (such as a ``304 NOT MODIFIED``
-response), in the case of interceptors, or add caching information to a
-response (such as setting the ``Cache-Control`` HTTP response header), in the
-case of mutators.
-
-For more details on how to use these components, see the documentation for
-`plone.caching`_.
-
 Please note that ``plone.app.caching`` places the caching ruleset registry
 into "explicit" mode. This means that you *must* declare a caching rulset
 (with the ``<cache:rulesetType />`` directive) before you can use it.
+
+
+Caching operations are components written in Python which either interrupt
+rendering to provide a cached response (such as a ``304 NOT MODIFIED``
+response), or add caching information to a response (such as setting the
+``Cache-Control`` HTTP response header).
+
+For more details on how to use these components, see the documentation for
+`plone.caching`_.
 
 Once ruleset and caching operation types have been registered, they will
 appear in the caching control panel.
@@ -131,8 +130,8 @@ you can set the logging level with the ``event-log-level`` option.
 
 You should see output in the log like::
 
-    2010-01-11 16:44:10 DEBUG plone.caching Published: <ATImage at /test/i> Ruleset: plone.download Interceptor: None
-    2010-01-11 16:44:10 DEBUG plone.caching Published: <ATImage at /test/i> Ruleset: plone.download Mutator: plone.caching.operations.chain
+    2010-01-11 16:44:10 DEBUG plone.caching Published: <ATImage at /test/i> Ruleset: plone.download Operation: None
+    2010-01-11 16:44:10 DEBUG plone.caching Published: <ATImage at /test/i> Ruleset: plone.download Operation: plone.caching.operations.chain
 
 The ``None`` indicates that no ruleset or operation was mapped.
 
@@ -165,10 +164,14 @@ Here is an example from this package::
         />
 
 The directory ``profiles/with-caching-proxy`` contains a single import step,
-``registry.xml``, containing settings to configure the ruleset to interceptor
-and mutator mappings, and setting options for various operations. It may be
-useful looking at that file for inspiration if you are building your own
-caching profile. Alternatively, you can export the registry from the
+``registry.xml``, containing settings to configure the ruleset to operation
+mapping, and setting options for various operations. Default options for the
+various standard operations are found in the ``registry.xml`` file that is
+part of the standard installation profile for this product, in the directory
+``profiles/default``.
+
+It may be useful looking at these files for inspiration if you are building
+your own caching profile. Alternatively, you can export the registry from the
 ``portal_setup`` tool and pull out the records under the prefixes
 ``plone.caching`` and ``plone.app.caching``.
 
@@ -278,8 +281,8 @@ memory. This is done in two main ways:
   the results of certain functions in RAM. For example, some viewlets and
   portlets cache their rendered output in RAM for a time, alleviating the need
   to calculate them every time.
-* Some caching operations may cache an entire response in memory. A caching
-  interceptor can then return the cached version provided it is valid.
+* Some caching operations may cache an entire response in memory, so that
+  they can later intercept the request to return a cached response..
 
 Caching in RAM in Zope is not as efficient as caching in a proxy, for a number
 of reasons:

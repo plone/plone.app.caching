@@ -13,7 +13,7 @@ class GZipTransform(object):
     """Transformation using plone.transformchain.
     
     This is registered at order 10000, i.e. "late", but before the caching 
-    mutator hook. A typical transform chain order may include:
+    operation hook. A typical transform chain order may include:
     
     * lxml transforms (e.g. plone.app.blocks, collectivexdv) => 8000-8999
     * gzip => 10000

@@ -6,49 +6,49 @@
     <include package="plone.caching" />
     <include package="plone.app.registry" />
     
-    <!-- Response mutators -->
-    <adapter   factory=".mutators.CompositeViews"        name="plone.app.caching.compositeviews" />
-    <utility component=".mutators.CompositeViews"        name="plone.app.caching.compositeviews" />
+    <!-- Caching operations 
+         ~~~~~~~~~~~~~~~~~~ -->
+    
+    <adapter   factory=".default.CompositeViews"        name="plone.app.caching.compositeviews" />
+    <utility component=".default.CompositeViews"        name="plone.app.caching.compositeviews" />
 
-    <adapter   factory=".mutators.ContentFeeds"          name="plone.app.caching.contentfeeds" />
-    <utility component=".mutators.ContentFeeds"          name="plone.app.caching.contentfeeds" />
+    <adapter   factory=".default.ContentFeeds"          name="plone.app.caching.contentfeeds" />
+    <utility component=".default.ContentFeeds"          name="plone.app.caching.contentfeeds" />
 
-    <adapter   factory=".mutators.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
-    <utility component=".mutators.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
+    <adapter   factory=".default.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
+    <utility component=".default.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
 
-    <adapter   factory=".mutators.Downloads"             name="plone.app.caching.downloads" />
-    <utility component=".mutators.Downloads"             name="plone.app.caching.downloads" />
+    <adapter   factory=".default.Downloads"             name="plone.app.caching.downloads" />
+    <utility component=".default.Downloads"             name="plone.app.caching.downloads" />
 
-    <adapter   factory=".mutators.DownloadsWithProxy"    name="plone.app.caching.downloadswithproxy" />
-    <utility component=".mutators.DownloadsWithProxy"    name="plone.app.caching.downloadswithproxy" />
+    <adapter   factory=".default.DownloadsWithProxy"    name="plone.app.caching.downloadswithproxy" />
+    <utility component=".default.DownloadsWithProxy"    name="plone.app.caching.downloadswithproxy" />
 
-    <adapter   factory=".mutators.Resources"             name="plone.app.caching.resources" />
-    <utility component=".mutators.Resources"             name="plone.app.caching.resources" />
+    <adapter   factory=".default.Resources"             name="plone.app.caching.resources" />
+    <utility component=".default.Resources"             name="plone.app.caching.resources" />
 
-    <adapter   factory=".mutators.StableResources"       name="plone.app.caching.stableresources" />
-    <utility component=".mutators.StableResources"       name="plone.app.caching.stableresources" />
+    <adapter   factory=".default.StableResources"       name="plone.app.caching.stableresources" />
+    <utility component=".default.StableResources"       name="plone.app.caching.stableresources" />
     
     <!-- Special handling for content in Plone's ResourceRegistries, if installed -->
     <adapter
         zcml:condition="installed Products.ResourceRegistries"
-        factory=".mutators.ResourceRegistriesStableResources"
+        factory=".default.ResourceRegistriesStableResources"
         name="plone.app.caching.stableresources"
         />
     
-    <!-- RAM page cache interceptor -->
-    <adapter   factory=".pagecache.PageCache"            name="plone.app.caching.operations.pagecache" />
-    <utility component=".pagecache.PageCache"            name="plone.app.caching.operations.pagecache" />
-    <adapter   factory=".pagecache.Store"                name="plone.app.caching.operations.pagecache" />
+    <!-- RAM cache storage: a transformation at the very end of the chain -->
+    <adapter   factory=".ramcache.Store"                name="plone.app.caching.operations.ramcache" />
     
     <!-- ETag components -->
-    <adapter factory=".etags.UserID"                     name="userid" />
-    <adapter factory=".etags.Roles"                      name="roles" />
-    <adapter factory=".etags.Language"                   name="language" />
-    <adapter factory=".etags.UserLanguage"               name="userLanguage" />
-    <adapter factory=".etags.GZip"                       name="gzip" />
-    <adapter factory=".etags.LastModified"               name="lastModified" />
-    <adapter factory=".etags.CatalogCounter"             name="catalogCounter" />
-    <adapter factory=".etags.ObjectLocked"               name="locked" />
-    <adapter factory=".etags.Skin"                       name="skin" />
+    <adapter factory=".etags.UserID"                    name="userid" />
+    <adapter factory=".etags.Roles"                     name="roles" />
+    <adapter factory=".etags.Language"                  name="language" />
+    <adapter factory=".etags.UserLanguage"              name="userLanguage" />
+    <adapter factory=".etags.GZip"                      name="gzip" />
+    <adapter factory=".etags.LastModified"              name="lastModified" />
+    <adapter factory=".etags.CatalogCounter"            name="catalogCounter" />
+    <adapter factory=".etags.ObjectLocked"              name="locked" />
+    <adapter factory=".etags.Skin"                      name="skin" />
     
 </configure>

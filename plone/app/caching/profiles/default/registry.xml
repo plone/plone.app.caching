@@ -15,7 +15,7 @@
     <record name="plone.caching.operations.chain.operations">
         <field type="plone.registry.field.List">
             <title>Operations</title>
-            <description>A list of mutators to call, in order</description>
+            <description>A list of operations to call, in order</description>
             <value_type type="plone.registry.field.DottedName" />
         </field>
         <value></value>

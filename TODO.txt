@@ -71,7 +71,6 @@ Zope 2 style resources
     => ``Products.CMFCore.FSFile.FSFile``,
     => ``Products.CMFCore.FSImage.FSImage``
     => ``OFS.Image.File``
-    => name: ``zope-resource``
 
 Zope 3 style resources
 ----------------------
@@ -95,8 +94,8 @@ Zope 3 style resources
 **Strategy:**
 
 * Register cache rule for ``Products.Five.browser.resource.Resource``
-    => name: ``zope-resource`` (same as for Zope 2 style resource)
-* Possibly implement differently through alternative IResponseMutator adapter
+    => (same as for Zope 2 style resource)
+* Possibly implement differently through alternative caching operation adapter
   using the same name
 
 Other
