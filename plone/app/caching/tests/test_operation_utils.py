@@ -1,26 +1,38 @@
-from StringIO import StringIO
-
 import unittest
 import zope.component.testing
-
-from zope.interface import classImplements
-from zope.component import provideAdapter
-
-from zope.annotation.interfaces import IAnnotations
-from zope.annotation.interfaces import IAttributeAnnotatable
-from zope.annotation.attribute import AttributeAnnotations
 
 import time
 import datetime
 import dateutil.parser
 import dateutil.tz
 import wsgiref.handlers
+from StringIO import StringIO
+
+from zope.interface import implements
+from zope.interface import Interface
+from zope.interface import classImplements
+from zope.interface import alsoProvides
+
+from zope.component import provideAdapter
+from zope.component import adapts
+
+from z3c.caching.interfaces import ILastModified
+
+from zope.annotation.interfaces import IAnnotations
+from zope.annotation.interfaces import IAttributeAnnotatable
+from zope.annotation.attribute import AttributeAnnotations
 
 from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPRequest import HTTPResponse
 
+from OFS.SimpleItem import SimpleItem
+
+from Products.CMFCore.interfaces import IContentish
+
 class DummyPublished(object):
-    pass
+    
+    def __init__(self, parent=None):
+        self.__parent__ = parent
 
 class ResponseModificationHelpersTest(unittest.TestCase):
     
@@ -30,6 +42,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
     
     def tearDown(self):
         zope.component.testing.tearDown()
+    
     
     # doNotCache()
     
@@ -74,6 +87,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         expires = dateutil.parser.parse(response.getHeader('Expires'))
         self.failUnless(now > expires)
     
+    
     # cacheInBrowser()
     
     def test_cacheInBrowser_no_etag_no_last_modified(self):
@@ -117,7 +131,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         expires = dateutil.parser.parse(response.getHeader('Expires'))
         self.failUnless(now > expires)
     
-    def test_cacheInBrowser_lastmodified(self):
+    def test_cacheInBrowser_lastModified(self):
         from plone.app.caching.operations.utils import cacheInBrowser
         
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
@@ -128,7 +142,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
         
-        cacheInBrowser(published, request, response, lastmodified=now)
+        cacheInBrowser(published, request, response, lastModified=now)
         
         self.assertEquals(200, response.getStatus())
         self.assertEquals('max-age=0, must-revalidate, private', response.getHeader('Cache-Control'))
@@ -138,7 +152,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         expires = dateutil.parser.parse(response.getHeader('Expires'))
         self.failUnless(now > expires)
     
-    def test_cacheInBrowser_lastmodified_and_etag(self):
+    def test_cacheInBrowser_lastModified_and_etag(self):
         from plone.app.caching.operations.utils import cacheInBrowser
         
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
@@ -151,7 +165,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         
         nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
         
-        cacheInBrowser(published, request, response, etag=etag, lastmodified=now)
+        cacheInBrowser(published, request, response, etag=etag, lastModified=now)
         
         self.assertEquals(200, response.getStatus())
         self.assertEquals('max-age=0, must-revalidate, private', response.getHeader('Cache-Control'))
@@ -160,6 +174,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         
         expires = dateutil.parser.parse(response.getHeader('Expires'))
         self.failUnless(now > expires)
+    
     
     # cacheInProxy()
     
@@ -198,7 +213,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         
         nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
         
-        cacheInProxy(published, request, response, smaxage=60, etag=etag, lastmodified=now, vary=vary)
+        cacheInProxy(published, request, response, smaxage=60, etag=etag, lastModified=now, vary=vary)
         
         self.assertEquals(200, response.getStatus())
         self.assertEquals('max-age=0, s-maxage=60, must-revalidate', response.getHeader('Cache-Control'))
@@ -208,6 +223,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         
         expires = dateutil.parser.parse(response.getHeader('Expires'))
         self.failUnless(now > expires)
+    
     
     # cacheInBrowserAndProxy()
     
@@ -246,7 +262,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         
         nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
         
-        cacheInBrowserAndProxy(published, request, response, maxage=60, etag=etag, lastmodified=now, vary=vary)
+        cacheInBrowserAndProxy(published, request, response, maxage=60, etag=etag, lastModified=now, vary=vary)
         
         self.assertEquals(200, response.getStatus())
         self.assertEquals('max-age=60, must-revalidate, public', response.getHeader('Cache-Control'))
@@ -256,6 +272,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         
         expires = dateutil.parser.parse(response.getHeader('Expires'))
         self.failUnless(now > expires)
+    
     
     # cacheInRAM()
     
@@ -322,6 +339,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         annotations = IAnnotations(request)
         self.assertEquals("|foo|bar|||/foo?", annotations["alt.key"])
         self.failUnless(IRAMCached.providedBy(request))
+        
 
 class ResponseInterceptorHelpersTest(unittest.TestCase):
     
@@ -331,6 +349,7 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
     
     def tearDown(self):
         zope.component.testing.tearDown()
+    
     
     # cachedResponse()
     
@@ -360,6 +379,7 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         self.assertEquals('bar', response.getHeader('X-Foo'))
         self.assertEquals('qux', response.getHeader('X-Bar'))
         self.assertEquals('||blah||', response.getHeader('ETag', literal=1))
+    
     
     # notModified()
     
@@ -393,7 +413,7 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         
         nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
         
-        body = notModified(published, request, response, etag=etag, lastmodified=now)
+        body = notModified(published, request, response, etag=etag, lastModified=now)
         
         self.assertEquals(u"", body)
         self.assertEquals(etag, response.getHeader('ETag', literal=1))
@@ -419,8 +439,21 @@ class CacheCheckHelpersTest(unittest.TestCase):
     
     # visibleToRole()
     
-    def test_visible_to_role(self):
-        pass
+    def test_visibleToRole_not_real(self):
+        from plone.app.caching.operations.utils import visibleToRole
+        published = DummyPublished()
+        self.assertEquals(False, visibleToRole(published, role='Anonymous'))
+    
+    def test_visibleToRole_permission(self):
+        from plone.app.caching.operations.utils import visibleToRole
+        
+        s = SimpleItem()
+        
+        s.manage_permission('View', ('Member', 'Manager',))
+        self.assertEquals(False, visibleToRole(s, role='Anonymous'))
+        
+        s.manage_permission('View', ('Member', 'Manager', 'Anonymous',))
+        self.assertEquals(True, visibleToRole(s, role='Anonymous'))
     
     # fetchFromRAMCache()
     
@@ -442,61 +475,348 @@ class MiscHelpersTest(unittest.TestCase):
     # getContext()
     
     def test_getContext(self):
-        pass
-
+        from plone.app.caching.operations.utils import getContext
+        
+        class Parent(object):
+            implements(IContentish)
+        
+        parent = Parent()
+        published = DummyPublished(parent)
+        
+        self.failUnless(getContext(parent) is parent)
+        self.failUnless(getContext(published) is parent)
+        
     def test_getContext_custom_marker(self):
-        pass
+        from plone.app.caching.operations.utils import getContext
+        
+        class Parent(object):
+            implements(IContentish)
+            
+            def __init__(self, parent=None):
+                self.__parent__ = parent
+        
+        class IDummy(Interface):
+            pass
+        
+        grandparent = Parent()
+        parent = Parent(grandparent)
+        published = DummyPublished(parent)
+        
+        self.failUnless(getContext(published, marker=IDummy) is None)
+        self.failUnless(getContext(published, marker=(IDummy,)) is None)
+        
+        alsoProvides(grandparent, IDummy)
+        
+        self.failUnless(getContext(parent, marker=IDummy) is grandparent)
+        self.failUnless(getContext(published, marker=(IDummy,)) is grandparent)
     
     # formatDateTime()
     
-    def test_formatDateTime(self):
-        pass
-
+    def test_formatDateTime_utc(self):
+        from plone.app.caching.operations.utils import formatDateTime
+        
+        dt = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        self.assertEquals('Wed, 24 Nov 2010 03:04:05 GMT', formatDateTime(dt))
+    
+    def test_formatDateTime_local(self):
+        from plone.app.caching.operations.utils import formatDateTime
+        
+        dt = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzlocal())
+        self.assertEquals('Tue, 23 Nov 2010 19:04:05 GMT', formatDateTime(dt))
+    
+    def test_formatDateTime_naive(self):
+        from plone.app.caching.operations.utils import formatDateTime
+        
+        dt = datetime.datetime(2010, 11, 24, 3, 4, 5, 6)
+        inGMT = formatDateTime(dt)
+        
+        # Who knows what your local timezone is :-)
+        self.failUnless('Nov 2010' in inGMT)
+        
+        # Can't compare offset aware and naive
+        p = dateutil.parser.parse(inGMT).astimezone(dateutil.tz.tzlocal())
+        self.assertEquals((2010, 11, 24, 3, 4, 5), (p.year, p.month, p.day, p.hour, p.minute, p.second))
+    
+    
     # parseDateTime()
     
-    def test_parseDateTime(self):
-        pass
+    def test_parseDateTime_invalid(self):
+        from plone.app.caching.operations.utils import parseDateTime
+        
+        self.assertEquals(None, parseDateTime("foo"))
+    
+    def test_parseDateTime_rfc1123(self):
+        from plone.app.caching.operations.utils import parseDateTime
+        
+        dt = datetime.datetime(2010, 11, 24, 3, 4, 5, 0, dateutil.tz.tzlocal())
+        self.assertEquals(dt, parseDateTime("'Tue, 23 Nov 2010 19:04:05 GMT'"))
     
     def test_formatDateTime_no_timezone(self):
-        pass
+        from plone.app.caching.operations.utils import parseDateTime
+        
+        # parser will assume input was local time
+        dt = datetime.datetime(2010, 11, 23, 19, 4, 5, 0, dateutil.tz.tzlocal())
+        self.assertEquals(dt, parseDateTime("'Tue, 23 Nov 2010 19:04:05'"))
+    
     
     # getLastModified()
-
+    
     def test_getLastModified_no_adaper(self):
-        pass
+        from plone.app.caching.operations.utils import getLastModified
+        
+        published = DummyPublished()
+        self.assertEquals(None, getLastModified(published))
     
     def test_getLastModified_none(self):
-        pass
+        from plone.app.caching.operations.utils import getLastModified
+        
+        class DummyLastModified(object):
+            implements(ILastModified)
+            adapts(DummyPublished)
+            
+            def __init__(self, context):
+                self.context = context
+            
+            def __call__(self):
+                return None
+        
+        provideAdapter(DummyLastModified)
+        
+        published = DummyPublished()
+        self.assertEquals(None, getLastModified(published))
     
     def test_getLastModified_missing_timezone(self):
-        pass
+        from plone.app.caching.operations.utils import getLastModified
+        
+        class DummyLastModified(object):
+            implements(ILastModified)
+            adapts(DummyPublished)
+            
+            def __init__(self, context):
+                self.context = context
+            
+            def __call__(self):
+                return datetime.datetime(2010, 11, 24, 3, 4, 5, 6)
+        
+        provideAdapter(DummyLastModified)
+        
+        published = DummyPublished()
+        self.assertEquals(datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzlocal()),
+                          getLastModified(published))
     
     def test_getLastModified_timezone(self):
-        pass
+        from plone.app.caching.operations.utils import getLastModified
+        
+        class DummyLastModified(object):
+            implements(ILastModified)
+            adapts(DummyPublished)
+            
+            def __init__(self, context):
+                self.context = context
+            
+            def __call__(self):
+                return datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        
+        provideAdapter(DummyLastModified)
+        
+        published = DummyPublished()
+        self.assertEquals(datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc()),
+                          getLastModified(published))
+    
     
     # getExpiration()
     
     def test_getExpiration_0(self):
-        pass
+        from plone.app.caching.operations.utils import getExpiration
+        
+        now = datetime.datetime.now()
+        val = getExpiration(0)
+        
+        difference = now - val
+        
+        # it's more than a year in the past, which is plenty; it's actually
+        # more like 10 years in the past, but it's hard to compare when the
+        # calculation is based on the current time of the test.
+        self.failUnless(difference >= datetime.timedelta(days=365))
     
     def test_getExpiration_past(self):
-        pass
+        from plone.app.caching.operations.utils import getExpiration
+        
+        now = datetime.datetime.now()
+        val = getExpiration(-1)
+        
+        difference = now - val
+        
+        # any value in the past basically has the same effect as setting -1
+        self.failUnless(difference >= datetime.timedelta(days=365))
     
     def test_getExpiration_future(self):
-        pass
+        from plone.app.caching.operations.utils import getExpiration
+        
+        now = datetime.datetime.now()
+        val = getExpiration(60)
+        
+        difference = val - now
+        
+        # give the test two seconds' leeway
+        self.failUnless(difference >= datetime.timedelta(seconds=58))
+    
     
     # getETag()
     
-    def test_getETag_minimal(self):
-        pass
-
+    def test_getETag_extra_only(self):
+        from plone.app.caching.operations.utils import getETag
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        published = DummyPublished()
+        
+        self.assertEquals('|foo|bar;baz', getETag(published, request, extraTokens=('foo', 'bar,baz')))
+    
+    def test_getETag_key_not_found(self):
+        from plone.app.caching.operations.utils import getETag
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        published = DummyPublished()
+        
+        self.assertEquals('|', getETag(published, request, keys=('foo', 'bar',)))
+    
+    def test_getETag_adapter_returns_none(self):
+        from plone.app.caching.operations.utils import getETag
+        from plone.app.caching.interfaces import IETagValue
+        
+        class FooETag(object):
+            implements(IETagValue)
+            adapts(DummyPublished, HTTPRequest)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self):
+                return 'foo'
+        
+        provideAdapter(FooETag, name=u"foo")
+        
+        class BarETag(object):
+            implements(IETagValue)
+            adapts(DummyPublished, HTTPRequest)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self):
+                return None
+        
+        provideAdapter(BarETag, name=u"bar")
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        published = DummyPublished()
+        
+        self.assertEquals('|foo', getETag(published, request, keys=('foo', 'bar',)))
+    
     def test_getETag_full(self):
-        pass
-
+        from plone.app.caching.operations.utils import getETag
+        from plone.app.caching.interfaces import IETagValue
+        
+        class FooETag(object):
+            implements(IETagValue)
+            adapts(DummyPublished, HTTPRequest)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self):
+                return 'foo'
+        
+        provideAdapter(FooETag, name=u"foo")
+        
+        class BarETag(object):
+            implements(IETagValue)
+            adapts(DummyPublished, HTTPRequest)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self):
+                return 'bar'
+        
+        provideAdapter(BarETag, name=u"bar")
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        published = DummyPublished()
+        
+        self.assertEquals('|foo|bar|baz;qux', getETag(published, request,
+                keys=('foo', 'bar',), extraTokens=('baz,qux',)))
+    
+    
     # parseETags()
-
-    def test_parseETags(self):
-        pass
+    
+    def test_parseETags_empty(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals([], parseETags(''))
+    
+    def test_parseETags_None(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals([], parseETags(''))
+    
+    def test_parseETags_star(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['*'], parseETags('*'))
+    
+    def test_parseETags_star_quoted(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['*'], parseETags('"*"'))
+    
+    def test_parseETags_single(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['|foo|bar;baz'], parseETags('|foo|bar;baz'))
+    
+    def test_parseETags_single_quoted(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['|foo|bar;baz'], parseETags('"|foo|bar;baz"'))
+    
+    def test_parseETags_multiple(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['|foo|bar;baz', '1234'], parseETags('|foo|bar;baz, 1234'))
+    
+    def test_parseETags_multiple_quoted(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['|foo|bar;baz', '1234'], parseETags('"|foo|bar;baz", "1234"'))
+    
+    def test_parseETags_multiple_nospace(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['|foo|bar;baz', '1234'], parseETags('|foo|bar;baz,1234'))
+    
+    def test_parseETags_multiple_quoted_nospace(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['|foo|bar;baz', '1234'], parseETags('"|foo|bar;baz","1234"'))
+    
+    def test_parseETags_multiple_weak(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['|foo|bar;baz', '1234'], parseETags('|foo|bar;baz, W/1234'))
+    
+    def test_parseETags_multiple_quoted_weak(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['|foo|bar;baz', '1234'], parseETags('"|foo|bar;baz", W/"1234"'))
+    
+    def test_parseETags_multiple_weak_disallowed(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['|foo|bar;baz'], parseETags('|foo|bar;baz, W/1234', allowWeak=False))
+    
+    def test_parseETags_multiple_quoted_weak_disallowed(self):
+        from plone.app.caching.operations.utils import parseETags
+        self.assertEquals(['|foo|bar;baz'], parseETags('"|foo|bar;baz", W/"1234"', allowWeak=False))
 
 class RAMCacheTest(unittest.TestCase):
     
@@ -533,3 +853,5 @@ class RAMCacheTest(unittest.TestCase):
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
+
+

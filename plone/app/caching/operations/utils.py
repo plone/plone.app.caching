@@ -31,8 +31,11 @@ PAGE_CACHE_ANNOTATION_KEY = 'plone.app.caching.operations.ramcache.key'
 logger = logging.getLogger('plone.app.caching')
 
 parseETagLock = allocate_lock()
-etagQuote = re.compile('(\s*\"([^\"]*)\"\s*,{0,1})')
-etagNoQuote = re.compile('(\s*([^,]*)\s*,{0,1})')
+# etagQuote = re.compile('(\s*\"([^\"]*)\"\s*,{0,1})')
+# etagNoQuote = re.compile('(\s*([^,]*)\s*,{0,1})')
+
+etagQuote = re.compile('(\s*(W\/)?\"([^\"]*)\"\s*,?)')
+etagNoQuote = re.compile('(\s*(W\/)?([^,]*)\s*,?)')
 
 #
 # Operation helpers, used in the implementations of interceptResponse() and
@@ -57,15 +60,15 @@ def doNotCache(published, request, response):
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, must-revalidate, private')
 
-def cacheInBrowser(published, request, response, etag=None, lastmodified=None):
+def cacheInBrowser(published, request, response, etag=None, lastModified=None):
     """Set response headers to indicate that browsers should cache the
     response but expire immediately and revalidate the cache on every
     subsequent request.
     
     ``etag`` is a string value indicating an ETag to use.
-    ``lastmodified`` is a datetime object
+    ``lastModified`` is a datetime object
     
-    If neither etag nor lastmodified is given then no validation is
+    If neither etag nor lastModified is given then no validation is
     possible and this becomes equivalent to doNotCache()
     """
     
@@ -73,24 +76,24 @@ def cacheInBrowser(published, request, response, etag=None, lastmodified=None):
         response.setHeader('ETag', etag, literal=1)
         # -> enable 304s
         
-    if lastmodified is not None:
-        response.setHeader('Last-Modified', formatDateTime(lastmodified))
+    if lastModified is not None:
+        response.setHeader('Last-Modified', formatDateTime(lastModified))
         # -> enable 304s
     
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, must-revalidate, private')
 
-def cacheInProxy(published, request, response, smaxage, lastmodified=None, etag=None, vary=None):
+def cacheInProxy(published, request, response, smaxage, lastModified=None, etag=None, vary=None):
     """Set headers to cache the response in a caching proxy.
     
     ``smaxage`` is the timeout value in seconds.
-    ``lastmodified`` is a datetime object for the last modified time
+    ``lastModified`` is a datetime object for the last modified time
     ``etag`` is an etag string
     ``vary`` is a vary header string
     """
     
-    if lastmodified is not None:
-        response.setHeader('Last-Modified', formatDateTime(lastmodified))
+    if lastModified is not None:
+        response.setHeader('Last-Modified', formatDateTime(lastModified))
         # -> enable 304s
     
     if etag is not None:
@@ -103,18 +106,18 @@ def cacheInProxy(published, request, response, smaxage, lastmodified=None, etag=
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, s-maxage=%d, must-revalidate' % smaxage)
 
-def cacheInBrowserAndProxy(published, request, response, maxage, lastmodified=None, etag=None, vary=None):
+def cacheInBrowserAndProxy(published, request, response, maxage, lastModified=None, etag=None, vary=None):
     """Set headers to cache the response in the browser and caching proxy if
     applicable.
     
     ``maxage`` is the timeout value in seconds
-    ``lastmodified`` is a datetime object for the last modified time
+    ``lastModified`` is a datetime object for the last modified time
     ``etag`` is an etag string
     ``vary`` is a vary header string
     """
     
-    if lastmodified is not None:
-        response.setHeader('Last-Modified', formatDateTime(lastmodified))
+    if lastModified is not None:
+        response.setHeader('Last-Modified', formatDateTime(lastModified))
         # -> enable 304s
     
     if etag is not None:
@@ -174,21 +177,21 @@ def cachedResponse(published, request, response, status, headers, body):
     
     return body
 
-def notModified(published, request, response, etag=None, lastmodified=None):
+def notModified(published, request, response, etag=None, lastModified=None):
     """Return a ``304 NOT MODIFIED`` response. Modifies the response (status)
     and returns an empty body to indicate the request should be interrupted.
     
     ``etag`` is an ETag to set on the response
-    ``lastmodified`` is the last modified date to set on the response
+    ``lastModified`` is the last modified date to set on the response
     
-    Both ``etag`` and ``lastmodified`` are optional.
+    Both ``etag`` and ``lastModified`` are optional.
     """
     
     if etag is not None:
         response.setHeader('ETag', etag, literal=1)
     
-    if lastmodified is not None:
-        response.setHeader('Last-Modified', formatDateTime(lastmodified)) 
+    if lastModified is not None:
+        response.setHeader('Last-Modified', formatDateTime(lastModified)) 
     
     response.setStatus(304)
     return u""
@@ -198,14 +201,14 @@ def notModified(published, request, response, etag=None, lastmodified=None):
 # Cache checks
 # 
 
-def isModified(request, etag=None, lastmodified=None):
+def isModified(request, etag=None, lastModified=None):
     """Return True or False depending on whether the published resource has
     been modified.
     
     ``etag`` is the current etag, to be checked against the If-None-Match
     header.
     
-    ``lastmodified`` is the current last-modified datetime, to be checked
+    ``lastModified`` is the current last-modified datetime, to be checked
     against the If-Modified-Since header.
     """
     
@@ -233,7 +236,7 @@ def isModified(request, etag=None, lastmodified=None):
         etagMatched = True
         
     # Check the modification date
-    if ifModifiedSince and lastmodified is not None:
+    if ifModifiedSince and lastModified is not None:
         
         # Attempt to get a date
         
@@ -245,7 +248,7 @@ def isModified(request, etag=None, lastmodified=None):
         
         # has content been modified since the if-modified-since time?
         try:
-            if lastmodified > ifModifiedSince:
+            if lastModified > ifModifiedSince:
                 return True
         except TypeError:
             logger.exception("Could not compare dates")
@@ -328,8 +331,13 @@ def getContext(published, marker=(IContentish, ISiteRoot,)):
 def formatDateTime(dt):
     """Format a Python datetime object as an RFC1123 date.
     
-    Returns a string.
+    If the datetime object is timezone-naive, it is assumed to be local time.
     """
+    
+    # We have to pass local time to format_date_time()
+    
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(dateutil.tz.tzlocal())
     
     return wsgiref.handlers.format_date_time(time.mktime(dt.timetuple()))
 
@@ -337,17 +345,21 @@ def parseDateTime(str):
     """Return a Python datetime object from an an RFC1123 date.
     
     Returns a datetime object with a timezone. If no timezone is found in the
-    input string, assume UTC.
+    input string, assume local time.
     """
     
-    dt = dateutil.parser.parse(str)
+    try:
+        dt = dateutil.parser.parse(str)
+    except ValueError:
+        return None
+    
     if not dt:
         return None
     
     if dt.tzinfo is None:
         dt = datetime.datetime(dt.year, dt.month, dt.day,
                                dt.hour, dt.minute, dt.second, dt.microsecond,
-                               dateutil.tz.tzutc())
+                               dateutil.tz.tzlocal())
     
     return dt
 
@@ -355,7 +367,7 @@ def getLastModified(published):
     """Get a last modified date or None.
     
     If an ``ILastModified`` adapter can be found, and returns a date that is
-    not timezone aware, force it to UTC.
+    not timezone aware, assume it is local time and add timezone.
     """
     
     lastModified = ILastModified(published, None)
@@ -369,21 +381,22 @@ def getLastModified(published):
     if dt.tzinfo is None:
         dt = datetime.datetime(dt.year, dt.month, dt.day,
                                dt.hour, dt.minute, dt.second, dt.microsecond,
-                               dateutil.tz.tzutc())
+                               dateutil.tz.tzlocal())
     
     return dt
 
 def getExpiration(maxage):
-    """Get an expiration date as a datetime.
+    """Get an expiration date as a datetime in the local timezone.
     
-    ``maxage`` is the maximum age of the item, in seconds.
+    ``maxage`` is the maximum age of the item, in seconds. If it is 0 or
+    negative, return a date ten years in the past.
     """
     
     now = datetime.datetime.now()
     if maxage > 0:
         return now + datetime.timedelta(seconds=maxage)
     else:
-        return now - datetime.timedelta(seconds=10*365*24*3600)
+        return now - datetime.timedelta(days=3650)
 
 def getETag(published, request, keys=(), extraTokens=()):
     """Calculate an ETag.
@@ -412,19 +425,25 @@ def getETag(published, request, keys=(), extraTokens=()):
         tokens.append(token)
     
     etag = '|' + '|'.join(tokens)
-    return etag.replace(',',';')  # commas are bad in etags
+    return etag.replace(',', ';')  # commas are bad in etags
 
-def parseETags(text, result=None):
+def parseETags(text, allowWeak=True, _result=None):
     """Parse a header value into a list of etags. Handles fishy quoting and
     other browser quirks.
     
-    Returns a list of strings.
+    ``text`` is the header value to parse.
+    ``allowWeak`` should be False if weak ETag values should not be returned
+    ``_result`` is internal - don't set it.
+    
+    Returns a list of strings. For weak etags, the W/ prefix is removed.
     """
+    
+    result = _result
     
     if result is None:
         result = []
     
-    if not len(text):
+    if not text:
         return result
     
     # Lock, since regular expressions are not threadsafe
@@ -434,23 +453,27 @@ def parseETags(text, result=None):
         if m:
             # Match quoted etag (spec-observing client)
             l     = len(m.group(1))
-            value = m.group(2)
+            value = (m.group(2) or '') + (m.group(3) or '')
         else:
             # Match non-quoted etag (lazy client)
             m = etagNoQuote.match(text)
             if m:
                 l     = len(m.group(1))
-                value = m.group(2)
+                value = (m.group(2) or '') + (m.group(3) or '')
             else:
                 return result
     finally:
         parseETagLock.release()
         
     if value:
-        result.append(value)
+        
+        if value.startswith('W/'):
+            if allowWeak:
+                result.append(value[2:])
+        else:
+            result.append(value)
     
-    return parseETags(text[l:], result)
-
+    return parseETags(text[l:], allowWeak=allowWeak, _result=result)
 
 #
 # RAM cache management
