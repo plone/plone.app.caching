@@ -271,29 +271,6 @@ def visibleToRole(published, role, permission='View'):
     """
     return role in rolesForPermissionOn(permission, published)
 
-def fetchFromRAMCache(request, etag=None, globalKey=PAGE_CACHE_KEY):
-    """Return a page cached in RAM, or None if it cannot be found.
-    
-    ``etag`` is an ETag for the content, and is used as a basis for the
-    cache key.
-    
-    ``globalKey`` is the global cache key. This needs to be the same key
-    as the one used to store the data, i.e. it must correspond to the one
-    used when calling ``storeResponseInRAMCache()``.
-    """
-    
-    cache = getRAMCache(globalKey)
-    if cache is None:
-        return None
-    
-    key = getRAMCacheKey(request, etag=etag)
-    if key is None:
-        return None
-    
-    return cache.get(key)
-
-
-
 #
 # Basic helper functions
 # 
@@ -502,7 +479,7 @@ def getRAMCacheKey(request, etag=None):
     resource's path and the etag.
     """
     
-    resourceKey = request['PATH_INFO'] + '?' + request['QUERY_STRING']
+    resourceKey = request.get('PATH_INFO', '') + '?' + request.get('QUERY_STRING', '')
     if etag:
         resourceKey = etag + '||' + resourceKey
     return resourceKey
@@ -535,3 +512,24 @@ def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY,
     status = response.getStatus()
     headers = dict(request.response.headers)
     cache[key] = (status, headers, result)
+
+def fetchFromRAMCache(request, etag=None, globalKey=PAGE_CACHE_KEY, default=None):
+    """Return a page cached in RAM, or None if it cannot be found.
+    
+    ``etag`` is an ETag for the content, and is used as a basis for the
+    cache key.
+    
+    ``globalKey`` is the global cache key. This needs to be the same key
+    as the one used to store the data, i.e. it must correspond to the one
+    used when calling ``storeResponseInRAMCache()``.
+    """
+    
+    cache = getRAMCache(globalKey)
+    if cache is None:
+        return None
+    
+    key = getRAMCacheKey(request, etag=etag)
+    if key is None:
+        return None
+    
+    return cache.get(key, default)

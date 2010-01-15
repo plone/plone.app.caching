@@ -14,7 +14,10 @@ from zope.interface import classImplements
 from zope.interface import alsoProvides
 
 from zope.component import provideAdapter
+from zope.component import provideUtility
 from zope.component import adapts
+
+from plone.memoize.interfaces import ICacheChooser
 
 from z3c.caching.interfaces import ILastModified
 
@@ -428,7 +431,8 @@ class CacheCheckHelpersTest(unittest.TestCase):
     
     def tearDown(self):
         zope.component.testing.tearDown()
-
+    
+    
     # isModified()
     
     def test_isModified_minimal(self):
@@ -455,13 +459,6 @@ class CacheCheckHelpersTest(unittest.TestCase):
         s.manage_permission('View', ('Member', 'Manager', 'Anonymous',))
         self.assertEquals(True, visibleToRole(s, role='Anonymous'))
     
-    # fetchFromRAMCache()
-    
-    def test_fetchFromRAMCache_minimal(self):
-        pass
-    
-    def test_fetchFromRAMCache_full(self):
-        pass
 
 class MiscHelpersTest(unittest.TestCase):
     
@@ -827,31 +824,351 @@ class RAMCacheTest(unittest.TestCase):
     def tearDown(self):
         zope.component.testing.tearDown()
     
+    
     # getRAMCache()
-
+    
     def test_getRAMCache_no_chooser(self):
-        pass
+        from plone.app.caching.operations.utils import getRAMCache
+        self.assertEquals(None, getRAMCache())
+    
+    def test_getRAMCache_custom_global_key(self):
+        from plone.app.caching.operations.utils import getRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'foo'
+                return cache
+        
+        provideUtility(Chooser())
+        self.assertEquals(cache, getRAMCache('foo'))
     
     def test_getRAMCache_normal(self):
-        pass
+        from plone.app.caching.operations.utils import getRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'plone.app.caching.operations.ramcache'
+                return cache
+        
+        provideUtility(Chooser())
+        self.assertEquals(cache, getRAMCache())
+    
     
     # getRAMCacheKey()
     
-    def test_getRAMCacheKey_no_etag(self):
-        pass
+    def test_getRAMCacheKey_empty(self):
+        from plone.app.caching.operations.utils import getRAMCacheKey
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        self.assertEquals('?', getRAMCacheKey(request))
+    
+    def test_getRAMCacheKey_normal(self):
+        from plone.app.caching.operations.utils import getRAMCacheKey
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['PATH_INFO'] = '/foo/bar'
+        request.environ['QUERY_STRING'] = 'x=1&y=2'
+        
+        self.assertEquals('/foo/bar?x=1&y=2', getRAMCacheKey(request))
     
     def test_getRAMCacheKey_etag(self):
-        pass
+        from plone.app.caching.operations.utils import getRAMCacheKey
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['PATH_INFO'] = '/foo/bar'
+        request.environ['QUERY_STRING'] = 'x=1&y=2'
+        
+        self.assertEquals('|foo|bar||/foo/bar?x=1&y=2', getRAMCacheKey(request, etag="|foo|bar"))
+    
     
     # storeResponseInRAMCache()
-
-    def test_storeResponseInRAMCache_minimal(self):
-        pass
     
-    def test_storeResponseInRAMCache_full(self):
-        pass
+    def test_storeResponseInRAMCache_no_key(self):
+        from plone.app.caching.operations.utils import storeResponseInRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'plone.app.caching.operations.ramcache'
+                return cache
+        
+        provideUtility(Chooser())
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        result = u"Body"
+        response.setHeader('X-Foo', 'bar')
+        
+        storeResponseInRAMCache(request, response, result)
+        
+        self.assertEquals(0, len(cache))
+    
+    def test_storeResponseInRAMCache_no_cache(self):
+        from plone.app.caching.operations.utils import storeResponseInRAMCache
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        result = u"Body"
+        response.setHeader('X-Foo', 'bar')
+        
+        IAnnotations(request)['plone.app.caching.operations.ramcache.key'] = 'foo'
+        
+        storeResponseInRAMCache(request, response, result)
+    
+    def test_storeResponseInRAMCache_normal(self):
+        from plone.app.caching.operations.utils import storeResponseInRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'plone.app.caching.operations.ramcache'
+                return cache
+        
+        provideUtility(Chooser())
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        result = u"Body"
+        response.setHeader('X-Foo', 'bar')
+        
+        IAnnotations(request)['plone.app.caching.operations.ramcache.key'] = 'foo'
+        
+        storeResponseInRAMCache(request, response, result)
+        
+        self.assertEquals(1, len(cache))
+        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'), cache['foo'])
+    
+    def test_storeResponseInRAMCache_custom_keys(self):
+        from plone.app.caching.operations.utils import storeResponseInRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'cachekey'
+                return cache
+        
+        provideUtility(Chooser())
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        result = u"Body"
+        response.setHeader('X-Foo', 'bar')
+        
+        IAnnotations(request)['annkey'] = 'foo'
+        
+        storeResponseInRAMCache(request, response, result, globalKey='cachekey', annotationsKey='annkey')
+        
+        self.assertEquals(1, len(cache))
+        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'), cache['foo'])
+    
+    
+    # fetchFromRAMCache()
+    
+    def test_fetchFromRAMCache_no_cache(self):
+        from plone.app.caching.operations.utils import fetchFromRAMCache
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['PATH_INFO'] = '/foo/bar'
+        request.environ['QUERY_STRING'] = ''
+        
+        self.assertEquals(None, fetchFromRAMCache(request))
+    
+    def test_fetchFromRAMCache_minimal(self):
+        from plone.app.caching.operations.utils import fetchFromRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'plone.app.caching.operations.ramcache'
+                return cache
+        
+        provideUtility(Chooser())
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['PATH_INFO'] = '/foo/bar'
+        request.environ['QUERY_STRING'] = ''
+        
+        cache['/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        
+        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'),
+                          fetchFromRAMCache(request))
+    
+    def test_fetchFromRAMCache_with_etag(self):
+        from plone.app.caching.operations.utils import fetchFromRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'plone.app.caching.operations.ramcache'
+                return cache
+        
+        provideUtility(Chooser())
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['PATH_INFO'] = '/foo/bar'
+        request.environ['QUERY_STRING'] = ''
+        
+        cache['|a|b||/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        
+        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'),
+                          fetchFromRAMCache(request, etag="|a|b"))
+    
+    def test_fetchFromRAMCache_custom_key(self):
+        from plone.app.caching.operations.utils import fetchFromRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'cachekey'
+                return cache
+        
+        provideUtility(Chooser())
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['PATH_INFO'] = '/foo/bar'
+        request.environ['QUERY_STRING'] = ''
+        
+        cache['/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        
+        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'),
+                          fetchFromRAMCache(request, globalKey='cachekey'))
+    
+    def test_fetchFromRAMCache_miss(self):
+        from plone.app.caching.operations.utils import fetchFromRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'plone.app.caching.operations.ramcache'
+                return cache
+        
+        provideUtility(Chooser())
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['PATH_INFO'] = '/foo/bar'
+        request.environ['QUERY_STRING'] = ''
+        
+        cache['/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        
+        self.assertEquals(None, fetchFromRAMCache(request, etag='|foo'))
+    
+    def test_fetchFromRAMCache_miss_custom_default(self):
+        from plone.app.caching.operations.utils import fetchFromRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'plone.app.caching.operations.ramcache'
+                return cache
+        
+        provideUtility(Chooser())
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['PATH_INFO'] = '/foo/bar'
+        request.environ['QUERY_STRING'] = ''
+        
+        cache['/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        
+        marker = object()
+        self.failUnless(fetchFromRAMCache(request, etag='|foo', default=marker) is marker)
+    
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
-
-

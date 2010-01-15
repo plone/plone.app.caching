@@ -4,8 +4,12 @@ Plone caching to-do
 plone.app.caching
 -----------------
 
- [ ] Tests for utils
- 
+ [ ] Test notModified() helper
+
+ [ ] Test interaction between RAMCache and GZip
+        - must cache uncompressed
+        - should therefore re-enable compression
+
  [ ] Integration tests (mainly aimed at testing the default caching operations)
  
  [ ] Update KGS
