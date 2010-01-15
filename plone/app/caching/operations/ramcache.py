@@ -33,7 +33,7 @@ class Store(object):
         if status != 200:
             return None
         
-        storeResponseInRAMCache(self.published, self.request, self.request.response, result.encode(encoding))
+        storeResponseInRAMCache(self.request, self.request.response, result.encode(encoding))
         return None
     
     def transformBytes(self, result, encoding):
@@ -41,7 +41,7 @@ class Store(object):
         if status != 200:
             return None
         
-        storeResponseInRAMCache(self.published, self.request, self.request.response, result)
+        storeResponseInRAMCache(self.request, self.request.response, result)
         return None
     
     def transformIterable(self, result, encoding):
@@ -49,5 +49,5 @@ class Store(object):
         if status != 200:
             return None
         
-        storeResponseInRAMCache(self.published, self.request, self.request.response,''.join(result))
+        storeResponseInRAMCache(self.request, self.request.response,''.join(result))
         return None

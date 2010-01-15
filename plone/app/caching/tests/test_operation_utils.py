@@ -380,7 +380,74 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         self.assertEquals('bar', response.getHeader('X-Foo'))
         self.assertEquals('qux', response.getHeader('X-Bar'))
         self.assertEquals('||blah||', response.getHeader('ETag', literal=1))
+
+    def test_cachedResponse_gzip_off(self):
+        from plone.app.caching.operations.utils import cachedResponse
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        published = DummyPublished()
+        
+        headers = {
+            'X-Cache-Rule': 'foo',
+            'X-Foo': 'bar',
+            'ETag': '||blah||',
+        }
+        
+        response.setHeader('X-Foo', 'baz')
+        response.setHeader('X-Bar', 'qux')
+        response.setStatus(200)
+        
+        request.environ['HTTP_ACCEPT_ENCODING'] = 'gzip; deflate'
+        response.enableHTTPCompression(request)
+        
+        assert response.enableHTTPCompression(query=True)
+        
+        body = cachedResponse(published, request, response, 404, headers, u"body", 0)
+        
+        self.assertEquals(u"body", body)
+        self.assertEquals(404, response.getStatus())
+        self.assertEquals('foo', response.getHeader('X-Cache-Rule'))
+        self.assertEquals('bar', response.getHeader('X-Foo'))
+        self.assertEquals('qux', response.getHeader('X-Bar'))
+        self.assertEquals('||blah||', response.getHeader('ETag', literal=1))    
+        
+        self.failIf(response.enableHTTPCompression(query=True))
     
+    def test_cachedResponse_gzip_on(self):
+        from plone.app.caching.operations.utils import cachedResponse
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        published = DummyPublished()
+        
+        headers = {
+            'X-Cache-Rule': 'foo',
+            'X-Foo': 'bar',
+            'ETag': '||blah||',
+        }
+        
+        response.setHeader('X-Foo', 'baz')
+        response.setHeader('X-Bar', 'qux')
+        response.setStatus(200)
+        
+        request.environ['HTTP_ACCEPT_ENCODING'] = 'gzip; deflate'
+        response.enableHTTPCompression(request, disable=True)
+        
+        assert not response.enableHTTPCompression(query=True)
+        
+        body = cachedResponse(published, request, response, 404, headers, u"body", 1)
+        
+        self.assertEquals(u"body", body)
+        self.assertEquals(404, response.getStatus())
+        self.assertEquals('foo', response.getHeader('X-Cache-Rule'))
+        self.assertEquals('bar', response.getHeader('X-Foo'))
+        self.assertEquals('qux', response.getHeader('X-Bar'))
+        self.assertEquals('||blah||', response.getHeader('ETag', literal=1))    
+        
+        self.failUnless(response.enableHTTPCompression(query=True))
     
     # notModified()
     
@@ -1210,7 +1277,41 @@ class RAMCacheTest(unittest.TestCase):
         storeResponseInRAMCache(request, response, result)
         
         self.assertEquals(1, len(cache))
-        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'), cache['foo'])
+        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body', 0), cache['foo'])
+    
+    def test_storeResponseInRAMCache_gzip(self):
+        from plone.app.caching.operations.utils import storeResponseInRAMCache
+        
+        class Cache(dict):
+            pass
+        
+        cache = Cache()
+        
+        class Chooser(object):
+            implements(ICacheChooser)
+            
+            def __call__(self, key):
+                assert key == 'plone.app.caching.operations.ramcache'
+                return cache
+        
+        provideUtility(Chooser())
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_ACCEPT_ENCODING'] = 'gzip; deflate'
+        response.enableHTTPCompression(request)
+        
+        result = u"Body"
+        response.setHeader('X-Foo', 'bar')
+        
+        IAnnotations(request)['plone.app.caching.operations.ramcache.key'] = 'foo'
+        
+        storeResponseInRAMCache(request, response, result)
+        
+        self.assertEquals(1, len(cache))
+        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body', 1), cache['foo'])
     
     def test_storeResponseInRAMCache_custom_keys(self):
         from plone.app.caching.operations.utils import storeResponseInRAMCache
@@ -1241,8 +1342,7 @@ class RAMCacheTest(unittest.TestCase):
         storeResponseInRAMCache(request, response, result, globalKey='cachekey', annotationsKey='annkey')
         
         self.assertEquals(1, len(cache))
-        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'), cache['foo'])
-    
+        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body', 0), cache['foo'])
     
     # fetchFromRAMCache()
     

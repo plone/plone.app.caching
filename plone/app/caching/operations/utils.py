@@ -158,13 +158,14 @@ def cacheInRAM(published, request, response, etag=None, annotationsKey=PAGE_CACH
     annotations[annotationsKey] = key
     alsoProvides(request, IRAMCached)
 
-def cachedResponse(published, request, response, status, headers, body):
+def cachedResponse(published, request, response, status, headers, body, gzip=False):
     """Returned a cached page. Modifies the response (status and headers)
     and returns the cached body.
     
     ``status`` is the cached HTTP status
     ``headers`` is a dictionary of cached HTTP headers
     ``body`` is a cached response body
+    ``gzip`` should be set to True if the response is to be gzipped
     """
     
     response.setStatus(status)
@@ -174,6 +175,11 @@ def cachedResponse(published, request, response, status, headers, body):
             response.setHeader(k, v, literal=1)
         else:
             response.setHeader(k, v)
+    
+    if not gzip:
+        response.enableHTTPCompression(request, disable=True)
+    else:
+        response.enableHTTPCompression(request)
     
     return body
 
@@ -510,10 +516,14 @@ def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY,
     
     status = response.getStatus()
     headers = dict(request.response.headers)
-    cache[key] = (status, headers, result)
+    gzipFlag = response.enableHTTPCompression(query=True)
+    
+    cache[key] = (status, headers, result, gzipFlag)
 
 def fetchFromRAMCache(request, etag=None, globalKey=PAGE_CACHE_KEY, default=None):
     """Return a page cached in RAM, or None if it cannot be found.
+    
+    The return value is a tuple as stored by ``storeResponseInRAMCache()``.
     
     ``etag`` is an ETag for the content, and is used as a basis for the
     cache key.
