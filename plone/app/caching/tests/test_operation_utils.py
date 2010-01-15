@@ -79,8 +79,6 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         response.setHeader('Last-Modified', wsgiref.handlers.format_date_time(time.mktime(now.timetuple())))
         
-        now = datetime.datetime.now(dateutil.tz.tzlocal())
-        
         doNotCache(published, request, response)
         
         self.assertEquals(200, response.getStatus())
@@ -435,12 +433,239 @@ class CacheCheckHelpersTest(unittest.TestCase):
     
     # isModified()
     
-    def test_isModified_minimal(self):
-        pass
-
-    def test_isModified_full(self):
-        pass
+    def test_isModified_no_headers_no_keys(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        self.assertEquals(True, isModified(request))
     
+    def test_isModified_no_headers_with_keys(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        etag = '|foo'
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        
+        self.assertEquals(True, isModified(request, etag=etag, lastModified=lastModified))
+
+    def test_isModified_ims_invalid_date(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_MODIFIED_SINCE'] = 'blah'
+        
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        
+        self.assertEquals(True, isModified(request, lastModified=lastModified))
+    
+    def test_isModified_ims_modified(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_MODIFIED_SINCE'] = 'Tue, 24 Nov 2009 03:04:05 GMT'
+        
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        
+        self.assertEquals(True, isModified(request, lastModified=lastModified))
+    
+    def test_isModified_ims_not_modified(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_MODIFIED_SINCE'] = 'Thu, 24 Nov 2011 03:04:05 GMT'
+        
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        
+        self.assertEquals(False, isModified(request, lastModified=lastModified))
+    
+    def test_isModified_ims_not_modified_two_dates(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_MODIFIED_SINCE'] = 'Thu, 24 Nov 2011 03:04:05 GMT; Thu, 24 Nov 2011 03:04:05'
+        
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        
+        self.assertEquals(False, isModified(request, lastModified=lastModified))
+    
+    def test_isModified_ims_not_modified_etag_no_inm_header(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_MODIFIED_SINCE'] = 'Thu, 24 Nov 2011 03:04:05 GMT'
+        
+        etag = '|foo'
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        
+        self.assertEquals(True, isModified(request, etag=etag, lastModified=lastModified))
+    
+    def test_isModified_inm_no_tags(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        etag = '|foo'
+        
+        self.assertEquals(True, isModified(request, etag=etag))
+    
+    def test_isModified_inm_one_tag_no_match(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_NONE_MATCH'] = '"|bar"'
+        
+        etag = '|foo'
+        
+        self.assertEquals(True, isModified(request, etag=etag))
+    
+    def test_isModified_inm_multiple_tags_no_match(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_NONE_MATCH'] = '"|bar", W/"|baz"'
+        
+        etag = '|foo'
+        
+        self.assertEquals(True, isModified(request, etag=etag))
+    
+    def test_isModified_inm_invalid_tag(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_NONE_MATCH'] = '"'
+        
+        etag = '|foo'
+        
+        self.assertEquals(True, isModified(request, etag=etag))
+    
+    def test_isModified_inm_star(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_NONE_MATCH'] = '"*", W/"|baz"'
+        
+        etag = '|foo'
+        
+        self.assertEquals(False, isModified(request, etag=etag))
+    
+    def test_isModified_inm_match_single(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_NONE_MATCH'] = '"|foo"'
+        
+        etag = '|foo'
+        
+        self.assertEquals(False, isModified(request, etag=etag))
+    
+    def test_isModified_inm_match_multiple(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_NONE_MATCH'] = '"|foo", "|bar"'
+        
+        etag = '|foo'
+        
+        self.assertEquals(False, isModified(request, etag=etag))
+    
+    def test_isModified_inm_match_weak(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_NONE_MATCH'] = 'W/"|foo"'
+        
+        etag = '|foo'
+        
+        self.assertEquals(False, isModified(request, etag=etag))
+    
+    def test_isModified_inm_match_ignores_ims_if_no_last_modified_date(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_NONE_MATCH'] = '"|foo"'
+        request.environ['HTTP_IF_MODIFIED_SINCE'] = 'Tue, 24 Nov 2009 03:04:05 GMT'
+        
+        etag = '|foo'
+        
+        self.assertEquals(False, isModified(request, etag=etag))
+    
+    def test_isModified_inm_match_modified(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_NONE_MATCH'] = '"|foo"'
+        request.environ['HTTP_IF_MODIFIED_SINCE'] = 'Tue, 24 Nov 2009 03:04:05 GMT'
+        
+        etag = '|foo'
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        
+        self.assertEquals(True, isModified(request, etag=etag, lastModified=lastModified))
+    
+    def test_isModified_inm_match_not_modified(self):
+        from plone.app.caching.operations.utils import isModified
+        
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        
+        request.environ['HTTP_IF_NONE_MATCH'] = '"|foo"'
+        request.environ['HTTP_IF_MODIFIED_SINCE'] = 'Thu, 24 Nov 2011 03:04:05 GMT'
+        
+        etag = '|foo'
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        
+        self.assertEquals(False, isModified(request, etag=etag, lastModified=lastModified))
+
     # visibleToRole()
     
     def test_visibleToRole_not_real(self):
@@ -519,7 +744,16 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.operations.utils import formatDateTime
         
         dt = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzlocal())
-        self.assertEquals('Tue, 23 Nov 2010 19:04:05 GMT', formatDateTime(dt))
+        inGMT = formatDateTime(dt)
+        
+        # Who knows what your local timezone is :-)
+        self.failUnless(inGMT.endswith(' GMT'))
+        self.failUnless('Nov 2010' in inGMT)
+        
+        # We lose microseconds. Big whoop.
+        p = dateutil.parser.parse(inGMT).astimezone(dateutil.tz.tzlocal())
+        lofi = datetime.datetime(2010, 11, 24, 3, 4, 5, 0, dateutil.tz.tzlocal())
+        self.assertEquals(p, lofi)
     
     def test_formatDateTime_naive(self):
         from plone.app.caching.operations.utils import formatDateTime
@@ -528,12 +762,12 @@ class MiscHelpersTest(unittest.TestCase):
         inGMT = formatDateTime(dt)
         
         # Who knows what your local timezone is :-)
+        self.failUnless(inGMT.endswith(' GMT'))
         self.failUnless('Nov 2010' in inGMT)
         
         # Can't compare offset aware and naive
         p = dateutil.parser.parse(inGMT).astimezone(dateutil.tz.tzlocal())
         self.assertEquals((2010, 11, 24, 3, 4, 5), (p.year, p.month, p.day, p.hour, p.minute, p.second))
-    
     
     # parseDateTime()
     
@@ -545,8 +779,8 @@ class MiscHelpersTest(unittest.TestCase):
     def test_parseDateTime_rfc1123(self):
         from plone.app.caching.operations.utils import parseDateTime
         
-        dt = datetime.datetime(2010, 11, 24, 3, 4, 5, 0, dateutil.tz.tzlocal())
-        self.assertEquals(dt, parseDateTime("'Tue, 23 Nov 2010 19:04:05 GMT'"))
+        dt = datetime.datetime(2010, 11, 23, 3, 4, 5, 0, dateutil.tz.tzutc())
+        self.assertEquals(dt, parseDateTime("'Tue, 23 Nov 2010 3:04:05 GMT'"))
     
     def test_formatDateTime_no_timezone(self):
         from plone.app.caching.operations.utils import parseDateTime
@@ -554,7 +788,6 @@ class MiscHelpersTest(unittest.TestCase):
         # parser will assume input was local time
         dt = datetime.datetime(2010, 11, 23, 19, 4, 5, 0, dateutil.tz.tzlocal())
         self.assertEquals(dt, parseDateTime("'Tue, 23 Nov 2010 19:04:05'"))
-    
     
     # getLastModified()
     

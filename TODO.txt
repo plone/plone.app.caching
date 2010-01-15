@@ -4,8 +4,6 @@ Plone caching to-do
 plone.app.caching
 -----------------
 
- [ ] Test notModified() helper
-
  [ ] Test interaction between RAMCache and GZip
         - must cache uncompressed
         - should therefore re-enable compression

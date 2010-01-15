@@ -240,10 +240,10 @@ def isModified(request, etag=None, lastModified=None):
         
         # Attempt to get a date
         
-        try:
-            ifModifiedSince = ifModifiedSince.split(';')[0]
-            ifModifiedSince = parseDateTime(ifModifiedSince)
-        except:
+        ifModifiedSince = ifModifiedSince.split(';')[0]
+        ifModifiedSince = parseDateTime(ifModifiedSince)
+        
+        if ifModifiedSince is None:
             return True
         
         # has content been modified since the if-modified-since time?
@@ -253,13 +253,12 @@ def isModified(request, etag=None, lastModified=None):
         except TypeError:
             logger.exception("Could not compare dates")
         
-        # If we generate an ETag, don't validate the conditional GET unless 
-        # the client supplies an ETag.  This may be more conservative than the
-        # spec requires.
+        # If we expected an ETag and the client didn't give us one, consider
+        # that an error. This may be more conservative than the spec requires.
         if etag is not None:
             if not etagMatched:
                 return True
-                
+    
     return False
 
 def visibleToRole(published, role, permission='View'):
