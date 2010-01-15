@@ -1,7 +1,12 @@
-import wsgiref.handlers
+import re
 import time
 import datetime
 import logging
+import dateutil.parser
+import dateutil.tz
+import wsgiref.handlers
+
+from thread import allocate_lock
 
 from zope.interface import alsoProvides
 from zope.component import queryMultiAdapter
@@ -16,6 +21,7 @@ from plone.app.caching.interfaces import IETagValue
 
 from z3c.caching.interfaces import ILastModified
 
+from AccessControl.PermissionRole import rolesForPermissionOn
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import ISiteRoot
 
@@ -23,6 +29,10 @@ PAGE_CACHE_KEY = 'plone.app.caching.operations.ramcache'
 PAGE_CACHE_ANNOTATION_KEY = 'plone.app.caching.operations.ramcache.key'
 
 logger = logging.getLogger('plone.app.caching')
+
+parseETagLock = allocate_lock()
+etagQuote = re.compile('(\s*\"([^\"]*)\"\s*,{0,1})')
+etagNoQuote = re.compile('(\s*([^,]*)\s*,{0,1})')
 
 #
 # Operation helpers, used in the implementations of interceptResponse() and
@@ -41,7 +51,7 @@ def doNotCache(published, request, response):
     expire immediately and disable validation.
     """
     
-    if 'last-modified' in response.headers:
+    if response.getHeader('Last-Modified'):
         del response.headers['last-modified']
     
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
@@ -60,12 +70,15 @@ def cacheInBrowser(published, request, response, etag=None, lastmodified=None):
     """
     
     if etag is not None:
-        response.setHeader('ETag', etag)
+        response.setHeader('ETag', etag, literal=1)
+        # -> enable 304s
+        
     if lastmodified is not None:
         response.setHeader('Last-Modified', formatDateTime(lastmodified))
+        # -> enable 304s
+    
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, must-revalidate, private')
-    # -> enable 304s
 
 def cacheInProxy(published, request, response, smaxage, lastmodified=None, etag=None, vary=None):
     """Set headers to cache the response in a caching proxy.
@@ -81,16 +94,17 @@ def cacheInProxy(published, request, response, smaxage, lastmodified=None, etag=
         # -> enable 304s
     
     if etag is not None:
-        response.setHeader('ETag', etag)
+        response.setHeader('ETag', etag, literal=1)
         # -> enable 304s
+    
+    if vary is not None:
+        response.setHeader('Vary', vary)
     
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, s-maxage=%s, must-revalidate' %smaxage)
     
-    if vary is not None:
-        response.setHeader('Vary', vary)
 
-def cacheEverywhere(published, request, response, maxage, lastmodified=None, etag=None, vary=None):
+def cacheInBrowserAndProxy(published, request, response, maxage, lastmodified=None, etag=None, vary=None):
     """Set headers to cache the response in the browser and caching proxy if
     applicable.
     
@@ -100,20 +114,19 @@ def cacheEverywhere(published, request, response, maxage, lastmodified=None, eta
     ``vary`` is a vary header string
     """
     
-    # Slightly misleading name as caching in RAM is not done here
     if lastmodified is not None:
         response.setHeader('Last-Modified', formatDateTime(lastmodified))
         # -> enable 304s
     
     if etag is not None:
-        response.setHeader('ETag', etag)
+        response.setHeader('ETag', etag, literal=1)
         # -> enable 304s
-    
-    response.setHeader('Expires', formatDateTime(getExpiration(0)))
-    response.setHeader('Cache-Control', 'max-age=%s, must-revalidate, public' %maxage)
     
     if vary is not None:
         response.setHeader('Vary', vary)
+    
+    response.setHeader('Expires', formatDateTime(getExpiration(0)))
+    response.setHeader('Cache-Control', 'max-age=%s, must-revalidate, public' %maxage)
 
 def cacheInRAM(published, request, response, etag=None, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
     """Set a flag indicating that the response for the given request
@@ -144,7 +157,7 @@ def cacheInRAM(published, request, response, etag=None, annotationsKey=PAGE_CACH
     alsoProvides(request, IRAMCached)
 
 def cachedResponse(published, request, response, cached):
-    """Returned a cached page. Modifies the request (status and headers)
+    """Returned a cached page. Modifies the response (status and headers)
     and returns the cached body.
     
     ``cached`` is an object as returned by ``fetchFromRAMCache()`` and stored
@@ -156,16 +169,96 @@ def cachedResponse(published, request, response, cached):
     response.setStatus(status)
 
     for k, v in headers.items():
-        if k == 'ETag':
+        if k.lower() == 'etag':
             response.setHeader(k, v, literal=1)
         else:
             response.setHeader(k, v)
     
     return body
 
+def notModified(published, request, response, etag=None, lastmodified=None):
+    """Return a ``304 NOT MODIFIED`` response. Modifies the response (status)
+    and returns an empty body to indicate the request should be interrupted.
+    
+    ``etag`` is an ETag to set on the response
+    ``lastmodified`` is the last modified date to set on the response
+    
+    Both ``etag`` and ``lastmodified`` are optional.
+    """
+    
+    if etag is not None:
+        response.setHeader('ETag', etag, literal=1)
+    
+    if lastmodified is not None:
+        response.setHeader('Last-Modified', formatDateTime(lastmodified)) 
+    
+    response.setStatus(304)
+    return u""
+
 #
-# RAM cache management
+# Cache checks
 # 
+
+def isModified(request, etag=None, lastmodified=None):
+    """Return True or False depending on whether the published resource has
+    been modified.
+    
+    ``etag`` is the current etag, to be checked against the If-None-Match
+    header.
+    
+    ``lastmodified`` is the current last-modified datetime, to be checked
+    against the If-Modified-Since header.
+    """
+    
+    ifModifiedSince = request.getHeader('If-Modified-Since', None)
+    ifNoneMatch = request.getHeader('If-None-Match', None)
+
+    if ifModifiedSince is None and ifNoneMatch is None:
+        return True
+
+    etagMatched = False
+
+    # Check etags
+    if ifNoneMatch and etag is not None:
+        if not etag:
+            return True
+
+        clientETags = parseETags(ifNoneMatch)
+        if not clientETags:
+            return True
+
+        # is the current etag in the list of client-side etags?
+        if etag not in clientETags and '*' not in clientETags:
+            return True
+        
+        etagMatched = True
+
+    # Check the modification date
+    if ifModifiedSince and lastmodified is not None:
+
+        # Attempt to get a date
+        
+        try:
+            ifModifiedSince = ifModifiedSince.split(';')[0]
+            ifModifiedSince = parseDateTime(ifModifiedSince)
+        except:
+            return True
+        
+        # has content been modified since the if-modified-since time?
+        try:
+            if lastmodified > ifModifiedSince:
+                return True
+        except TypeError:
+            logger.exception("Could not compare dates")
+        
+        # If we generate an ETag, don't validate the conditional GET unless 
+        # the client supplies an ETag.  This may be more conservative than the
+        # spec requires.
+        if etag is not None:
+            if not etagMatched:
+                return True
+
+    return False
 
 def fetchFromRAMCache(request, etag, globalKey=PAGE_CACHE_KEY):
     """Return a page cached in RAM, or None if it cannot be found.
@@ -187,6 +280,15 @@ def fetchFromRAMCache(request, etag, globalKey=PAGE_CACHE_KEY):
         return None
     
     return cache.get(key)
+
+def visibleToRole(published, role, permission='View'):
+    """Determine if the published object would be visible to the given
+    role.
+    
+    ``role`` is a role name, e.g. ``Anonymous``.
+    ``permission`` is the permission to check for.
+    """
+    return role in rolesForPermissionOn(permission, published)
 
 def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
     """Store the given response in the RAM cache.
@@ -259,15 +361,45 @@ def formatDateTime(dt):
     
     return wsgiref.handlers.format_date_time(time.mktime(dt.timetuple()))
 
-def safeLastModified(published):
-    """Get a last modified date or None
+def parseDateTime(str):
+    """Return a Python datetime object from an an RFC1123 date.
+    
+    Returns a datetime object with a timezone. If no timezone is found in the
+    input string, assume UTC.
+    """
+    
+    dt = dateutil.parser.parse(str)
+    if not dt:
+        return None
+    
+    if dt.tzinfo is None:
+        dt = datetime.datetime(dt.year, dt.month, dt.day,
+                               dt.hour, dt.minute, dt.second, dt.microsecond,
+                               dateutil.tz.tzutc())
+    
+    return dt
+
+def getLastModified(published):
+    """Get a last modified date or None.
+    
+    If an ``ILastModified`` adapter can be found, and returns a date that is
+    not timezone aware, force it to UTC.
     """
     
     lastModified = ILastModified(published, None)
     if lastModified is None:
         return None
     
-    return lastModified()
+    dt = lastModified()
+    if dt is None:
+        return None
+    
+    if dt.tzinfo is None:
+        dt = datetime.datetime(dt.year, dt.month, dt.day,
+                               dt.hour, dt.minute, dt.second, dt.microsecond,
+                               dateutil.tz.tzutc())
+    
+    return dt
 
 def getExpiration(maxage):
     """Get an expiration date as a datetime.
@@ -337,3 +469,43 @@ def getETag(published, request, keys=(), extraTokens=()):
     
     etag = '|' + '|'.join(tokens)
     return etag.replace(',',';')  # commas are bad in etags
+
+# Adapted from Products.CMFCore.utils
+
+def parseETags(text, result=None):
+    """Parse a header value into a list of etags. Handles fishy quoting and
+    other browser quirks.
+    
+    Returns a list of strings.
+    """
+
+    if result is None:
+        result = []
+    
+    if not len(text):
+        return result
+    
+    # Lock, since regular expressions are not threadsafe
+    parseETagLock.acquire()
+    try:
+        m = etagQuote.match(text)
+        if m:
+            # Match quoted etag (spec-observing client)
+            l     = len(m.group(1))
+            value = m.group(2)
+        else:
+            # Match non-quoted etag (lazy client)
+            m = etagNoQuote.match(text)
+            if m:
+                l     = len(m.group(1))
+                value = m.group(2)
+            else:
+                return result
+    finally:
+        parseETagLock.release()
+
+    if value:
+        result.append(value)
+    
+    return parseETags(text[l:], result)
+

@@ -1,5 +1,3 @@
-from AccessControl.PermissionRole import rolesForPermissionOn
-
 from zope.interface import implements
 from zope.interface import classProvides
 from zope.interface import Interface
@@ -15,14 +13,19 @@ from plone.caching.utils import lookupOptions
 from plone.app.caching.operations.utils import doNotCache
 from plone.app.caching.operations.utils import cacheInBrowser
 from plone.app.caching.operations.utils import cacheInProxy
-from plone.app.caching.operations.utils import cacheEverywhere
+from plone.app.caching.operations.utils import cacheInBrowserAndProxy
 from plone.app.caching.operations.utils import cacheInRAM
+
 from plone.app.caching.operations.utils import cachedResponse
+from plone.app.caching.operations.utils import notModified
 
 from plone.app.caching.operations.utils import getETag
 from plone.app.caching.operations.utils import getContext
-from plone.app.caching.operations.utils import safeLastModified
+from plone.app.caching.operations.utils import getLastModified
+
 from plone.app.caching.operations.utils import fetchFromRAMCache
+from plone.app.caching.operations.utils import isModified
+from plone.app.caching.operations.utils import visibleToRole
 
 from plone.app.caching.interfaces import _
 
@@ -62,11 +65,17 @@ class CompositeViews(object):
         context = getContext(self.published)
         portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
         
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        
         if portal_state.anonymous():
-            etag = getETag(self.published, self.request, options['etags'] or self.etags)
             cached = fetchFromRAMCache(self.request, etag=etag)
             if cached is not None:
                 return cachedResponse(self.published, self.request, response, cached=cached)
+        
+        if not isModified(self.request, etag=etag):
+            return notModified(self.published, self.request, response, etag=etag)
+        
+        return None
     
     def modifyResponse(self, rulename, response):
         options = lookupOptions(CompositeViews, rulename)
@@ -108,11 +117,17 @@ class ContentFeeds(object):
         context = getContext(self.published)
         portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
         
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        
         if portal_state.anonymous():
-            etag = getETag(self.published, self.request, options['etags'] or self.etags)
             cached = fetchFromRAMCache(self.request, etag=etag)
             if cached is not None:
                 return cachedResponse(self.published, self.request, response, cached=cached)
+        
+        if not isModified(self.request, etag=etag):
+            return notModified(self.published, self.request, response, etag=etag)
+        
+        return None
     
     def modifyResponse(self, rulename, response):
         options = lookupOptions(ContentFeeds, rulename)
@@ -121,6 +136,7 @@ class ContentFeeds(object):
         portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
         
         etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        
         cacheInBrowser(self.published, self.request, response, etag=etag)
         
         if portal_state.anonymous():            
@@ -153,6 +169,21 @@ class ContentFeedsWithProxy(object):
         self.request = request
     
     def interceptResponse(self, rulename, response):
+        options = lookupOptions(ContentFeedsWithProxy, rulename)
+        
+        context = getContext(self.published)
+        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
+        
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        
+        if portal_state.anonymous():
+            cached = fetchFromRAMCache(self.request, etag=etag)
+            if cached is not None:
+                return cachedResponse(self.published, self.request, response, cached=cached)
+        else:
+            if not isModified(self.request, etag=etag):
+                return notModified(self.published, self.request, response, etag=etag)
+        
         return None
     
     def modifyResponse(self, rulename, response):
@@ -190,13 +221,16 @@ class Downloads(object):
         self.request = request
     
     def interceptResponse(self, rulename, response):
+        if visibleToRole(self.published, role='Anonymous'):
+            lastmodified = getLastModified(self.published)
+            if not isModified(self.request, lastmodified=lastmodified):
+                return notModified(self.published, self.request, response, lastmodified=lastmodified)
+        
         return None
     
     def modifyResponse(self, rulename, response):
-        context = getContext(self.published)
-        
-        if 'Anonymous' in rolesForPermissionOn('View', context):
-            lastmodified = safeLastModified(self.published)
+        if visibleToRole(self.published, role='Anonymous'):
+            lastmodified = getLastModified(self.published)
             cacheInBrowser(self.published, self.request, response, lastmodified=lastmodified)
         else:
             doNotCache(self.published, self.request, response)
@@ -232,13 +266,11 @@ class DownloadsWithProxy(object):
     def modifyResponse(self, rulename, response):
         options = lookupOptions(DownloadsWithProxy, rulename)
         
-        context = getContext(self.published)
-        
         smaxage = options['smaxage'] or self.smaxage
         vary = options['vary'] or self.vary
         
-        if 'Anonymous' in rolesForPermissionOn('View', context):
-            lastmodified = safeLastModified(self.published)
+        if visibleToRole(self.published, role='Anonymous'):
+            lastmodified = getLastModified(self.published)
             cacheInProxy(self.published, self.request, response, smaxage=smaxage, lastmodified=lastmodified, vary=vary)
         else:
             doNotCache(self.published, self.request, response)
@@ -267,6 +299,10 @@ class Resources(object):
         self.request = request
     
     def interceptResponse(self, rulename, response):
+        lastmodified = getLastModified(self.published)
+        if not isModified(self.request, lastmodified=lastmodified):
+            return notModified(self.published, self.request, response, lastmodified=lastmodified)
+        
         return None
     
     def modifyResponse(self, rulename, response):
@@ -275,8 +311,8 @@ class Resources(object):
         maxage = options['maxage'] or self.maxage
         vary = options['vary'] or self.vary
         
-        lastmodified = safeLastModified(self.published)
-        cacheEverywhere(self.published, self.request, response, maxage=maxage, lastmodified=lastmodified, vary=vary)
+        lastmodified = getLastModified(self.published)
+        cacheInBrowserAndProxy(self.published, self.request, response, maxage=maxage, lastmodified=lastmodified, vary=vary)
 
 class StableResources(object):
     implements(ICachingOperation)
@@ -304,6 +340,14 @@ class StableResources(object):
         self.request = request
     
     def interceptResponse(self, rulename, response):
+        options = lookupOptions(StableResources, rulename)
+        
+        lastmodified = getLastModified(self.published)
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        
+        if not isModified(self.request, etag=etag, lastmodified=lastmodified):
+            return notModified(self.published, self.request, response, etag=etag, lastmodified=lastmodified)
+        
         return None
     
     def modifyResponse(self, rulename, response):
@@ -313,8 +357,9 @@ class StableResources(object):
         etag = getETag(self.published, self.request, options['etags'] or self.etags)
         vary = options['vary'] or self.vary
         
-        lastmodified = safeLastModified(self.published)
-        cacheEverywhere(self.published, self.request, response, maxage=maxage, lastmodified=lastmodified, etag=etag, vary=vary)
+        lastmodified = getLastModified(self.published)
+        cacheInBrowserAndProxy(self.published, self.request, response,
+            maxage=maxage, etag=etag, lastmodified=lastmodified, vary=vary)
 
 if HAVE_RESOURCE_REGISTRIES:
 
@@ -325,9 +370,6 @@ if HAVE_RESOURCE_REGISTRIES:
         
         adapts(ICookedFile, IHTTPRequest)
 
-        def interceptResponse(self, rulename, response):
-            return None
-    
         def modifyResponse(self, rulename, response):
             registry = getContext(self.published, IResourceRegistry)
             

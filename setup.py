@@ -25,6 +25,7 @@ setup(name='plone.app.caching',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'python-dateutil',
           'plone.caching',
           'plone.cachepurging',
           'plone.app.registry',

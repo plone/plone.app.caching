@@ -1,4 +1,5 @@
 from datetime import datetime
+from dateutil.tz import tzlocal
 
 from zope.interface import implementer, implements
 from zope.component import adapter, adapts
@@ -39,7 +40,7 @@ class PersistentLastModified(object):
         context = aq_base(self.context)
         mtime = getattr(context, '_p_mtime', None)
         if mtime is not None and mtime > 0:
-            return datetime.fromtimestamp(mtime)
+            return datetime.fromtimestamp(mtime, tzlocal())
         return None
 
 class OFSFileLastModified(PersistentLastModified):
@@ -63,7 +64,7 @@ class FSObjectLastModified(object):
         # we do this instead of getModTime() to avoid having to convert from
         # a DateTime
         mtime = self.context._file_mod_time
-        return datetime.fromtimestamp(mtime)
+        return datetime.fromtimestamp(mtime, tzlocal())
 
 class CatalogableDublinCoreLastModified(object):
     """ILastModified adapter for ICatalogableDublinCore, which includes
@@ -108,5 +109,5 @@ class ResourceLastModified(object):
     def __call__(self):
         lmt = getattr(self.context.context, 'lmt', None)
         if lmt is not None:
-            return datetime.fromtimestamp(lmt)
+            return datetime.fromtimestamp(lmt, tzlocal())
         return None

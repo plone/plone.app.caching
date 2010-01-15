@@ -5,6 +5,8 @@ import unittest
 import zope.component.testing
 import DateTime
 
+from dateutil.tz import tzlocal
+
 from persistent.TimeStamp import TimeStamp
 
 from zope.component import provideAdapter
@@ -51,7 +53,7 @@ class TestLastModified(unittest.TestCase):
         zpt = ZopePageTemplate('zpt').__of__(d)
         self.assertEquals(None, ILastModified(zpt)())
         
-        mod = datetime.datetime(2001, 4, 19, 12, 25, 21, 120000)
+        mod = datetime.datetime(2001, 4, 19, 12, 25, 21, 120000, tzinfo=tzlocal())
         d._p_mtime = 987654321.12 # datetime(2001, 4, 19, 12, 25, 21, 120000)
         self.assertEquals(mod, ILastModified(zpt)())
     
@@ -62,7 +64,7 @@ class TestLastModified(unittest.TestCase):
         self.assertEquals(None, ILastModified(dummy)())
         
         timestamp = 987654321.0
-        mod = datetime.datetime(2001, 4, 19, 12, 25, 21)
+        mod = datetime.datetime(2001, 4, 19, 12, 25, 21, tzinfo=tzlocal())
         ts = TimeStamp(*time.gmtime(timestamp)[:6])
         
         dummy._p_jar = FauxDataManager()
@@ -76,7 +78,7 @@ class TestLastModified(unittest.TestCase):
         self.assertEquals(None, ILastModified(dummy)())
         
         timestamp = 987654321.0
-        mod = datetime.datetime(2001, 4, 19, 12, 25, 21)
+        mod = datetime.datetime(2001, 4, 19, 12, 25, 21, tzinfo=tzlocal())
         ts = TimeStamp(*time.gmtime(timestamp)[:6])
         
         dummy._p_jar = FauxDataManager()
@@ -89,7 +91,7 @@ class TestLastModified(unittest.TestCase):
         dummy = FSFile('dummy', __file__)
         
         modtime = float(os.path.getmtime(__file__))
-        mod = datetime.datetime.fromtimestamp(modtime)
+        mod = datetime.datetime.fromtimestamp(modtime, tzlocal())
         
         self.assertEquals(mod, ILastModified(dummy)())
     
@@ -99,7 +101,7 @@ class TestLastModified(unittest.TestCase):
         dummy = FSImage('dummy', __file__) # not really an image, but anyway
         
         modtime = float(os.path.getmtime(__file__))
-        mod = datetime.datetime.fromtimestamp(modtime)
+        mod = datetime.datetime.fromtimestamp(modtime, tzlocal())
         
         self.assertEquals(mod, ILastModified(dummy)())
     
@@ -156,7 +158,7 @@ class TestLastModified(unittest.TestCase):
         r = FileResource(f, request)
         
         modtime = float(os.path.getmtime(__file__))
-        mod = datetime.datetime.fromtimestamp(modtime)
+        mod = datetime.datetime.fromtimestamp(modtime, tz=tzlocal())
         
         self.assertEquals(mod, ILastModified(r)())
 
@@ -173,7 +175,7 @@ class TestLastModified(unittest.TestCase):
         r = FileResource(f, request)
         
         modtime = float(os.path.getmtime(__file__))
-        mod = datetime.datetime.fromtimestamp(modtime)
+        mod = datetime.datetime.fromtimestamp(modtime, tz=tzlocal())
         
         self.assertEquals(mod, ILastModified(r)())
     

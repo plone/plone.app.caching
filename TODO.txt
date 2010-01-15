@@ -4,8 +4,6 @@ Plone caching to-do
 plone.app.caching
 -----------------
 
- [ ] Set RAM cache key
-
  [ ] Tests for utils
  
  [ ] Tests for ETag components

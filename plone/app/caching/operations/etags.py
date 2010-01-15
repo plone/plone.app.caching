@@ -13,7 +13,7 @@ from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.interfaces import IPloneCacheSettings
 
 from plone.app.caching.operations.utils import getContext
-from plone.app.caching.operations.utils import safeLastModified
+from plone.app.caching.operations.utils import getLastModified
 
 from Products.CMFCore.utils import getToolByName
 
@@ -135,7 +135,7 @@ class LastModified(object):
         self.request = request
     
     def __call__(self):
-        lastModified = safeLastModified(self.published)
+        lastModified = getLastModified(self.published)
         if lastModified is None:
             return None
         return str(time.mktime(lastModified.timetuple()))
