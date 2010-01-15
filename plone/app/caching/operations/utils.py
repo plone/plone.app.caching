@@ -27,6 +27,7 @@ from Products.CMFCore.interfaces import ISiteRoot
 
 PAGE_CACHE_KEY = 'plone.app.caching.operations.ramcache'
 PAGE_CACHE_ANNOTATION_KEY = 'plone.app.caching.operations.ramcache.key'
+ETAG_ANNOTATION_KEY = 'plone.app.caching.operations.etag'
 
 logger = logging.getLogger('plone.app.caching')
 
@@ -393,6 +394,12 @@ def getETag(published, request, keys=(), extraTokens=()):
     All tokens will be concatenated into an ETag string, separated by pipes.
     """
     
+    annotations = IAnnotations(request, None)
+    if annotations is not None:
+        etag = annotations.get(ETAG_ANNOTATION_KEY)
+        if etag is not None:
+            return etag
+    
     tokens = []
     for key in keys:
         component = queryMultiAdapter((published, request), IETagValue, name=key)
@@ -407,7 +414,12 @@ def getETag(published, request, keys=(), extraTokens=()):
         tokens.append(token)
     
     etag = '|' + '|'.join(tokens)
-    return etag.replace(',', ';')  # commas are bad in etags
+    etag = etag.replace(',', ';')  # commas are bad in etags
+    
+    if annotations is not None:
+        annotations[ETAG_ANNOTATION_KEY] = etag
+    
+    return etag
 
 def parseETags(text, allowWeak=True, _result=None):
     """Parse a header value into a list of etags. Handles fishy quoting and
