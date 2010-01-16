@@ -83,7 +83,7 @@
         
         <!-- Automatically purge these always -->
         <class class="OFS.Image.File">
-            <implements interface="plone.cachepurging.interfaces.IPurgeable" />
+            <implements interface="z3c.caching.interfaces.IPurgeable" />
         </class>
         
     </configure>
