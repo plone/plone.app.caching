@@ -979,7 +979,7 @@ class MiscHelpersTest(unittest.TestCase):
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
         
-        self.assertEquals('|', getETag(published, request, keys=('foo', 'bar',)))
+        self.assertEquals(None, getETag(published, request, keys=('foo', 'bar',)))
     
     def test_getETag_adapter_returns_none(self):
         from plone.app.caching.operations.utils import getETag
