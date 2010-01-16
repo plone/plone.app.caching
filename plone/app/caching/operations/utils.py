@@ -445,6 +445,9 @@ def getETag(published, request, keys=(), extraTokens=()):
     for token in extraTokens:
         tokens.append(token)
     
+    if len(tokens) == 0:
+        return None
+    
     etag = '|' + '|'.join(tokens)
     etag = etag.replace(',', ';')  # commas are bad in etags
     
