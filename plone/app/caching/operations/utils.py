@@ -28,6 +28,8 @@ from Products.CMFCore.interfaces import ISiteRoot
 PAGE_CACHE_KEY = 'plone.app.caching.operations.ramcache'
 PAGE_CACHE_ANNOTATION_KEY = 'plone.app.caching.operations.ramcache.key'
 ETAG_ANNOTATION_KEY = 'plone.app.caching.operations.etag'
+LASTMODIFIED_ANNOTATION_KEY = 'plone.app.caching.operations.lastmodified'
+_marker = object()
 
 logger = logging.getLogger('plone.app.caching')
 
@@ -346,6 +348,24 @@ def parseDateTime(str):
     
     return dt
 
+def getLastModifiedAnnotation(published, request):
+    """Try to get the last modified date from a request annotation if available,
+    otherwise try to get it from published object
+    """
+    
+    annotations = IAnnotations(request, None)
+    if annotations is not None:
+        dt = annotations.get(LASTMODIFIED_ANNOTATION_KEY, _marker)
+        if dt is not _marker:
+            return dt
+    
+    dt = getLastModified(published)
+    
+    if annotations is not None:
+        annotations[LASTMODIFIED_ANNOTATION_KEY] = dt
+    
+    return dt
+
 def getLastModified(published):
     """Get a last modified date or None.
     
@@ -381,6 +401,24 @@ def getExpiration(maxage):
     else:
         return now - datetime.timedelta(days=3650)
 
+def getETagAnnotation(published, request, keys=(), extraTokens=()):
+    """Try to get the ETag from a request annotation if available,
+    otherwise try to get it from published object
+    """
+    
+    annotations = IAnnotations(request, None)
+    if annotations is not None:
+        etag = annotations.get(ETAG_ANNOTATION_KEY, _marker)
+        if etag is not _marker:
+            return etag
+    
+    etag = getETag(published, request, keys, extraTokens)
+    
+    if annotations is not None:
+        annotations[ETAG_ANNOTATION_KEY] = etag
+    
+    return etag
+
 def getETag(published, request, keys=(), extraTokens=()):
     """Calculate an ETag.
     
@@ -393,12 +431,6 @@ def getETag(published, request, keys=(), extraTokens=()):
     
     All tokens will be concatenated into an ETag string, separated by pipes.
     """
-    
-    annotations = IAnnotations(request, None)
-    if annotations is not None:
-        etag = annotations.get(ETAG_ANNOTATION_KEY)
-        if etag is not None:
-            return etag
     
     tokens = []
     for key in keys:
@@ -415,9 +447,6 @@ def getETag(published, request, keys=(), extraTokens=()):
     
     etag = '|' + '|'.join(tokens)
     etag = etag.replace(',', ';')  # commas are bad in etags
-    
-    if annotations is not None:
-        annotations[ETAG_ANNOTATION_KEY] = etag
     
     return etag
 

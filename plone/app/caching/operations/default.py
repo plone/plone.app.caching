@@ -19,9 +19,9 @@ from plone.app.caching.operations.utils import cacheInRAM
 from plone.app.caching.operations.utils import cachedResponse
 from plone.app.caching.operations.utils import notModified
 
-from plone.app.caching.operations.utils import getETag
+from plone.app.caching.operations.utils import getETagAnnotation
 from plone.app.caching.operations.utils import getContext
-from plone.app.caching.operations.utils import getLastModified
+from plone.app.caching.operations.utils import getLastModifiedAnnotation
 
 from plone.app.caching.operations.utils import fetchFromRAMCache
 from plone.app.caching.operations.utils import isModified
@@ -61,7 +61,7 @@ class CompositeViews(object):
     
     def interceptResponse(self, rulename, response):
         options = lookupOptions(CompositeViews, rulename)
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        etag = getETagAnnotation(self.published, self.request, options['etags'] or self.etags)
         
         if not isModified(self.request, etag=etag):
             return notModified(self.published, self.request, response, etag=etag)
@@ -78,7 +78,7 @@ class CompositeViews(object):
     
     def modifyResponse(self, rulename, response):
         options = lookupOptions(CompositeViews, rulename)
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        etag = getETagAnnotation(self.published, self.request, options['etags'] or self.etags)
         
         cacheInBrowser(self.published, self.request, response, etag=etag)
         
@@ -112,7 +112,7 @@ class ContentFeeds(object):
     
     def interceptResponse(self, rulename, response):
         options = lookupOptions(ContentFeeds, rulename)
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        etag = getETagAnnotation(self.published, self.request, options['etags'] or self.etags)
         
         if not isModified(self.request, etag=etag):
             return notModified(self.published, self.request, response, etag=etag)
@@ -129,7 +129,7 @@ class ContentFeeds(object):
     
     def modifyResponse(self, rulename, response):
         options = lookupOptions(ContentFeeds, rulename)
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        etag = getETagAnnotation(self.published, self.request, options['etags'] or self.etags)
         
         cacheInBrowser(self.published, self.request, response, etag=etag)
         
@@ -167,7 +167,7 @@ class ContentFeedsWithProxy(object):
     
     def interceptResponse(self, rulename, response):
         options = lookupOptions(ContentFeedsWithProxy, rulename)
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        etag = getETagAnnotation(self.published, self.request, options['etags'] or self.etags)
         
         if not isModified(self.request, etag=etag):
             return notModified(self.published, self.request, response, etag=etag)
@@ -184,7 +184,7 @@ class ContentFeedsWithProxy(object):
     
     def modifyResponse(self, rulename, response):
         options = lookupOptions(ContentFeedsWithProxy, rulename)
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        etag = getETagAnnotation(self.published, self.request, options['etags'] or self.etags)
         smaxage = options['smaxage'] or self.smaxage
         vary = options['vary'] or self.vary
         
@@ -217,7 +217,7 @@ class Downloads(object):
     
     def interceptResponse(self, rulename, response):
         if visibleToRole(self.published, role='Anonymous'):
-            lastModified = getLastModified(self.published)
+            lastModified = getLastModifiedAnnotation(self.published, self.request)
             if not isModified(self.request, lastModified=lastModified):
                 return notModified(self.published, self.request, response, lastModified=lastModified)
         
@@ -225,7 +225,7 @@ class Downloads(object):
     
     def modifyResponse(self, rulename, response):
         if visibleToRole(self.published, role='Anonymous'):
-            lastModified = getLastModified(self.published)
+            lastModified = getLastModifiedAnnotation(self.published, self.request)
             cacheInBrowser(self.published, self.request, response, lastModified=lastModified)
         else:
             doNotCache(self.published, self.request, response)
@@ -265,7 +265,7 @@ class DownloadsWithProxy(object):
         vary = options['vary'] or self.vary
         
         if visibleToRole(self.published, role='Anonymous'):
-            lastModified = getLastModified(self.published)
+            lastModified = getLastModifiedAnnotation(self.published, self.request)
             cacheInProxy(self.published, self.request, response, smaxage=smaxage, lastModified=lastModified, vary=vary)
         else:
             doNotCache(self.published, self.request, response)
@@ -294,7 +294,7 @@ class Resources(object):
         self.request = request
     
     def interceptResponse(self, rulename, response):
-        lastModified = getLastModified(self.published)
+        lastModified = getLastModifiedAnnotation(self.published, self.request)
         if not isModified(self.request, lastModified=lastModified):
             return notModified(self.published, self.request, response, lastModified=lastModified)
         
@@ -306,7 +306,7 @@ class Resources(object):
         maxage = options['maxage'] or self.maxage
         vary = options['vary'] or self.vary
         
-        lastModified = getLastModified(self.published)
+        lastModified = getLastModifiedAnnotation(self.published, self.request)
         cacheInBrowserAndProxy(self.published, self.request, response, maxage=maxage, lastModified=lastModified, vary=vary)
 
 class StableResources(object):
@@ -337,8 +337,8 @@ class StableResources(object):
     def interceptResponse(self, rulename, response):
         options = lookupOptions(StableResources, rulename)
         
-        lastModified = getLastModified(self.published)
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        lastModified = getLastModifiedAnnotation(self.published, self.request)
+        etag = getETagAnnotation(self.published, self.request, options['etags'] or self.etags)
         
         if not isModified(self.request, etag=etag, lastModified=lastModified):
             return notModified(self.published, self.request, response, etag=etag, lastModified=lastModified)
@@ -349,10 +349,10 @@ class StableResources(object):
         options = lookupOptions(StableResources, rulename)
         
         maxage = options['maxage'] or self.maxage
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        etag = getETagAnnotation(self.published, self.request, options['etags'] or self.etags)
         vary = options['vary'] or self.vary
         
-        lastModified = getLastModified(self.published)
+        lastModified = getLastModifiedAnnotation(self.published, self.request)
         cacheInBrowserAndProxy(self.published, self.request, response,
             maxage=maxage, etag=etag, lastModified=lastModified, vary=vary)
 
