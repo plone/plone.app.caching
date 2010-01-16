@@ -159,7 +159,7 @@ class ContentFeedsWithProxy(object):
     # Fallback option values
     etags = ('userid', 'catalogCounter', 'language', 'gzip', 'skin')
     smaxage = 86400
-    vary = ''
+    vary = None
 
     def __init__(self, published, request):
         self.published = published
@@ -219,7 +219,8 @@ class Downloads(object):
         if visibleToRole(self.published, role='Anonymous'):
             lastModified = getLastModifiedAnnotation(self.published, self.request)
             if not isModified(self.request, lastModified=lastModified):
-                return notModified(self.published, self.request, response, lastModified=lastModified)
+                return notModified(self.published, self.request, response, 
+                    lastModified=lastModified)
         
         return None
     
@@ -249,7 +250,7 @@ class DownloadsWithProxy(object):
     
     # Fallback option values
     smaxage = 86400
-    vary = ''
+    vary = None
     
     def __init__(self, published, request):
         self.published = published
@@ -266,7 +267,8 @@ class DownloadsWithProxy(object):
         
         if visibleToRole(self.published, role='Anonymous'):
             lastModified = getLastModifiedAnnotation(self.published, self.request)
-            cacheInProxy(self.published, self.request, response, smaxage=smaxage, lastModified=lastModified, vary=vary)
+            cacheInProxy(self.published, self.request, response, 
+                smaxage=smaxage, lastModified=lastModified, vary=vary)
         else:
             doNotCache(self.published, self.request, response)
 
@@ -287,7 +289,7 @@ class Resources(object):
     
     # Fallback option values
     maxage = 86400
-    vary = ''
+    vary = None
 
     def __init__(self, published, request):
         self.published = published
@@ -296,7 +298,8 @@ class Resources(object):
     def interceptResponse(self, rulename, response):
         lastModified = getLastModifiedAnnotation(self.published, self.request)
         if not isModified(self.request, lastModified=lastModified):
-            return notModified(self.published, self.request, response, lastModified=lastModified)
+            return notModified(self.published, self.request, response, 
+                lastModified=lastModified)
         
         return None
     
@@ -307,7 +310,8 @@ class Resources(object):
         vary = options['vary'] or self.vary
         
         lastModified = getLastModifiedAnnotation(self.published, self.request)
-        cacheInBrowserAndProxy(self.published, self.request, response, maxage=maxage, lastModified=lastModified, vary=vary)
+        cacheInBrowserAndProxy(self.published, self.request, response, 
+            maxage=maxage, lastModified=lastModified, vary=vary)
 
 class StableResources(object):
     implements(ICachingOperation)
@@ -328,7 +332,7 @@ class StableResources(object):
     
     maxage = 31536000
     etags = ()
-    vary = ''
+    vary = None
 
     def __init__(self, published, request):
         self.published = published
@@ -341,7 +345,8 @@ class StableResources(object):
         etag = getETagAnnotation(self.published, self.request, options['etags'] or self.etags)
         
         if not isModified(self.request, etag=etag, lastModified=lastModified):
-            return notModified(self.published, self.request, response, etag=etag, lastModified=lastModified)
+            return notModified(self.published, self.request, response, 
+                etag=etag, lastModified=lastModified)
         
         return None
     
