@@ -61,30 +61,29 @@ class CompositeViews(object):
     
     def interceptResponse(self, rulename, response):
         options = lookupOptions(CompositeViews, rulename)
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        
+        if not isModified(self.request, etag=etag):
+            return notModified(self.published, self.request, response, etag=etag)
         
         context = getContext(self.published)
         portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
-        
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
         
         if portal_state.anonymous():
             cached = fetchFromRAMCache(self.request, etag=etag)
             if cached is not None:
                 return cachedResponse(self.published, self.request, response, *cached)
         
-        if not isModified(self.request, etag=etag):
-            return notModified(self.published, self.request, response, etag=etag)
-        
         return None
     
     def modifyResponse(self, rulename, response):
         options = lookupOptions(CompositeViews, rulename)
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        
+        cacheInBrowser(self.published, self.request, response, etag=etag)
         
         context = getContext(self.published)
         portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
-        
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
-        cacheInBrowser(self.published, self.request, response, etag=etag)
         
         if portal_state.anonymous():
             cacheInRAM(self.published, self.request, response, etag=etag)
@@ -113,31 +112,29 @@ class ContentFeeds(object):
     
     def interceptResponse(self, rulename, response):
         options = lookupOptions(ContentFeeds, rulename)
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        
+        if not isModified(self.request, etag=etag):
+            return notModified(self.published, self.request, response, etag=etag)
         
         context = getContext(self.published)
         portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
-        
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
         
         if portal_state.anonymous():
             cached = fetchFromRAMCache(self.request, etag=etag)
             if cached is not None:
                 return cachedResponse(self.published, self.request, response, *cached)
         
-        if not isModified(self.request, etag=etag):
-            return notModified(self.published, self.request, response, etag=etag)
-        
         return None
     
     def modifyResponse(self, rulename, response):
         options = lookupOptions(ContentFeeds, rulename)
-        
-        context = getContext(self.published)
-        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
-        
         etag = getETag(self.published, self.request, options['etags'] or self.etags)
         
         cacheInBrowser(self.published, self.request, response, etag=etag)
+        
+        context = getContext(self.published)
+        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
         
         if portal_state.anonymous():            
             cacheInRAM(self.published, self.request, response, etag=etag)
@@ -170,31 +167,29 @@ class ContentFeedsWithProxy(object):
     
     def interceptResponse(self, rulename, response):
         options = lookupOptions(ContentFeedsWithProxy, rulename)
+        etag = getETag(self.published, self.request, options['etags'] or self.etags)
+        
+        if not isModified(self.request, etag=etag):
+            return notModified(self.published, self.request, response, etag=etag)
         
         context = getContext(self.published)
         portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
-        
-        etag = getETag(self.published, self.request, options['etags'] or self.etags)
         
         if portal_state.anonymous():
             cached = fetchFromRAMCache(self.request, etag=etag)
             if cached is not None:
                 return cachedResponse(self.published, self.request, response, *cached)
-        else:
-            if not isModified(self.request, etag=etag):
-                return notModified(self.published, self.request, response, etag=etag)
         
         return None
     
     def modifyResponse(self, rulename, response):
         options = lookupOptions(ContentFeedsWithProxy, rulename)
-        
-        context = getContext(self.published)
-        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
-        
         etag = getETag(self.published, self.request, options['etags'] or self.etags)
         smaxage = options['smaxage'] or self.smaxage
         vary = options['vary'] or self.vary
+        
+        context = getContext(self.published)
+        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
         
         if portal_state.anonymous():            
             cacheInProxy(self.published, self.request, response, smaxage=smaxage, etag=etag, vary=vary)
