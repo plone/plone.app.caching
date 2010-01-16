@@ -6,8 +6,9 @@ from zope.globalrequest import getRequest
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.lifecycleevent.interfaces import IObjectMovedEvent
 
-from plone.cachepurging import Purge
-from plone.cachepurging.interfaces import IPurgePaths
+from z3c.caching.purge import Purge
+from z3c.caching.interfaces import IPurgePaths
+
 from plone.cachepurging.interfaces import IPurgePathRewriter
 
 from Products.CMFCore.interfaces import IDiscussionResponse

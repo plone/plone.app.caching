@@ -25,8 +25,8 @@ from plone.registry.interfaces import IRegistry
 from plone.registry.fieldfactory import persistentFieldAdapter
 from plone.registry import Registry
 
-from plone.cachepurging.interfaces import IPurgeEvent
-from plone.cachepurging.interfaces import IPurgePaths
+from z3c.caching.interfaces import IPurgeEvent
+from z3c.caching.interfaces import IPurgePaths
 
 from plone.app.caching.interfaces import IPloneCacheSettings
 
