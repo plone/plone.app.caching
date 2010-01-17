@@ -323,6 +323,27 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                            'foo/at_download/image2', 'foo/image2', 'foo/image2_mini', 'foo/image2_normal'],
                            list(purger.getRelativePaths()))
         self.assertEquals([], list(purger.getAbsolutePaths()))
+    
+    def test_file_image_text_fields(self):
+        
+        class ATMultipleFields(atapi.BaseContent):
+            schema = atapi.Schema((
+                    atapi.StringField('foo'),
+                    atapi.FileField('file1'),
+                    atapi.ImageField('image1'),
+                    atapi.ImageField('image2', sizes={'mini': (50,50), 'normal' : (100,100)}),
+                    atapi.TextField('text'),
+                ))
+        
+        context = ATMultipleFields('foo')
+        purger = ObjectFieldPurgePaths(context)
+        
+        self.assertEquals(['foo/download', 'foo/at_download',
+                           'foo/at_download/file1', 'foo/file1',
+                           'foo/at_download/image1', 'foo/image1','foo/image1_thumb',
+                           'foo/at_download/image2', 'foo/image2', 'foo/image2_mini', 'foo/image2_normal'],
+                           list(purger.getRelativePaths()))
+        self.assertEquals([], list(purger.getAbsolutePaths()))
         
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)

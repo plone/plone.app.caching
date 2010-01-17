@@ -12,13 +12,12 @@ import OFS.Image
 
 from zope.component import getUtility
 
+from zope.globalrequest import setRequest
+
 from plone.registry.interfaces import IRegistry
-
 from plone.caching.interfaces import ICacheSettings
-
 from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.cachepurging.interfaces import IPurger
-
 from plone.app.caching.interfaces import IPloneCacheSettings
 
 TEST_IMAGE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
@@ -49,6 +48,7 @@ class TestOperations(FunctionalTestCase):
     layer = Layer
     
     def afterSetUp(self):
+        setRequest(self.portal.REQUEST)
         self.registry = getUtility(IRegistry)
         
         self.cacheSettings = self.registry.forInterface(ICacheSettings)
@@ -57,6 +57,9 @@ class TestOperations(FunctionalTestCase):
         
         self.purger = getUtility(IPurger)
         self.purger.reset()
+    
+    def beforeTearDown(self):
+        setRequest(None)
     
     def test_disabled(self):
         self.cacheSettings.enabled = False
@@ -211,9 +214,85 @@ class TestOperations(FunctionalTestCase):
         pass
     
     def test_auto_purge_content_types(self):
-        pass
+        
+        self.setRoles(('Manager',))
+        
+        # Non-folder content
+        self.portal.invokeFactory('Document', 'd1')
+        self.portal['d1'].setTitle(u"Document one")
+        self.portal['d1'].setDescription(u"Document one description")
+        self.portal['d1'].setText("<p>Body one</p>")
+        self.portal['d1'].reindexObject()
+        
+        self.setRoles(('Member',))
+        
+        # Purging disabled
+        self.cachePurgingSettings.enabled = False
+        self.cachePurgingSettings.cachingProxies = ()
+        self.ploneCacheSettings.purgedContentTypes = ()
+        
+        editURL = self.portal['d1'].absolute_url() + '/edit'
+        
+        browser = Browser()
+        browser.handleErrors = False
+        
+        browser.open(self.portal.absolute_url() + '/login')
+        browser.getControl(name='__ac_name').value = default_user
+        browser.getControl(name='__ac_password').value = default_password
+        browser.getControl('Log in').click()
+        
+        browser.open(editURL)
+        browser.getControl(name='title').value = u"Title 1"
+        browser.getControl(name='form.button.save').click()
+        
+        self.assertEquals([], self.purger._sync)
+        self.assertEquals([], self.purger._async)
+        
+        # Enable purging, but not the content type
+        self.cachePurgingSettings.enabled = True
+        self.cachePurgingSettings.cachingProxies = ('http://localhost:1234',)
+        self.ploneCacheSettings.purgedContentTypes = ()
+        
+        browser.open(editURL)
+        browser.getControl(name='title').value = u"Title 2"
+        browser.getControl(name='form.button.save').click()
+        
+        self.assertEquals([], self.purger._sync)
+        self.assertEquals([], self.purger._async)
+        
+        # Enable the content type, but disable purging
+        self.cachePurgingSettings.enabled = False
+        self.cachePurgingSettings.cachingProxies = ('http://localhost:1234',)
+        self.ploneCacheSettings.purgedContentTypes = ()
+        
+        browser.open(editURL)
+        browser.getControl(name='title').value = u"Title 3"
+        browser.getControl(name='form.button.save').click()
+        
+        self.assertEquals([], self.purger._sync)
+        self.assertEquals([], self.purger._async)
+        
+        # Enable properly
+        self.cachePurgingSettings.enabled = True
+        self.cachePurgingSettings.cachingProxies = ('http://localhost:1234',)
+        self.ploneCacheSettings.purgedContentTypes = ('Document',)
+        
+        browser.open(editURL)
+        browser.getControl(name='title').value = u"Title 4"
+        browser.getControl(name='form.button.save').click()
+        
+        self.assertEquals([], self.purger._sync)
+        self.assertEquals(set([
+                'http://localhost:1234/plone/d1',
+                'http://localhost:1234/plone/d1/document_view',
+                'http://localhost:1234/plone/d1/',
+                'http://localhost:1234/plone/d1/view']), set(self.purger._async))
+        
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
+
+
+
 
 

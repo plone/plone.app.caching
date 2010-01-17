@@ -25,11 +25,10 @@ from Acquisition import aq_parent
 
 try:
     from Products.Archetypes.interfaces import IBaseObject
-    from Products.Archetypes.interfaces import IFileField, IImageField
+    from Products.Archetypes.interfaces import IFileField, IImageField, ITextField
     HAVE_AT = True
-except:
+except ImportError:
     HAVE_AT = False
-  
 
 class ContentPurgePaths(object):
     """Paths to purge for content items
@@ -155,7 +154,10 @@ if HAVE_AT:
             schema = self.context.Schema()
 
             def fieldFilter(field):
-                return IFileField.providedBy(field) or IImageField.providedBy(field)
+                return (
+                    (IFileField.providedBy(field) or IImageField.providedBy(field))
+                    and not ITextField.providedBy(field)
+                )
             
             seenDownloads = False
             
