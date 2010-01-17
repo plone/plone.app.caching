@@ -35,23 +35,35 @@ class GZipTransform(object):
         self.request = request
     
     def transformUnicode(self, result, encoding):
-        self.setGzip()
+        if self.setGzip():
+            # ensure that we modify the response so that it's re-set; the
+            # real work happens in setBody, but if this returns None and
+            # nothing else transform the request, nothing is returned.
+            return unicode(result)
         return None
     
     def transformBytes(self, result, encoding):
-        self.setGzip()
+        if self.setGzip():
+            # Same as above - here we are cheeky and change the type of
+            # transform, to avoid copying the entire body if we can
+            return [result]
         return None
     
     def transformIterable(self, result, encoding):
-        self.setGzip()
+        if self.setGzip():
+            # Same as above
+            return iter(result)
         return None
     
     def setGzip(self):
         
         registry = queryUtility(IRegistry)
         if registry is None:
-            return
+            return False
         
         settings = registry.forInterface(IPloneCacheSettings, check=False)
         if settings.enableCompression:
             self.request.response.enableHTTPCompression(self.request)
+            return True
+        
+        return False

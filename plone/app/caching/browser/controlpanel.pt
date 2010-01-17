@@ -15,12 +15,12 @@
     
     $().ready(function() {
         
-        // jq('a.editGlobalOperationParameters, a.editRulesetOperationParameters').prepOverlay({
-        //     subtype: 'ajax',
-        //     filter: '#portal-column-content>*',
-        //     formselector: 'form',
-        //     closeselector: '[name=form.button.Cancel]',
-        // });
+        jq('a.editGlobalOperationParameters, a.editRulesetOperationParameters').prepOverlay({
+            subtype: 'ajax',
+            filter: '#portal-column-content>*',
+            formselector: 'form',
+            closeselector: '[name=form.button.Cancel]',
+        });
         
     });
     

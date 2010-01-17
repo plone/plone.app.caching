@@ -135,6 +135,7 @@
         <field type="plone.registry.field.ASCIILine">
             <title>Vary</title>
             <description>Name(s) of HTTP headers that must match for the caching proxy to return a cached response</description>
+            <required>False</required>
         </field>
         <value></value>
     </record>
@@ -152,6 +153,7 @@
         <field type="plone.registry.field.ASCIILine">
             <title>Vary</title>
             <description>Name(s) of HTTP headers that must match for the caching proxy to return a cached response</description>
+            <required>False</required>
         </field>
         <value></value>
     </record>
@@ -178,6 +180,7 @@
         <field type="plone.registry.field.ASCIILine">
             <title>Vary</title>
             <description>Name(s) of HTTP headers that must match for the caching proxy to return a cached response</description>
+            <required>False</required>
         </field>
         <value></value>
     </record>
