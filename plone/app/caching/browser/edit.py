@@ -247,5 +247,3 @@ class EditForm(form.Form):
         IStatusMessage(self.request).addStatusMessage(_(u"Ruleset-specific settings removed"), type="info")
         self.request.response.redirect("%s/@@caching-controlpanel#detailed-settings" % self.context.absolute_url())
         return ''
-
-    
