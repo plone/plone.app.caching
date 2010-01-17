@@ -45,6 +45,7 @@ setup(name='plone.app.caching',
           'z3c.form',
           'z3c.zcmlhook',
       ],
+      extras_require={'tests': ['collective.testcaselayer']},
       entry_points="""
       [z3c.autoinclude.plugin]
       target = plone

@@ -10,6 +10,23 @@
 
 <div metal:fill-slot="prefs_configlet_content">
 
+<script type="text/javascript">
+(function($) {
+    
+    $().ready(function() {
+        
+        // jq('a.editGlobalOperationParameters, a.editRulesetOperationParameters').prepOverlay({
+        //     subtype: 'ajax',
+        //     filter: '#portal-column-content>*',
+        //     formselector: 'form',
+        //     closeselector: '[name=form.button.Cancel]',
+        // });
+        
+    });
+    
+})(jQuery);
+</script>
+
       <div id="region-content" class="documentEditable">
           
         <div id="edit-bar">
@@ -576,18 +593,21 @@
                                                     No parameters
                                                 </div>
                                                 <div style="white-space: nowrap" class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
-                                                    <a  i18n:translate="link_view_edit_clear"
+                                                    <a  class="editGlobalOperationParameters"
+                                                        i18n:translate="link_view_edit_clear"
                                                         tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-global/${operationName}"
                                                         >View/edit</a>
                                                     <span i18n:translate="label_global">global parameters</span>
                                                 </div>
                                                 <div style="white-space: nowrap" class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
                                                     <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType['name'])">
-                                                        <a  tal:condition="hasRulesetOptions"
+                                                        <a  class="editRulesetOperationParameters"
+                                                            tal:condition="hasRulesetOptions"
                                                             i18n:translate="link_view_edit_clear"
                                                             tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
                                                             >View/edit/clear</a>
-                                                        <a  tal:condition="not:hasRulesetOptions"
+                                                        <a  class="editRulesetOperationParameters"
+                                                            tal:condition="not:hasRulesetOptions"
                                                             i18n:translate="link_create"
                                                             tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
                                                             >Create</a>
