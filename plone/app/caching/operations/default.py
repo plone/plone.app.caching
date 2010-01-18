@@ -216,12 +216,9 @@ class Downloads(object):
         self.request = request
     
     def interceptResponse(self, rulename, response):
-        if visibleToRole(self.published, role='Anonymous'):
-            lastModified = getLastModifiedAnnotation(self.published, self.request)
-            if not isModified(self.request, lastModified=lastModified):
-                return notModified(self.published, self.request, response, 
-                    lastModified=lastModified)
-        
+        lastModified = getLastModifiedAnnotation(self.published, self.request)
+        if not isModified(self.request, lastModified=lastModified):
+            return notModified(self.published, self.request, response, lastModified=lastModified)
         return None
     
     def modifyResponse(self, rulename, response):
@@ -257,6 +254,9 @@ class DownloadsWithProxy(object):
         self.request = request
     
     def interceptResponse(self, rulename, response):
+        lastModified = getLastModifiedAnnotation(self.published, self.request)
+        if not isModified(self.request, lastModified=lastModified):
+            return notModified(self.published, self.request, response, lastModified=lastModified)
         return None
     
     def modifyResponse(self, rulename, response):
