@@ -222,11 +222,8 @@ class Downloads(object):
         return None
     
     def modifyResponse(self, rulename, response):
-        if visibleToRole(self.published, role='Anonymous'):
-            lastModified = getLastModifiedAnnotation(self.published, self.request)
-            cacheInBrowser(self.published, self.request, response, lastModified=lastModified)
-        else:
-            doNotCache(self.published, self.request, response)
+        lastModified = getLastModifiedAnnotation(self.published, self.request)
+        cacheInBrowser(self.published, self.request, response, lastModified=lastModified)
 
 class DownloadsWithProxy(object):
     implements(ICachingOperation)
@@ -265,12 +262,13 @@ class DownloadsWithProxy(object):
         smaxage = options['smaxage'] or self.smaxage
         vary = options['vary'] or self.vary
         
+        lastModified = getLastModifiedAnnotation(self.published, self.request)
+        
         if visibleToRole(self.published, role='Anonymous'):
-            lastModified = getLastModifiedAnnotation(self.published, self.request)
             cacheInProxy(self.published, self.request, response, 
                 smaxage=smaxage, lastModified=lastModified, vary=vary)
         else:
-            doNotCache(self.published, self.request, response)
+            cacheInBrowser(self.published, self.request, response, lastModified=lastModified)
 
 class Resources(object):
     implements(ICachingOperation)
@@ -300,7 +298,6 @@ class Resources(object):
         if not isModified(self.request, lastModified=lastModified):
             return notModified(self.published, self.request, response, 
                 lastModified=lastModified)
-        
         return None
     
     def modifyResponse(self, rulename, response):
