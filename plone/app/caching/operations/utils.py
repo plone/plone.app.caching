@@ -179,6 +179,8 @@ def cachedResponse(published, request, response, status, headers, body, gzip=Fal
         else:
             response.setHeader(k, v)
     
+    response.setHeader('X-PageCache', 'True', literal=1)
+    
     if not gzip:
         response.enableHTTPCompression(request, disable=True)
     else:
