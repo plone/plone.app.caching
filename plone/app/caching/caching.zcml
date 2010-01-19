@@ -110,6 +110,13 @@
                     
     </configure>
     
+    <!-- Standard image content saved in an Archetype field, like ATImage scales-->
+    <configure zcml:condition="installed Products.Archetypes">
+    
+        <cache:ruleset ruleset="plone.download" for="Products.Archetypes.Field.Image" />
+    
+    </configure>
+    
     <!-- plone.app.blob content -->
     <configure zcml:condition="installed plone.app.blob">
         
