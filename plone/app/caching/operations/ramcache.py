@@ -20,7 +20,7 @@ class Store(object):
     """
     
     implements(ITransform)
-    adapts(Interface, IRAMCached)
+    adapts(Interface, Interface)
     
     order = 90000
     
@@ -29,6 +29,9 @@ class Store(object):
         self.request = request
     
     def transformUnicode(self, result, encoding):
+        if not IRAMCached.providedBy(self.request):
+            return None
+        
         status = self.request.response.getStatus()
         if status != 200:
             return None
@@ -37,6 +40,9 @@ class Store(object):
         return None
     
     def transformBytes(self, result, encoding):
+        if not IRAMCached.providedBy(self.request):
+            return None
+        
         status = self.request.response.getStatus()
         if status != 200:
             return None
@@ -45,6 +51,9 @@ class Store(object):
         return None
     
     def transformIterable(self, result, encoding):
+        if not IRAMCached.providedBy(self.request):
+            return None
+        
         status = self.request.response.getStatus()
         if status != 200:
             return None
