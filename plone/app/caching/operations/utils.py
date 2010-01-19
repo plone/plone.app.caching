@@ -179,7 +179,7 @@ def cachedResponse(published, request, response, status, headers, body, gzip=Fal
         else:
             response.setHeader(k, v)
     
-    response.setHeader('X-PageCache', 'True', literal=1)
+    response.setHeader('X-RAMCache', PAGE_CACHE_KEY, literal=1)
     
     if not gzip:
         response.enableHTTPCompression(request, disable=True)
@@ -435,25 +435,30 @@ def getETag(published, request, keys=(), extraTokens=()):
     """
     
     tokens = []
+    noTokens = True
     for key in keys:
         component = queryMultiAdapter((published, request), IETagValue, name=key)
         if component is None:
             logger.warning("Could not find value adapter for ETag component %s", key)
+            tokens.append('')
         else:
             value = component()
-            if value is not None:
-                tokens.append(value)
+            if value is None:
+                value = ''
+            else:
+                noTokens = False
+            tokens.append(value)
     
     for token in extraTokens:
+        noTokens = False
         tokens.append(token)
     
-    if len(tokens) == 0:
+    if noTokens:
         return None
     
     etag = '|' + '|'.join(tokens)
-    etag = etag.replace(',', ';')  # commas are bad in etags
     
-    return etag
+    return etag.replace(',', ';')  # commas are bad in etags
 
 def parseETags(text, allowWeak=True, _result=None):
     """Parse a header value into a list of etags. Handles fishy quoting and
