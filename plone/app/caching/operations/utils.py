@@ -130,7 +130,7 @@ def cacheInBrowserAndProxy(published, request, response, maxage, lastModified=No
     if vary is not None:
         response.setHeader('Vary', vary)
     
-    response.setHeader('Expires', formatDateTime(getExpiration(0)))
+    response.setHeader('Expires', formatDateTime(getExpiration(maxage)))
     response.setHeader('Cache-Control', 'max-age=%s, must-revalidate, public' % maxage)
 
 def cacheInRAM(published, request, response, etag=None, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):

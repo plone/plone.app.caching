@@ -54,7 +54,7 @@ class CompositeViews(object):
     
     # Fallback option values
     etags = ('userid', 'catalogCounter', 'language', 'gzip', 'skin', 'locked')
-
+    
     def __init__(self, published, request):
         self.published = published
         self.request = request
