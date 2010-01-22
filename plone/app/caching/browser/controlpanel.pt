@@ -18,8 +18,9 @@
         jq('a.editGlobalOperationParameters, a.editRulesetOperationParameters').prepOverlay({
             subtype: 'ajax',
             filter: '#portal-column-content>*',
-            formselector: 'form',
-            closeselector: '[name=form.button.Cancel]',
+            formselector: 'form:has(div[id^=formfield-form-widgets-plone-app-caching])',
+            closeselector: '[name=form.buttons.cancel]',
+            noform: 'close'
         });
         
     });

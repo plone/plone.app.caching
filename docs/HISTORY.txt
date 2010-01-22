@@ -4,5 +4,10 @@ Changelog for plone.app.caching
 
 plone.app.caching - 1.0a1 Unreleased
 
+    - Tighten form selector for ajax forms so that it can be
+      distinguished from other forms that might show up on
+      a results page.
+      [smcmahon]
+
     - Initial package structure.
       [zopeskel]
