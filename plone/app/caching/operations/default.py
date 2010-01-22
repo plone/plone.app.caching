@@ -39,10 +39,10 @@ except ImportError:
 class CompositeViews(object):
     implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
-
+    
     # Type metadata
     classProvides(ICachingOperationType)
-
+    
     title = _(u"Cache composite views")
     description = _(u"Composite views (content item views and templates) can "
                     u"include dependencies that are difficult to track in "
@@ -91,10 +91,10 @@ class CompositeViews(object):
 class ContentFeeds(object):
     implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
-
+    
     # Type metadata
     classProvides(ICachingOperationType)
-
+    
     title = _(u"Cache content feeds")
     description = _(u"Content feeds can change so we cache these in the "
                     u"browser but expire immediately and enable ETag "
@@ -105,7 +105,7 @@ class ContentFeeds(object):
     
     # Fallback option values
     etags = ('userid', 'catalogCounter', 'language', 'gzip', 'skin')
-
+    
     def __init__(self, published, request):
         self.published = published
         self.request = request
@@ -142,10 +142,10 @@ class ContentFeeds(object):
 class ContentFeedsWithProxy(object):
     implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
-
+    
     # Type metadata
     classProvides(ICachingOperationType)
-
+    
     title = _(u"Cache content feeds with proxy")
     description = _(u"Content feeds can change so we cache these in the "
                     u"browser but expire immediately and enable ETag "
@@ -160,7 +160,7 @@ class ContentFeedsWithProxy(object):
     etags = ('userid', 'catalogCounter', 'language', 'gzip', 'skin')
     smaxage = 86400
     vary = None
-
+    
     def __init__(self, published, request):
         self.published = published
         self.request = request
@@ -200,10 +200,10 @@ class ContentFeedsWithProxy(object):
 class Downloads(object):
     implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
-
+    
     # Type metadata
     classProvides(ICachingOperationType)
-
+    
     title = _(u"Cache downloads")
     description = _(u"Downloads (like File and Image content items) can "
                     u"change so we cache these in the browser but expire "
@@ -228,10 +228,10 @@ class Downloads(object):
 class DownloadsWithProxy(object):
     implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
-
+    
     # Type metadata
     classProvides(ICachingOperationType)
-
+    
     title = _(u"Cache downloads with proxy")
     description = _(u"Downloads (like File and Image content items) can "
                     u"change so we cache these in the browser but expire "
@@ -273,10 +273,10 @@ class DownloadsWithProxy(object):
 class Resources(object):
     implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
-
+    
     # Type metadata
     classProvides(ICachingOperationType)
-
+    
     title = _(u"Cache resources")
     description = _(u"Standard resources (like skin images and filesystem "
                     u"resources) don't change often so it's often safe to "
@@ -288,7 +288,7 @@ class Resources(object):
     # Fallback option values
     maxage = 86400
     vary = None
-
+    
     def __init__(self, published, request):
         self.published = published
         self.request = request
@@ -313,10 +313,10 @@ class Resources(object):
 class StableResources(object):
     implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
-
+    
     # Type metadata
     classProvides(ICachingOperationType)
-
+    
     title = _(u"Cache stable resources")
     description = _(u"Stable resources (like ResourceRegistry-maintained "
                     u"css and js files) never change without changing their "
@@ -330,7 +330,7 @@ class StableResources(object):
     maxage = 31536000
     etags = ()
     vary = None
-
+    
     def __init__(self, published, request):
         self.published = published
         self.request = request
@@ -366,7 +366,7 @@ if HAVE_RESOURCE_REGISTRIES:
         """
         
         adapts(ICookedFile, IHTTPRequest)
-
+        
         def modifyResponse(self, rulename, response):
             registry = getContext(self.published, IResourceRegistry)
             
