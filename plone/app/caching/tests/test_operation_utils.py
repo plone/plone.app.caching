@@ -246,8 +246,9 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEquals(None, response.getHeader('ETag', literal=1))
         self.assertEquals(None, response.getHeader('Vary'))
         
-        expires = dateutil.parser.parse(response.getHeader('Expires'))
-        self.failUnless(now > expires)
+        timedelta = dateutil.parser.parse(response.getHeader('Expires')) - now
+        self.failIf(timedelta < datetime.timedelta(seconds=59))
+        self.failIf(timedelta > datetime.timedelta(seconds=60))
     
     def test_cacheInBrowserAndProxy_full(self):
         from plone.app.caching.operations.utils import cacheInBrowserAndProxy
@@ -271,8 +272,9 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEquals('|foo|bar|', response.getHeader('ETag', literal=1))
         self.assertEquals('Accept-Language', response.getHeader('Vary'))
         
-        expires = dateutil.parser.parse(response.getHeader('Expires'))
-        self.failUnless(now > expires)
+        timedelta = dateutil.parser.parse(response.getHeader('Expires')) - now
+        self.failIf(timedelta < datetime.timedelta(seconds=59))
+        self.failIf(timedelta > datetime.timedelta(seconds=60))
     
     
     # cacheInRAM()
