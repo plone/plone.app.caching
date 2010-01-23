@@ -261,7 +261,7 @@ def isModified(request, etag=None, lastModified=None):
         try:
             # browser only knows the date to one second resolution
             if (lastModified - ifModifiedSince) > datetime.timedelta(seconds=1):
-                return true
+                return True
         except TypeError:
             logger.exception("Could not compare dates")
         
