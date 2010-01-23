@@ -260,7 +260,8 @@ def isModified(request, etag=None, lastModified=None):
         # has content been modified since the if-modified-since time?
         try:
             # browser only knows the date to one second resolution
-            return (lastModified - ifModifiedSince) > datetime.timedelta(seconds=1)
+            if (lastModified - ifModifiedSince) > datetime.timedelta(seconds=1):
+                return true
         except TypeError:
             logger.exception("Could not compare dates")
         
