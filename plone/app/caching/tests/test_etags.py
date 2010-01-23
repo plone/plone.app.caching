@@ -1,8 +1,9 @@
 import unittest
 import zope.component.testing
 
+import time
 from datetime import datetime
-from dateutil.tz import tzutc
+from dateutil.tz import tzlocal
 from StringIO import StringIO
 
 from zope.interface import implements
@@ -335,6 +336,9 @@ class TestETags(unittest.TestCase):
     def test_LastModified(self):
         from plone.app.caching.operations.etags import LastModified
         
+        mod = datetime(2010, 1, 2, 3, 4, 5, 6, tzlocal())
+        utcStamp = time.mktime(mod.utctimetuple())
+        
         class DummyLastModified(object):
             implements(ILastModified)
             adapts(DummyPublished)
@@ -343,7 +347,7 @@ class TestETags(unittest.TestCase):
                 self.context = context
             
             def __call__(self):
-                return datetime(2010, 1, 2, 3, 4, 5, 6, tzutc())
+                return mod
         
         provideAdapter(DummyLastModified)
         
@@ -353,8 +357,7 @@ class TestETags(unittest.TestCase):
         published = DummyPublished(DummyContext())
         
         etag = LastModified(published, request)
-        
-        self.assertEquals('1262372645.0', etag())
+        self.assertEquals(str(utcStamp), etag())
     
     # CatalogCounter
     

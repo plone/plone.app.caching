@@ -53,8 +53,13 @@ class TestLastModified(unittest.TestCase):
         zpt = ZopePageTemplate('zpt').__of__(d)
         self.assertEquals(None, ILastModified(zpt)())
         
-        mod = datetime.datetime(2001, 4, 19, 12, 25, 21, 120000, tzinfo=tzlocal())
-        d._p_mtime = 987654321.12 # datetime(2001, 4, 19, 12, 25, 21, 120000)
+        
+        timestamp = 987654321.0 # time stamp (in UTC)
+        # equivalent in local time, which is what the last-modified adapter
+        # should return
+        mod = datetime.datetime.fromtimestamp(timestamp, tzlocal())
+        
+        d._p_mtime = 987654321.0
         self.assertEquals(mod, ILastModified(zpt)())
     
     def test_OFSFileLastModified_File(self):
@@ -63,9 +68,12 @@ class TestLastModified(unittest.TestCase):
         dummy = File('dummy', 'Dummy', 'data')
         self.assertEquals(None, ILastModified(dummy)())
         
-        timestamp = 987654321.0
-        mod = datetime.datetime(2001, 4, 19, 12, 25, 21, tzinfo=tzlocal())
-        ts = TimeStamp(*time.gmtime(timestamp)[:6])
+        timestamp = 987654321.0 # time stamp (in UTC)
+        ts = TimeStamp(*time.gmtime(timestamp)[:6]) # corresponding TimeStamp
+        
+        # equivalent in local time, which is what the last-modified adapter
+        # should return
+        mod = datetime.datetime.fromtimestamp(timestamp, tzlocal())
         
         dummy._p_jar = FauxDataManager()
         dummy._p_serial = repr(ts)
@@ -77,9 +85,12 @@ class TestLastModified(unittest.TestCase):
         dummy = Image('dummy', 'Dummy', 'data')
         self.assertEquals(None, ILastModified(dummy)())
         
-        timestamp = 987654321.0
-        mod = datetime.datetime(2001, 4, 19, 12, 25, 21, tzinfo=tzlocal())
-        ts = TimeStamp(*time.gmtime(timestamp)[:6])
+        timestamp = 987654321.0 # time stamp (in UTC)
+        ts = TimeStamp(*time.gmtime(timestamp)[:6]) # corresponding TimeStamp
+        
+        # equivalent in local time, which is what the last-modified adapter
+        # should return
+        mod = datetime.datetime.fromtimestamp(timestamp, tzlocal())
         
         dummy._p_jar = FauxDataManager()
         dummy._p_serial = repr(ts)

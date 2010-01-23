@@ -138,7 +138,7 @@ class LastModified(object):
         lastModified = getLastModified(self.published)
         if lastModified is None:
             return None
-        return str(time.mktime(lastModified.timetuple()))
+        return str(time.mktime(lastModified.utctimetuple()))
 
 class CatalogCounter(object):
     """The ``catalogCounter`` etag component, returning a counter which is
