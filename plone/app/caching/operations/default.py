@@ -375,4 +375,4 @@ if HAVE_RESOURCE_REGISTRIES:
                     doNotCache(self.published, self.request, response)
                     return
             
-            super(ResourceRegistriesStableResources, self).__call__(rulename, response)
+            super(ResourceRegistriesStableResources, self).modifyResponse(rulename, response)
