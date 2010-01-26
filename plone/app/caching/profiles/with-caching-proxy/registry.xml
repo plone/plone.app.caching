@@ -18,6 +18,7 @@
           <title>ETags</title>
           <description>A list of ETag component names to include</description>
           <value_type type="plone.registry.field.ASCIILine" />
+          <required>False</required>
       </field>
       <value>
           <element>userid</element>
@@ -32,6 +33,7 @@
       <field type="plone.registry.field.Bool">
           <title>RAM cache</title>
           <description>Turn on caching in Zope memory</description>
+          <required>False</required>
       </field>
       <value>True</value>
   </record>
@@ -43,6 +45,7 @@
           <title>ETags</title>
           <description>A list of ETag component names to include</description>
           <value_type type="plone.registry.field.ASCIILine" />
+          <required>False</required>
       </field>
       <value>
           <element>userid</element>
@@ -57,6 +60,7 @@
       <field type="plone.registry.field.Bool">
           <title>RAM cache</title>
           <description>Turn on caching in Zope memory</description>
+          <required>False</required>
       </field>
       <value>True</value>
   </record>
@@ -67,6 +71,7 @@
       <field type="plone.registry.field.Int">
           <title>Shared maximum age</title>
           <description>Time (in seconds) to cache the response in the caching proxy. Leave blank to use value from "Maximum age" field.</description>
+          <required>False</required>
       </field>
       <value>86400</value>
   </record>
@@ -75,6 +80,7 @@
           <title>ETags</title>
           <description>A list of ETag component names to include</description>
           <value_type type="plone.registry.field.ASCIILine" />
+          <required>False</required>
       </field>
       <value>
           <element>userid</element>
@@ -88,6 +94,7 @@
       <field type="plone.registry.field.Bool">
           <title>RAM cache</title>
           <description>Turn on caching in Zope memory</description>
+          <required>False</required>
       </field>
       <value>True</value>
   </record>
@@ -98,6 +105,7 @@
       <field type="plone.registry.field.Int">
           <title>Shared maximum age</title>
           <description>Time (in seconds) to cache the response in the caching proxy. Leave blank to use value from "Maximum age" field.</description>
+          <required>False</required>
       </field>
       <value>86400</value>
   </record>
@@ -105,6 +113,7 @@
       <field type="plone.registry.field.Bool">
           <title>Last-modified validation</title>
           <description>Turn on Last-Modified headers</description>
+          <required>False</required>
       </field>
       <value>True</value>
   </record>
@@ -115,6 +124,7 @@
       <field type="plone.registry.field.Int">
           <title>Maximum age</title>
           <description>Time (in seconds) to cache the response in the browser or caching proxy</description>
+          <required>False</required>
       </field>
       <value>86400</value>
   </record>
@@ -122,6 +132,7 @@
       <field type="plone.registry.field.Bool">
           <title>Last-modified validation</title>
           <description>Turn on Last-Modified headers</description>
+          <required>False</required>
       </field>
       <value>True</value>
   </record>
@@ -132,6 +143,7 @@
       <field type="plone.registry.field.Int">
           <title>Maximum age</title>
           <description>Time (in seconds) to cache the response in the browser or caching proxy</description>
+          <required>False</required>
       </field>
       <value>31536000</value>
   </record>
@@ -139,6 +151,7 @@
       <field type="plone.registry.field.Bool">
           <title>Last-modified validation</title>
           <description>Turn on Last-Modified headers</description>
+          <required>False</required>
       </field>
       <value>True</value>
   </record>
