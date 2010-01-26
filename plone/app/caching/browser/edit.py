@@ -207,7 +207,7 @@ class EditForm(form.Form):
     @property
     def title(self):
         if self.rulesetName:
-            return _(u"Edit ${operation} options for ruleset ${ruleset}",
+            return _(u"Edit ${operation} options for Ruleset: ${ruleset}",
                         mapping={'operation': self.operation.title,
                                  'ruleset': self.ruleset.title})
         else:
