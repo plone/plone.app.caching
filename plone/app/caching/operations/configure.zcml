@@ -9,32 +9,27 @@
     <!-- Caching operations 
          ~~~~~~~~~~~~~~~~~~ -->
     
-    <adapter   factory=".default.CompositeViews"        name="plone.app.caching.compositeviews" />
-    <utility component=".default.CompositeViews"        name="plone.app.caching.compositeviews" />
+    <adapter   factory=".default.StrongCaching"         name="plone.app.caching.strongCaching" />
+    <utility component=".default.StrongCaching"         name="plone.app.caching.strongCaching" />
 
-    <adapter   factory=".default.ContentFeeds"          name="plone.app.caching.contentfeeds" />
-    <utility component=".default.ContentFeeds"          name="plone.app.caching.contentfeeds" />
+    <adapter   factory=".default.ModerateCaching"       name="plone.app.caching.moderateCaching" />
+    <utility component=".default.ModerateCaching"       name="plone.app.caching.moderateCaching" />
 
-    <adapter   factory=".default.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
-    <utility component=".default.ContentFeedsWithProxy" name="plone.app.caching.contentfeedswithproxy" />
+    <adapter   factory=".default.WeakCaching"           name="plone.app.caching.weakCaching" />
+    <utility component=".default.WeakCaching"           name="plone.app.caching.weakCaching" />
 
-    <adapter   factory=".default.Downloads"             name="plone.app.caching.downloads" />
-    <utility component=".default.Downloads"             name="plone.app.caching.downloads" />
+    <adapter   factory=".default.NoCaching"             name="plone.app.caching.noCaching" />
+    <utility component=".default.NoCaching"             name="plone.app.caching.noCaching" />
 
-    <adapter   factory=".default.DownloadsWithProxy"    name="plone.app.caching.downloadswithproxy" />
-    <utility component=".default.DownloadsWithProxy"    name="plone.app.caching.downloadswithproxy" />
+    <adapter   factory=".default.BaseCaching"           name="plone.app.caching.baseCaching" />
+    <utility component=".default.BaseCaching"           name="plone.app.caching.baseCaching" />
 
-    <adapter   factory=".default.Resources"             name="plone.app.caching.resources" />
-    <utility component=".default.Resources"             name="plone.app.caching.resources" />
-
-    <adapter   factory=".default.StableResources"       name="plone.app.caching.stableresources" />
-    <utility component=".default.StableResources"       name="plone.app.caching.stableresources" />
     
     <!-- Special handling for content in Plone's ResourceRegistries, if installed -->
     <adapter
         zcml:condition="installed Products.ResourceRegistries"
-        factory=".default.ResourceRegistriesStableResources"
-        name="plone.app.caching.stableresources"
+        factory=".default.ResourceRegistriesCaching"
+        name="plone.app.caching.strongCaching"
         />
     
     <!-- RAM cache storage: a transformation at the very end of the chain -->

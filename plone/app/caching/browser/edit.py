@@ -27,7 +27,7 @@ class EditForm(form.Form):
     settings for an operation, or to edit "ruleset-specific" overrides. The
     latter mode is invoked when ``rulesetName`` and ``ruleset`` are set.
     
-    The form fields are built form the records in registry corresponding to
+    The form fields are built from the records in registry corresponding to
     the operation's ``options`` list, taking the ``prefix`` into account.
     See ``plone.caching`` for a detailed explanation of how the naming scheme
     works.
@@ -49,7 +49,7 @@ class EditForm(form.Form):
     
     The ``cloneField()`` method takes care of this for us.
     
-    Once the fields have been set up, the form operations on a dictionrary
+    Once the fields have been set up, the form operations on a dictionary
     context (as returned by ``getContent()``), where the keys are the record
     names.
     """

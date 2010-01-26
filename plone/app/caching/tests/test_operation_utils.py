@@ -241,7 +241,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInBrowserAndProxy(published, request, response, maxage=60)
         
         self.assertEquals(200, response.getStatus())
-        self.assertEquals('max-age=60, must-revalidate, public', response.getHeader('Cache-Control'))
+        self.assertEquals('max-age=60, proxy-revalidate, public', response.getHeader('Cache-Control'))
         self.assertEquals(None, response.getHeader('Last-Modified'))
         self.assertEquals(None, response.getHeader('ETag', literal=1))
         self.assertEquals(None, response.getHeader('Vary'))
@@ -267,7 +267,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInBrowserAndProxy(published, request, response, maxage=60, etag=etag, lastModified=now, vary=vary)
         
         self.assertEquals(200, response.getStatus())
-        self.assertEquals('max-age=60, must-revalidate, public', response.getHeader('Cache-Control'))
+        self.assertEquals('max-age=60, proxy-revalidate, public', response.getHeader('Cache-Control'))
         self.assertEquals(nowFormatted, response.getHeader('Last-Modified'))
         self.assertEquals('|foo|bar|', response.getHeader('ETag', literal=1))
         self.assertEquals('Accept-Language', response.getHeader('Vary'))
@@ -319,7 +319,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInRAM(published, request, response, etag=etag)
         
         annotations = IAnnotations(request)
-        self.assertEquals("|foo|bar|||/foo?", annotations[PAGE_CACHE_ANNOTATION_KEY])
+        self.assertEquals("||foo|bar|||/foo?", annotations[PAGE_CACHE_ANNOTATION_KEY])
         self.failUnless(IRAMCached.providedBy(request))
     
     def test_cacheInRAM_etag_alternate_key(self):
@@ -340,7 +340,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInRAM(published, request, response, etag=etag, annotationsKey="alt.key")
         
         annotations = IAnnotations(request)
-        self.assertEquals("|foo|bar|||/foo?", annotations["alt.key"])
+        self.assertEquals("||foo|bar|||/foo?", annotations["alt.key"])
         self.failUnless(IRAMCached.providedBy(request))
         
 
@@ -1203,7 +1203,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = 'x=1&y=2'
         
-        self.assertEquals('|foo|bar||/foo/bar?x=1&y=2', getRAMCacheKey(request, etag="|foo|bar"))
+        self.assertEquals('||foo|bar||/foo/bar?x=1&y=2', getRAMCacheKey(request, etag="|foo|bar"))
     
     
     # storeResponseInRAMCache()
@@ -1413,7 +1413,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['|a|b||/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        cache['||a|b||/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
         
         self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'),
                           fetchFromRAMCache(request, etag="|a|b"))

@@ -2,13 +2,146 @@
 
   <record name="plone.caching.interfaces.ICacheSettings.operationMapping">
     <value purge="False">
-      <element key="plone.resource">plone.app.caching.resources</element>
-      <element key="plone.stableResource">plone.app.caching.stableresources</element>
-      <element key="plone.content.itemView">plone.app.caching.compositeviews</element>
-      <element key="plone.content.feed">plone.app.caching.contentfeedswithproxy</element>
-      <element key="plone.content.folderView">plone.app.caching.compositeviews</element>
-      <element key="plone.download">plone.app.caching.downloadswithproxy</element>
+      <element key="plone.resource">plone.app.caching.strongCaching</element>
+      <element key="plone.stableResource">plone.app.caching.strongCaching</element>
+      <element key="plone.content.itemView">plone.app.caching.weakCaching</element>
+      <element key="plone.content.feed">plone.app.caching.moderateCaching</element>
+      <element key="plone.content.folderView">plone.app.caching.weakCaching</element>
+      <element key="plone.download">plone.app.caching.moderateCaching</element>
     </value>
   </record>
+
+
+  <!-- plone.content.itemView -->
+  <record name="plone.app.caching.weakCaching.plone.content.itemView.etags">
+      <field type="plone.registry.field.Tuple">
+          <title>ETags</title>
+          <description>A list of ETag component names to include</description>
+          <value_type type="plone.registry.field.ASCIILine" />
+      </field>
+      <value>
+          <element>userid</element>
+          <element>catalogCounter</element>
+          <element>language</element>
+          <element>gzip</element>
+          <element>skin</element>
+          <element>locked</element>
+      </value>
+  </record>
+  <record name="plone.app.caching.weakCaching.plone.content.itemView.ramCache">
+      <field type="plone.registry.field.Bool">
+          <title>RAM cache</title>
+          <description>Turn on caching in Zope memory</description>
+      </field>
+      <value>True</value>
+  </record>
+
+
+  <!-- plone.content.folderView -->
+  <record name="plone.app.caching.weakCaching.plone.content.folderView.etags">
+      <field type="plone.registry.field.Tuple">
+          <title>ETags</title>
+          <description>A list of ETag component names to include</description>
+          <value_type type="plone.registry.field.ASCIILine" />
+      </field>
+      <value>
+          <element>userid</element>
+          <element>catalogCounter</element>
+          <element>language</element>
+          <element>gzip</element>
+          <element>skin</element>
+          <element>locked</element>
+      </value>
+  </record>
+  <record name="plone.app.caching.weakCaching.plone.content.folderView.ramCache">
+      <field type="plone.registry.field.Bool">
+          <title>RAM cache</title>
+          <description>Turn on caching in Zope memory</description>
+      </field>
+      <value>True</value>
+  </record>
+
+
+  <!-- plone.content.feed -->
+  <record name="plone.app.caching.moderateCaching.plone.content.feed.smaxage">
+      <field type="plone.registry.field.Int">
+          <title>Shared maximum age</title>
+          <description>Time (in seconds) to cache the response in the caching proxy. Leave blank to use value from "Maximum age" field.</description>
+      </field>
+      <value>86400</value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.feed.etags">
+      <field type="plone.registry.field.Tuple">
+          <title>ETags</title>
+          <description>A list of ETag component names to include</description>
+          <value_type type="plone.registry.field.ASCIILine" />
+      </field>
+      <value>
+          <element>userid</element>
+          <element>catalogCounter</element>
+          <element>language</element>
+          <element>gzip</element>
+          <element>skin</element>
+      </value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.feed.ramCache">
+      <field type="plone.registry.field.Bool">
+          <title>RAM cache</title>
+          <description>Turn on caching in Zope memory</description>
+      </field>
+      <value>True</value>
+  </record>
+
+
+  <!-- plone.download -->
+  <record name="plone.app.caching.moderateCaching.plone.download.smaxage">
+      <field type="plone.registry.field.Int">
+          <title>Shared maximum age</title>
+          <description>Time (in seconds) to cache the response in the caching proxy. Leave blank to use value from "Maximum age" field.</description>
+      </field>
+      <value>86400</value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.download.lastModified">
+      <field type="plone.registry.field.Bool">
+          <title>Last-modified validation</title>
+          <description>Turn on Last-Modified headers</description>
+      </field>
+      <value>True</value>
+  </record>
+
+
+  <!-- plone.resource-->
+  <record name="plone.app.caching.strongCaching.plone.resource.maxage">
+      <field type="plone.registry.field.Int">
+          <title>Maximum age</title>
+          <description>Time (in seconds) to cache the response in the browser or caching proxy</description>
+      </field>
+      <value>86400</value>
+  </record>
+  <record name="plone.app.caching.strongCaching.plone.resource.lastModified">
+      <field type="plone.registry.field.Bool">
+          <title>Last-modified validation</title>
+          <description>Turn on Last-Modified headers</description>
+      </field>
+      <value>True</value>
+  </record>
+
+
+  <!-- plone.stableResource-->
+  <record name="plone.app.caching.strongCaching.plone.stableResource.maxage">
+      <field type="plone.registry.field.Int">
+          <title>Maximum age</title>
+          <description>Time (in seconds) to cache the response in the browser or caching proxy</description>
+      </field>
+      <value>31536000</value>
+  </record>
+  <record name="plone.app.caching.strongCaching.plone.resource.lastModified">
+      <field type="plone.registry.field.Bool">
+          <title>Last-modified validation</title>
+          <description>Turn on Last-Modified headers</description>
+      </field>
+      <value>True</value>
+  </record>
+
 
 </registry>

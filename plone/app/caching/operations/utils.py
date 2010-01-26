@@ -48,6 +48,31 @@ etagNoQuote = re.compile('(\s*(W\/)?([^,]*)\s*,?)')
 # as any additional keyword parameters required.
 # 
 
+def setCacheHeaders(published, request, response, maxage=None, smaxage=None, etag=None, lastModified=None, vary=None):
+    """General purpose dispatcher to set various cache headers 
+    
+    ``maxage`` is the cache timeout value in seconds
+    ``smaxage`` is the proxy cache timeout value in seconds.
+    ``lastModified`` is a datetime object for the last modified time
+    ``etag`` is an etag string
+    ``vary`` is a vary header string
+    """
+    
+    if maxage:
+        cacheInBrowserAndProxy(published, request, response, maxage, smaxage=smaxage,
+            etag=etag, lastModified=lastModified, vary=vary)
+        
+    elif smaxage:
+        cacheInProxy(published, request, response, smaxage, 
+            etag=etag, lastModified=lastModified, vary=vary)
+        
+    elif etag or lastModified:
+        cacheInBrowser(published, request, response, 
+            etag=etag, lastModified=lastModified)
+        
+    else:
+        doNotCache(published, request, response)
+
 def doNotCache(published, request, response):
     """Set response headers to ensure that the response is not cached by
     web browsers or caching proxies.
@@ -86,7 +111,7 @@ def cacheInBrowser(published, request, response, etag=None, lastModified=None):
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, must-revalidate, private')
 
-def cacheInProxy(published, request, response, smaxage, lastModified=None, etag=None, vary=None):
+def cacheInProxy(published, request, response, smaxage, etag=None, lastModified=None, vary=None):
     """Set headers to cache the response in a caching proxy.
     
     ``smaxage`` is the timeout value in seconds.
@@ -109,11 +134,12 @@ def cacheInProxy(published, request, response, smaxage, lastModified=None, etag=
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, s-maxage=%d, must-revalidate' % smaxage)
 
-def cacheInBrowserAndProxy(published, request, response, maxage, lastModified=None, etag=None, vary=None):
+def cacheInBrowserAndProxy(published, request, response, maxage, smaxage=None, etag=None, lastModified=None, vary=None):
     """Set headers to cache the response in the browser and caching proxy if
     applicable.
     
     ``maxage`` is the timeout value in seconds
+    ``smaxage`` is the proxy timeout value in seconds
     ``lastModified`` is a datetime object for the last modified time
     ``etag`` is an etag string
     ``vary`` is a vary header string
@@ -131,9 +157,15 @@ def cacheInBrowserAndProxy(published, request, response, maxage, lastModified=No
         response.setHeader('Vary', vary)
     
     response.setHeader('Expires', formatDateTime(getExpiration(maxage)))
-    response.setHeader('Cache-Control', 'max-age=%s, must-revalidate, public' % maxage)
+    
+    if smaxage is not None:
+        maxage = '%s, s-maxage=%s' %(maxage, smaxage)
+    
+    # Substituting proxy-validate in place of must=revalidate here because of Safari bug
+    # https://bugs.webkit.org/show_bug.cgi?id=13128
+    response.setHeader('Cache-Control', 'max-age=%s, proxy-revalidate, public' % maxage)
 
-def cacheInRAM(published, request, response, etag=None, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
+def cacheInRAM(published, request, response, etag=None, lastModified=None, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
     """Set a flag indicating that the response for the given request
     should be cached in RAM.
     
@@ -156,7 +188,7 @@ def cacheInRAM(published, request, response, etag=None, annotationsKey=PAGE_CACH
     if annotations is None:
         return None
     
-    key = getRAMCacheKey(request, etag=etag)
+    key = getRAMCacheKey(request, etag=etag, lastModified=lastModified)
     
     annotations[annotationsKey] = key
     alsoProvides(request, IRAMCached)
@@ -222,6 +254,9 @@ def isModified(request, etag=None, lastModified=None):
     ``lastModified`` is the current last-modified datetime, to be checked
     against the If-Modified-Since header.
     """
+    
+    if not etag and not lastModified:
+        return True
     
     ifModifiedSince = request.getHeader('If-Modified-Since', None)
     ifNoneMatch = request.getHeader('If-None-Match', None)
@@ -351,10 +386,13 @@ def parseDateTime(str):
     
     return dt
 
-def getLastModifiedAnnotation(published, request):
+def getLastModifiedAnnotation(published, request, lastModified=True):
     """Try to get the last modified date from a request annotation if available,
     otherwise try to get it from published object
     """
+    
+    if not lastModified:
+        return None
     
     annotations = IAnnotations(request, None)
     if annotations is not None:
@@ -362,19 +400,22 @@ def getLastModifiedAnnotation(published, request):
         if dt is not _marker:
             return dt
     
-    dt = getLastModified(published)
+    dt = getLastModified(published, lastModified=lastModified)
     
     if annotations is not None:
         annotations[LASTMODIFIED_ANNOTATION_KEY] = dt
     
     return dt
 
-def getLastModified(published):
+def getLastModified(published, lastModified=True):
     """Get a last modified date or None.
     
     If an ``ILastModified`` adapter can be found, and returns a date that is
     not timezone aware, assume it is local time and add timezone.
     """
+    
+    if not lastModified:
+        return None
     
     lastModified = ILastModified(published, None)
     if lastModified is None:
@@ -409,13 +450,16 @@ def getETagAnnotation(published, request, keys=(), extraTokens=()):
     otherwise try to get it from published object
     """
     
+    if not keys and not extraTokens:
+        return None
+    
     annotations = IAnnotations(request, None)
     if annotations is not None:
         etag = annotations.get(ETAG_ANNOTATION_KEY, _marker)
         if etag is not _marker:
             return etag
     
-    etag = getETag(published, request, keys, extraTokens)
+    etag = getETag(published, request, keys=keys, extraTokens=extraTokens)
     
     if annotations is not None:
         annotations[ETAG_ANNOTATION_KEY] = etag
@@ -434,6 +478,9 @@ def getETag(published, request, keys=(), extraTokens=()):
     
     All tokens will be concatenated into an ETag string, separated by pipes.
     """
+    
+    if not keys and not extraTokens:
+        return None
     
     tokens = []
     noTokens = True
@@ -529,16 +576,25 @@ def getRAMCache(globalKey=PAGE_CACHE_KEY):
     
     return chooser(globalKey)
 
-def getRAMCacheKey(request, etag=None):
+def getRAMCacheKey(request, etag=None, lastModified=None):
     """Calculate the cache key for pages cached in RAM.
     
-    ``etag`` is a unique etag string. The cache key is a combination of the
-    resource's path and the etag.
+    ``etag`` is a unique etag string. 
+    
+    ``lastModified`` is a datetime object giving the last=modified
+     date for the resource.
+    
+    The cache key is a combination of the resource's path, the etag,
+    and the last-modified date. Both the etag and last=modified are
+    optional but in most cases that are worth caching in RAM, the etag
+    is needed to ensure the key changes when the resource view changes.
     """
     
     resourceKey = request.get('PATH_INFO', '') + '?' + request.get('QUERY_STRING', '')
     if etag:
-        resourceKey = etag + '||' + resourceKey
+        resourceKey = '|' + etag + '||' + resourceKey
+    if lastModified:
+        resourceKey = '|' + str(lastModified) + '||' + resourceKey
     return resourceKey
 
 def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
@@ -572,13 +628,19 @@ def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY,
     
     cache[key] = (status, headers, result, gzipFlag)
 
-def fetchFromRAMCache(request, etag=None, globalKey=PAGE_CACHE_KEY, default=None):
+def fetchFromRAMCache(request, etag=None, lastModified=None, globalKey=PAGE_CACHE_KEY, default=None):
     """Return a page cached in RAM, or None if it cannot be found.
     
     The return value is a tuple as stored by ``storeResponseInRAMCache()``.
     
-    ``etag`` is an ETag for the content, and is used as a basis for the
-    cache key.
+    ``etag`` is an ETag for the content, and is usually used as a basis for
+    the cache key.
+    
+    ``lastModified`` is the last modified date for the content, which can
+    potentially be used instead of etag if sufficient to ensure freshness.
+    Perhaps a rare occurance but it's here in case someone needs it.
+    Do not use this to cache binary responses (like images and file downloads)
+    as Zope already caches most of the payload of these.
     
     ``globalKey`` is the global cache key. This needs to be the same key
     as the one used to store the data, i.e. it must correspond to the one
@@ -589,7 +651,7 @@ def fetchFromRAMCache(request, etag=None, globalKey=PAGE_CACHE_KEY, default=None
     if cache is None:
         return None
     
-    key = getRAMCacheKey(request, etag=etag)
+    key = getRAMCacheKey(request, etag=etag, lastModified=lastModified)
     if key is None:
         return None
     

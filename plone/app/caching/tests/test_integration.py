@@ -18,7 +18,7 @@ from zope.component import getUtility
 
 from zope.globalrequest import setRequest
 
-from z3c.caching.interfaces import ILastModified
+#from z3c.caching.interfaces import ILastModified
 
 from plone.registry.interfaces import IRegistry
 from plone.caching.interfaces import ICacheSettings
@@ -28,22 +28,6 @@ from plone.app.caching.interfaces import IPloneCacheSettings
 
 TEST_IMAGE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
 TEST_FILE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
-
-# XXX For truer integration testing, maybe should we load up the actual profile instead
-PROFILE_WITHOUT_PROXY = {
-    'plone.resource': 'plone.app.caching.resources',
-    'plone.stableResource': 'plone.app.caching.stableresources',
-    'plone.content.itemView': 'plone.app.caching.compositeviews',
-    'plone.content.feed': 'plone.app.caching.contentfeeds',
-    'plone.content.folderView': 'plone.app.caching.compositeviews',
-    'plone.download': 'plone.app.caching.downloads'}
-PROFILE_WITH_PROXY = {
-    'plone.resource': 'plone.app.caching.resources',
-    'plone.stableResource': 'plone.app.caching.stableresources',
-    'plone.content.itemView': 'plone.app.caching.compositeviews',
-    'plone.content.feed': 'plone.app.caching.contentfeedswithproxy',
-    'plone.content.folderView': 'plone.app.caching.compositeviews',
-    'plone.download': 'plone.app.caching.downloadswithproxy'}
 
 
 class TestOperations(FunctionalTestCase):
@@ -72,6 +56,8 @@ class TestOperations(FunctionalTestCase):
     
     def afterSetUp(self):
         setRequest(self.portal.REQUEST)
+        self.addProfile('plone.app.caching:without-caching-proxy')
+        
         self.registry = getUtility(IRegistry)
         
         self.cacheSettings = self.registry.forInterface(ICacheSettings)
@@ -214,7 +200,6 @@ class TestOperations(FunctionalTestCase):
     
     def test_composite_views(self):
         self.cacheSettings.enabled = True
-        self.cacheSettings.operationMapping = PROFILE_WITHOUT_PROXY
         
         self.setRoles(('Manager',))
         testText = "Testing... body one"
@@ -253,7 +238,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
         browser.open(self.portal['f1'].absolute_url())
         self.assertEquals('plone.content.folderView', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.compositeviews', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         self.assertEquals('|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'])
@@ -265,7 +250,7 @@ class TestOperations(FunctionalTestCase):
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.failUnless(testText in browser.contents)
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.compositeviews', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         self.assertEquals('|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'])
@@ -276,7 +261,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.compositeviews', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # Authenticated should NOT be RAM cached
         self.assertEquals(None, browser.headers.get('X-RAMCache'))
         
@@ -295,7 +280,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal['f1'].absolute_url())
         self.assertEquals('plone.content.folderView', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.compositeviews', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         self.assertEquals('||51||0|Sunburst Theme|0', browser.headers['ETag'])
@@ -305,7 +290,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.compositeviews', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         self.failUnless(testText in browser.contents)
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
@@ -317,7 +302,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.compositeviews', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should come from RAM cache
         self.assertEquals('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.failUnless(testText in browser.contents)
@@ -332,7 +317,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.compositeviews', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
@@ -347,14 +332,13 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.compositeviews', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # The etag has changed so we should get a fresh page.
         self.assertEquals(None, browser.headers.get('X-RAMCache'))
         self.assertEquals('200 Ok', browser.headers['Status'])
     
     def test_content_feeds(self):
         self.cacheSettings.enabled = True
-        self.cacheSettings.operationMapping = PROFILE_WITHOUT_PROXY
         
         self.setRoles(('Manager',))
         
@@ -369,7 +353,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.contentfeeds', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         self.assertEquals('||40||0|Sunburst Theme', browser.headers['ETag'])
@@ -380,7 +364,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.contentfeeds', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should come from RAM cache
         self.assertEquals('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.assertEquals(rssText, browser.contents)
@@ -395,7 +379,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.contentfeeds', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
@@ -405,7 +389,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.contentfeeds', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         self.assertEquals('|test_user_1_|40||0|Sunburst Theme', browser.headers['ETag'])
@@ -416,13 +400,13 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.contentfeeds', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # Authenticated should NOT be RAM cached
         self.assertEquals(None, browser.headers.get('X-RAMCache'))
     
     def test_content_feeds_proxy(self):
+        self.addProfile('plone.app.caching:with-caching-proxy')
         self.cacheSettings.enabled = True
-        self.cacheSettings.operationMapping = PROFILE_WITH_PROXY
         
         self.setRoles(('Manager',))
         
@@ -437,7 +421,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.contentfeedswithproxy', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInProxy
         self.assertEquals('max-age=0, s-maxage=86400, must-revalidate', browser.headers['Cache-Control'])
         self.assertEquals('||40||0|Sunburst Theme', browser.headers['ETag'])
@@ -448,7 +432,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.contentfeedswithproxy', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should come from the RAM cache
         self.assertEquals('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.assertEquals(rssText, browser.contents)
@@ -463,7 +447,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.contentfeedswithproxy', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
@@ -473,7 +457,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.contentfeedswithproxy', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         self.assertEquals('|test_user_1_|40||0|Sunburst Theme', browser.headers['ETag'])
@@ -484,13 +468,12 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.contentfeedswithproxy', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # Authenticated should NOT be RAM cached
         self.assertEquals(None, browser.headers.get('X-RAMCache'))
     
     def test_downloads(self):
         self.cacheSettings.enabled = True
-        self.cacheSettings.operationMapping = PROFILE_WITHOUT_PROXY
         
         self.setRoles(('Manager',))
         
@@ -516,7 +499,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal['f1']['i1'].absolute_url())
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.downloads', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         self.failIf(None == browser.headers.get('Last-Modified'))  # remove this when the next line works
@@ -530,7 +513,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('If-Modified-Since', lastmodified)
         browser.open(self.portal['f1']['i1'].absolute_url())
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.downloads', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
@@ -539,7 +522,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal['f1']['i1'].absolute_url() + '/image_preview')
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.downloads', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         self.failIf(None == browser.headers.get('Last-Modified'))  # remove this when the next line works
@@ -547,8 +530,8 @@ class TestOperations(FunctionalTestCase):
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
     
     def test_downloads_proxy(self):
+        self.addProfile('plone.app.caching:with-caching-proxy')
         self.cacheSettings.enabled = True
-        self.cacheSettings.operationMapping = PROFILE_WITH_PROXY
         
         self.setRoles(('Manager',))
         
@@ -572,7 +555,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('Authorization', 'Basic %s:%s' % (portal_owner, default_password,))
         browser.open(self.portal['f1']['i1'].absolute_url())
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.downloadswithproxy', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # Folder not published yet so image should not be cached in proxy
         # so this should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
@@ -585,7 +568,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('Authorization', 'Basic %s:%s' % (portal_owner, default_password,))
         browser.open(self.portal['f1']['i1'].absolute_url() + '/image_preview')
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.downloadswithproxy', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # Folder not published yet so image scale should not be cached in proxy
         # so this should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
@@ -600,7 +583,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal['f1']['i1'].absolute_url())
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.downloadswithproxy', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # Now visible to anonymous so this should use cacheInProxy
         self.assertEquals('max-age=0, s-maxage=86400, must-revalidate', browser.headers['Cache-Control'])
         self.failIf(None == browser.headers.get('Last-Modified'))  # remove this when the next line works
@@ -614,7 +597,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('If-Modified-Since', lastmodified)
         browser.open(self.portal['f1']['i1'].absolute_url())
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.downloadswithproxy', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
@@ -623,7 +606,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal['f1']['i1'].absolute_url() + '/image_preview')
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.downloadswithproxy', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # Now visible to anonymous so this should use cacheInProxy
         self.assertEquals('max-age=0, s-maxage=86400, must-revalidate', browser.headers['Cache-Control'])
         self.failIf(None == browser.headers.get('Last-Modified'))  # remove this when the next line works
@@ -632,7 +615,6 @@ class TestOperations(FunctionalTestCase):
     
     def test_resources(self):
         self.cacheSettings.enabled = True
-        self.cacheSettings.operationMapping = PROFILE_WITHOUT_PROXY
         
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         
@@ -640,9 +622,9 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal.absolute_url() + '/rss.gif')
         self.assertEquals('plone.resource', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.resources', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowserAndProxy
-        self.assertEquals('max-age=86400, must-revalidate, public', browser.headers['Cache-Control'])
+        self.assertEquals('max-age=86400, proxy-revalidate, public', browser.headers['Cache-Control'])
         self.failIf(None == browser.headers.get('Last-Modified'))  # remove this when the next line works
         #self.assertEquals('---lastmodified---', browser.headers['Last-Modified'])
         timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
@@ -655,7 +637,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('If-Modified-Since', lastmodified)
         browser.open(self.portal.absolute_url() + '/rss.gif')
         self.assertEquals('plone.resource', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.resources', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
@@ -668,7 +650,6 @@ class TestOperations(FunctionalTestCase):
     
     def test_stable_resources_resource_registries(self):
         self.cacheSettings.enabled = True
-        self.cacheSettings.operationMapping = PROFILE_WITHOUT_PROXY
         cssregistry = self.portal.portal_css
         
         now = datetime.datetime.now(dateutil.tz.tzlocal())
@@ -677,9 +658,9 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(cssregistry.absolute_url() + '/public.css')
         self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.stableresources', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowserAndProxy
-        self.assertEquals('max-age=31536000, must-revalidate, public', browser.headers['Cache-Control'])
+        self.assertEquals('max-age=31536000, proxy-revalidate, public', browser.headers['Cache-Control'])
         self.failIf(None == browser.headers.get('Last-Modified'))  # remove this when the next line works
         #self.assertEquals('---lastmodified---', browser.headers['Last-Modified'])
         timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
@@ -693,7 +674,7 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('If-Modified-Since', lastmodified)
         browser.open(cssregistry.absolute_url() + '/public.css')
         self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.stableresources', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
@@ -703,7 +684,7 @@ class TestOperations(FunctionalTestCase):
         browser = Browser()
         browser.open(cssregistry.absolute_url() + '/public.css')
         self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.stableresources', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should use doNotCache
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         self.assertEquals(None, browser.headers.get('Last-Modified'))
