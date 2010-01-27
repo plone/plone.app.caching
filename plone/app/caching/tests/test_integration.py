@@ -273,8 +273,8 @@ class TestOperations(FunctionalTestCase):
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal['f1']['d1'].absolute_url())
         # This should be a 304 response
-        self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
+        self.assertEquals('', browser.contents)
         
         # Request the anonymous folder
         browser = Browser()
@@ -319,8 +319,8 @@ class TestOperations(FunctionalTestCase):
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
-        self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
+        self.assertEquals('', browser.contents)
         
         # Edit the page to update the etag
         self.portal['f1']['d1'].setText(testText2)
@@ -381,8 +381,8 @@ class TestOperations(FunctionalTestCase):
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
-        self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
+        self.assertEquals('', browser.contents)
         
         # Request the authenticated rss feed
         browser = Browser()
@@ -449,8 +449,8 @@ class TestOperations(FunctionalTestCase):
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
-        self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
+        self.assertEquals('', browser.contents)
         
         # Request the authenticated rss feed
         browser = Browser()
@@ -515,8 +515,8 @@ class TestOperations(FunctionalTestCase):
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
-        self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
+        self.assertEquals('', browser.contents)
         
         # Request an image scale
         browser = Browser()
@@ -599,8 +599,8 @@ class TestOperations(FunctionalTestCase):
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
-        self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
+        self.assertEquals('', browser.contents)
         
         # Request an image scale
         browser = Browser()
@@ -639,8 +639,8 @@ class TestOperations(FunctionalTestCase):
         self.assertEquals('plone.resource', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
-        self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
+        self.assertEquals('', browser.contents)
     
     def test_stable_resources(self):
         # We don't actually have any non-RR stable resources
@@ -662,7 +662,7 @@ class TestOperations(FunctionalTestCase):
         # This should use cacheInBrowserAndProxy
         self.assertEquals('max-age=31536000, proxy-revalidate, public', browser.headers['Cache-Control'])
         self.failIf(None == browser.headers.get('Last-Modified'))  # remove this when the next line works
-        #self.assertEquals('---lastmodified---', browser.headers['Last-Modified'])
+        # self.assertEquals('---lastmodified---', browser.headers['Last-Modified'])
         timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
         self.failUnless(timedelta > datetime.timedelta(seconds=31535990))
         # self.failUnless(timedelta > datetime.timedelta(seconds=604790))
@@ -676,8 +676,8 @@ class TestOperations(FunctionalTestCase):
         self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
-        self.assertEquals('', browser.contents)
         self.assertEquals('304 Not Modified', browser.headers['Status'])
+        self.assertEquals('', browser.contents)
         
         # Request the ResourceRegistry resource -- with RR in debug mode
         cssregistry.setDebugMode(True)

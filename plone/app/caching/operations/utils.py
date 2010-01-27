@@ -102,11 +102,11 @@ def cacheInBrowser(published, request, response, etag=None, lastModified=None):
     
     if etag is not None:
         response.setHeader('ETag', etag, literal=1)
-        # -> enable 304s
         
     if lastModified is not None:
         response.setHeader('Last-Modified', formatDateTime(lastModified))
-        # -> enable 304s
+    elif response.getHeader('Last-Modified'):
+        del response.headers['last-modified']
     
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, must-revalidate, private')
@@ -122,11 +122,11 @@ def cacheInProxy(published, request, response, smaxage, etag=None, lastModified=
     
     if lastModified is not None:
         response.setHeader('Last-Modified', formatDateTime(lastModified))
-        # -> enable 304s
+    elif response.getHeader('Last-Modified'):
+        del response.headers['last-modified']
     
     if etag is not None:
         response.setHeader('ETag', etag, literal=1)
-        # -> enable 304s
     
     if vary is not None:
         response.setHeader('Vary', vary)
@@ -147,11 +147,11 @@ def cacheInBrowserAndProxy(published, request, response, maxage, smaxage=None, e
     
     if lastModified is not None:
         response.setHeader('Last-Modified', formatDateTime(lastModified))
-        # -> enable 304s
+    elif response.getHeader('Last-Modified'):
+        del response.headers['last-modified']
     
     if etag is not None:
         response.setHeader('ETag', etag, literal=1)
-        # -> enable 304s
     
     if vary is not None:
         response.setHeader('Vary', vary)
