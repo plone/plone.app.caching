@@ -143,10 +143,10 @@ class WeakCaching(BaseCaching):
     """Weak caching operation. A subclass of the generic BaseCaching
     operation to help make the UI approachable by mortals
     """
-        
+    
     # Type metadata
     classProvides(ICachingOperationType)
-
+    
     title = _(u"Weak caching")
     description = _(u"Cache in browser but expire immediately and enable 304 "
                     u"responses on subsequent requests. 304's require configuration "
@@ -156,6 +156,7 @@ class WeakCaching(BaseCaching):
                     u"to construct the ETag header. "
                     u"To also cache public responses in Zope memory, set 'RAM cache' to True. ")
     prefix = 'plone.app.caching.weakCaching'
+    sort = 3
     
     # Configurable options
     options = ('etags','lastModified','ramCache','vary')
@@ -181,6 +182,7 @@ class ModerateCaching(BaseCaching):
                     u"to remove the 's-maxage' token from the response, then stale "
                     u"responses might be seen until the cached entry expires. ")
     prefix = 'plone.app.caching.moderateCaching'
+    sort = 2
     
     # Configurable options
     options = ('smaxage','etags','lastModified','ramCache','vary')
@@ -205,6 +207,7 @@ class StrongCaching(BaseCaching):
                     u"that never change without changing their URL, or resources "
                     u"for which temporary staleness is not critical.")
     prefix = 'plone.app.caching.strongCaching'
+    sort = 1
     
     # Configurable options
     options = ('maxage','smaxage','etags','lastModified','ramCache','vary')
@@ -250,6 +253,7 @@ class NoCaching(object):
     description = _(u"Use this operation to keep the response "
                     u"out of all caches.")
     prefix = 'plone.app.caching.noCaching'
+    sort = 4
     options = ()
     
     def __init__(self, published, request):

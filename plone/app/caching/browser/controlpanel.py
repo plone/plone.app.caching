@@ -368,6 +368,7 @@ class ControlPanel(BaseView):
                 name=name,
                 title=type_.title,
                 description=getattr(type_, 'description', ''),
+                sort=getattr(type_, 'sort', 100),
                 prefix=getattr(type_, 'prefix', None),
                 options=getattr(type_, 'options', ()),
                 hasOptions=self.hasGlobalOptions(type_),
@@ -390,7 +391,7 @@ class ControlPanel(BaseView):
     @memoize
     def operationTypes(self):
         operations = [v for k, v in self.operationTypesLookup.items()]
-        operations.sort(lambda x,y: cmp(x['title'], y['title']))
+        operations.sort(lambda x,y: (cmp(x['sort'], y['sort']) or cmp(x['title'], y['title'])))
         return operations
 
     @property
