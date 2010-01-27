@@ -80,8 +80,8 @@ class BaseCaching(object):
         self.published = published
         self.request = request
     
-    def interceptResponse(self, rulename, response):
-        options = lookupOptions(self.__class__, rulename)
+    def interceptResponse(self, rulename, response, class_=None):
+        options = lookupOptions(class_ or self.__class__, rulename)
         etag = getETagAnnotation(self.published, self.request, keys=options['etags'])
         lastModified = getLastModifiedAnnotation(self.published, self.request, lastModified=options['lastModified'])
         ramCache = options['ramCache']
@@ -100,8 +100,8 @@ class BaseCaching(object):
         
         return None
     
-    def modifyResponse(self, rulename, response):
-        options = lookupOptions(self.__class__, rulename)
+    def modifyResponse(self, rulename, response, class_=None):
+        options = lookupOptions(class_ or self.__class__, rulename)
         maxage = options.get('maxage') or self.maxage
         smaxage = options.get('smaxage') or self.smaxage
         ramCache = options['ramCache']
@@ -223,6 +223,9 @@ if HAVE_RESOURCE_REGISTRIES:
         
         adapts(ICookedFile, IHTTPRequest)
         
+        def interceptResponse(self, rulename, response):
+            super(ResourceRegistriesCaching, self).interceptResponse(rulename, response, class_=StrongCaching)
+        
         def modifyResponse(self, rulename, response):
             registry = getContext(self.published, IResourceRegistry)
             
@@ -231,7 +234,7 @@ if HAVE_RESOURCE_REGISTRIES:
                     doNotCache(self.published, self.request, response)
                     return
             
-            super(ResourceRegistriesCaching, self).modifyResponse(rulename, response)
+            super(ResourceRegistriesCaching, self).modifyResponse(rulename, response, class_=StrongCaching)
 
 class NoCaching(object):
     """A caching operation that tries to keep the response 

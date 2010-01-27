@@ -131,7 +131,7 @@
       </field>
       <value>31536000</value>
   </record>
-  <record name="plone.app.caching.strongCaching.plone.resource.lastModified">
+  <record name="plone.app.caching.strongCaching.plone.stableResource.lastModified">
       <field type="plone.registry.field.Bool">
           <title>Last-modified validation</title>
           <description>Turn on Last-Modified headers</description>
