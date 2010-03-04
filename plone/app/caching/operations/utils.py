@@ -233,8 +233,13 @@ def notModified(published, request, response, etag=None, lastModified=None):
     if etag is not None:
         response.setHeader('ETag', etag, literal=1)
     
-    if lastModified is not None:
-        response.setHeader('Last-Modified', formatDateTime(lastModified)) 
+    # Specs say that Last-Modified MUST NOT be included in a 304
+    # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+    # 
+    # Let's leave if off for now and see if breaks in the real world
+    # 
+    #if lastModified is not None:
+    #    response.setHeader('Last-Modified', formatDateTime(lastModified)) 
     
     response.setStatus(304)
     return u""
