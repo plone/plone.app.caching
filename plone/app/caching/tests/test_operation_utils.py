@@ -481,13 +481,15 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         etag = "|foo|bar|"
         
-        nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
+        # Last-Modified not needed according to spec
+        #nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
         
         body = notModified(published, request, response, etag=etag, lastModified=now)
         
         self.assertEquals(u"", body)
         self.assertEquals(etag, response.getHeader('ETag', literal=1))
-        self.assertEquals(nowFormatted, response.getHeader('Last-Modified'))
+        self.assertEquals(None, response.getHeader('Last-Modified'))
+        #self.assertEquals(nowFormatted, response.getHeader('Last-Modified'))
         self.assertEquals(304, response.getStatus())
 
 class CacheCheckHelpersTest(unittest.TestCase):
