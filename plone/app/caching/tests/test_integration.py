@@ -2,12 +2,12 @@ import pkg_resources
 
 import unittest
 
-import datetime
-import dateutil.parser
-import dateutil.tz
+#import datetime
+#import dateutil.parser
+#import dateutil.tz
 
 from Products.PloneTestCase.ptc import FunctionalTestCase
-from Products.PloneTestCase.ptc import portal_owner, default_user, default_password
+from Products.PloneTestCase.ptc import default_user, default_password
 
 from plone.app.caching.tests.layer import Layer
 

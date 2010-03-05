@@ -31,6 +31,10 @@ TEST_FILE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif
 class TestProfile(FunctionalTestCase):
     """This test aims to exercise the caching operations expected from the
     `with-caching-proxy` profile.
+    
+    Several of the operations are just duplicates of the ones for the
+    `without-caching-proxy` profile but we still want to redo them in this
+    context to ensure the profile has set the correct settings.
     """
     
     layer = Layer
@@ -45,37 +49,46 @@ class TestProfile(FunctionalTestCase):
         self.cachePurgingSettings = self.registry.forInterface(ICachePurgingSettings)
         self.ploneCacheSettings = self.registry.forInterface(IPloneCacheSettings)
         
+        self.cacheSettings.enabled = True
+        
         self.purger = getUtility(IPurger)
         self.purger.reset()
     
     def beforeTearDown(self):
         setRequest(None)
     
+    # We'll reuse these tests from TestProfileBase
+    # but in the 'with-caching-proxy' context.
+    # No need to duplicate the code here.
+    # 
+    # - test_composite_views()
+    #
+    # - test_resources()
+    #
+    # - test_stable_resources()
+    
     def test_composite_views(self):
-        self.cacheSettings.enabled = True
+        # This is a clone of the same test for 'without-caching-proxy'
+        # Can we just call that test from this context?
         
+        # Add folder content
         self.setRoles(('Manager',))
-        testText = "Testing... body one"
-        testText2 = "Testing... body two"
-        
-        # Folder content
         self.portal.invokeFactory('Folder', 'f1')
         self.portal['f1'].setTitle(u"Folder one")
         self.portal['f1'].setDescription(u"Folder one description")
         self.portal['f1'].reindexObject()
         
-        # Page content
+        # Add page content
         self.portal['f1'].invokeFactory('Document', 'd1')
         self.portal['f1']['d1'].setTitle(u"Document one")
         self.portal['f1']['d1'].setDescription(u"Document one description")
+        testText = "Testing... body one"
         self.portal['f1']['d1'].setText(testText)
         self.portal['f1']['d1'].reindexObject()
         
         # Publish the folder and page
         self.portal.portal_workflow.doActionFor(self.portal['f1'], 'publish')
         self.portal.portal_workflow.doActionFor(self.portal['f1']['d1'], 'publish')
-        
-        now = datetime.datetime.now(dateutil.tz.tzlocal())
         
         # Should we set up the etag components?
         # - set member?  No
@@ -87,6 +100,7 @@ class TestProfile(FunctionalTestCase):
         #
         
         # Request the quthenticated folder
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
         browser.open(self.portal['f1'].absolute_url())
@@ -97,7 +111,8 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
-        # Request the quthenticated page
+        # Request the authenticated page
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
         browser.open(self.portal['f1']['d1'].absolute_url())
@@ -130,6 +145,7 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('', browser.contents)
         
         # Request the anonymous folder
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal['f1'].absolute_url())
         self.assertEquals('plone.content.folderView', browser.headers['X-Cache-Rule'])
@@ -140,6 +156,7 @@ class TestProfile(FunctionalTestCase):
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the anonymous page
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
@@ -152,6 +169,7 @@ class TestProfile(FunctionalTestCase):
         
         # Request the anonymous page again -- to test RAM cache.
         # Anonymous should be RAM cached
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
@@ -176,6 +194,7 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('', browser.contents)
         
         # Edit the page to update the etag
+        testText2 = "Testing... body two"
         self.portal['f1']['d1'].setText(testText2)
         self.portal['f1']['d1'].reindexObject()
         
@@ -191,18 +210,15 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('200 Ok', browser.headers['Status'])
     
     def test_content_feeds(self):
-        self.cacheSettings.enabled = True
-        
-        self.setRoles(('Manager',))
         
         # Enable syndication
+        self.setRoles(('Manager',))
         self.syndication = self.portal.portal_syndication
         self.syndication.editProperties(isAllowed=True)
         self.syndication.enableSyndication(self.portal)
         
-        now = datetime.datetime.now(dateutil.tz.tzlocal())
-        
         # Request the rss feed
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
@@ -213,6 +229,7 @@ class TestProfile(FunctionalTestCase):
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the rss feed again -- to test RAM cache
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         rssText = browser.contents
         browser = Browser()
         browser.open(self.portal.absolute_url() + '/RSS')
@@ -238,6 +255,7 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('', browser.contents)
         
         # Request the authenticated rss feed
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
         browser.open(self.portal.absolute_url() + '/RSS')
@@ -258,26 +276,23 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals(None, browser.headers.get('X-RAMCache'))
     
     def test_downloads(self):
-        self.cacheSettings.enabled = True
         
+        # Add folder content
         self.setRoles(('Manager',))
-        
-        # Folder content
         self.portal.invokeFactory('Folder', 'f1')
         self.portal['f1'].setTitle(u"Folder one")
         self.portal['f1'].setDescription(u"Folder one description")
         self.portal['f1'].reindexObject()
         
-        # Content image
+        # Add content image
         self.portal['f1'].invokeFactory('Image', 'i1')
         self.portal['f1']['i1'].setTitle(u"Image one")
         self.portal['f1']['i1'].setDescription(u"Image one description")
         self.portal['f1']['i1'].setImage(OFS.Image.Image('test.gif', 'test.gif', open(TEST_IMAGE, 'rb')))
         self.portal['f1']['i1'].reindexObject()
         
-        now = datetime.datetime.now(dateutil.tz.tzlocal())
-        
         # Request the image with Manager role
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.addHeader('Authorization', 'Basic %s:%s' % (portal_owner, default_password,))
         browser.open(self.portal['f1']['i1'].absolute_url())
@@ -291,6 +306,7 @@ class TestProfile(FunctionalTestCase):
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request an image scale with Manager role
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.addHeader('Authorization', 'Basic %s:%s' % (portal_owner, default_password,))
         browser.open(self.portal['f1']['i1'].absolute_url() + '/image_preview')
@@ -307,6 +323,7 @@ class TestProfile(FunctionalTestCase):
         self.portal.portal_workflow.doActionFor(self.portal['f1'], 'publish')
         
         # Request the image
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal['f1']['i1'].absolute_url())
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
@@ -330,6 +347,7 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('', browser.contents)
         
         # Request an image scale
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal['f1']['i1'].absolute_url() + '/image_preview')
         self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
@@ -341,11 +359,11 @@ class TestProfile(FunctionalTestCase):
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
     
     def test_resources(self):
-        self.cacheSettings.enabled = True
-        
-        now = datetime.datetime.now(dateutil.tz.tzlocal())
+        # This is a clone of the same test for 'without-caching-proxy'
+        # Can we just call that test from this context?
         
         # Request a skin image
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal.absolute_url() + '/rss.gif')
         self.assertEquals('plone.resource', browser.headers['X-Cache-Rule'])
@@ -370,18 +388,22 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('', browser.contents)
     
     def test_stable_resources(self):
-        # We don't actually have any non-RR stable resources
+        # This is a clone of the same test for 'without-caching-proxy'
+        # Can we just call that test from this context?
+        # (yes, this is not really testing anything. It's a placeholder)
+        # 
+        # We don't actually have any non-RR stable resources yet
         # What is the best way to test this?
         # Maybe not important since the RR test exercises the same code?
         pass
     
     def test_stable_resources_resource_registries(self):
-        self.cacheSettings.enabled = True
-        cssregistry = self.portal.portal_css
-        
-        now = datetime.datetime.now(dateutil.tz.tzlocal())
+        # Very similar to 'without-caching-proxy' context
+        # but with Last-Modified header turned on
         
         # Request a ResourceRegistry resource
+        cssregistry = self.portal.portal_css
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(cssregistry.absolute_url() + '/public.css')
         self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
@@ -406,6 +428,7 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('', browser.contents)
         
         # Request the ResourceRegistry resource -- with RR in debug mode
+        now = datetime.datetime.now(dateutil.tz.tzlocal())
         cssregistry.setDebugMode(True)
         browser = Browser()
         browser.open(cssregistry.absolute_url() + '/public.css')
