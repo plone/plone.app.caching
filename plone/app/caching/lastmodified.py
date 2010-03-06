@@ -10,7 +10,11 @@ from zope.app.publisher.interfaces import IResource
 from z3c.caching.interfaces import ILastModified
 
 from Acquisition import aq_base
+from Acquisition import aq_parent
+from Acquisition import aq_inner
+
 from OFS.Image import File
+from Products.Archetypes.Field import Image as ImageScale
 from Products.CMFCore.interfaces import ICatalogableDublinCore
 from Products.CMFCore.FSObject import FSObject
 
@@ -47,6 +51,22 @@ class OFSFileLastModified(PersistentLastModified):
     """ILastModified adapter for OFS.Image.File
     """
     adapts(File)
+
+class ImageScaleLastModified(object):
+    """ILastModified adapter for Products.Archetypes.Field.Image
+    """
+    
+    implements(ILastModified)
+    adapts(ImageScale)
+    
+    def __init__(self, context):
+        self.context = context
+    
+    def __call__(self):
+        parent = aq_parent(aq_inner(self.context))
+        if parent is not None:
+            return ILastModified(parent)()
+        return None
 
 class FSObjectLastModified(object):
     """ILastModified adapter for FSFile and FSImage
