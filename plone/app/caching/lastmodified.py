@@ -18,6 +18,11 @@ from Products.Archetypes.Field import Image as ImageScale
 from Products.CMFCore.interfaces import ICatalogableDublinCore
 from Products.CMFCore.FSObject import FSObject
 
+from plone.app.caching.operations.utils import getContext
+from Products.ResourceRegistries.interfaces import ICookedFile
+from Products.ResourceRegistries.interfaces import IResourceRegistry
+
+
 @implementer(ILastModified)
 @adapter(IPageTemplate)
 def pageTemplateDelegateLastModified(template):
@@ -130,4 +135,24 @@ class ResourceLastModified(object):
         lmt = getattr(self.context.context, 'lmt', None)
         if lmt is not None:
             return datetime.fromtimestamp(lmt, tzlocal())
+        return None
+
+class CookedFileLastModified(object):
+    """ILastModified for Resource Registry `cooked` files
+    """
+    
+    implements(ILastModified)
+    adapts(ICookedFile)
+    
+    def __init__(self, context):
+        self.context = context
+    
+    def __call__(self):
+        registry = getContext(self.context, IResourceRegistry)
+        if registry is not None:
+            if registry.getDebugMode() or not registry.isCacheable(self.context.__name__):
+                return None
+            mtime = getattr(registry.aq_base, '_p_mtime', None)
+            if mtime is not None and mtime > 0:
+                return datetime.fromtimestamp(mtime, tzlocal())
         return None

@@ -236,10 +236,14 @@ def notModified(published, request, response, etag=None, lastModified=None):
     # Specs say that Last-Modified MUST NOT be included in a 304
     # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     # 
-    # Let's leave if off for now and see if breaks in the real world
-    # 
-    #if lastModified is not None:
-    #    response.setHeader('Last-Modified', formatDateTime(lastModified)) 
+    if lastModified is not None:
+        response.setHeader('Last-Modified', formatDateTime(lastModified)) 
+    #if response.getHeader('Last-Modified'):
+    #    del response.headers['last-modified']
+    #if response.getHeader('Expires'):
+    #    del response.headers['expires']
+    #if response.getHeader('Cache-Control'):
+    #    del response.headers['cache-control']
     
     response.setStatus(304)
     return u""

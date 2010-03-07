@@ -56,5 +56,6 @@
     <adapter factory=".lastmodified.CatalogableDublinCoreLastModified" />
     <adapter factory=".lastmodified.DCTimesLastModified" />
     <adapter factory=".lastmodified.ResourceLastModified" />
+    <adapter factory=".lastmodified.CookedFileLastModified" />
     
 </configure>

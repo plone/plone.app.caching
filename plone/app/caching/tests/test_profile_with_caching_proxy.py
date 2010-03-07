@@ -398,8 +398,8 @@ class TestProfile(FunctionalTestCase):
         pass
     
     def test_stable_resources_resource_registries(self):
-        # Very similar to 'without-caching-proxy' context
-        # but with Last-Modified header turned on
+        # This is a clone of the same test for 'without-caching-proxy'
+        # Can we just call that test from this context?
         
         # Request a ResourceRegistry resource
         cssregistry = self.portal.portal_css
@@ -410,22 +410,30 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowserAndProxy
         self.assertEquals('max-age=31536000, proxy-revalidate, public', browser.headers['Cache-Control'])
-        # XXX - Fix this.  RR needs a special last modified adapter
-        #self.failIf(None == browser.headers.get('Last-Modified'))
+        self.failIf(None == browser.headers.get('Last-Modified'))
         timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
         self.failUnless(timedelta > datetime.timedelta(seconds=31535990))
         
-        # XXX - Fix this.  This should be a 304 response
+        # XXX - Fix this.  This should just be a 304 response but Zope
+        # is adding extra headers and a body to it.
+        # 
         # Request the ResourceRegistry resource again -- with IMS header to test 304
-        #lastmodified = browser.headers['Last-Modified']
-        #browser = Browser()
-        #browser.raiseHttpErrors = False
-        #browser.addHeader('If-Modified-Since', lastmodified)
-        #browser.open(cssregistry.absolute_url() + '/public.css')
-        #self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
-        #self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
-        #self.assertEquals('304 Not Modified', browser.headers['Status'])
+        lastmodified = browser.headers['Last-Modified']
+        browser = Browser()
+        browser.raiseHttpErrors = False
+        browser.addHeader('If-Modified-Since', lastmodified)
+        browser.open(cssregistry.absolute_url() + '/public.css')
+        self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
+        self.assertEquals('304 Not Modified', browser.headers['Status'])
+        #
+        # Zope is adding the body.  Why?
         #self.assertEquals('', browser.contents)
+        # 
+        # These headers are added by Zope.  Why?
+        #self.assertEquals(None, browser.headers.get('Expires'))
+        #self.assertEquals(None, browser.headers.get('Cache-Control'))
+        #self.assertEquals(None, browser.headers.get('Last-Modified'))
         
         # Request the ResourceRegistry resource -- with RR in debug mode
         now = datetime.datetime.now(dateutil.tz.tzlocal())
