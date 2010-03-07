@@ -127,7 +127,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEquals(200, response.getStatus())
         self.assertEquals('max-age=0, must-revalidate, private', response.getHeader('Cache-Control'))
         self.assertEquals(None, response.getHeader('Last-Modified'))
-        self.assertEquals("|foo|bar|", response.getHeader('ETag', literal=1))
+        self.assertEquals('"|foo|bar|"', response.getHeader('ETag', literal=1))
         
         expires = dateutil.parser.parse(response.getHeader('Expires'))
         self.failUnless(now > expires)
@@ -171,7 +171,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEquals(200, response.getStatus())
         self.assertEquals('max-age=0, must-revalidate, private', response.getHeader('Cache-Control'))
         self.assertEquals(nowFormatted, response.getHeader('Last-Modified'))
-        self.assertEquals("|foo|bar|", response.getHeader('ETag', literal=1))
+        self.assertEquals('"|foo|bar|"', response.getHeader('ETag', literal=1))
         
         expires = dateutil.parser.parse(response.getHeader('Expires'))
         self.failUnless(now > expires)
@@ -219,7 +219,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEquals(200, response.getStatus())
         self.assertEquals('max-age=0, s-maxage=60, must-revalidate', response.getHeader('Cache-Control'))
         self.assertEquals(nowFormatted, response.getHeader('Last-Modified'))
-        self.assertEquals('|foo|bar|', response.getHeader('ETag', literal=1))
+        self.assertEquals('"|foo|bar|"', response.getHeader('ETag', literal=1))
         self.assertEquals('Accept-Language', response.getHeader('Vary'))
         
         expires = dateutil.parser.parse(response.getHeader('Expires'))
@@ -269,7 +269,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEquals(200, response.getStatus())
         self.assertEquals('max-age=60, proxy-revalidate, public', response.getHeader('Cache-Control'))
         self.assertEquals(nowFormatted, response.getHeader('Last-Modified'))
-        self.assertEquals('|foo|bar|', response.getHeader('ETag', literal=1))
+        self.assertEquals('"|foo|bar|"', response.getHeader('ETag', literal=1))
         self.assertEquals('Accept-Language', response.getHeader('Vary'))
         
         timedelta = dateutil.parser.parse(response.getHeader('Expires')) - now

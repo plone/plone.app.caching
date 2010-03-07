@@ -78,7 +78,7 @@ class TestProfile(FunctionalTestCase):
         # - turn on gzip?
         # - set skin?  Maybe
         # - leave status unlocked
-        #
+        # - set the mod date on the resource registries?  Probably.
         
         # Request the quthenticated folder
         now = datetime.datetime.now(dateutil.tz.tzlocal())
@@ -89,7 +89,9 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'])
+        # XXX - Fix this.  The RR mod date element changes with each test run
+        #self.assertEquals('|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'])
+        self.assertEquals('"|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'][:37])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated page
@@ -102,7 +104,8 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'])
+        # XXX - Fix this.  The RR mod date element changes with each test run
+        self.assertEquals('"|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'][:37])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated page again -- to test RAM cache.
@@ -133,7 +136,8 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('||51||0|Sunburst Theme|0', browser.headers['ETag'])
+        # XXX - Fix this.  The RR mod date element changes with each test run
+        self.assertEquals('"||51||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the anonymous page
@@ -145,7 +149,8 @@ class TestProfile(FunctionalTestCase):
         self.failUnless(testText in browser.contents)
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('||51||0|Sunburst Theme|0', browser.headers['ETag'])
+        # XXX - Fix this.  The RR mod date element changes with each test run
+        self.assertEquals('"||51||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the anonymous page again -- to test RAM cache.
@@ -159,7 +164,8 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.failUnless(testText in browser.contents)
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('||51||0|Sunburst Theme|0', browser.headers['ETag'])
+        # XXX - Fix this.  The RR mod date element changes with each test run
+        self.assertEquals('"||51||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the anonymous page again -- with an INM header to test 304.
@@ -206,7 +212,7 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('||40||0|Sunburst Theme', browser.headers['ETag'])
+        self.assertEquals('"||40||0|Sunburst Theme"', browser.headers['ETag'])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the rss feed again -- to test RAM cache
@@ -220,7 +226,7 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.assertEquals(rssText, browser.contents)
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('||40||0|Sunburst Theme', browser.headers['ETag'])
+        self.assertEquals('"||40||0|Sunburst Theme"', browser.headers['ETag'])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the rss feed again -- with an INM header to test 304.
@@ -244,7 +250,7 @@ class TestProfile(FunctionalTestCase):
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('|test_user_1_|40||0|Sunburst Theme', browser.headers['ETag'])
+        self.assertEquals('"|test_user_1_|40||0|Sunburst Theme"', browser.headers['ETag'])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated rss feed again -- to test RAM cache
@@ -379,7 +385,6 @@ class TestProfile(FunctionalTestCase):
         # These headers are added by Zope.  Why?
         #self.assertEquals(None, browser.headers.get('Expires'))
         #self.assertEquals(None, browser.headers.get('Cache-Control'))
-        #self.assertEquals(None, browser.headers.get('Last-Modified'))
         
         # Request the ResourceRegistry resource -- with RR in debug mode
         now = datetime.datetime.now(dateutil.tz.tzlocal())
