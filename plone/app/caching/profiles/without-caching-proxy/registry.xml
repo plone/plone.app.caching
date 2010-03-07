@@ -27,6 +27,7 @@
           <element>gzip</element>
           <element>skin</element>
           <element>locked</element>
+          <element>resourceRegistries</element>
       </value>
   </record>
   <record name="plone.app.caching.weakCaching.plone.content.itemView.ramCache">
@@ -54,6 +55,7 @@
           <element>gzip</element>
           <element>skin</element>
           <element>locked</element>
+          <element>resourceRegistries</element>
       </value>
   </record>
   <record name="plone.app.caching.weakCaching.plone.content.folderView.ramCache">

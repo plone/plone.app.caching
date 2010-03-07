@@ -46,5 +46,6 @@
     <adapter factory=".etags.CatalogCounter"            name="catalogCounter" />
     <adapter factory=".etags.ObjectLocked"              name="locked" />
     <adapter factory=".etags.Skin"                      name="skin" />
+    <adapter factory=".etags.ResourceRegistries"        name="resourceRegistries" />
     
 </configure>

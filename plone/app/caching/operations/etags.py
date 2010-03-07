@@ -13,7 +13,7 @@ from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.interfaces import IPloneCacheSettings
 
 from plone.app.caching.operations.utils import getContext
-from plone.app.caching.operations.utils import getLastModified
+from plone.app.caching.operations.utils import getLastModifiedAnnotation
 
 from Products.CMFCore.utils import getToolByName
 
@@ -135,7 +135,7 @@ class LastModified(object):
         self.request = request
     
     def __call__(self):
-        lastModified = getLastModified(self.published)
+        lastModified = getLastModifiedAnnotation(self.published, self.request)
         if lastModified is None:
             return None
         return str(time.mktime(lastModified.utctimetuple()))
@@ -202,4 +202,36 @@ class Skin(object):
             return self.request[requestVariable]
         
         return portal_skins.getDefaultSkin()
+
+class ResourceRegistries(object):
+    """The ``resourceRegistry`` etag component, returning the most recent
+    last modified timestamp from all three Resource Registries.  This is
+    useful for avoiding requests for expired resources from cached pages.
+    """
+    
+    implements(IETagValue)
+    adapts(Interface, Interface)
+    
+    def __init__(self, published, request):
+        self.published = published
+        self.request = request
+    
+    def __call__(self):
+        context = getContext(self.published)
+        
+        registries = []
+        registries.append(getToolByName(context, 'portal_css', None))
+        registries.append(getToolByName(context, 'portal_javascripts', None))
+        registries.append(getToolByName(context, 'portal_kss', None))
+        
+        mtimes = []
+        now = time.time()
+        for registry in registries:
+            mtime = now
+            if registry is not None:
+                mtime = getattr(registry.aq_base, '_p_mtime', now)
+            mtimes.append(mtime)
+        
+        mtimes.sort()
+        return str(mtimes[-1])
 
