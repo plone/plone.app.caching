@@ -101,7 +101,7 @@ def cacheInBrowser(published, request, response, etag=None, lastModified=None):
     """
     
     if etag is not None:
-        response.setHeader('ETag', etag, literal=1)
+        response.setHeader('ETag', '"%s"' %etag, literal=1)
         
     if lastModified is not None:
         response.setHeader('Last-Modified', formatDateTime(lastModified))
@@ -126,7 +126,7 @@ def cacheInProxy(published, request, response, smaxage, etag=None, lastModified=
         del response.headers['last-modified']
     
     if etag is not None:
-        response.setHeader('ETag', etag, literal=1)
+        response.setHeader('ETag', '"%s"' %etag, literal=1)
     
     if vary is not None:
         response.setHeader('Vary', vary)
@@ -151,7 +151,7 @@ def cacheInBrowserAndProxy(published, request, response, maxage, smaxage=None, e
         del response.headers['last-modified']
     
     if etag is not None:
-        response.setHeader('ETag', etag, literal=1)
+        response.setHeader('ETag', '"%s"' %etag, literal=1)
     
     if vary is not None:
         response.setHeader('Vary', vary)
@@ -514,8 +514,10 @@ def getETag(published, request, keys=(), extraTokens=()):
         return None
     
     etag = '|' + '|'.join(tokens)
+    etag = etag.replace(',', ';')  # commas are bad in etags
+    etag = etag.replace('"', "'")  # double quotes are bad in etags
     
-    return etag.replace(',', ';')  # commas are bad in etags
+    return etag
 
 def parseETags(text, allowWeak=True, _result=None):
     """Parse a header value into a list of etags. Handles fishy quoting and
