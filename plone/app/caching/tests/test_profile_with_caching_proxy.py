@@ -28,7 +28,7 @@ TEST_IMAGE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gi
 TEST_FILE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
 
 
-class TestProfile(FunctionalTestCase):
+class TestProfileWithCaching(FunctionalTestCase):
     """This test aims to exercise the caching operations expected from the
     `with-caching-proxy` profile.
     
@@ -56,16 +56,6 @@ class TestProfile(FunctionalTestCase):
     
     def beforeTearDown(self):
         setRequest(None)
-    
-    # We'll reuse these tests from TestProfileBase
-    # but in the 'with-caching-proxy' context.
-    # No need to duplicate the code here.
-    # 
-    # - test_composite_views()
-    #
-    # - test_resources()
-    #
-    # - test_stable_resources()
     
     def test_composite_views(self):
         # This is a clone of the same test for 'without-caching-proxy'
@@ -405,12 +395,14 @@ class TestProfile(FunctionalTestCase):
     def test_stable_resources_resource_registries(self):
         # This is a clone of the same test for 'without-caching-proxy'
         # Can we just call that test from this context?
+        path = "/Sunburst%20Theme/public.css"
         
         # Request a ResourceRegistry resource
         cssregistry = self.portal.portal_css
+        path = cssregistry.absolute_url() + "/Sunburst%20Theme/public.css"
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
-        browser.open(cssregistry.absolute_url() + '/public.css')
+        browser.open(path)
         self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowserAndProxy
@@ -419,31 +411,25 @@ class TestProfile(FunctionalTestCase):
         timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
         self.failUnless(timedelta > datetime.timedelta(seconds=31535990))
         
-        # XXX - Fix this.  This should just be a 304 response but Zope
-        # is adding extra headers and a body to it.
-        # 
         # Request the ResourceRegistry resource again -- with IMS header to test 304
         lastmodified = browser.headers['Last-Modified']
         browser = Browser()
         browser.raiseHttpErrors = False
         browser.addHeader('If-Modified-Since', lastmodified)
-        browser.open(cssregistry.absolute_url() + '/public.css')
+        browser.open(path)
         self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         self.assertEquals('304 Not Modified', browser.headers['Status'])
-        #
-        # Zope is adding the body.  Why?
-        #self.assertEquals('', browser.contents)
-        # 
-        # These headers are added by Zope.  Why?
-        #self.assertEquals(None, browser.headers.get('Expires'))
-        #self.assertEquals(None, browser.headers.get('Cache-Control'))
+        self.assertEquals('', browser.contents)
+        self.assertEquals(None, browser.headers.get('Last-Modified'))
+        self.assertEquals(None, browser.headers.get('Expires'))
+        self.assertEquals(None, browser.headers.get('Cache-Control'))
         
         # Request the ResourceRegistry resource -- with RR in debug mode
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         cssregistry.setDebugMode(True)
         browser = Browser()
-        browser.open(cssregistry.absolute_url() + '/public.css')
+        browser.open(path)
         self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should use doNotCache

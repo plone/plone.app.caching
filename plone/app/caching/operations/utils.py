@@ -234,16 +234,22 @@ def notModified(published, request, response, etag=None, lastModified=None):
         response.setHeader('ETag', etag, literal=1)
     
     # Specs say that Last-Modified MUST NOT be included in a 304
+    # and Cache-Control/Expires MUST NOT be included unless they
+    # differ from the original response.  We'll delete all, including
+    # Expires although technically it should be included.  This is
+    # probably okay since in the original we only include Expires
+    # along with a Cache-Control and HTTP/1.1 clients will always
+    # use the later over any Expires header anyway.  HTTP/1.0 clients
+    # never send conditional requests so they will never see this.
+    # 
     # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     # 
-    if lastModified is not None:
-        response.setHeader('Last-Modified', formatDateTime(lastModified)) 
-    #if response.getHeader('Last-Modified'):
-    #    del response.headers['last-modified']
-    #if response.getHeader('Expires'):
-    #    del response.headers['expires']
-    #if response.getHeader('Cache-Control'):
-    #    del response.headers['cache-control']
+    if response.getHeader('Last-Modified'):
+        del response.headers['last-modified']
+    if response.getHeader('Expires'):
+        del response.headers['expires']
+    if response.getHeader('Cache-Control'):
+        del response.headers['cache-control']
     
     response.setStatus(304)
     return u""

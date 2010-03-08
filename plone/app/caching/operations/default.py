@@ -227,7 +227,7 @@ if HAVE_RESOURCE_REGISTRIES:
         adapts(ICookedFile, IHTTPRequest)
         
         def interceptResponse(self, rulename, response):
-            super(ResourceRegistriesCaching, self).interceptResponse(rulename, response, class_=StrongCaching)
+            return super(ResourceRegistriesCaching, self).interceptResponse(rulename, response, class_=StrongCaching)
         
         def modifyResponse(self, rulename, response):
             registry = getContext(self.published, IResourceRegistry)
