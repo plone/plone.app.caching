@@ -68,7 +68,7 @@ class ImageScaleLastModified(object):
         self.context = context
     
     def __call__(self):
-        parent = aq_parent(aq_inner(self.context))
+        parent = getContext(self.context)
         if parent is not None:
             return ILastModified(parent)()
         return None
