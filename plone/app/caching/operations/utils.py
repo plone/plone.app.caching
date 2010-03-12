@@ -11,15 +11,16 @@ from thread import allocate_lock
 from zope.interface import alsoProvides
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
+from zope.component import getUtility
 
 from zope.annotation.interfaces import IAnnotations
-
+from z3c.caching.interfaces import ILastModified
+from plone.registry.interfaces import IRegistry
 from plone.memoize.interfaces import ICacheChooser
 
 from plone.app.caching.interfaces import IRAMCached
 from plone.app.caching.interfaces import IETagValue
-
-from z3c.caching.interfaces import ILastModified
+from plone.app.caching.interfaces import IPloneCacheSettings
 
 from AccessControl.PermissionRole import rolesForPermissionOn
 from Products.CMFCore.interfaces import IContentish
@@ -258,6 +259,31 @@ def notModified(published, request, response, etag=None, lastModified=None):
 #
 # Cache checks
 # 
+
+def cacheStop(request, rulename):
+    """Check for any cache stop variables in the request.
+    """
+    
+    # Only cache GET requests
+    if request.get('REQUEST_METHOD') != 'GET':
+        return True
+    
+    # rss_search also uses the SearchableText variable
+    # so we'll hard code an exception for now
+    if rulename == 'plone.content.feed':
+        return False
+    
+    registry = getUtility(IRegistry)
+    if registry is None:
+        return False
+    
+    ploneSettings = registry.forInterface(IPloneCacheSettings)
+    variables = ploneSettings.cacheStopRequestVariables
+    
+    for variable in variables:
+        if request.has_key(variable):
+            return True
+    return False
 
 def isModified(request, etag=None, lastModified=None):
     """Return True or False depending on whether the published resource has

@@ -34,7 +34,7 @@
         />
     
     <!-- RAM cache storage: a transformation at the very end of the chain -->
-    <adapter   factory=".ramcache.Store"                name="plone.app.caching.operations.ramcache" />
+    <adapter factory=".ramcache.Store"                  name="plone.app.caching.operations.ramcache" />
     
     <!-- ETag components -->
     <adapter factory=".etags.UserID"                    name="userid" />

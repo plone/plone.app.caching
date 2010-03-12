@@ -61,6 +61,13 @@ class IPloneCacheSettings(Interface):
             value_type=schema.ASCIILine(title=_(u"Content type name")),
             default=('File', 'Image',),
         )
+    
+    cacheStopRequestVariables = schema.Tuple(
+            title=_(u"Request variables that prevent caching"),
+            description=_(u"Variables in the request that prevent caching if present"),
+            value_type=schema.ASCIILine(title=_(u"Request variables")),
+            default=('statusmessages', 'SearchableText',),
+        )
 
 class IETagValue(Interface):
     """ETag component builder

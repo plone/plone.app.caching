@@ -1,3 +1,5 @@
+import random
+
 from zope.interface import implements
 from zope.interface import classProvides
 from zope.interface import Interface
@@ -13,6 +15,7 @@ from plone.caching.utils import lookupOptions
 from plone.app.caching.operations.utils import setCacheHeaders
 from plone.app.caching.operations.utils import doNotCache
 from plone.app.caching.operations.utils import cacheInRAM
+from plone.app.caching.operations.utils import cacheStop
 
 from plone.app.caching.operations.utils import cachedResponse
 from plone.app.caching.operations.utils import notModified
@@ -86,9 +89,15 @@ class BaseCaching(object):
         lastModified = getLastModifiedAnnotation(self.published, self.request, lastModified=options['lastModified'])
         ramCache = options['ramCache']
         
+        # Check for cache stop request variables
+        if cacheStop(self.request, rulename):
+            return None
+        
+        # Check if this should be a 304 response
         if not isModified(self.request, etag=etag, lastModified=lastModified):
             return notModified(self.published, self.request, response, etag=etag, lastModified=lastModified)
         
+        # Check if this is in the ram cache
         if ramCache:
             context = getContext(self.published)
             portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
@@ -110,7 +119,12 @@ class BaseCaching(object):
         etag = getETagAnnotation(self.published, self.request, etags)
         lastModified = getLastModifiedAnnotation(self.published, self.request, options['lastModified'])
         
-        # Do the maxage/smaxage settings allow for proxy caching
+        # Check for cache stop request variables
+        if cacheStop(self.request, rulename):
+            etag = str(random.randint(10**10, 10**11))
+            setCacheHeaders(self.published, self.request, response, etag=etag)
+        
+        # Do the maxage/smaxage settings allow for proxy caching?
         proxyCache = smaxage or (maxage and smaxage is None)
         
         # Check if the content can be cached in shared caches
