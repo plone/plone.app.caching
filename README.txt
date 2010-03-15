@@ -578,15 +578,17 @@ dependancy tracking, composite views are often notoriously difficult to purge
 reliably from caching proxies so the default caching profiles set headers
 which expire the cache immediately (``weak caching``).
 
-Using Squid as a caching proxy, we can still see some speed improvement as
-Squid supports conditional requests to the backend and 304 responses from 
-plone.app.caching are relatively quick.  Varnish does not currently 
-support conditional requests to the backend.
-
 However, most of the inline resources linked to from the composite view (css, 
 javascript, images, etc.) can be cached very well in proxy so the overall
 speed of most composite views will always be better with a caching proxy in front
 despite the page itself not being cached.
+
+Also, when using Squid as a caching proxy, we can still see some additional
+speed improvement as Squid supports conditional requests to the backend and
+304 responses from plone.app.caching are relatively quick.  This means that
+even though the proxy cache will expire immediately, Squid can revalidate its
+cache relatively quickly.  Varnish does not currently support conditional 
+requests to the backend.
 
 For relatively stable composite views or for those views for which you can
 tolerate some potential staleness, you might be tempted to try switching from
