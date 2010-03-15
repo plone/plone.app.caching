@@ -262,7 +262,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # Authenticated should NOT be RAM cached
         self.assertEquals(None, browser.headers.get('X-RAMCache'))
     
-    def test_downloads(self):
+    def test_content_files(self):
         
         # Add folder content
         self.setRoles(('Manager',))
@@ -285,7 +285,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal['f1']['i1'].absolute_url())
-        self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
@@ -299,7 +299,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         browser.raiseHttpErrors = False
         browser.addHeader('If-Modified-Since', lastmodified)
         browser.open(self.portal['f1']['i1'].absolute_url())
-        self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEquals('304 Not Modified', browser.headers['Status'])
@@ -309,7 +309,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal['f1']['i1'].absolute_url() + '/image_preview')
-        self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])

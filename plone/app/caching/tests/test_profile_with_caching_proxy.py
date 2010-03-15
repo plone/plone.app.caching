@@ -270,7 +270,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         # Authenticated should NOT be RAM cached
         self.assertEquals(None, browser.headers.get('X-RAMCache'))
     
-    def test_downloads(self):
+    def test_content_files(self):
         
         # Add folder content
         self.setRoles(('Manager',))
@@ -291,7 +291,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         browser = Browser()
         browser.addHeader('Authorization', 'Basic %s:%s' % (portal_owner, default_password,))
         browser.open(self.portal['f1']['i1'].absolute_url())
-        self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # Folder not published yet so image should not be cached in proxy
         # so this should use cacheInBrowser
@@ -305,7 +305,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         browser = Browser()
         browser.addHeader('Authorization', 'Basic %s:%s' % (portal_owner, default_password,))
         browser.open(self.portal['f1']['i1'].absolute_url() + '/image_preview')
-        self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # Folder not published yet so image scale should not be cached in proxy
         # so this should use cacheInBrowser
@@ -321,7 +321,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal['f1']['i1'].absolute_url())
-        self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # Now visible to anonymous so this should use cacheInProxy
         self.assertEquals('max-age=0, s-maxage=86400, must-revalidate', browser.headers['Cache-Control'])
@@ -335,7 +335,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         browser.raiseHttpErrors = False
         browser.addHeader('If-Modified-Since', lastmodified)
         browser.open(self.portal['f1']['i1'].absolute_url())
-        self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEquals('304 Not Modified', browser.headers['Status'])
@@ -345,7 +345,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser()
         browser.open(self.portal['f1']['i1'].absolute_url() + '/image_preview')
-        self.assertEquals('plone.download', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # Now visible to anonymous so this should use cacheInProxy
         self.assertEquals('max-age=0, s-maxage=86400, must-revalidate', browser.headers['Cache-Control'])

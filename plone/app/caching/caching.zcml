@@ -42,9 +42,9 @@
         />
     
     <cache:rulesetType
-        name="plone.download"
-        title="Downloadable content"
-        description="Includes files and images in content space, which is downloaded rather than displayed in Plone."
+        name="plone.content.file"
+        title="Content files and images"
+        description="Includes files and images in content space."
         />
     
     <cache:rulesetType
@@ -105,22 +105,22 @@
     <!-- Standard Plone (non-blob) file and image content objects -->
     <configure zcml:condition="installed Products.ATContentTypes">
         
-        <cache:ruleset ruleset="plone.download" for="Products.ATContentTypes.interfaces.IATFile" />
-        <cache:ruleset ruleset="plone.download" for="Products.ATContentTypes.interfaces.IATImage" />
+        <cache:ruleset ruleset="plone.content.file" for="Products.ATContentTypes.interfaces.IATFile" />
+        <cache:ruleset ruleset="plone.content.file" for="Products.ATContentTypes.interfaces.IATImage" />
                     
     </configure>
     
     <!-- Standard image content saved in an Archetype field, like ATImage scales-->
     <configure zcml:condition="installed Products.Archetypes">
     
-        <cache:ruleset ruleset="plone.download" for="Products.Archetypes.Field.Image" />
+        <cache:ruleset ruleset="plone.content.file" for="Products.Archetypes.Field.Image" />
     
     </configure>
     
     <!-- plone.app.blob content -->
     <configure zcml:condition="installed plone.app.blob">
         
-        <cache:ruleset ruleset="plone.download" for="plone.app.blob.interfaces.IATBlob" />
+        <cache:ruleset ruleset="plone.content.file" for="plone.app.blob.interfaces.IATBlob" />
         
     </configure>
     
