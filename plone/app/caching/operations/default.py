@@ -122,7 +122,7 @@ class BaseCaching(object):
         # Check for cache stop request variables
         if cacheStop(self.request, rulename):
             etag = str(random.randint(10**10, 10**11))
-            setCacheHeaders(self.published, self.request, response, etag=etag)
+            return setCacheHeaders(self.published, self.request, response, etag=etag)
         
         # Do the maxage/smaxage settings allow for proxy caching?
         proxyCache = smaxage or (maxage and smaxage is None)
