@@ -112,8 +112,10 @@ code. They are listed with descriptions in the control panel.
       resource directories on the filesystem.
 
 * *Stable file and image resources* (plone.stableResource)
-      These are resources which can be cached 'forever'. Normally this
-      means that if the object does change, its URL changes too.
+      Stable resources like the css, javascript, and kss files registered
+      with the Resource Registries.  These are resources which can be cached
+      'forever'.  Normally this means that if the object does change, its
+      URL changes too.
 
 
 Default cache operations
@@ -323,9 +325,9 @@ Caching proxies and purging
 ---------------------------
 
 It is common to place a so-called caching reverse proxy in front of Zope
-when hosting large Plone sites. On Unix, the best option is generally
-considered to be `Varnish`_, although `Squid`_ will also work. On Windows,
-you can use Squid or the (commercial, but better) `Enfold Proxy`_.
+when hosting large Plone sites.  On Unix, a popular option is `Varnish`_,
+although `Squid`_ is also a good choice.  On Windows, you can use Squid
+or the (commercial, but better) `Enfold Proxy`_.
 
 Some operations in ``plone.app.caching`` can set response headers that
 instruct the caching proxy how best to cache content [1]_. For example, it is
@@ -506,26 +508,35 @@ listed in an ``etags`` tuple in the operation's options.
 
 The ETag names tokens supported by default are:
 
-userid
+* userid
     The current user's id
-roles
+
+* roles
     A list of the current user's roles in the given context
-language
+
+* language
     The language(s) accepted by the browser, in the ``ACCEPT_LANGUAGE`` header
-userLanguage
+
+* userLanguage
     The current user's preferred language
-gzip
+
+* gzip
     Whether or not the content is going to be served compressed
-lastModified
+
+* lastModified
     A timestamp indicating the last-modified date of the given context
-catalogCounter
+
+* catalogCounter
     A counter that is incremented each time the catalog is updated, i.e. each
     time content in the site is changed.
-locked
+
+* locked
     Whether or not the given context is locked for editing.
-skin
+
+* skin
     The name of the current skin (theme)
-resourceRegistry
+
+* resourceRegistry
     A timestamp indicating the most recent last-modified date for all three
     Resource Registries. This is useful for avoiding requests for expired
     resources from cached pages.
@@ -537,7 +548,7 @@ name. The name is used to look up the component. Thus, you can also override
 one of the tokens above for a particular type of context or request (e.g. via
 a browser layer), by registering a more specific adapter with the same name.
 
-As an example, here is the ``language`` adapter:
+As an example, here is the ``language`` adapter::
     
     from zope.interface import implements
     from zope.interface import Interface
@@ -626,9 +637,10 @@ or different protocol (https/http) for authenticated versus anonymous
 responses.
 
 Yet another solution involves intercepting the request and dynamically adding
-a special header to the anonymous request and then using Vary to add this to
-the cache key.  Examples of this last solution for both Squid and Varnish
-are included in this package [XXX - not done yet]
+a special ``X-Anonymous`` header to the anonymous request and then using Vary
+in split view responses to add this header to the cache key.  Examples of this
+last solution for both Squid and Varnish are included in this package.
+[XXX - not done yet]
 
 
 
