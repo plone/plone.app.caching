@@ -206,8 +206,8 @@ and LiveHTTPHeaders add-on for the Firefox browser.  Similar tools
 for inspecting response headers exist for Safari and IE.
 
 If you enable the DEBUG logging level for the ``plone.caching`` logger, 
-you will get this output in your event log. One way to do that is to set
-the global Zope logging level to DEBUG in ``zope.conf``::
+you will get additional debug output in your event log. One way to do that
+is to set the global Zope logging level to DEBUG in ``zope.conf``::
 
     <eventlog>
         level DEBUG
@@ -248,21 +248,23 @@ Default caching profiles
 the known best sets of cache settings that work with a typical default 
 Plone installation:
 
-* *With caching proxy.* Settings useful for setups with a caching
-  proxy such as Squid or Varnish.
+* *With caching proxy.*
+      Settings useful for setups with a caching proxy such as Squid or 
+      Varnish.
 
-* *Without caching proxy.* Settings useful for setups without a 
-  caching proxy.
+* *Without caching proxy.*
+      Settings useful for setups without a caching proxy.
 
 The only difference between these two profiles is the handling of content
 feeds and files/images in content space which are set with response headers
 that are a bit more aggressive when a caching proxy is available.
 
-Despite the minor differences, a setup with a caching proxy is generally
-faster for all responses, except for the ``composite views`` which by design
-are not cached in proxies in either of the default policies (see the composite
-view discussion below).  However, most of the inline resources referenced
-by the composite views can be cached very effectively in the proxy.
+Despite the minor differences, a setup with a caching proxy will still generally
+be faster for all responses.  This is true even for the "composite views" (which
+by design are not cached in proxies with either of the default profiles)
+since most of the inline resources referenced by these views can be cached
+very effectively in the proxy (see the composite view discussion later
+in this document)
 
 
 
@@ -279,9 +281,9 @@ Customization may also be needed if third-party products are installed
 which require special treatment.  Examine the response headers to determine
 whether the third-party product requires special treatment.  Most simple
 cases probably can be solved by adding the content type or template to the
-appropriate mapping.  More complicated cases, may require a bit more work.
-See [placeholder1] and [placeholder2] for examples of third party products
-providing custom caching operations using this framework.
+appropriate mapping.  More complicated cases, may require custom caching
+operations.  See [placeholder1] and [placeholder2] for examples of third 
+party products providing custom caching operations using this framework.
 
 A GenericSetup profile used for caching should be registered for the
 ``ICacheProfiles`` marker interface to distinguish it from more general
