@@ -173,8 +173,8 @@ an operation in the drop-down list to view its description.
 
 These operation descriptions are a bit simplified as several of these operations
 also include tests to downgrade caching depending on various parameter settings,
-workflow state, and access priviledges.  For more detail about the heuristics
-involved, it's best to review the operation code itself.
+workflow state, and access priviledges.  For more detail, it's best to review
+the operation code itself.
 
 
 Caching operation helper functions
