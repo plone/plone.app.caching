@@ -184,7 +184,7 @@ Caching operation helper functions
 
 If you will find the implementations of the default caching operations
 in the package ``plone.app.caching.operations``. If you are writing a 
-custom caching operation, The ``utils`` module contains helper functions
+custom caching operation, the ``utils`` module contains helper functions
 which you may find useful.
 
 

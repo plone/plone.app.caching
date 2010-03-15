@@ -102,8 +102,8 @@
   </record>
 
 
-  <!-- plone.download -->
-  <record name="plone.app.caching.moderateCaching.plone.download.smaxage">
+  <!-- plone.content.file -->
+  <record name="plone.app.caching.moderateCaching.plone.content.file.smaxage">
       <field type="plone.registry.field.Int">
           <title>Shared maximum age</title>
           <description>Time (in seconds) to cache the response in the caching proxy. Leave blank to use value from "Maximum age" field.</description>
@@ -111,7 +111,7 @@
       </field>
       <value>86400</value>
   </record>
-  <record name="plone.app.caching.moderateCaching.plone.download.lastModified">
+  <record name="plone.app.caching.moderateCaching.plone.content.file.lastModified">
       <field type="plone.registry.field.Bool">
           <title>Last-modified validation</title>
           <description>Turn on Last-Modified headers</description>
