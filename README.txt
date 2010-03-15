@@ -142,7 +142,7 @@ an operation in the drop-down list to view its description.
       be configured to disallow caching in other intermediate proxies
       that may exist between the local proxies and the browser (see the
       example proxy configs included with this package for some solutions
-      to this problem).
+      to this problem).  [XXX - example proxy configs not done yet]
 
 * *Weak caching* (plone.app.caching.weakCaching)
       Same as "moderate caching" but without proxy caching. Cache in browser
@@ -173,7 +173,7 @@ an operation in the drop-down list to view its description.
 
 These operation descriptions are a bit simplified as several of these operations
 also include tests to downgrade caching depending on various parameter settings,
-workflow state, and access priviledges.  For more detail, it's best to review
+workflow state, and access privileges.  For more detail, it's best to review
 the operation code itself.
 
 
