@@ -7,12 +7,14 @@
       i18n:domain="plone.app.caching">
       
 <body>
-<div metal:fill-slot="prefs_configlet_content">
+<metal:block fill-slot="prefs_configlet_main">
     
     <h1 class="documentFirstHeading" tal:content="view/title">View Title</h1>
     
-    <metal:block use-macro="context/@@ploneform-macros/titlelessform" />
+    <div id="content-core">
+        <metal:block use-macro="context/@@ploneform-macros/titlelessform" />
+    </div>
     
-</div>
+</metal:block>
 </body>
 </html>

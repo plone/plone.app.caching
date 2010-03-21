@@ -14,15 +14,13 @@
 (function($) {
     
     $().ready(function() {
-        
-        jq('a.editGlobalOperationParameters, a.editRulesetOperationParameters').prepOverlay({
+        $('a.editGlobalOperationParameters, a.editRulesetOperationParameters').prepOverlay({
             subtype: 'ajax',
-            filter: '#portal-column-content>*',
-            formselector: 'form:has(div[id^=formfield-form-widgets-plone-app-caching])',
+            filter: common_content_filter,
+            formselector: 'form:has(div[id^=formfield-form-widgets])',
             closeselector: '[name=form.buttons.cancel]',
             noform: 'close'
         });
-        
     });
     
 })(jQuery);
