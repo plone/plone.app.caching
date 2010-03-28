@@ -1,6 +1,7 @@
 import pkg_resources
 
 import unittest
+from cStringIO import StringIO
 
 import datetime
 import dateutil.parser
@@ -31,6 +32,10 @@ TEST_FILE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif
 class TestProfileWithoutCaching(FunctionalTestCase):
     """This test aims to exercise the caching operations expected from the
     `without-caching-proxy` profile.
+    
+    Several of the operations are just duplicates of the ones for the
+    `with-caching-proxy` profile but we still want to redo them in this
+    context to ensure the profile has set the correct settings.
     """
     
     layer = Layer
@@ -343,6 +348,25 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # This should be a 304 response
         self.assertEquals('304 Not Modified', browser.headers['Status'])
         self.assertEquals('', browser.contents)
+        
+        # Request a large datafile (over 64K) to test files that use
+        # the "response.write()" function to initiate a streamed response.
+        # This is of type OFS.Image.File but it should also apply to
+        # large OFS.Image.Image, large non-blog ATImages/ATFiles, and
+        # large Resource Registry cooked files, which all use the same
+        # method to initiate a streamed response.
+        s = "a" * (1 << 16) * 3
+        self.portal.manage_addFile('bigfile', file=StringIO(s), content_type='application/octet-stream')
+        browser = Browser()
+        browser.open(self.portal['bigfile'].absolute_url())
+        self.assertEquals('plone.resource', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
+        # This should use cacheInBrowserAndProxy
+        self.assertEquals('max-age=86400, proxy-revalidate, public', browser.headers['Cache-Control'])
+        self.failIf(None == browser.headers.get('Last-Modified'))  # remove this when the next line works
+        #self.assertEquals('---lastmodified---', browser.headers['Last-Modified'])
+        timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
+        self.failUnless(timedelta > datetime.timedelta(seconds=86390))
     
     def test_stable_resources(self):
         # We don't actually have any non-RR stable resources yet
