@@ -144,7 +144,7 @@ an operation in the drop-down list to view its description.
       be configured to disallow caching in other intermediate proxies
       that may exist between the local proxies and the browser (see the
       example proxy configs included with this package for some solutions
-      to this problem).  [XXX - example proxy configs not done yet]
+      to this problem).
 
 * *Weak caching* (plone.app.caching.weakCaching)
       Same as "moderate caching" but without proxy caching. Cache in browser
@@ -268,6 +268,14 @@ since most of the inline resources referenced by these views can be cached
 very effectively in the proxy (see the composite view discussion later
 in this document)
 
+Also included is an example profile for a "split-view" caching setup.
+
+* *With caching proxy (and split-view caching)*
+      An example profile for a caching proxy setup with split-view
+      caching enabled.
+
+This example requires a special proxy setup.  See the proxy examples
+in the 'proxy-configs' directory
 
 
 Custom caching profiles
@@ -639,8 +647,8 @@ responses.
 Yet another solution involves intercepting the request and dynamically adding
 a special ``X-Anonymous`` header to the anonymous request and then using Vary
 in split view responses to add this header to the cache key.  Examples of this
-last solution for both Squid and Varnish are included in this package.
-[XXX - not done yet]
+last solution for both Squid and Varnish are included in this package in the
+'proxy-configs' directory.
 
 
 

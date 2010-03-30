@@ -1,0 +1,195 @@
+<registry>
+
+  <record name="plone.caching.interfaces.ICacheSettings.operationMapping">
+    <value purge="False">
+      <element key="plone.resource">plone.app.caching.strongCaching</element>
+      <element key="plone.stableResource">plone.app.caching.strongCaching</element>
+      <element key="plone.content.itemView">plone.app.caching.moderateCaching</element>
+      <element key="plone.content.feed">plone.app.caching.moderateCaching</element>
+      <element key="plone.content.folderView">plone.app.caching.moderateCaching</element>
+      <element key="plone.content.file">plone.app.caching.moderateCaching</element>
+    </value>
+  </record>
+
+
+  <!-- plone.content.itemView -->
+  <record name="plone.app.caching.moderateCaching.plone.content.itemView.etags">
+      <field type="plone.registry.field.Tuple">
+          <title>ETags</title>
+          <description>A list of ETag component names to include</description>
+          <value_type type="plone.registry.field.ASCIILine" />
+          <required>False</required>
+      </field>
+      <value>
+          <element>userid</element>
+          <element>catalogCounter</element>
+          <element>language</element>
+          <element>gzip</element>
+          <element>skin</element>
+          <element>locked</element>
+          <element>resourceRegistries</element>
+      </value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.itemView.ramCache">
+      <field type="plone.registry.field.Bool">
+          <title>RAM cache</title>
+          <description>Turn on caching in Zope memory</description>
+          <required>False</required>
+      </field>
+      <value>True</value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.itemView.smaxage">
+      <field type="plone.registry.field.Int">
+          <title>Shared maximum age</title>
+          <description>Time (in seconds) to cache the response in the caching proxy. Leave blank to use value from "Maximum age" field.</description>
+          <required>False</required>
+      </field>
+      <value>3600</value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.itemView.vary">
+      <field type="plone.registry.field.ASCIILine">
+          <title>Vary</title>
+          <description>Name(s) of HTTP headers that must match for the caching proxy to return a cached response</description>
+          <required>False</required>
+      </field>
+      <value>X-Anonymous</value>
+  </record>
+
+
+
+  <!-- plone.content.folderView -->
+  <record name="plone.app.caching.moderateCaching.plone.content.folderView.etags">
+      <field type="plone.registry.field.Tuple">
+          <title>ETags</title>
+          <description>A list of ETag component names to include</description>
+          <value_type type="plone.registry.field.ASCIILine" />
+          <required>False</required>
+      </field>
+      <value>
+          <element>userid</element>
+          <element>catalogCounter</element>
+          <element>language</element>
+          <element>gzip</element>
+          <element>skin</element>
+          <element>locked</element>
+          <element>resourceRegistries</element>
+      </value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.folderView.ramCache">
+      <field type="plone.registry.field.Bool">
+          <title>RAM cache</title>
+          <description>Turn on caching in Zope memory</description>
+          <required>False</required>
+      </field>
+      <value>True</value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.folderView.smaxage">
+      <field type="plone.registry.field.Int">
+          <title>Shared maximum age</title>
+          <description>Time (in seconds) to cache the response in the caching proxy. Leave blank to use value from "Maximum age" field.</description>
+          <required>False</required>
+      </field>
+      <value>3600</value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.folderView.vary">
+      <field type="plone.registry.field.ASCIILine">
+          <title>Vary</title>
+          <description>Name(s) of HTTP headers that must match for the caching proxy to return a cached response</description>
+          <required>False</required>
+      </field>
+      <value>X-Anonymous</value>
+  </record>
+
+
+  <!-- plone.content.feed -->
+  <record name="plone.app.caching.moderateCaching.plone.content.feed.smaxage">
+      <field type="plone.registry.field.Int">
+          <title>Shared maximum age</title>
+          <description>Time (in seconds) to cache the response in the caching proxy. Leave blank to use value from "Maximum age" field.</description>
+          <required>False</required>
+      </field>
+      <value>86400</value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.feed.etags">
+      <field type="plone.registry.field.Tuple">
+          <title>ETags</title>
+          <description>A list of ETag component names to include</description>
+          <value_type type="plone.registry.field.ASCIILine" />
+          <required>False</required>
+      </field>
+      <value>
+          <element>userid</element>
+          <element>catalogCounter</element>
+          <element>language</element>
+          <element>gzip</element>
+          <element>skin</element>
+      </value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.feed.ramCache">
+      <field type="plone.registry.field.Bool">
+          <title>RAM cache</title>
+          <description>Turn on caching in Zope memory</description>
+          <required>False</required>
+      </field>
+      <value>True</value>
+  </record>
+
+
+  <!-- plone.content.file -->
+  <record name="plone.app.caching.moderateCaching.plone.content.file.smaxage">
+      <field type="plone.registry.field.Int">
+          <title>Shared maximum age</title>
+          <description>Time (in seconds) to cache the response in the caching proxy. Leave blank to use value from "Maximum age" field.</description>
+          <required>False</required>
+      </field>
+      <value>86400</value>
+  </record>
+  <record name="plone.app.caching.moderateCaching.plone.content.file.lastModified">
+      <field type="plone.registry.field.Bool">
+          <title>Last-modified validation</title>
+          <description>Turn on Last-Modified headers</description>
+          <required>False</required>
+      </field>
+      <value>True</value>
+  </record>
+
+
+  <!-- plone.resource-->
+  <record name="plone.app.caching.strongCaching.plone.resource.maxage">
+      <field type="plone.registry.field.Int">
+          <title>Maximum age</title>
+          <description>Time (in seconds) to cache the response in the browser or caching proxy</description>
+          <required>False</required>
+      </field>
+      <value>86400</value>
+  </record>
+  <record name="plone.app.caching.strongCaching.plone.resource.lastModified">
+      <field type="plone.registry.field.Bool">
+          <title>Last-modified validation</title>
+          <description>Turn on Last-Modified headers</description>
+          <required>False</required>
+      </field>
+      <value>True</value>
+  </record>
+
+
+  <!-- plone.stableResource-->
+  <record name="plone.app.caching.strongCaching.plone.stableResource.maxage">
+      <field type="plone.registry.field.Int">
+          <title>Maximum age</title>
+          <description>Time (in seconds) to cache the response in the browser or caching proxy</description>
+          <required>False</required>
+      </field>
+      <value>31536000</value>
+  </record>
+  <record name="plone.app.caching.strongCaching.plone.stableResource.lastModified">
+      <field type="plone.registry.field.Bool">
+          <title>Last-modified validation</title>
+          <description>Turn on Last-Modified headers</description>
+          <required>False</required>
+      </field>
+      <value>True</value>
+  </record>
+
+
+</registry>
