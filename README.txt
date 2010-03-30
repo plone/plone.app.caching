@@ -179,6 +179,49 @@ workflow state, and access privileges.  For more detail, it's best to review
 the operation code itself.
 
 
+Cache operation parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Much of the cache operation behavior is controlled via user-adjustable parameters.
+In fact, three of the default caching operations (strong caching, moderate caching,
+and weak caching) are essentially all the same operation but with different default
+parameter settings and with some parameters hidden from the UI.
+
+* *Maximum age* (maxage)
+      Time (in seconds) to cache the response in the browser or caching proxy.
+      Adds a "Cache-Control: max-age=<value>" header and a matching "Expires"
+      header to the response. 
+
+* *Shared maximum age* (smaxage)
+      Time (in seconds) to cache the response in the caching proxy. 
+      Adds a "Cache-Control: s-maxage=<value>" header to the response.
+
+* *ETags* (etags)
+      A list of the names of the ETag components to include in the ETag header.
+      Also turns on "304 Not Modified" responses for "If-None-Match" conditional
+      requests.      
+
+* *Last-modified validation* (lastModified)
+      Adds a "Last-Modified" header to the response and turns on "304 Not Modified"
+      responses for "If-Modified-Since" conditional requests.
+
+* *RAM cache* (ramCache)
+      Turn on caching in Zope memory.  If the URL is not specific enough to
+      ensure uniqueness then either ETags or Last-Modified should also be added
+      to the list of parameters in order to generate a unique cache key.
+
+* *Vary* (vary)
+      Name(s) of HTTP headers in the request that must match (in addition to the URL)
+      for a caching proxy to return a cached response.
+      
+* *Request variables that prevent caching* (cacheStopRequestVariables)
+      A list of variables in the request (including Cookies) that prevent caching
+      if present.  Note, unlike the others above, this global parameter is not 
+      directly visible in the plone.app.caching UI.  There should unlikely be any
+      need to change this list but, if needed, it can be edited via the Configuration
+      Registry control panel.
+
+
 Caching operation helper functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
