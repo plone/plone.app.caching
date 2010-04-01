@@ -13,7 +13,7 @@ Copy the entire contents of this directory to a new project directory and run bu
 
 This will initialize the project directory and run all the 'parts' as defined in buildout.cfg.
 
-- An Apache vhost configuration will be generated at "./etc/apache-vhost.conf"
+- An Apache vhost configuration will be generated at "./etc/httpd-vhost.conf"
 
 - A Varnish vcl file will be generated at "./etc/varnish.vcl"
 
