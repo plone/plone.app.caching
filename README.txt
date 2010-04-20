@@ -736,9 +736,8 @@ These configurations are provided for instructional purposes but with a little
 modification they can also be used in production.  To use in a real 
 production instance, you will need to adjust the configuration to match your
 setup.  For a simple standard setup, you might only need to change the ``hostname`` 
-value in the buildout.cfg.  To install, you first need to have buildout installed.
-See http://www.buildout.org/install.html and read the README.txt files in each 
-example for more instructions.
+value in the buildout.cfg.  Read the README.txt files in each example for more 
+instructions.
 
 There are also some alternative buildout recipes for building and configuring
 proxy configs: `plone.recipe.squid`_ and `plone.recipe.varnish`_.  The examples
