@@ -9,6 +9,7 @@ caching in Plone. It builds on ``z3c.caching``, ``plone.caching`` and
 
 .. contents:: Table of Contents
 
+
 Installation
 ------------
 
@@ -31,6 +32,7 @@ line that includes the Plone KGS::
 Update the version number at the end of the URL as appropriate. You can find
 an overview of the versions 
 `here <http://good-py.appspot.com/release/plone.app.caching>`_
+
 
 The caching control panel
 -------------------------
@@ -60,6 +62,91 @@ Under the settings tab, you will find four fieldsets:
 * *Detailed settings*, where you can configure parameters for individual
   caching operations.
 
+
+Caching profiles
+----------------
+
+All persistent configuration for the caching machinery is stored in the
+configuration registry, as managed by ``plone.app.registry``.  This can be
+modified using the ``registry.xml`` GenericSetup import step.  The *Import
+settings* tab of the control panel allows you to import these caching profiles.
+
+
+Default caching profiles
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``plone.app.caching`` includes three default caching profiles.  Two of these
+profiles encapsulate the cache settings that are known to work well with a
+typical default Plone installation.  The third is an example profile for a 
+"split-view" caching setup (see the split-view discussion later in this document).
+
+The three default caching profiles:
+
+* **Without caching proxy**
+      Settings useful for setups without a caching proxy.
+
+* **With caching proxy**
+      Settings useful for setups with a caching proxy such as Squid or 
+      Varnish.  The only difference from the "without caching proxy" 
+      profile are some settings to enable proxy caching of files/images
+      in content space and content feeds.
+
+* **With caching proxy (and split-view caching)**
+      An example profile for a caching proxy setup with split-view
+      caching enabled.  This example requires a special proxy setup.
+      See the proxy examples in the "proxy-configs" directory.
+
+
+Custom caching profiles
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Caching policies are often a compromise between speed and freshness.  
+More aggressive caching often comes at the cost of increased risk of
+stale responses. The default profiles provided tend to err on the side
+of freshness over speed so there is some room for tweaking if greater
+speed is desired.
+
+Customization may also be needed if third-party products are installed
+which require special treatment.  Examine the HTTP response headers to determine
+whether the third-party product requires special treatment.  Most simple
+cases probably can be solved by adding the content type or template to the
+appropriate mapping.  More complicated cases, may require custom caching
+operations.
+
+A GenericSetup profile used for caching should be registered for the
+``ICacheProfiles`` marker interface to distinguish it from more general
+profiles used to install a product. This also hides the profile from
+Plone's Add-ons control panel.
+
+Here is an example from this package::
+
+    <genericsetup:registerProfile
+        name="with-caching-proxy"
+        title="With caching proxy"
+        description="Settings useful for setups with a caching proxy such as Squid or Varnish"
+        directory="profiles/with-caching-proxy"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        for="plone.app.caching.interfaces.ICacheProfiles"
+        />
+
+The directory ``profiles/with-caching-proxy`` contains a single import step,
+``registry.xml``, containing settings to configure the ruleset to operation
+mapping, and setting options for various operations. Default options for the
+various standard operations are found in the ``registry.xml`` file that is
+part of the standard installation profile for this product, in the directory
+``profiles/default``.
+
+It may be useful looking at these files for inspiration if you are building
+your own caching profile. Alternatively, you can export the registry from the
+``portal_setup`` tool and pull out the records under the prefixes
+``plone.caching`` and ``plone.app.caching``.
+
+Typically, ``registry.xml`` is all that is required, but you are free to add
+additional import steps if required. You can also add a ``metadata.xml`` and
+use the GenericSetup dependency mechanism to install other profiles on the
+fly.
+
+
 Rulesets and caching operations
 -------------------------------
 
@@ -80,38 +167,38 @@ response), or add caching information to a response (such as setting the
 For more details on how to use these components, see the documentation for
 `plone.caching`_.
 
-Once ruleset and caching operation types have been registered, they will
+Once rulesets and caching operations have been registered, they will
 appear in the caching control panel.
 
-Default cache ruleset types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``plone.app.caching`` declares a few default ruleset types, which you map in
-its control panel and use in ``<cache:ruleset />`` directives in your own
-code. They are listed with descriptions in the control panel.
+Default rulesets
+~~~~~~~~~~~~~~~~
 
-* *Content feed* (plone.content.feed)
+``plone.app.caching`` declares a few default rulesets.  They are listed
+with descriptions in the control panel.
+
+* **Content feed** (``plone.content.feed``)
       A dynamic feed, e.g. using RSS or ATOM.
 
-* *Content files and images* (plone.content.file)
+* **Content files and images** (``plone.content.file``)
       Includes files and images in content space usually either downloaded
       or included as an inline element in one of the other public-facing 
       views.
 
-* *Content folder view* (plone.content.folderView)
+* **Content folder view** (``plone.content.folderView``)
       A public-facing view for a content item that is a folder or container
       for other items.
 
-* *Content item view* (plone.content.itemView)
+* **Content item view** (``plone.content.itemView``)
       A public-facing view for a content item that is not a folder or 
       container for other items.
 
-* *File and image resources* (plone.resource)
+* **File and image resources** (``plone.resource``)
       Includes images and files created or customised through the ZMI,
       those exposed in the portal_skins tool, and images registered in
       resource directories on the filesystem.
 
-* *Stable file and image resources* (plone.stableResource)
+* **Stable file and image resources** (``plone.stableResource``)
       Stable resources like the css, javascript, and kss files registered
       with the Resource Registries.  These are resources which can be cached
       'forever'.  Normally this means that if the object does change, its
@@ -121,18 +208,27 @@ code. They are listed with descriptions in the control panel.
 Default cache operations
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-``plone.app.caching`` also declares a number of default operation types,
-most of which can be configured via the GUI or through the configuration
-registry directly (see below). These are listed in the control panel as
-available operations for the various ruleset types. Hover your mouse over
-an operation in the drop-down list to view its description.
+``plone.app.caching`` also declares a number of default operation types.
+These are listed in the control panel as available operations for the 
+various rulesets. Hover your mouse over an operation in the drop-down 
+list to view its description.
 
-* *Strong caching* (plone.app.caching.strongCaching)
+* **Strong caching** (``plone.app.caching.strongCaching``)
       Cache in proxies and browser (default 24 hours).  Caution: Only use
       for stable resources that never change without changing their URL,
       or resources for which temporary staleness is not critical.
 
-* *Moderate caching.* (plone.app.caching.moderateCaching)
+      In the caching profiles ``without-caching-proxy`` and ``with-caching-proxy``,
+      this operation is mapped to the rulesets ``plone.resource`` and 
+      ``plone.stableResource``, which causes the following
+      headers to be added to the response::
+      
+        Last-Modified: <last-modified-date>
+        Cache-Control: max-age=<seconds>, proxy-revalidate, public
+        
+..
+
+* **Moderate caching** (``plone.app.caching.moderateCaching``)
       Cache in browser but expire immediately and enable 304 responses 
       on subsequent requests (similar to "weak caching").  Also cache
       public views in proxies (default 24 hours). Use a purgable caching
@@ -146,7 +242,24 @@ an operation in the drop-down list to view its description.
       example proxy configs included with this package for some solutions
       to this problem).
 
-* *Weak caching* (plone.app.caching.weakCaching)
+      In the caching profiles ``without-caching-proxy`` and ``with-caching-proxy``, 
+      this operation is mapped to the rulesets ``plone.content.itemView`` and 
+      ``plone.content.folderView``, which causes the following 
+      headers to be added to the response:: 
+
+        ETag: <etag-value>
+        Cache-Control: max-age=0, s-maxage=<seconds>, must-revalidate
+
+      In the caching profile ``with-caching-proxy``, this operation is also mapped
+      to the rulesets ``plone.content.feed`` and ``plone.content.file``,
+      which causes the following headers to be added to the response::
+
+        Last-Modified: <last-modified-date>
+        Cache-Control: max-age=0, s-maxage=<seconds>, must-revalidate
+
+..
+
+* **Weak caching** (``plone.app.caching.weakCaching``)
       Same as "moderate caching" but without proxy caching. Cache in browser
       but expire immediately and enable 304 responses on subsequent requests.
       304's require configuration of the ``Last-modified`` and/or ``ETags``
@@ -155,7 +268,16 @@ an operation in the drop-down list to view its description.
       used to to construct the ETag header. To also cache public responses
       in Zope memory, set the ``RAM cache`` parameter to True.
 
-* *No caching* (plone.app.caching.noCaching)
+      In the caching profile ``without-caching-proxy``, this operation is mapped to
+      the rulesets ``plone.content.feed`` and ``plone.content.file``, which
+      causes the following headers to be added to the response::
+
+        ETag: <etag-value>
+        Cache-Control: max-age=0, must-revalidate, private
+
+..        
+
+* **No caching** (``plone.app.caching.noCaching``)
       Use this operation to keep the response out of all caches. The 
       default settings generate an IE-safe no-cache operation. Under
       certain conditions, IE chokes on ``no-cache`` and ``no-store`` 
@@ -167,7 +289,7 @@ an operation in the drop-down list to view its description.
       is also desired, set the ``No store`` parameter to True.  
       [XXX - 'no store' option not done yet]
 
-* *Chain* (plone.caching.operations.chain)
+* **Chain** (``plone.caching.operations.chain``)
       Allows multiple operations to be chained together. When intercepting
       the response, the first chained operation to return a value will
       be used. Subsequent operations are ignored. When modifying the
@@ -187,34 +309,34 @@ In fact, three of the default caching operations (strong caching, moderate cachi
 and weak caching) are essentially all the same operation but with different default
 parameter settings and with some parameters hidden from the UI.
 
-* *Maximum age* (maxage)
+* *Maximum age* (``maxage``)
       Time (in seconds) to cache the response in the browser or caching proxy.
       Adds a "Cache-Control: max-age=<value>" header and a matching "Expires"
       header to the response. 
 
-* *Shared maximum age* (smaxage)
+* *Shared maximum age* (``smaxage``)
       Time (in seconds) to cache the response in the caching proxy. 
       Adds a "Cache-Control: s-maxage=<value>" header to the response.
 
-* *ETags* (etags)
+* *ETags* (``etags``)
       A list of the names of the ETag components to include in the ETag header.
       Also turns on "304 Not Modified" responses for "If-None-Match" conditional
       requests.      
 
-* *Last-modified validation* (lastModified)
+* *Last-modified validation* (``lastModified``)
       Adds a "Last-Modified" header to the response and turns on "304 Not Modified"
       responses for "If-Modified-Since" conditional requests.
 
-* *RAM cache* (ramCache)
+* *RAM cache* (``ramCache``)
       Turn on caching in Zope memory.  If the URL is not specific enough to
       ensure uniqueness then either ETags or Last-Modified should also be added
       to the list of parameters in order to generate a unique cache key.
 
-* *Vary* (vary)
+* *Vary* (``vary``)
       Name(s) of HTTP headers in the request that must match (in addition to the URL)
       for a caching proxy to return a cached response.
       
-* *Request variables that prevent caching* (cacheStopRequestVariables)
+* *Request variables that prevent caching* (``cacheStopRequestVariables``)
       A list of variables in the request (including Cookies) that prevent caching
       if present.  Note, unlike the others above, this global parameter is not 
       directly visible in the plone.app.caching UI.  There should unlikely be any
@@ -241,10 +363,10 @@ this: via debug response headers and via debug logging.
 Several debug response headers are added automatically by plone.app.caching
 and plone.cahing. These headers include:
 
-* X-Cache-Rule: <matching rule id>
-* X-Cache-Operation: <matching operation id>
-* X-Cache-Chain-Operations: <list of chain operation ids>
-* X-RAMCache: <ram cache id>
+* ``X-Cache-Rule: <matching rule id>``
+* ``X-Cache-Operation: <matching operation id>``
+* ``X-Cache-Chain-Operations: <list of chain operation ids>``
+* ``X-RAMCache: <ram cache id>``
 
 Viewing these headers is relatively easy with tools like the Firebug
 and LiveHTTPHeaders add-on for the Firefox browser.  Similar tools
@@ -275,101 +397,6 @@ The ``None`` indicates that no ruleset or operation was mapped.
 It is probably not a good idea to leave debug logging on for production use,
 as it can produce a lot of output, filling up log files and adding unnecessary
 load to your disks.
-
-
-Managing caching profiles
--------------------------
-
-All persistent configuration for the caching machinery is stored in the
-configuration registry, as managed by ``plone.app.registry``. This can be
-modified using the ``registry.xml`` GenericSetup import step. The *Import
-settings* tab of the control panel allows you to import these profiles.
-
-
-Default caching profiles
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-``plone.app.caching`` provides two default caching profiles that include
-the known best sets of cache settings that work with a typical default 
-Plone installation:
-
-* *With caching proxy.*
-      Settings useful for setups with a caching proxy such as Squid or 
-      Varnish.
-
-* *Without caching proxy.*
-      Settings useful for setups without a caching proxy.
-
-The only difference between these two profiles is the handling of content
-feeds and files/images in content space which are set with response headers
-that are a bit more aggressive when a caching proxy is available.
-
-Despite the minor differences, a setup with a caching proxy will still generally
-be faster for all responses.  This is true even for the "composite views" (which
-by design are not cached in proxies with either of the default profiles)
-since most of the inline resources referenced by these views can be cached
-very effectively in the proxy (see the composite view discussion later
-in this document)
-
-Also included is an example profile for a "split-view" caching setup.
-
-* *With caching proxy (and split-view caching)*
-      An example profile for a caching proxy setup with split-view
-      caching enabled.
-
-This example requires a special proxy setup.  See the proxy examples
-in the 'proxy-configs' directory
-
-
-Custom caching profiles
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Caching policies are often a compromise between speed and freshness.  
-More aggressive caching often comes at the cost of increased risk of
-stale responses. The default profiles provided tend to err on the side
-of freshness over speed so there is some room for tweaking if greater
-speed is desired.
-
-Customization may also be needed if third-party products are installed
-which require special treatment.  Examine the response headers to determine
-whether the third-party product requires special treatment.  Most simple
-cases probably can be solved by adding the content type or template to the
-appropriate mapping.  More complicated cases, may require custom caching
-operations.  See [placeholder1] and [placeholder2] for examples of third 
-party products providing custom caching operations using this framework.
-
-A GenericSetup profile used for caching should be registered for the
-``ICacheProfiles`` marker interface to distinguish it from more general
-profiles used to install a product, say. This also hides the profile from
-Plone's Add-ons control panel.
-
-Here is an example from this package::
-
-    <genericsetup:registerProfile
-        name="with-caching-proxy"
-        title="With caching proxy"
-        description="Settings useful for setups with a caching proxy such as Squid or Varnish"
-        directory="profiles/with-caching-proxy"
-        provides="Products.GenericSetup.interfaces.EXTENSION"
-        for="plone.app.caching.interfaces.ICacheProfiles"
-        />
-
-The directory ``profiles/with-caching-proxy`` contains a single import step,
-``registry.xml``, containing settings to configure the ruleset to operation
-mapping, and setting options for various operations. Default options for the
-various standard operations are found in the ``registry.xml`` file that is
-part of the standard installation profile for this product, in the directory
-``profiles/default``.
-
-It may be useful looking at these files for inspiration if you are building
-your own caching profile. Alternatively, you can export the registry from the
-``portal_setup`` tool and pull out the records under the prefixes
-``plone.caching`` and ``plone.app.caching``.
-
-Typically, ``registry.xml`` is all that is required, but you are free to add
-additional import steps if required. You can also add a ``metadata.xml`` and
-use the GenericSetup dependency mechanism to install other profiles on the
-fly.
 
 
 Caching proxies and purging
@@ -462,6 +489,7 @@ a quick solution for the awkward situation where your boss walks in and
 wonders why the "about us" page is still showing that old picture of him,
 before he had a new haircut.
 
+
 The RAM cache
 -------------
 
@@ -493,6 +521,7 @@ You can use the *RAM cache* tab in the caching control panel to view
 statistics about the use of the RAM cache. On the *Change settings* tab, you
 can also control the size of the cache, and the frequency with which it is
 purged of old items.
+
 
 Alternative RAM cache implementations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -539,6 +568,7 @@ Below is a sketch of such a cache chooser, courtesy of Wojciech Lichota::
 You could install this with the following lines in an overrides.zcml::
 
     <utility factory=".memcached.MemcachedCacheChooser" />
+
 
 ETags
 -----
@@ -624,8 +654,7 @@ As an example, here is the ``language`` adapter::
 
 This is registered in ZCML like so::
 
-    <adapter factory=".etags.Language"                   name="language" />
-
+    <adapter factory=".etags.Language" name="language" />
 
 
 Composite views
@@ -638,7 +667,7 @@ of composite views is the difficulty inherent in keeping track of all changes
 that might affect the final composited view. Because of the difficulty of 
 dependancy tracking, composite views are often notoriously difficult to purge 
 reliably from caching proxies so the default caching profiles set headers
-which expire the cache immediately (``weak caching``).
+which expire the cache immediately (i.e. *weak caching*).
 
 However, most of the inline resources linked to from the composite view (css, 
 javascript, images, etc.) can be cached very well in proxy so the overall
@@ -654,7 +683,7 @@ requests to the backend.
 
 For relatively stable composite views or for those views for which you can
 tolerate some potential staleness, you might be tempted to try switching from
-``weak caching`` to ``moderate caching`` with the ``s-maxage`` expiration
+*weak caching* to *moderate caching* with the ``s-maxage`` expiration
 value set to some tolerable value but first make sure you understand the
 issues regarding "split view" caching (see below).
 
@@ -679,19 +708,44 @@ provide different views to anonymous and authenticated requests.
 In Plone, authenticated requests are tracked via cookies which are not
 usually used in cache keys.  
 
-One solution is to add a ``Vary: Cookie`` response header but, unfortunately,
-since cookies are used for all sorts of state maintenance and web tracking,
-this will usually result in very inefficient caching.
+One solution to this problem is to add a ``Vary:Cookie`` response header but, 
+unfortunately, since cookies are used for all sorts of state maintenance and 
+web tracking, this will usually result in very inefficient caching.
 
 Another solution is to enforce a different domain name, different path,
 or different protocol (https/http) for authenticated versus anonymous
 responses.
 
 Yet another solution involves intercepting the request and dynamically adding
-a special ``X-Anonymous`` header to the anonymous request and then using Vary
-in split view responses to add this header to the cache key.  Examples of this
-last solution for both Squid and Varnish are included in this package in the
-'proxy-configs' directory.
+a special ``X-Anonymous`` header to the anonymous request and then adding
+``Vary:X-Anonymous`` to the split view response so that this header will added
+to the cache key.  Examples of this last solution for both Squid and Varnish
+are included in the ``proxy-configs`` directory of this package.
+
+
+Proxy configuration
+-------------------
+
+The ``plone.app.caching`` package includes some example buildout configurations
+in the ``proxy-configs`` directory.  Two versions are included: one demonstrating
+a Squid-behind-Apache proxy setup and another demonstrating a Varnish-behind-Apache
+proxy setup.  Both examples also demonstrate how to properly configure split-view
+caching.
+
+These configurations are provided for instructional purposes but with a little
+modification they can also be used in production.  To use in a real 
+production instance, you will need to adjust the configuration to match your
+setup.  For a simple standard setup, you might only need to change the ``hostname`` 
+value in the buildout.cfg.  To install, you first need to have buildout installed.
+See http://www.buildout.org/install.html and read the README.txt files in each 
+example for more instructions.
+
+There are also some alternative buildout recipes for building and configuring
+proxy configs: `plone.recipe.squid`_ and `plone.recipe.varnish`_.  The examples
+in this package do not use these recipes in favor of using a more explicit, and
+hopefully more educational, template-based approach.  Even if you decide to
+use one of the automated recipes, it will probably be worth your while to study
+the examples included in this package to get a few pointers.
 
 
 
@@ -707,3 +761,5 @@ last solution for both Squid and Varnish are included in this package in the
 .. _Squid: http://squid-cache.org
 .. _Enfold Proxy: http://enfoldsystems.com/software/proxy/
 .. _memcached: http://memcached.org
+.. _plone.recipe.squid: http://pypi.python.org/pypi/plone.recipe.squid
+.. _plone.recipe.varnish: http://pypi.python.org/pypi/plone.recipe.varnish
