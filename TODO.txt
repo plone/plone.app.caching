@@ -4,8 +4,6 @@ Plone caching to-do
 plone.app.caching
 -----------------
 
- [ ] Integration tests (mainly aimed at testing the default caching operations)
- 
  [ ] Update KGS
  
  [ ] Add caching declarations to plone.namedfile

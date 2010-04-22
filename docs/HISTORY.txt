@@ -1,7 +1,8 @@
-Changelog for plone.app.caching
--------------------------------
+Changelog
+---------
 
-plone.app.caching - 1.0a1 Unreleased
 
-    - Initial release.
+1.0a1 - April 22, 2010
+
+    * Initial release.
       [optilude, newbery, smcmahon]

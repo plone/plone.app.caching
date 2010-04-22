@@ -1,13 +1,14 @@
-plone.app.caching - HTTP caching support for Plone
-==================================================
+.. contents:: Table of Contents
 
-This package provides Plone UI and default rules for managing HTTP response
-caching in Plone. It builds on ``z3c.caching``, ``plone.caching`` and
-``plone.cachepurging``. 
+
+Introduction
+------------
+
+``plone.app.caching`` provides a Plone UI and default rules for managing
+HTTP response caching in Plone. It builds on ``z3c.caching``, ``plone.caching``
+and ``plone.cachepurging``. 
 
 ``plone.app.caching`` requires Plone 4 or later.
-
-.. contents:: Table of Contents
 
 
 Installation
@@ -399,16 +400,20 @@ as it can produce a lot of output, filling up log files and adding unnecessary
 load to your disks.
 
 
-Caching proxies and purging
----------------------------
+Caching proxies
+---------------
 
 It is common to place a so-called caching reverse proxy in front of Zope
 when hosting large Plone sites.  On Unix, a popular option is `Varnish`_,
 although `Squid`_ is also a good choice.  On Windows, you can use Squid
 or the (commercial, but better) `Enfold Proxy`_.
 
+It is important to realise that whilst ``plone.app.caching`` provides
+some functionality for controlling how Plone interacts with a caching
+proxy, the proxy itself must be configured separately.
+
 Some operations in ``plone.app.caching`` can set response headers that
-instruct the caching proxy how best to cache content [1]_. For example, it is
+instruct the caching proxy how best to cache content.  For example, it is
 normally a good idea to cache static resources (such as images and
 stylesheets) and "downloadables" (such as Plone content of the types ``File``
 or ``Image``) in the proxy. This content will then be served to most users
@@ -426,9 +431,11 @@ was modified. There are three general strategies for dealing with this:
   contain a time-based token, which changes when the ResourceRegistries
   are updated. This approach has the benefit of also being able to
   "invalidate" content stored in a user's browser cache.
+
 * All caching proxies support setting timeouts. This means that content may
   be stale, but typically only up to a few minutes. This is sometimes an
   acceptable policy for high-volume sites where most users do not log in.
+
 * Most caching proxies support receiving PURGE requests for paths that
   should be purged. For example, if the proxy has cached a resource at
   ``/logo.jpg``, and that object is modified, a PURGE request could be sent
@@ -445,15 +452,22 @@ Tracking all these dependencies and purging in an efficient manner is
 impossible unless the caching proxy configuration is highly customised for
 the site.
 
+
+Purging a caching proxy
+~~~~~~~~~~~~~~~~~~~~~~~
+
 Synchronous and asynchronous purging is enabled via `plone.cachepurging`_.
 In the control panel, you can configure the use of a proxy via various
 options, such as:
 
 * Whether or not to enable purging globally.
+
 * The address of the caching server to which PURGE requests should be sent.
+
 * Whether or not virtual host rewriting takes place before the caching proxy
   receives a URL or not. This has implications for how the PURGE path is
   constructed.
+
 * Any domain aliases for your site, to enable correct purging of content
   served via e.g. http://example.com and http://www.example.com.
 
@@ -488,6 +502,30 @@ one or more URLs. This is a useful way to debug cache purging, as well as
 a quick solution for the awkward situation where your boss walks in and
 wonders why the "about us" page is still showing that old picture of him,
 before he had a new haircut.
+
+
+Installing and configuring a caching proxy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``plone.app.caching`` package includes some example buildout configurations
+in the ``proxy-configs`` directory.  Two versions are included: one demonstrating
+a Squid-behind-Apache proxy setup and another demonstrating a Varnish-behind-Apache
+proxy setup.  Both examples also demonstrate how to properly configure split-view
+caching.
+
+These configurations are provided for instructional purposes but with a little
+modification they can also be used in production.  To use in a real 
+production instance, you will need to adjust the configuration to match your
+setup.  For a simple standard setup, you might only need to change the ``hostname`` 
+value in the buildout.cfg.  Read the README.txt files in each example for more 
+instructions.
+
+There are also some alternative buildout recipes for building and configuring
+proxy configs: `plone.recipe.squid`_ and `plone.recipe.varnish`_.  The examples
+in this package do not use these recipes in favor of using a more explicit, and
+hopefully more educational, template-based approach.  Even if you decide to
+use one of the automated recipes, it will probably be worth your while to study
+the examples included in this package to get a few pointers.
 
 
 The RAM cache
@@ -721,36 +759,6 @@ a special ``X-Anonymous`` header to the anonymous request and then adding
 ``Vary:X-Anonymous`` to the split view response so that this header will added
 to the cache key.  Examples of this last solution for both Squid and Varnish
 are included in the ``proxy-configs`` directory of this package.
-
-
-Proxy configuration
--------------------
-
-The ``plone.app.caching`` package includes some example buildout configurations
-in the ``proxy-configs`` directory.  Two versions are included: one demonstrating
-a Squid-behind-Apache proxy setup and another demonstrating a Varnish-behind-Apache
-proxy setup.  Both examples also demonstrate how to properly configure split-view
-caching.
-
-These configurations are provided for instructional purposes but with a little
-modification they can also be used in production.  To use in a real 
-production instance, you will need to adjust the configuration to match your
-setup.  For a simple standard setup, you might only need to change the ``hostname`` 
-value in the buildout.cfg.  Read the README.txt files in each example for more 
-instructions.
-
-There are also some alternative buildout recipes for building and configuring
-proxy configs: `plone.recipe.squid`_ and `plone.recipe.varnish`_.  The examples
-in this package do not use these recipes in favor of using a more explicit, and
-hopefully more educational, template-based approach.  Even if you decide to
-use one of the automated recipes, it will probably be worth your while to study
-the examples included in this package to get a few pointers.
-
-
-
-.. [1] It is important to realise that whilst ``plone.app.caching`` provides
-       some functionality for controlling how Plone interacts with a caching
-       proxy, the proxy itself must be configured separately.
 
 
 .. _plone.caching: http://pypi.python.org/pypi/plone.caching
