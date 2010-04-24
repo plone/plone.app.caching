@@ -189,8 +189,8 @@ class ModerateCaching(BaseCaching):
     classProvides(ICachingOperationType)
     
     title = _(u"Moderate caching")
-    description = _(u"Similar to Weak Caching but also cache public views in "
-                    u"proxies (default 24 hours). "
+    description = _(u"Cache in browser but expire immediately (same as 'weak caching'), "
+                    u"and cache in proxy (default: 24 hrs). "
                     u"Use a purgable caching reverse proxy for best results. "
                     u"Caution: If proxy cannot be purged, or cannot be configured "
                     u"to remove the 's-maxage' token from the response, then stale "
@@ -216,8 +216,8 @@ class StrongCaching(BaseCaching):
     classProvides(ICachingOperationType)
     
     title = _(u"Strong caching")
-    description = _(u"Cache in proxies and browser"
-                    u"(default 24 hours). Caution: Only use for stable resources "
+    description = _(u"Cache in browser and proxy (default: 24 hrs). "
+                    u"Caution: Only use for stable resources "
                     u"that never change without changing their URL, or resources "
                     u"for which temporary staleness is not critical.")
     prefix = 'plone.app.caching.strongCaching'

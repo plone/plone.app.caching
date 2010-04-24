@@ -42,24 +42,30 @@ After installation, you will find a Caching control panel in Plone's site
 setup. This consists of four main tabs:
 
 * *Change settings*, where you can control caching behaviour
+
 * *Import settings*, where you can import pre-defined profiles of cache
   settings
+
 * *Purge caching proxy*, where you can manually purge content from a caching
   proxy. This tab only appears if you have purging enabled under
   *Change settings*.
+
 * *RAM cache*, where you can view statistics about and purge the RAM cache.
 
 Under the settings tab, you will find four fieldsets:
 
 * *General settings*, for global options such as turning caching on or off.
+
 * *Caching proxies*, where you can control Plone's use of a caching proxy
   such as Squid or Varnish.
+
 * *Caching operation mappings*, where caching rulesets (hints about views
   and resources used for caching purposes) can be associated with caching
   operations (which either intercept a request to return a cached response, or
   modifies a response to add cache control headers). This is also where
   rulesets for legacy page templates (created through the web or the
   portal_skins tool) are configured.
+
 * *Detailed settings*, where you can configure parameters for individual
   caching operations.
 
@@ -215,7 +221,7 @@ various rulesets. Hover your mouse over an operation in the drop-down
 list to view its description.
 
 * **Strong caching** (``plone.app.caching.strongCaching``)
-      Cache in proxies and browser (default 24 hours).  Caution: Only use
+      Cache in browser and proxy (default: 24 hours).  Caution: Only use
       for stable resources that never change without changing their URL,
       or resources for which temporary staleness is not critical.
 
@@ -229,10 +235,9 @@ list to view its description.
         
 ..
 
-* **Moderate caching** (``plone.app.caching.moderateCaching``)
-      Cache in browser but expire immediately and enable 304 responses 
-      on subsequent requests (similar to "weak caching").  Also cache
-      public views in proxies (default 24 hours). Use a purgable caching
+* **Moderate caching** (``plone.app.caching.moderateCaching``),
+      Cache in browser but expire immediately (same as ``weak caching``),
+      and cache in proxy (default: 24 hours).  Use a purgable caching
       reverse proxy for best results.  Caution: If proxy cannot be purged
       reliably (for example, in the case of composite pages where it may
       be difficult to track when a dependency has changed) then stale 
@@ -261,13 +266,12 @@ list to view its description.
 ..
 
 * **Weak caching** (``plone.app.caching.weakCaching``)
-      Same as "moderate caching" but without proxy caching. Cache in browser
-      but expire immediately and enable 304 responses on subsequent requests.
-      304's require configuration of the ``Last-modified`` and/or ``ETags``
-      settings. If Last-Modified header is insufficient to ensure freshness,
-      turn on ETag checking by listing each ETag component that should be 
-      used to to construct the ETag header. To also cache public responses
-      in Zope memory, set the ``RAM cache`` parameter to True.
+      Cache in browser but expire immediately and enable 304 responses on 
+      subsequent requests.  304's require configuration of the ``Last-Modified``
+      and/or ``ETags`` settings.  If Last-Modified header is insufficient to
+      ensure freshness, turn on ETag checking by listing each ETag component that 
+      should be used to to construct the ETag header.  To also cache public 
+      responses in Zope memory, set the ``RAM cache`` parameter to True.
 
       In the caching profile ``without-caching-proxy``, this operation is mapped to
       the rulesets ``plone.content.feed`` and ``plone.content.file``, which
@@ -365,8 +369,11 @@ Several debug response headers are added automatically by plone.app.caching
 and plone.cahing. These headers include:
 
 * ``X-Cache-Rule: <matching rule id>``
+
 * ``X-Cache-Operation: <matching operation id>``
+
 * ``X-Cache-Chain-Operations: <list of chain operation ids>``
+
 * ``X-RAMCache: <ram cache id>``
 
 Viewing these headers is relatively easy with tools like the Firebug
@@ -480,9 +487,13 @@ for details on how this works, especially if you need to write your own.
 The default purge paths include:
 
 * ${object_path}, -- the object's canonical path
+
 * ${object_path}/ -- in case the object is a folder
+
 * ${object_path}/view -- the ``view`` method alias
+
 * ${object_path}/${default-view} -- in case a default view template is used
+
 * The download URLs for any Archetypes object fields, in the case of
   Archetypes content. This includes support for the standard ``File`` and
   ``Image`` types.
@@ -539,6 +550,7 @@ memory. This is done in two main ways:
   the results of certain functions in RAM. For example, some viewlets and
   portlets cache their rendered output in RAM for a time, alleviating the need
   to calculate them every time.
+
 * Some caching operations may cache an entire response in memory, so that
   they can later intercept the request to return a cached response..
 
@@ -547,10 +559,13 @@ of reasons:
 
 * Zope still has to perform traversal, security, transaction management and so
   on before serving a request with a RAM-cached response.
+
 * Zope's use of memory is not as efficient as that of a finely optimised
   caching proxy.
+
 * Storing lots of content in RAM may compete with the standard ZODB object
   cache and other memory pools used by Zope, thus slowing down Zope overall.
+
 * In multi-client ZEO setups, the RAM cache is (by default at least) not
   shared among instances (though it is shared among threads in that instance).
   Thus, each ZEO client process will maintain its own cache.
