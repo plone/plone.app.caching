@@ -16,7 +16,7 @@
     $().ready(function() {
         $('a.editGlobalOperationParameters, a.editRulesetOperationParameters').prepOverlay({
             subtype: 'ajax',
-            filter: common_content_filter,
+            filter: '#content>*:not(div.configlet),dl.portalMessage.error,dl.portalMessage.info',
             formselector: 'form:has(div[id^=formfield-form-widgets])',
             closeselector: '[name=form.buttons.cancel]',
             noform: 'close'
