@@ -773,7 +773,9 @@ Yet another solution involves intercepting the request and dynamically adding
 a special ``X-Anonymous`` header to the anonymous request and then adding
 ``Vary:X-Anonymous`` to the split view response so that this header will added
 to the cache key.  Examples of this last solution for both Squid and Varnish
-are included in the ``proxy-configs`` directory of this package.
+are included in the ``proxy-configs`` directory of this package, which are
+intended to be used in concert with something like the split-view caching
+profile of ``plone.app.caching``.
 
 
 .. _plone.caching: http://pypi.python.org/pypi/plone.caching
