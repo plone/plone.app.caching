@@ -38,7 +38,7 @@
         </div>
         
         <div class="contentActions">
-          &nbsp;
+          &#160;
         </div>
 
         <div class="documentContent" id="content">
@@ -124,7 +124,7 @@
                             name="form.button.Purge"
                             class="destructive"
                             value="Purge"
-                            i18n:attributes="value">
+                            i18n:attributes="value" />
                     </div>
                     
                     <input tal:replace="structure context/@@authenticator/authenticator" />
