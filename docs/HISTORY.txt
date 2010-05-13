@@ -5,7 +5,8 @@ Changelog
 1.0b1 - Unreleased
 ~~~~~~~~~~~~~~~~~~
 
-    * ...
+    * template fixes for cmf.pt compatibility 
+      [pilz]
 
 
 1.0a1 - April 24, 2010
