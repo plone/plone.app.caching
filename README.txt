@@ -248,18 +248,15 @@ list to view its description.
       example proxy configs included with this package for some solutions
       to this problem).
 
-      In the caching profiles ``without-caching-proxy`` and ``with-caching-proxy``, 
-      this operation is mapped to the rulesets ``plone.content.itemView`` and 
-      ``plone.content.folderView``, which causes the following 
-      headers to be added to the response:: 
+      In the caching profile ``with-caching-proxy``, this operation is mapped
+      to the rulesets ``plone.content.feed`` and ``plone.content.file``,
+      which causes the following headers to be added to the response:: 
 
+        [plone.content.feed]
         ETag: <etag-value>
         Cache-Control: max-age=0, s-maxage=<seconds>, must-revalidate
-
-      In the caching profile ``with-caching-proxy``, this operation is also mapped
-      to the rulesets ``plone.content.feed`` and ``plone.content.file``,
-      which causes the following headers to be added to the response::
-
+        
+        [plone.content.file]
         Last-Modified: <last-modified-date>
         Cache-Control: max-age=0, s-maxage=<seconds>, must-revalidate
 
@@ -273,14 +270,21 @@ list to view its description.
       should be used to to construct the ETag header.  To also cache public 
       responses in Zope memory, set the ``RAM cache`` parameter to True.
 
-      In the caching profile ``without-caching-proxy``, this operation is mapped to
-      the rulesets ``plone.content.feed`` and ``plone.content.file``, which
-      causes the following headers to be added to the response::
+      In the caching profile ``without-caching-proxy``, this operation is mapped
+      to the rulesets ``plone.content.itemView``, ``plone.content.folderView``, 
+      ``plone.content.feed``, and ``plone.content.file``, which causes the
+      following headers to be added to the response:: 
 
+        [plone.content.itemView, plone.content.folderView, plone.content.feed]
         ETag: <etag-value>
         Cache-Control: max-age=0, must-revalidate, private
+        
+        [plone.content.file]
+        Last-Modified: <last-modified-date>
+        Cache-Control: max-age=0, must-revalidate, private
 
-..        
+      In the caching profile ``with-caching-proxy``, this operation is mapped
+      only to the rulesets ``plone.content.itemView`` and ``plone.content.folderView``.
 
 * **No caching** (``plone.app.caching.noCaching``)
       Use this operation to keep the response out of all caches. The 
@@ -304,6 +308,23 @@ These operation descriptions are a bit simplified as several of these operations
 also include tests to downgrade caching depending on various parameter settings,
 workflow state, and access privileges.  For more detail, it's best to review
 the operation code itself.
+
+
+Default ruleset/operation mappings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To recap, ``plone.app.caching`` defines three default cache policies containing the cache operation mappings for each of the six rulesets.  The default mappings are as follows:
+
+===============  =====================  ==================  =============================
+..               without-caching-proxy  with-caching-proxy  with-caching-proxy-splitviews
+===============  =====================  ==================  =============================
+itemView         weakCaching            weakCaching         moderateCaching
+folderView       weakCaching            weakCaching         moderateCaching
+feed             weakCaching            moderateCaching     moderateCaching
+file             weakCaching            moderateCaching     moderateCaching
+resource         strongCaching          strongCaching       strongCaching
+stableResource   strongCaching          strongCaching       strongCaching
+===============  =====================  ==================  =============================
 
 
 Cache operation parameters
