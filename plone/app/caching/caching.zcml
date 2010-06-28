@@ -82,10 +82,10 @@
     
         <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSFile.FSFile" />
         <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSImage.FSImage" />
-    
+        
     </configure>
     
-    <!-- OFS (in-ZODB) files and images -->
+    <!-- OFS (in-ZODB) files, images -->
     <configure zcml:condition="installed OFS.Image">
     
         <cache:ruleset ruleset="plone.resource" for="OFS.Image.File" />
@@ -123,6 +123,24 @@
     <configure zcml:condition="installed Products.Archetypes">
     
         <cache:ruleset ruleset="plone.content.file" for="Products.Archetypes.Field.Image" />
+    
+    </configure>
+    
+    <!-- Archetypes based folders and non-folderish content items -->
+    <configure zcml:condition="installed Products.Archetypes">
+    
+        <!-- These rely on the ContentItemLookup delegation -->
+        <cache:ruleset ruleset="plone.content.itemView"   for="Products.Archetypes.BaseContent.BaseContent" />
+        <cache:ruleset ruleset="plone.content.folderView" for="Products.Archetypes.BaseFolder.BaseFolder" />
+    
+    </configure>
+    
+    <!-- Dexterity based folders and non-folderish content items -->
+    <configure zcml:condition="installed plone.dexterity">
+    
+        <!-- These rely on the ContentItemLookup delegation -->
+        <cache:ruleset ruleset="plone.content.itemView"   for="plone.dexterity.interfaces.IDexterityItem" />
+        <cache:ruleset ruleset="plone.content.folderView" for="plone.dexterity.interfaces.IDexterityContainer" />
     
     </configure>
     

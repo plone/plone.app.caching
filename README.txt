@@ -435,6 +435,50 @@ It is probably not a good idea to leave debug logging on for production use,
 as it can produce a lot of output, filling up log files and adding unnecessary
 load to your disks.
 
+Content-type based rulesets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Normally, you declare caching rulesets for a view, e.g. with::
+
+    <cache:ruleset
+        ruleset="plone.content.itemView"
+        for=".browser.MyItemView"
+        />
+
+See `plone.caching`_ for details.
+
+plone.app.caching installs a special ruleset lookup adapter that is invoked
+for skin layer page templates and browser views not assigned a more specific
+rule set. This adapter allows you to declare a ruleset for the *default view*
+of a given content type by supplying a content type class or interface to the
+``<cache:rulset />`` directive::
+
+    <cache:ruleset
+        ruleset="plone.content.itemView"
+        for=".interfaces.IMyContentType"
+        />
+
+or for a class:
+
+    <cache:ruleset
+        ruleset="plone.content.itemView"
+        for=".content.MyContentType"
+        />
+
+There are two reasons to want to do this:
+
+* Your type uses a skin layer page template for its default view, instead of a
+  browser view. In this case, you can either declare the ruleset on the
+  type as shown above (in ZCML), or map the type name in the registry,
+  using the GUI or GenericSetup. The former is more robust and certainly more
+  natural if you are declaring other, more conventional rulesets in ZCML
+  already.
+* You want to set the ruleset for a number of content types. In fact,
+  plone.app.caching already does this for you: The Archetypes base classes
+  ``BaseContent`` and ``BaseFolder`` are assigned the rulesets
+  ``plone.content.itemView`` and ``plone.content.folderview``, respectively.
+  Ditto for Dexterity's ``IDexterityItem`` and ``IDexterityContainer``
+  interfaces.
 
 Caching proxies
 ---------------

@@ -458,15 +458,30 @@
             
                         <label i18n:translate="label_template_mappings">Legacy template mappings</label>
                         <div class="formHelp" i18n:translate="help_template_mappings">
+                            <p>
                             Legacy page templates defined in the <em>portal_skins</em>
                             tool in the ZMI, or created or customised through the web cannot be
-                            associated with rulesets in the usual way. Instead, the
-                            association is maintained here. Enter template names (one per
-                            line) and/or choose content types below. If you choose a
-                            content type name, the corresponding caching rule will be
-                            associated with the default view of that content type.
+                            associated with rulesets in the usual way. There are two options:
+                            </p>
+                            <ul>
+                                <li>If the template is the <em>default type</em> of a content type
+                                     it is possible to associate the type class or an interface it
+                                     provides with a ruleset.</li>
+                                 <li>You can also associate a specific page template (by name) or
+                                      content type with a ruleset using the options below.</li>
+                            </ul>
+                            <p>
+                            <strong>Note:</strong> By default, folder-like content types are
+                            associated with the ruleset <code>plone.content.folderView</code>,
+                            and item-like content types are associated with the ruleset
+                            <code>plone.content.itemView</code>. Any settings entered below or
+                            set via an explicit cache ruleset (in a ZCML file) will override these
+                            defaults.
+                            </p>
+                            <p>
                             <strong>Note:</strong> You can only use each template name or
                             content type once!
+                            </p>
                         </div>
             
                         <table class="listing nosort" id="templateMappingsTable">

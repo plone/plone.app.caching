@@ -2,6 +2,9 @@ import unittest
 
 import zope.component.testing
 
+from z3c.caching.registry import RulesetRegistry
+import z3c.caching.registry
+
 from zope.component import provideUtility, provideAdapter, getUtility
 from zope.interface import implements
 
@@ -12,12 +15,13 @@ from plone.registry.fieldfactory import persistentFieldAdapter
 
 from plone.app.caching.interfaces import IPloneCacheSettings
 
-from plone.app.caching.lookup import PageTemplateLookup
+from plone.app.caching.lookup import ContentItemLookup
 
 from Acquisition import Explicit
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 from Products.CMFCore.interfaces import IDynamicType
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
+from Products.Five.browser import BrowserView
 
 class DummyContent(Explicit):
     implements(IBrowserDefault, IDynamicType)
@@ -70,10 +74,14 @@ class DummyRequest(dict):
         self['PUBLISHED'] = published
         self.response = response
 
-class TestPageTemplateLookup(unittest.TestCase):
+class DummyView(BrowserView):
+    __name__ = 'defaultView'
+
+class TestContentItemLookup(unittest.TestCase):
     
     def setUp(self):
         provideAdapter(persistentFieldAdapter)
+        provideAdapter(RulesetRegistry)
     
     def tearDown(self):
         zope.component.testing.tearDown()
@@ -82,7 +90,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         published = ZopePageTemplate('someView')
         request = DummyRequest(published, DummyResponse())
         
-        self.assertEquals(None, PageTemplateLookup(published, request)())
+        self.assertEquals(None, ContentItemLookup(published, request)())
         
     def test_no_mappings(self):
         provideUtility(Registry(), IRegistry)
@@ -91,7 +99,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         
         published = ZopePageTemplate('someView')
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(None, PageTemplateLookup(published, request)())
+        self.assertEquals(None, ContentItemLookup(published, request)())
     
     def test_template_lookup(self):
         provideUtility(Registry(), IRegistry)
@@ -103,9 +111,9 @@ class TestPageTemplateLookup(unittest.TestCase):
 
         published = ZopePageTemplate('someView')
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule1', PageTemplateLookup(published, request)())
+        self.assertEquals('rule1', ContentItemLookup(published, request)())
     
-    def test_contenttype_lookup(self):
+    def test_contenttype_name_lookup(self):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(IPloneCacheSettings)
@@ -116,7 +124,69 @@ class TestPageTemplateLookup(unittest.TestCase):
         
         published = ZopePageTemplate('defaultView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule1', PageTemplateLookup(published, request)())
+        self.assertEquals('rule1', ContentItemLookup(published, request)())
+    
+    def test_contenttype_class_lookup_page_template(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(IPloneCacheSettings)
+        
+        ploneSettings = registry.forInterface(IPloneCacheSettings)
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {}
+        
+        z3c.caching.registry.register(DummyContent, 'rule1')
+        
+        published = ZopePageTemplate('defaultView').__of__(DummyContent())
+        request = DummyRequest(published, DummyResponse())
+        self.assertEquals('rule1', ContentItemLookup(published, request)())
+    
+    def test_contenttype_class_lookup_browser_view(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(IPloneCacheSettings)
+        
+        ploneSettings = registry.forInterface(IPloneCacheSettings)
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {}
+        
+        z3c.caching.registry.register(DummyContent, 'rule1')
+        
+        published = DummyView(DummyContent(), None)
+        request = DummyRequest(published, DummyResponse())
+        published.request = published
+        
+        self.assertEquals('rule1', ContentItemLookup(published, request)())
+    
+    def test_contenttype_class_lookup_template_override(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(IPloneCacheSettings)
+        
+        ploneSettings = registry.forInterface(IPloneCacheSettings)
+        ploneSettings.templateRulesetMapping = {'defaultView': 'rule2'}
+        ploneSettings.contentTypeRulesetMapping = {}
+        
+        z3c.caching.registry.register(DummyContent, 'rule1')
+        
+        published = ZopePageTemplate('defaultView').__of__(DummyContent())
+        request = DummyRequest(published, DummyResponse())
+        self.assertEquals('rule2', ContentItemLookup(published, request)())
+    
+    def test_contenttype_class_lookup_type_override(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(IPloneCacheSettings)
+        
+        ploneSettings = registry.forInterface(IPloneCacheSettings)
+        ploneSettings.templateRulesetMapping = {}
+        ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule2'}
+        
+        z3c.caching.registry.register(DummyContent, 'rule1')
+        
+        published = ZopePageTemplate('defaultView').__of__(DummyContent())
+        request = DummyRequest(published, DummyResponse())
+        self.assertEquals('rule2', ContentItemLookup(published, request)())
     
     def test_contenttype_not_default_view(self):
         provideUtility(Registry(), IRegistry)
@@ -129,7 +199,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         
         published = ZopePageTemplate('someView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(None, PageTemplateLookup(published, request)())
+        self.assertEquals(None, ContentItemLookup(published, request)())
     
     def test_parent_not_content(self):
         provideUtility(Registry(), IRegistry)
@@ -142,7 +212,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(None, PageTemplateLookup(published, request)())
+        self.assertEquals(None, ContentItemLookup(published, request)())
     
     def test_parent_not_IBrowserDefault_methodid(self):
         provideUtility(Registry(), IRegistry)
@@ -155,7 +225,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/view'))
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule1', PageTemplateLookup(published, request)())
+        self.assertEquals('rule1', ContentItemLookup(published, request)())
     
     def test_parent_not_IBrowserDefault_default_method(self):
         provideUtility(Registry(), IRegistry)
@@ -168,7 +238,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/'))
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule1', PageTemplateLookup(published, request)())
+        self.assertEquals('rule1', ContentItemLookup(published, request)())
     
     def test_parent_not_IBrowserDefault_actiononly(self):
         provideUtility(Registry(), IRegistry)
@@ -182,7 +252,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView'))
         request = DummyRequest(published, DummyResponse())
         
-        self.assertEquals('rule1', PageTemplateLookup(published, request)())
+        self.assertEquals('rule1', ContentItemLookup(published, request)())
     
     def test_match_template_and_content(self):
         provideUtility(Registry(), IRegistry)
@@ -196,7 +266,7 @@ class TestPageTemplateLookup(unittest.TestCase):
         published = ZopePageTemplate('defaultView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
         
-        self.assertEquals('rule1', PageTemplateLookup(published, request)())
+        self.assertEquals('rule1', ContentItemLookup(published, request)())
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)

@@ -38,8 +38,15 @@
     <!-- Default caching configuration -->
     <include file="caching.zcml" />
     
-    <!-- Lookup for page template resources -->
-    <adapter factory=".lookup.PageTemplateLookup" />
+    <!-- Lookup for content item views and page template resources -->
+    <adapter
+        for="zope.publisher.interfaces.browser.IBrowserView *"
+        factory=".lookup.ContentItemLookup"
+        />
+    <adapter
+        for="zope.pagetemplate.interfaces.IPageTemplate *"
+        factory=".lookup.ContentItemLookup"
+        />
     
     <!-- Add GZip compression: plone.transformchain order 10000 -->
     <adapter factory=".gzip.GZipTransform" name="plone.app.caching.gzip" />
