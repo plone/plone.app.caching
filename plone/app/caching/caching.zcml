@@ -144,6 +144,14 @@
     
     </configure>
     
+    <!-- plone.namedfile downloadable -->
+    <configure zcml:condition="installed plone.namedfile">
+    
+        <!-- These rely on the ContentItemLookup delegation -->
+        <cache:ruleset ruleset="plone.content.file"   for="plone.namedfile.browser.Download" />
+    
+    </configure>
+    
     <!-- plone.app.blob content -->
     <configure zcml:condition="installed plone.app.blob">
         
