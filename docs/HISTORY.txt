@@ -4,6 +4,13 @@ Changelog
 
 1.0b1 - Unreleased
 ~~~~~~~~~~~~~~~~~~
+    
+    * Add basic plone.namedfile caching rules, if plone.namedfile is installed
+      [optilude]
+
+    * Implement lookup based on portal type class/interface as well as name,
+      and set up defaults for items and folders.
+      [optilude]
 
     * template fixes for cmf.pt compatibility 
       [pilz]
