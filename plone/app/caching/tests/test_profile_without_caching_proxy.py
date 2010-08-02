@@ -96,7 +96,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
         #self.assertEquals('|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'])
-        self.assertEquals('"|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'][:37])
+        self.assertEquals('"|test_user_1_|50||0|Sunburst Theme|0', browser.headers['ETag'][:37])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated page
@@ -110,7 +110,8 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
-        self.assertEquals('"|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'][:37])
+        #self.assertEquals('"|test_user_1_|50||0|Sunburst Theme|0', browser.headers['ETag'])
+        self.assertEquals('"|test_user_1_|50||0|Sunburst Theme|0', browser.headers['ETag'][:37])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated page again -- to test RAM cache.
@@ -142,7 +143,8 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
-        self.assertEquals('"||51||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
+        #self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'])
+        self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the anonymous page
@@ -155,7 +157,8 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
-        self.assertEquals('"||51||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
+        #self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'])
+        self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the anonymous page again -- to test RAM cache.
@@ -170,7 +173,8 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         self.failUnless(testText in browser.contents)
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
-        self.assertEquals('"||51||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
+        #self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'])
+        self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the anonymous page again -- with an INM header to test 304.
@@ -217,7 +221,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('"||40||0|Sunburst Theme"', browser.headers['ETag'])
+        self.assertEquals('"||39||0|Sunburst Theme"', browser.headers['ETag'])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the rss feed again -- to test RAM cache
@@ -231,7 +235,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         self.assertEquals('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.assertEquals(rssText, browser.contents)
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('"||40||0|Sunburst Theme"', browser.headers['ETag'])
+        self.assertEquals('"||39||0|Sunburst Theme"', browser.headers['ETag'])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the rss feed again -- with an INM header to test 304.
@@ -255,7 +259,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('"|test_user_1_|40||0|Sunburst Theme"', browser.headers['ETag'])
+        self.assertEquals('"|test_user_1_|39||0|Sunburst Theme"', browser.headers['ETag'])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated rss feed again -- to test RAM cache
