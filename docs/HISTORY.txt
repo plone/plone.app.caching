@@ -5,6 +5,10 @@ Changelog
 1.0b1 - Unreleased
 ~~~~~~~~~~~~~~~~~~
     
+    * Add an option for "anonymous only" caching to the default operations.
+      This is a simple way to switch off caching for logged-in users.
+      [optilude]
+    
     * Add basic plone.namedfile caching rules, if plone.namedfile is installed
       [optilude]
 

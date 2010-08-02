@@ -73,11 +73,11 @@ class BaseCaching(object):
                     u"to use one of the other simpler operations (Strong caching, "
                     u"Moderate caching, Weak caching, or No caching).")
     prefix = 'plone.app.caching.baseCaching'
-    options = ('maxage','smaxage','etags','lastModified','ramCache', 'vary')
+    options = ('maxage','smaxage','etags','lastModified','ramCache', 'vary', 'anonOnly')
     
     # Default option values
     maxage = smaxage = etags = vary = None
-    lastModified = ramCache = False
+    lastModified = ramCache = anonOnly = False
     
     def __init__(self, published, request):
         self.published = published
@@ -113,6 +113,7 @@ class BaseCaching(object):
         options = lookupOptions(class_ or self.__class__, rulename)
         maxage = options.get('maxage') or self.maxage
         smaxage = options.get('smaxage') or self.smaxage
+        anonOnly = options.get('anonOnly') or self.anonOnly
         ramCache = options['ramCache']
         vary = options['vary']
         etags = options['etags']
@@ -124,6 +125,14 @@ class BaseCaching(object):
             etag = str(random.randint(10**10, 10**11))
             return setCacheHeaders(self.published, self.request, response, etag=etag)
         
+        # Check if we should only cache for anonymous users
+        context = getContext(self.published)
+        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
+        isAnonymous = portal_state.anonymous()
+        
+        if anonOnly and not isAnonymous:
+            return setCacheHeaders(self.published, self.request, response)
+        
         # Do the maxage/smaxage settings allow for proxy caching?
         proxyCache = smaxage or (maxage and smaxage is None)
         
@@ -132,9 +141,7 @@ class BaseCaching(object):
         if ramCache or proxyCache:
             if etags is not None:
                 if 'userid' in etags or 'roles' in etags:
-                    context = getContext(self.published)
-                    portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
-                    public = portal_state.anonymous()
+                    public = isAnonymous
             public = public and visibleToRole(self.published, role='Anonymous')
         
         if proxyCache and not public:
@@ -173,12 +180,12 @@ class WeakCaching(BaseCaching):
     sort = 3
     
     # Configurable options
-    options = ('etags','lastModified','ramCache','vary')
+    options = ('etags','lastModified','ramCache','vary', 'anonOnly')
     
     # Default option values
     maxage = 0
     smaxage = etags = vary = None
-    lastModified = ramCache = False
+    lastModified = ramCache = anonOnly = False
 
 class ModerateCaching(BaseCaching):
     """Moderate caching operation. A subclass of the generic BaseCaching
@@ -199,13 +206,13 @@ class ModerateCaching(BaseCaching):
     sort = 2
     
     # Configurable options
-    options = ('smaxage','etags','lastModified','ramCache','vary')
+    options = ('smaxage','etags','lastModified','ramCache','vary', 'anonOnly')
     
     # Default option values
     maxage = 0
     smaxage = 86400
     etags = vary = None
-    lastModified = ramCache = False
+    lastModified = ramCache = anonOnly = False
 
 class StrongCaching(BaseCaching):
     """Strong caching operation. A subclass of the generic BaseCaching
@@ -224,12 +231,12 @@ class StrongCaching(BaseCaching):
     sort = 1
     
     # Configurable options
-    options = ('maxage','smaxage','etags','lastModified','ramCache','vary')
+    options = ('maxage','smaxage','etags','lastModified','ramCache','vary', 'anonOnly')
     
     # Default option values
     maxage = 86400
     smaxage = etags = vary = None
-    lastModified = ramCache = False
+    lastModified = ramCache = anonOnly = False
 
 if HAVE_RESOURCE_REGISTRIES:
 

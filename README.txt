@@ -369,6 +369,11 @@ the UI.
 * *Vary* (``vary``)
       Name(s) of HTTP headers in the request that must match (in addition to
       the URL) for a caching proxy to return a cached response.
+
+* *Anonymous only* (``anonOnly``)
+      Set this to True if you want to explicitly stop sending cache headers
+      for logged-in users. This check is done first, so any other options
+      will effectively be ignored.
       
 * *Request variables that prevent caching* (``cacheStopRequestVariables``)
       A list of variables in the request (including Cookies) that prevent

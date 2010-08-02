@@ -82,6 +82,14 @@
         </field>
         <value></value>
     </record>
+    <record name="plone.app.caching.weakCaching.anonOnly">
+        <field type="plone.registry.field.Bool">
+            <title>Only cache for anonymous users</title>
+            <description>If set, no caching will take place for logged-in users</description>
+            <required>False</required>
+        </field>
+        <value>False</value>
+    </record>
 
 
     <!-- Moderate caching -->
@@ -127,7 +135,14 @@
         </field>
         <value></value>
     </record>
-
+    <record name="plone.app.caching.moderateCaching.anonOnly">
+        <field type="plone.registry.field.Bool">
+            <title>Only cache for anonymous users</title>
+            <description>If set, no caching will take place for logged-in users</description>
+            <required>False</required>
+        </field>
+        <value>False</value>
+    </record>
 
     <!-- Strong caching -->
     <record name="plone.app.caching.strongCaching.maxage">
@@ -180,7 +195,14 @@
         </field>
         <value></value>
     </record>
-    
+    <record name="plone.app.caching.strongCaching.anonOnly">
+        <field type="plone.registry.field.Bool">
+            <title>Only cache for anonymous users</title>
+            <description>If set, no caching will take place for logged-in users</description>
+            <required>False</required>
+        </field>
+        <value>False</value>
+    </record>    
 
     <!-- Uncomment if showing "Generic caching" in the UI.
          Also see operations/configure.zcml 
