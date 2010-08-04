@@ -7,6 +7,5 @@ plone.app.caching
  [ ] Update KGS
  
  [ ] Add caching declarations to plone.namedfile
-        - Download view should declare ruleset plone.download
         - IPurgeURL adapter should include full path to view plus sub-paths
  
