@@ -371,10 +371,17 @@ the UI.
       the URL) for a caching proxy to return a cached response.
 
 * *Anonymous only* (``anonOnly``)
-      Set this to True if you want to explicitly stop sending cache headers
-      for logged-in users. This check is done first, so any other options
-      will effectively be ignored.
-      
+      Set this to True if you want to force logged-in users to always get a
+      fresh copy. This works best with the "moderate caching" operation, and
+      will not work well with a "Max age" (to cache content in the browser)
+      greater than zero. By setting this option, you can focus the other cache
+      settings on the anonymous use case. Note that if you are using a caching
+      proxy, you will need to set a Vary header of "X-Anonymous" or similar,
+      and ensure that such a header is set in the proxy for logged in users (a
+      blunter alternative is to use "Cookie" as the header, although this can
+      have false positives). See the example Varnish and Squid configurations
+      that come with this package for more details.
+
 * *Request variables that prevent caching* (``cacheStopRequestVariables``)
       A list of variables in the request (including Cookies) that prevent
       caching if present. Note, unlike the others above, this global parameter

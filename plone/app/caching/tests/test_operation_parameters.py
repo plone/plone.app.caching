@@ -50,8 +50,10 @@ class TestOperationParameters(FunctionalTestCase):
         # Set pages to have strong caching so that we can see the difference
         # between logged in and anonymous
         
-        self.cacheSettings.operationMapping = {'plone.content.itemView': 'plone.app.caching.strongCaching'}
-        self.registry['plone.app.caching.strongCaching.anonOnly'] = True
+        self.cacheSettings.operationMapping = {'plone.content.itemView': 'plone.app.caching.moderateCaching'}
+        self.registry['plone.app.caching.moderateCaching.smaxage'] = 60
+        self.registry['plone.app.caching.moderateCaching.vary'] = 'X-Anonymous'
+        self.registry['plone.app.caching.moderateCaching.anonOnly'] = True
         
         # Publish the folder and page
         self.portal.portal_workflow.doActionFor(self.portal['f1'], 'publish')
@@ -61,19 +63,21 @@ class TestOperationParameters(FunctionalTestCase):
         browser = Browser()
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         self.failUnless(testText in browser.contents)
-        self.assertEquals('max-age=86400, proxy-revalidate, public', browser.headers['Cache-Control'])
+        self.assertEquals('max-age=0, s-maxage=60, must-revalidate', browser.headers['Cache-Control'])
+        self.assertEquals('X-Anonymous', browser.headers['Vary'])
+        self.failIf('Etag' in browser.headers)
         
         # View the page as logged-in
         browser = Browser()
         browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
-        self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
+        self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         self.failUnless(testText in browser.contents)
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
+        self.failUnless('Etag' in browser.headers)
         
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)
-

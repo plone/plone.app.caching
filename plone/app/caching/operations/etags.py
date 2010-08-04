@@ -1,3 +1,4 @@
+import random
 import time
 
 from zope.interface import implements
@@ -235,3 +236,25 @@ class ResourceRegistries(object):
         mtimes.sort()
         return str(mtimes[-1])
 
+class AnonymousOrRandom(object):
+    """The ``anonymousOrRandom`` etag component. This is normally added
+    implicitly by the ``anonOnly`` setting. It will return None for anonymous
+    users, but a random number for logged-in ones. The idea is to force a
+    re-fetch of a page every time for logged-in users.
+    """
+    
+    implements(IETagValue)
+    adapts(Interface, Interface)
+    
+    def __init__(self, published, request):
+        self.published = published
+        self.request = request
+    
+    def __call__(self):
+        context = getContext(self.published)
+        portal_state = queryMultiAdapter((context, self.request), name=u'plone_portal_state')
+        if portal_state is None:
+            return None
+        if portal_state.anonymous():
+            return None
+        return "%s%d" % (time.time(), random.randint(0, 1000))

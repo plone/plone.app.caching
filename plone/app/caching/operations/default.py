@@ -1,3 +1,4 @@
+import time
 import random
 
 from zope.interface import implements
@@ -117,21 +118,21 @@ class BaseCaching(object):
         ramCache = options['ramCache']
         vary = options['vary']
         etags = options['etags']
+        
+        # Add the ``anonymousOrRandom`` etag if we are anonymous only
+        if anonOnly:
+            if etags is None:
+                etags = ['anonymousOrRandom']
+            else:
+                etags = tuple(etags) + ('anonymousOrRandom',)
+        
         etag = getETagAnnotation(self.published, self.request, etags)
         lastModified = getLastModifiedAnnotation(self.published, self.request, options['lastModified'])
         
         # Check for cache stop request variables
         if cacheStop(self.request, rulename):
-            etag = str(random.randint(10**10, 10**11))
+            etag = "%s%d" % (time.time(), random.randint(0, 1000))
             return setCacheHeaders(self.published, self.request, response, etag=etag)
-        
-        # Check if we should only cache for anonymous users
-        context = getContext(self.published)
-        portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
-        isAnonymous = portal_state.anonymous()
-        
-        if anonOnly and not isAnonymous:
-            return setCacheHeaders(self.published, self.request, response)
         
         # Do the maxage/smaxage settings allow for proxy caching?
         proxyCache = smaxage or (maxage and smaxage is None)
@@ -140,8 +141,10 @@ class BaseCaching(object):
         public = True
         if ramCache or proxyCache:
             if etags is not None:
-                if 'userid' in etags or 'roles' in etags:
-                    public = isAnonymous
+                if 'userid' in etags or 'anonymousOrRandom' in etags or 'roles' in etags:
+                    context = getContext(self.published)
+                    portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
+                    public = portal_state.anonymous()
             public = public and visibleToRole(self.published, role='Anonymous')
         
         if proxyCache and not public:

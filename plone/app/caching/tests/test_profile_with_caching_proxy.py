@@ -62,6 +62,8 @@ class TestProfileWithCaching(FunctionalTestCase):
         # This is a clone of the same test for 'without-caching-proxy'
         # Can we just call that test from this context?
         
+        catalog = self.portal['portal_catalog']
+        
         # Add folder content
         self.setRoles(('Manager',))
         self.portal.invokeFactory('Folder', 'f1')
@@ -101,7 +103,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
         #self.assertEquals('"|test_user_1_|50||0|Sunburst Theme|0', browser.headers['ETag'])
-        self.assertEquals('"|test_user_1_|50||0|Sunburst Theme|0', browser.headers['ETag'][:37])
+        self.assertEquals('"|test_user_1_|%d||0|Sunburst Theme|0' % catalog.getCounter(), browser.headers['ETag'][:37])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated page
@@ -116,7 +118,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
         #self.assertEquals('"|test_user_1_|50||0|Sunburst Theme|0', browser.headers['ETag'])
-        self.assertEquals('"|test_user_1_|50||0|Sunburst Theme|0', browser.headers['ETag'][:37])
+        self.assertEquals('"|test_user_1_|%d||0|Sunburst Theme|0' % catalog.getCounter(), browser.headers['ETag'][:37])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated page again -- to test RAM cache.
@@ -149,7 +151,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
         #self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'])
-        self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
+        self.assertEquals('"||%d||0|Sunburst Theme|0|' % catalog.getCounter(), browser.headers['ETag'][:26])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the anonymous page
@@ -163,7 +165,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
         #self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'])
-        self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
+        self.assertEquals('"||%d||0|Sunburst Theme|0|' % catalog.getCounter(), browser.headers['ETag'][:26])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the anonymous page again -- to test RAM cache.
@@ -179,7 +181,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
         #self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'])
-        self.assertEquals('"||50||0|Sunburst Theme|0|', browser.headers['ETag'][:26])
+        self.assertEquals('"||%d||0|Sunburst Theme|0|' % catalog.getCounter(), browser.headers['ETag'][:26])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the anonymous page again -- with an INM header to test 304.
@@ -212,6 +214,8 @@ class TestProfileWithCaching(FunctionalTestCase):
     
     def test_content_feeds(self):
         
+        catalog = self.portal['portal_catalog']
+        
         # Enable syndication
         self.setRoles(('Manager',))
         self.syndication = self.portal.portal_syndication
@@ -226,7 +230,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInProxy
         self.assertEquals('max-age=0, s-maxage=86400, must-revalidate', browser.headers['Cache-Control'])
-        self.assertEquals('"||39||0|Sunburst Theme"', browser.headers['ETag'])
+        self.assertEquals('"||%d||0|Sunburst Theme"' % catalog.getCounter(), browser.headers['ETag'])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the rss feed again -- to test RAM cache
@@ -240,7 +244,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         self.assertEquals('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.assertEquals(rssText, browser.contents)
         self.assertEquals('max-age=0, s-maxage=86400, must-revalidate', browser.headers['Cache-Control'])
-        self.assertEquals('"||39||0|Sunburst Theme"', browser.headers['ETag'])
+        self.assertEquals('"||%d||0|Sunburst Theme"' % catalog.getCounter(), browser.headers['ETag'])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the rss feed again -- with an INM header to test 304.
@@ -264,7 +268,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEquals('"|test_user_1_|39||0|Sunburst Theme"', browser.headers['ETag'])
+        self.assertEquals('"|test_user_1_|%d||0|Sunburst Theme"' % catalog.getCounter(), browser.headers['ETag'])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated rss feed again -- to test RAM cache
@@ -418,6 +422,7 @@ class TestProfileWithCaching(FunctionalTestCase):
         pass
     
     def test_stable_resources_resource_registries(self):
+        
         # This is a clone of the same test for 'without-caching-proxy'
         # Can we just call that test from this context?
         path = "/Sunburst%20Theme/public.css"
