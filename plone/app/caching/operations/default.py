@@ -86,9 +86,21 @@ class BaseCaching(object):
     
     def interceptResponse(self, rulename, response, class_=None):
         options = lookupOptions(class_ or self.__class__, rulename)
-        etag = getETagAnnotation(self.published, self.request, keys=options['etags'])
-        lastModified = getLastModifiedAnnotation(self.published, self.request, lastModified=options['lastModified'])
-        ramCache = options['ramCache']
+        
+        etags        = options.get('etags') or self.etags
+        anonOnly     = options.get('anonOnly', self.anonOnly)
+        ramCache     = options.get('ramCache', self.ramCache)
+        lastModified = options.get('lastModified', self.lastModified)
+        
+        # Add the ``anonymousOrRandom`` etag if we are anonymous only
+        if anonOnly:
+            if etags is None:
+                etags = ['anonymousOrRandom']
+            elif 'anonymousOrRandom' not in etags:
+                etags = tuple(etags) + ('anonymousOrRandom',)
+        
+        etag = getETagAnnotation(self.published, self.request, keys=etags)
+        lastModified = getLastModifiedAnnotation(self.published, self.request, lastModified=lastModified)
         
         # Check for cache stop request variables
         if cacheStop(self.request, rulename):
@@ -112,18 +124,20 @@ class BaseCaching(object):
     
     def modifyResponse(self, rulename, response, class_=None):
         options = lookupOptions(class_ or self.__class__, rulename)
-        maxage = options.get('maxage') or self.maxage
-        smaxage = options.get('smaxage') or self.smaxage
-        anonOnly = options.get('anonOnly') or self.anonOnly
-        ramCache = options['ramCache']
-        vary = options['vary']
-        etags = options['etags']
+        
+        maxage   = options.get('maxage') or self.maxage
+        smaxage  = options.get('smaxage') or self.smaxage
+        etags    = options.get('etags') or self.etags
+        
+        anonOnly = options.get('anonOnly', self.anonOnly)
+        ramCache = options.get('ramCache', self.ramCache)
+        vary     = options.get('vary', self.vary)
         
         # Add the ``anonymousOrRandom`` etag if we are anonymous only
         if anonOnly:
             if etags is None:
                 etags = ['anonymousOrRandom']
-            else:
+            elif 'anonymousOrRandom' not in etags:
                 etags = tuple(etags) + ('anonymousOrRandom',)
         
         etag = getETagAnnotation(self.published, self.request, etags)
