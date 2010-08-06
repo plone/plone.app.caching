@@ -67,7 +67,7 @@
                 </p>
                 
                 <table tal:define="stats view/ramCache/getStatistics"
-                       class="listing nosort" summary="RAM Cache statistics"
+                       class="listing nosort" summary="RAM cache statistics"
                        i18n:attributes="summary heading_ramcache_stats;">
                   <thead> 
                     <th i18n:translate="label_cache_path">Key</th>
