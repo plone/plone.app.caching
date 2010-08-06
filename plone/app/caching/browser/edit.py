@@ -244,6 +244,6 @@ class EditForm(form.Form):
             if key in self.registry.records:
                 del self.registry.records[key]
         
-        IStatusMessage(self.request).addStatusMessage(_(u"Ruleset-specific settings removed"), type="info")
+        IStatusMessage(self.request).addStatusMessage(_(u"Ruleset-specific settings removed."), type="info")
         self.request.response.redirect("%s/@@caching-controlpanel#detailed-settings" % self.context.absolute_url())
         return ''

@@ -218,7 +218,7 @@ class ControlPanel(BaseView):
                 
                 if contentType in contentTypeRulesetMapping:
                     self.errors.setdefault('contenttypes', {})[ruleset] = \
-                        _(u"Content type ${contentType} is already mapped to the rule ${ruleset}", 
+                        _(u"Content type ${contentType} is already mapped to the rule ${ruleset}.", 
                             mapping={'contentType': self.contentTypesLookup.get(contentType, {}).get('title', contentType), 
                                      'ruleset': contentTypeRulesetMapping[contentType]})
                 else:
@@ -246,7 +246,7 @@ class ControlPanel(BaseView):
                 
                 if template in templateRulesetMapping:
                     self.errors.setdefault('templates', {})[ruleset] = \
-                        _(u"Template ${template} is already mapped to the rule ${ruleset}", 
+                        _(u"Template ${template} is already mapped to the rule ${ruleset}.", 
                             mapping={'template': template,
                                       'ruleset': templateRulesetMapping[template]})
                 else:
@@ -267,30 +267,30 @@ class ControlPanel(BaseView):
         try:
             ramCacheMaxEntries = int(ramCacheMaxEntries)
         except (ValueError, TypeError,):
-            self.errors['ramCacheMaxEntries'] = _(u"An integer is required")
+            self.errors['ramCacheMaxEntries'] = _(u"An integer is required.")
         else:
             if ramCacheMaxEntries < 0:
-                self.errors['ramCacheMaxEntries'] = _(u"A positive number is required")
+                self.errors['ramCacheMaxEntries'] = _(u"A positive number is required.")
         
         try:
             ramCacheMaxAge = int(ramCacheMaxAge)
         except (ValueError, TypeError,):
-            self.errors['ramCacheMaxAge'] = _(u"An integer is required")
+            self.errors['ramCacheMaxAge'] = _(u"An integer is required.")
         else:
             if ramCacheMaxAge < 0:
-                self.errors['ramCacheMaxAge'] = _(u"A positive number is required")
+                self.errors['ramCacheMaxAge'] = _(u"A positive number is required.")
         
         try:
             ramCacheCleanupInterval = int(ramCacheCleanupInterval)
         except (ValueError, TypeError,):
-            self.errors['ramCacheCleanupInterval'] = _(u"An integer is required")
+            self.errors['ramCacheCleanupInterval'] = _(u"An integer is required.")
         else:
             if ramCacheMaxAge < 0:
-                self.errors['ramCacheCleanupInterval'] = _(u"A positive number is required")
+                self.errors['ramCacheCleanupInterval'] = _(u"A positive number is required.")
         
         # Check for errors
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
+            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
             return
         
         # Save settings
@@ -473,10 +473,10 @@ class Import(BaseView):
         snapshot = self.request.form.get('snapshot', True)
         
         if not profile:
-            self.errors['profile'] = _(u"You must select a profile to import")
+            self.errors['profile'] = _(u"You must select a profile to import.")
         
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
+            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
             return
         
         portal_setup = getToolByName(self.context, 'portal_setup')
@@ -490,7 +490,7 @@ class Import(BaseView):
         # Import the new profile
         portal_setup.runAllImportStepsFromProfile("profile-%s" % profile)
         
-        IStatusMessage(self.request).addStatusMessage(_(u"Import complete"), "info")
+        IStatusMessage(self.request).addStatusMessage(_(u"Import complete."), "info")
     
     @property
     @memoize
@@ -516,10 +516,10 @@ class Purge(BaseView):
         sync = self.request.form.get('synchronous', True)
         
         if not urls:
-            self.errors['urls'] = _(u"No URLs or paths entered")
+            self.errors['urls'] = _(u"No URLs or paths entered.")
         
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
+            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
             return
         
         purger = getUtility(IPurger)
@@ -592,11 +592,11 @@ class RAMCache(BaseView):
     def processPurge(self):
         
         if self.ramCache is None:
-            IStatusMessage(self.request).addStatusMessage(_(u"RAM cache not installed"), "error")
+            IStatusMessage(self.request).addStatusMessage(_(u"RAM cache not installed."), "error")
         
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors"), "error")
+            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
             return
         
         self.ramCache.invalidateAll()
-        IStatusMessage(self.request).addStatusMessage(_(u"Cache purged"), "info")
+        IStatusMessage(self.request).addStatusMessage(_(u"Cache purged."), "info")
