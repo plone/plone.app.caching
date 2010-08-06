@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+1.0b2 - unreleased
+~~~~~~~~~~~~~~~~~~
+
+    * Fixed various i18n issues.
+      [vincentfretin]
+
 1.0b1 - August 4, 2010
 ~~~~~~~~~~~~~~~~~~~~~~
     
