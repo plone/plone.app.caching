@@ -70,7 +70,7 @@
                        class="listing nosort" summary="RAM cache statistics"
                        i18n:attributes="summary heading_ramcache_stats;">
                   <thead> 
-                    <th i18n:translate="label_cache_path">Key</th>
+                    <th i18n:translate="label_cache_key">Key</th>
                     <th i18n:translate="label_cache_hits">Hits</th>
                     <th i18n:translate="label_cache_misses">Misses</th>
                     <th i18n:translate="label_cache_size_bytes">Size (bytes)</th>
