@@ -309,7 +309,7 @@ class ControlPanel(BaseView):
         
         self.ramCache.update(ramCacheMaxEntries, ramCacheMaxAge, ramCacheCleanupInterval)
         
-        IStatusMessage(self.request).addStatusMessage(_(u"Changes saved"), "info")
+        IStatusMessage(self.request).addStatusMessage(_(u"Changes saved."), "info")
 
     
     # Rule types - used as the index column

@@ -227,12 +227,12 @@ class EditForm(form.Form):
             self.status = self.formErrorsMessage
             return
         self.applyChanges(data)
-        IStatusMessage(self.request).addStatusMessage(_(u"Changes saved"), "info")
+        IStatusMessage(self.request).addStatusMessage(_(u"Changes saved."), "info")
         self.request.response.redirect("%s/@@caching-controlpanel#detailed-settings" % self.context.absolute_url())
     
     @button.buttonAndHandler(_(u"Cancel"), name="cancel")
     def cancel(self, action):
-        IStatusMessage(self.request).addStatusMessage(_(u"Edit cancelled"), type="info")
+        IStatusMessage(self.request).addStatusMessage(_(u"Edit cancelled."), type="info")
         self.request.response.redirect("%s/@@caching-controlpanel#detailed-settings" % self.context.absolute_url())
         return ''
     
