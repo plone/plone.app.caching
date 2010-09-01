@@ -679,8 +679,9 @@ Below is a sketch of such a cache chooser, courtesy of Wojciech Lichota::
 
     from threading import local
     from pylibmc import Client
-    from plone.memoize.ram import MemcacheAdapter
+    from zope.interface import implements
     from plone.memoize.interfaces import ICacheChooser
+    from plone.memoize.ram import MemcacheAdapter
     
     class MemcachedCacheChooser(object):
         implements(ICacheChooser)
