@@ -258,3 +258,18 @@ class AnonymousOrRandom(object):
         if portal_state.anonymous():
             return None
         return "%s%d" % (time.time(), random.randint(0, 1000))
+
+class CopyCookie(object):
+    """The ``copy`` etag component, returning 1 or 0 depending on whether
+    the '__cp' cookie is set.
+    """
+    
+    implements(IETagValue)
+    adapts(Interface, Interface)
+    
+    def __init__(self, published, request):
+        self.published = published
+        self.request = request
+    
+    def __call__(self):
+        return self.request.get('__cp') and '1' or '0'

@@ -97,8 +97,17 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         # XXX - Fix this.  The RR mod date element changes with each test run
         #self.assertEquals('|test_user_1_|51||0|Sunburst Theme|0', browser.headers['ETag'])
-        self.assertEquals('"|test_user_1_|%d||0|Sunburst Theme|0' % catalog.getCounter(), browser.headers['ETag'][:37])
+        self.assertEquals('"|test_user_1_|%d||0|Sunburst Theme|0|0|' % catalog.getCounter(), browser.headers['ETag'][:40])
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
+        
+        # Set the copy/cut cookie and then request the folder view again
+        browser.cookies.create('__cp', 'xxx')
+        browser.open(self.portal['f1'].absolute_url())
+        # The response should be the same as before except for the etag
+        self.assertEquals('plone.content.folderView', browser.headers['X-Cache-Rule'])
+        self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
+        self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
+        self.assertEquals('"|test_user_1_|%d||0|Sunburst Theme|0|1|' % catalog.getCounter(), browser.headers['ETag'][:40])
         
         # Request the authenticated page
         now = datetime.datetime.now(dateutil.tz.tzlocal())

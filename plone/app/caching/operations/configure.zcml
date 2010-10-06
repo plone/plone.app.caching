@@ -48,5 +48,6 @@
     <adapter factory=".etags.Skin"                      name="skin" />
     <adapter factory=".etags.ResourceRegistries"        name="resourceRegistries" />
     <adapter factory=".etags.AnonymousOrRandom"         name="anonymousOrRandom" />
+    <adapter factory=".etags.CopyCookie"                name="copy" />
     
 </configure>
