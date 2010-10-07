@@ -4,34 +4,34 @@ Changelog
 1.0b2 - unreleased
 ~~~~~~~~~~~~~~~~~~
 
-    * Added an etag component to track the existence of a copy/cut cookie
-      [newbery]
+* Added an etag component to track the existence of a copy/cut cookie
+  [newbery]
 
-    * Fixed various i18n issues.
-      [vincentfretin]
+* Fixed various i18n issues.
+  [vincentfretin]
 
 
 1.0b1 - August 4, 2010
 ~~~~~~~~~~~~~~~~~~~~~~
-    
-    * Add an option for "anonymous only" caching to the default operations.
-      This is a simple way to switch off caching for logged-in users. See
-      the README for more details.
-      [optilude]
-    
-    * Add basic plone.namedfile caching rules, if plone.namedfile is installed
-      [optilude]
 
-    * Implement lookup based on portal type class/interface as well as name,
-      and set up defaults for items and folders.
-      [optilude]
+* Add an option for "anonymous only" caching to the default operations.
+  This is a simple way to switch off caching for logged-in users. See
+  the README for more details.
+  [optilude]
 
-    * template fixes for cmf.pt compatibility 
-      [pilz]
+* Add basic plone.namedfile caching rules, if plone.namedfile is installed
+  [optilude]
+
+* Implement lookup based on portal type class/interface as well as name,
+  and set up defaults for items and folders.
+  [optilude]
+
+* template fixes for cmf.pt compatibility
+  [pilz]
 
 
 1.0a1 - April 24, 2010
 ~~~~~~~~~~~~~~~~~~~~~~
 
-    * Initial release.
-      [optilude, newbery, smcmahon]
+* Initial release.
+  [optilude, newbery, smcmahon]
