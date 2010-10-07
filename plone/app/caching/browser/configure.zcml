@@ -2,7 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="plone.app.caching">
-    
+
     <browser:page
         name="caching-controlpanel"
         for="Products.CMFPlone.interfaces.IPloneSiteRoot"
@@ -26,7 +26,7 @@
         template="purge.pt"
         permission="cmf.ManagePortal"
         />
-    
+
     <browser:page
         name="caching-controlpanel-ramcache"
         for="Products.CMFPlone.interfaces.IPloneSiteRoot"
@@ -34,10 +34,10 @@
         template="ramcache.pt"
         permission="cmf.ManagePortal"
         />
-    
+
     <browser:resource
         name="plone.app.caching.gif"
         image="plone.app.caching.gif"
         />
-    
+
 </configure>
