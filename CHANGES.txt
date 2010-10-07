@@ -14,8 +14,8 @@ Changelog
   [vincentfretin]
 
 
-1.0b1 - August 4, 2010
-~~~~~~~~~~~~~~~~~~~~~~
+1.0b1 - 2010-08-04
+~~~~~~~~~~~~~~~~~~
 
 * Add an option for "anonymous only" caching to the default operations.
   This is a simple way to switch off caching for logged-in users. See
@@ -33,8 +33,8 @@ Changelog
   [pilz]
 
 
-1.0a1 - April 24, 2010
-~~~~~~~~~~~~~~~~~~~~~~
+1.0a1 - 2010-04-24
+~~~~~~~~~~~~~~~~~~
 
 * Initial release.
   [optilude, newbery, smcmahon]
