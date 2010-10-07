@@ -4,6 +4,9 @@ Changelog
 1.0b2 - unreleased
 ~~~~~~~~~~~~~~~~~~
 
+* Update distribution metadata to current best practice.
+  [hannosch]
+
 * Added an etag component to track the existence of a copy/cut cookie
   [newbery]
 
