@@ -1,8 +1,9 @@
+import unittest2 as unittest
+from plone.testing.zca import UNIT_TESTING
+
 import os
 import time
 import datetime
-import unittest
-import zope.component.testing
 import DateTime
 
 from dateutil.tz import tzlocal
@@ -27,6 +28,8 @@ class FauxDataManager(object):
 
 class TestLastModified(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(lastmodified.pageTemplateDelegateLastModified)
         provideAdapter(lastmodified.OFSFileLastModified)
@@ -34,9 +37,6 @@ class TestLastModified(unittest.TestCase):
         provideAdapter(lastmodified.CatalogableDublinCoreLastModified)
         provideAdapter(lastmodified.DCTimesLastModified)
         provideAdapter(lastmodified.ResourceLastModified)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
     
     def test_pageTemplateDelegateLastModified(self):
         from persistent import Persistent
@@ -189,6 +189,3 @@ class TestLastModified(unittest.TestCase):
         mod = datetime.datetime.fromtimestamp(modtime, tz=tzlocal())
         
         self.assertEquals(mod, ILastModified(r)())
-    
-def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)

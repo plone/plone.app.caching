@@ -10,6 +10,7 @@ from plone.memoize.instance import memoize
 
 from plone.registry.interfaces import IRegistry
 from plone.registry import Record
+from plone.registry import FieldRef
 
 from plone.app.caching.interfaces import _
 
@@ -175,11 +176,9 @@ class EditForm(form.Form):
                 globalKey = self.operation.prefix + key[len(self.operation.prefix) + len(self.rulesetName) + 1:]
                 assert globalKey in self.registry.records
                 
-                # Clone the global field for the purposes of the new record
-                field = self.cloneField(self.registry.records[globalKey].field)
-                
-                # Create a new record
-                self.registry.records[key] = Record(field, value)
+                # Create a new record with a FieldRef
+                field = self.registry.records[globalKey].field
+                self.registry.records[key] = Record(FieldRef(globalKey, field), value)
             
             else:
                 self.registry[key] = value

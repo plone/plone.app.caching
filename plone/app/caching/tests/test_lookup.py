@@ -1,6 +1,5 @@
-import unittest
-
-import zope.component.testing
+import unittest2 as unittest
+from plone.testing.zca import UNIT_TESTING
 
 from z3c.caching.registry import RulesetRegistry
 import z3c.caching.registry
@@ -79,12 +78,11 @@ class DummyView(BrowserView):
 
 class TestContentItemLookup(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(persistentFieldAdapter)
         provideAdapter(RulesetRegistry)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
     
     def test_no_registry(self):
         published = ZopePageTemplate('someView')
@@ -267,6 +265,3 @@ class TestContentItemLookup(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         
         self.assertEquals('rule1', ContentItemLookup(published, request)())
-
-def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)

@@ -1,5 +1,5 @@
-import unittest
-import zope.component.testing
+import unittest2 as unittest
+from plone.testing.zca import UNIT_TESTING
 
 import time
 import datetime
@@ -39,13 +39,11 @@ class DummyPublished(object):
 
 class ResponseModificationHelpersTest(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(AttributeAnnotations)
         classImplements(HTTPRequest, IAttributeAnnotatable)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
-    
     
     # doNotCache()
     
@@ -346,13 +344,11 @@ class ResponseModificationHelpersTest(unittest.TestCase):
 
 class ResponseInterceptorHelpersTest(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(AttributeAnnotations)
         classImplements(HTTPRequest, IAttributeAnnotatable)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
-    
     
     # cachedResponse()
     
@@ -492,13 +488,11 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
 
 class CacheCheckHelpersTest(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(AttributeAnnotations)
         classImplements(HTTPRequest, IAttributeAnnotatable)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
-    
     
     # isModified()
     
@@ -756,12 +750,11 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
 class MiscHelpersTest(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(AttributeAnnotations)
         classImplements(HTTPRequest, IAttributeAnnotatable)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
     
     # getContext()
     
@@ -1119,13 +1112,11 @@ class MiscHelpersTest(unittest.TestCase):
 
 class RAMCacheTest(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(AttributeAnnotations)
         classImplements(HTTPRequest, IAttributeAnnotatable)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
-    
     
     # getRAMCache()
     
@@ -1503,7 +1494,3 @@ class RAMCacheTest(unittest.TestCase):
         
         marker = object()
         self.failUnless(fetchFromRAMCache(request, etag='|foo', default=marker) is marker)
-    
-
-def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)

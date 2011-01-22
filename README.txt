@@ -140,21 +140,55 @@ Here is an example from this package::
 
 The directory ``profiles/with-caching-proxy`` contains a single import step,
 ``registry.xml``, containing settings to configure the ruleset to operation
-mapping, and setting options for various operations. Default options for the
-various standard operations are found in the ``registry.xml`` file that is
-part of the standard installation profile for this product, in the directory
-``profiles/default``.
+mapping, and setting options for various operations. At the time of writing,
+this includes::
 
-It may be useful looking at these files for inspiration if you are building
-your own caching profile. Alternatively, you can export the registry from the
-``portal_setup`` tool and pull out the records under the prefixes
-``plone.caching`` and ``plone.app.caching``.
+    <record name="plone.caching.interfaces.ICacheSettings.operationMapping">
+        <value purge="False">
+            <element key="plone.resource">plone.app.caching.strongCaching</element>
+            <element key="plone.stableResource">plone.app.caching.strongCaching</element>
+            <element key="plone.content.itemView">plone.app.caching.weakCaching</element>
+            <element key="plone.content.feed">plone.app.caching.moderateCaching</element>
+            <element key="plone.content.folderView">plone.app.caching.weakCaching</element>
+            <element key="plone.content.file">plone.app.caching.moderateCaching</element>
+        </value>
+    </record>
+
+Default options for the various standard operations are found in the
+``registry.xml`` file that is part of the standard installation profile for
+this product, in the directory ``profiles/default``. The custom profile
+overrides a number of operation settings for specific rulesets (see below).
+For example::
+    
+    <record name="plone.app.caching.weakCaching.plone.content.itemView.ramCache">
+        <field ref="plone.app.caching.weakCaching.ramCache" />
+        <value>True</value>
+    </record>
+
+This enables RAM caching for the "weak caching" operation for resources using
+the ruleset ``plone.content.itemView``. The default is defined in the main
+``registry.xml`` as::
+
+    <record name="plone.app.caching.weakCaching.ramCache">
+        <field type="plone.registry.field.Bool">
+            <title>RAM cache</title>
+            <description>Turn on caching in Zope memory</description>
+            <required>False</required>
+        </field>
+        <value>False</value>
+    </record>
+
+Notice how we use a *field reference* to avoid having to re-define the field.
+
+It may be useful looking at these bundled ``registry.xml`` for inspiration if
+you are building your own caching profile. Alternatively, you can export the
+registry from the ``portal_setup`` tool and pull out the records under the
+prefixes ``plone.caching`` and ``plone.app.caching``.
 
 Typically, ``registry.xml`` is all that is required, but you are free to add
 additional import steps if required. You can also add a ``metadata.xml`` and
 use the GenericSetup dependency mechanism to install other profiles on the
 fly.
-
 
 Rulesets and caching operations
 -------------------------------

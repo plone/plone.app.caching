@@ -1,17 +1,13 @@
+import unittest2 as unittest
+
+from plone.testing.z2 import Browser
+
+from plone.app.testing import TEST_USER_NAME, TEST_USER_PASSWORD
+from plone.app.testing import applyProfile
+from plone.app.testing import setRoles
+
 import pkg_resources
 
-import unittest
-
-#import datetime
-#import dateutil.parser
-#import dateutil.tz
-
-from Products.PloneTestCase.ptc import FunctionalTestCase
-from Products.PloneTestCase.ptc import default_user, default_password
-
-from plone.app.caching.tests.layer import Layer
-
-from Products.Five.testbrowser import Browser
 import OFS.Image
 
 from zope.component import getUtility
@@ -24,11 +20,13 @@ from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.cachepurging.interfaces import IPurger
 from plone.app.caching.interfaces import IPloneCacheSettings
 
+from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+
 TEST_IMAGE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
 TEST_FILE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
 
 
-class TestOperations(FunctionalTestCase):
+class TestOperations(unittest.TestCase):
     """This test aims to exercise some generic caching operations in a semi-
     realistic scenario.
     
@@ -53,11 +51,15 @@ class TestOperations(FunctionalTestCase):
     To test purging, check the self.purger._sync and self.purger._async lists.
     """
     
-    layer = Layer
+    layer = PLONE_APP_CACHING_FUNCTIONAL_TESTING
     
-    def afterSetUp(self):
+    def setUp(self):
+        self.app = self.layer['app']
+        self.portal = self.layer['portal']
+        
         setRequest(self.portal.REQUEST)
-        self.addProfile('plone.app.caching:without-caching-proxy')
+        
+        applyProfile(self.portal, 'plone.app.caching:without-caching-proxy')
         
         self.registry = getUtility(IRegistry)
         
@@ -68,13 +70,13 @@ class TestOperations(FunctionalTestCase):
         self.purger = getUtility(IPurger)
         self.purger.reset()
     
-    def beforeTearDown(self):
+    def tearDown(self):
         setRequest(None)
     
     def test_disabled(self):
         self.cacheSettings.enabled = False
         
-        self.setRoles(('Manager',))
+        setRoles(self.portal, TEST_USER_NAME, ('Manager',))
         
         # Folder content
         self.portal.invokeFactory('Folder', 'f1')
@@ -109,9 +111,10 @@ class TestOperations(FunctionalTestCase):
         # Resource registries resource
         cssResourcePath = self.portal['portal_css'].getEvaluatedResources(self.portal)[0].getId()
         
-        self.setRoles(('Member',))
+        setRoles(self.portal, TEST_USER_NAME, ('Member',))
         
-        browser = Browser()
+        import transaction; transaction.commit()
+        browser = Browser(self.app)
         
         # Check that we can open all without errors and without cache headers
         browser.open(self.portal.absolute_url())
@@ -143,7 +146,7 @@ class TestOperations(FunctionalTestCase):
     def test_gzip_setting(self):
         self.cacheSettings.enabled = True
         
-        self.setRoles(('Manager',))
+        setRoles(self.portal, TEST_USER_NAME, ('Manager',))
         
         # Folder content
         self.portal.invokeFactory('Folder', 'f1')
@@ -159,41 +162,52 @@ class TestOperations(FunctionalTestCase):
         self.portal['f1']['d1'].reindexObject()
         
         # GZip disabled, not accepted
-        browser = Browser()
+        
         self.ploneCacheSettings.enableCompression = False
+        
+        import transaction; transaction.commit()
+        browser = Browser(self.app)
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.failIf('Vary' in browser.headers)
         self.failIf('gzip' in browser.headers.get('Content-Encoding', ''))
         
         # GZip disabled, accepted
-        browser = Browser()
-        browser.addHeader('Accept-Encoding', 'gzip')
+        
         self.ploneCacheSettings.enableCompression = False
+        transaction.commit()
+        
+        browser = Browser(self.app)
+        browser.addHeader('Accept-Encoding', 'gzip')
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.failIf('Vary' in browser.headers)
         self.failIf('gzip' in browser.headers.get('Content-Encoding', ''))
         
         # GZip enabled, not accepted
-        browser = Browser()
         self.ploneCacheSettings.enableCompression = True
+        transaction.commit()
+        
+        browser = Browser(self.app)
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.failIf('Vary' in browser.headers)
         self.failIf('gzip' in browser.headers.get('Content-Encoding', ''))
         
         # GZip enabled, accepted
-        browser = Browser()
         self.ploneCacheSettings.enableCompression = True
+        transaction.commit()
+        
+        browser = Browser(self.app)
         browser.addHeader('Accept-Encoding', 'gzip')
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.failUnless('Accept-Encoding' in browser.headers['Vary'])
         self.assertEquals('gzip', browser.headers['Content-Encoding'])
         
         # Test as logged in (should not make any difference)
-        browser = Browser()
         self.ploneCacheSettings.enableCompression = True
+        transaction.commit()
         
+        browser = Browser(self.app)
         browser.addHeader('Accept-Encoding', 'gzip')
-        browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.failUnless('Accept-Encoding' in browser.headers['Vary'])
@@ -201,7 +215,7 @@ class TestOperations(FunctionalTestCase):
     
     def test_auto_purge_content_types(self):
         
-        self.setRoles(('Manager',))
+        setRoles(self.portal, TEST_USER_NAME, ('Manager',))
         
         # Non-folder content
         self.portal.invokeFactory('Document', 'd1')
@@ -210,7 +224,7 @@ class TestOperations(FunctionalTestCase):
         self.portal['d1'].setText("<p>Body one</p>")
         self.portal['d1'].reindexObject()
         
-        self.setRoles(('Member',))
+        setRoles(self.portal, TEST_USER_NAME, ('Member',))
         
         # Purging disabled
         self.cachePurgingSettings.enabled = False
@@ -219,12 +233,14 @@ class TestOperations(FunctionalTestCase):
         
         editURL = self.portal['d1'].absolute_url() + '/edit'
         
-        browser = Browser()
+        import transaction; transaction.commit()
+        
+        browser = Browser(self.app)
         browser.handleErrors = False
         
         browser.open(self.portal.absolute_url() + '/login')
-        browser.getControl(name='__ac_name').value = default_user
-        browser.getControl(name='__ac_password').value = default_password
+        browser.getControl(name='__ac_name').value = TEST_USER_NAME
+        browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
         browser.getControl('Log in').click()
         
         browser.open(editURL)
@@ -239,6 +255,8 @@ class TestOperations(FunctionalTestCase):
         self.cachePurgingSettings.cachingProxies = ('http://localhost:1234',)
         self.ploneCacheSettings.purgedContentTypes = ()
         
+        import transaction; transaction.commit()
+        
         browser.open(editURL)
         browser.getControl(name='title').value = u"Title 2"
         browser.getControl(name='form.button.save').click()
@@ -250,6 +268,8 @@ class TestOperations(FunctionalTestCase):
         self.cachePurgingSettings.enabled = False
         self.cachePurgingSettings.cachingProxies = ('http://localhost:1234',)
         self.ploneCacheSettings.purgedContentTypes = ()
+        
+        import transaction; transaction.commit()
         
         browser.open(editURL)
         browser.getControl(name='title').value = u"Title 3"
@@ -263,6 +283,8 @@ class TestOperations(FunctionalTestCase):
         self.cachePurgingSettings.cachingProxies = ('http://localhost:1234',)
         self.ploneCacheSettings.purgedContentTypes = ('Document',)
         
+        import transaction; transaction.commit()
+        
         browser.open(editURL)
         browser.getControl(name='title').value = u"Title 4"
         browser.getControl(name='form.button.save').click()
@@ -273,7 +295,3 @@ class TestOperations(FunctionalTestCase):
                 'http://localhost:1234/plone/d1/document_view',
                 'http://localhost:1234/plone/d1/',
                 'http://localhost:1234/plone/d1/view']), set(self.purger._async))
-
-def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
-

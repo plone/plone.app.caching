@@ -1,5 +1,5 @@
-import unittest
-import zope.component.testing
+import unittest2 as unittest
+from plone.testing.zca import UNIT_TESTING
 
 from zope.interface import implements
 
@@ -86,6 +86,8 @@ class FauxDiscussable(Explicit):
 
 class TestPurgeRedispatch(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         self.handler = Handler()
         provideHandler(self.handler.handler)
@@ -101,9 +103,6 @@ class TestPurgeRedispatch(unittest.TestCase):
         
         ploneSettings = registry.forInterface(IPloneCacheSettings)
         ploneSettings.purgedContentTypes = ('testtype',)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
     
     def test_not_purged(self):
         context = FauxNonContent('new').__of__(FauxContent())
@@ -158,6 +157,8 @@ class TestPurgeRedispatch(unittest.TestCase):
 
 class TestContentPurgePaths(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def test_no_default_view(self):
         context = FauxNonContent('foo')
         purger = ContentPurgePaths(context)
@@ -193,6 +194,8 @@ class TestContentPurgePaths(unittest.TestCase):
 
 class TestDiscussionItemPurgePaths(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         
         class FauxContentPurgePaths(object):
@@ -209,9 +212,6 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
                 return ['/purgeme']
         
         provideAdapter(FauxContentPurgePaths, name="testpurge")
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
     
     def test_no_tool(self):
         root = FauxContent('')
@@ -287,11 +287,10 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
 
 class TestObjectFieldPurgePaths(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(instanceSchemaFactory)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
     
     def test_no_file_image_fields(self):
         
@@ -344,9 +343,3 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                            'foo/at_download/image2', 'foo/image2', 'foo/image2_mini', 'foo/image2_normal'],
                            list(purger.getRelativePaths()))
         self.assertEquals([], list(purger.getAbsolutePaths()))
-        
-def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
-
-
-

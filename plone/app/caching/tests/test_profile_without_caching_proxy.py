@@ -1,18 +1,19 @@
 import pkg_resources
 
-import unittest
+import unittest2 as unittest
+
+from plone.testing.z2 import Browser
+
+from plone.app.testing import TEST_USER_NAME, TEST_USER_PASSWORD
+from plone.app.testing import setRoles
+from plone.app.testing import applyProfile
+
 from cStringIO import StringIO
 
 import datetime
 import dateutil.parser
 import dateutil.tz
 
-from Products.PloneTestCase.ptc import FunctionalTestCase
-from Products.PloneTestCase.ptc import default_user, default_password
-
-from plone.app.caching.tests.layer import Layer
-
-from Products.Five.testbrowser import Browser
 import OFS.Image
 
 from zope.component import getUtility
@@ -24,11 +25,13 @@ from plone.caching.interfaces import ICacheSettings
 from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.app.caching.interfaces import IPloneCacheSettings
 
+from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+
 TEST_IMAGE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
 TEST_FILE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
 
 
-class TestProfileWithoutCaching(FunctionalTestCase):
+class TestProfileWithoutCaching(unittest.TestCase):
     """This test aims to exercise the caching operations expected from the
     `without-caching-proxy` profile.
     
@@ -37,11 +40,15 @@ class TestProfileWithoutCaching(FunctionalTestCase):
     context to ensure the profile has set the correct settings.
     """
     
-    layer = Layer
+    layer = PLONE_APP_CACHING_FUNCTIONAL_TESTING
     
-    def afterSetUp(self):
+    def setUp(self):
+        self.app = self.layer['app']
+        self.portal = self.layer['portal']
+        
         setRequest(self.portal.REQUEST)
-        self.addProfile('plone.app.caching:without-caching-proxy')
+        
+        applyProfile(self.portal, 'plone.app.caching:without-caching-proxy')
         
         self.registry = getUtility(IRegistry)
         
@@ -51,7 +58,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         self.cacheSettings.enabled = True
     
-    def beforeTearDown(self):
+    def tearDown(self):
         setRequest(None)
     
     def test_composite_views(self):
@@ -59,7 +66,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         catalog = self.portal['portal_catalog']
         
         # Add folder content
-        self.setRoles(('Manager',))
+        setRoles(self.portal, TEST_USER_NAME, ('Manager',))
         self.portal.invokeFactory('Folder', 'f1')
         self.portal['f1'].setTitle(u"Folder one")
         self.portal['f1'].setDescription(u"Folder one description")
@@ -86,10 +93,12 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # - leave status unlocked
         # - set the mod date on the resource registries?  Probably.
         
+        import transaction; transaction.commit()
+        
         # Request the quthenticated folder
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
-        browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
+        browser = Browser(self.app)
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal['f1'].absolute_url())
         self.assertEquals('plone.content.folderView', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -111,8 +120,8 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request the authenticated page
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
-        browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
+        browser = Browser(self.app)
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.failUnless(testText in browser.contents)
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
@@ -125,8 +134,8 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated page again -- to test RAM cache.
-        browser = Browser()
-        browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
+        browser = Browser(self.app)
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -135,9 +144,9 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request the authenticated page again -- with an INM header to test 304
         etag = browser.headers['ETag']
-        browser = Browser()
+        browser = Browser(self.app)
         browser.raiseHttpErrors = False  # we really do want to see the 304
-        browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal['f1']['d1'].absolute_url())
         # This should be a 304 response
@@ -146,7 +155,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request the anonymous folder
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
+        browser = Browser(self.app)
         browser.open(self.portal['f1'].absolute_url())
         self.assertEquals('plone.content.folderView', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -159,7 +168,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request the anonymous page
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
+        browser = Browser(self.app)
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -174,7 +183,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # Request the anonymous page again -- to test RAM cache.
         # Anonymous should be RAM cached
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
+        browser = Browser(self.app)
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -189,7 +198,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request the anonymous page again -- with an INM header to test 304.
         etag = browser.headers['ETag']
-        browser = Browser()
+        browser = Browser(self.app)
         browser.raiseHttpErrors = False
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal['f1']['d1'].absolute_url())
@@ -204,9 +213,11 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         self.portal['f1']['d1'].setText(testText2)
         self.portal['f1']['d1'].reindexObject()
         
+        transaction.commit()
+        
         # Request the anonymous page again -- to test expiration of 304 and RAM.
         etag = browser.headers['ETag']
-        browser = Browser()
+        browser = Browser(self.app)
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
@@ -220,14 +231,16 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         catalog = self.portal['portal_catalog']
         
         # Enable syndication
-        self.setRoles(('Manager',))
+        setRoles(self.portal, TEST_USER_NAME, ('Manager',))
         self.syndication = self.portal.portal_syndication
         self.syndication.editProperties(isAllowed=True)
         self.syndication.enableSyndication(self.portal)
         
+        import transaction; transaction.commit()
+        
         # Request the rss feed
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
+        browser = Browser(self.app)
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -239,7 +252,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # Request the rss feed again -- to test RAM cache
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         rssText = browser.contents
-        browser = Browser()
+        browser = Browser(self.app)
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -252,7 +265,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request the rss feed again -- with an INM header to test 304.
         etag = browser.headers['ETag']
-        browser = Browser()
+        browser = Browser(self.app)
         browser.raiseHttpErrors = False
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal.absolute_url() + '/RSS')
@@ -264,8 +277,8 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request the authenticated rss feed
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
-        browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
+        browser = Browser(self.app)
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -275,8 +288,8 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
         
         # Request the authenticated rss feed again -- to test RAM cache
-        browser = Browser()
-        browser.addHeader('Authorization', 'Basic %s:%s' % (default_user, default_password,))
+        browser = Browser(self.app)
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -286,7 +299,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
     def test_content_files(self):
         
         # Add folder content
-        self.setRoles(('Manager',))
+        setRoles(self.portal, TEST_USER_NAME, ('Manager',))
         self.portal.invokeFactory('Folder', 'f1')
         self.portal['f1'].setTitle(u"Folder one")
         self.portal['f1'].setDescription(u"Folder one description")
@@ -302,9 +315,11 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # Publish the folder 
         self.portal.portal_workflow.doActionFor(self.portal['f1'], 'publish')
         
+        import transaction; transaction.commit()
+        
         # Request the image
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
+        browser = Browser(self.app)
         browser.open(self.portal['f1']['i1'].absolute_url())
         self.assertEquals('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -316,7 +331,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request the image again -- with an IMS header to test 304
         lastmodified = browser.headers['Last-Modified']
-        browser = Browser()
+        browser = Browser(self.app)
         browser.raiseHttpErrors = False
         browser.addHeader('If-Modified-Since', lastmodified)
         browser.open(self.portal['f1']['i1'].absolute_url())
@@ -328,7 +343,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request an image scale
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
+        browser = Browser(self.app)
         browser.open(self.portal['f1']['i1'].absolute_url() + '/image_preview')
         self.assertEquals('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -340,9 +355,11 @@ class TestProfileWithoutCaching(FunctionalTestCase):
     
     def test_resources(self):
         
+        import transaction; transaction.commit()
+        
         # Request a skin image
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
+        browser = Browser(self.app)
         browser.open(self.portal.absolute_url() + '/rss.gif')
         self.assertEquals('plone.resource', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
@@ -355,7 +372,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request the skin image again -- with an IMS header to test 304
         lastmodified = browser.headers['Last-Modified']
-        browser = Browser()
+        browser = Browser(self.app)
         browser.raiseHttpErrors = False
         browser.addHeader('If-Modified-Since', lastmodified)
         browser.open(self.portal.absolute_url() + '/rss.gif')
@@ -373,7 +390,10 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # method to initiate a streamed response.
         s = "a" * (1 << 16) * 3
         self.portal.manage_addFile('bigfile', file=StringIO(s), content_type='application/octet-stream')
-        browser = Browser()
+        
+        import transaction; transaction.commit()
+        
+        browser = Browser(self.app)
         browser.open(self.portal['bigfile'].absolute_url())
         self.assertEquals('plone.resource', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
@@ -396,8 +416,11 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         cssregistry = self.portal.portal_css
         path = cssregistry.absolute_url() + "/Sunburst%20Theme/public.css"
         cssregistry.setDebugMode(False)
+        
+        import transaction; transaction.commit()
+        
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        browser = Browser()
+        browser = Browser(self.app)
         browser.open(path)
         self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
@@ -409,7 +432,7 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         
         # Request the ResourceRegistry resource again -- with IMS header to test 304
         lastmodified = browser.headers['Last-Modified']
-        browser = Browser()
+        browser = Browser(self.app)
         browser.raiseHttpErrors = False
         browser.addHeader('If-Modified-Since', lastmodified)
         browser.open(path)
@@ -424,7 +447,10 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         # Request the ResourceRegistry resource -- with RR in debug mode
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         cssregistry.setDebugMode(True)
-        browser = Browser()
+        
+        import transaction; transaction.commit()
+        
+        browser = Browser(self.app)
         browser.open(path)
         self.assertEquals('plone.stableResource', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
@@ -432,7 +458,3 @@ class TestProfileWithoutCaching(FunctionalTestCase):
         self.assertEquals('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
         self.assertEquals(None, browser.headers.get('Last-Modified'))
         self.failUnless(now > dateutil.parser.parse(browser.headers['Expires']))
-
-def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
-

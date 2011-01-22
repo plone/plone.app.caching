@@ -441,7 +441,7 @@ class ControlPanel(BaseView):
             return False
         
         for option in options:
-            if '%s.%s' % (prefix, option,) in self.registry.records:
+            if '%s.%s' % (prefix, option,) in self.registry:
                 return True
         
         return False
@@ -454,7 +454,7 @@ class ControlPanel(BaseView):
             return False
         
         for option in options:
-            if '%s.%s.%s' % (prefix, ruleset, option,) in self.registry.records:
+            if '%s.%s.%s' % (prefix, ruleset, option,) in self.registry:
                 return True
         
         return False

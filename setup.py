@@ -29,7 +29,7 @@ setup(name='plone.app.caching',
           'python-dateutil',
           'plone.caching',
           'plone.cachepurging',
-          'plone.app.registry',
+          'plone.app.registry >= 1.0dev-r39408',
           'zope.interface',
           'zope.component',
           'zope.publisher',
@@ -46,7 +46,7 @@ setup(name='plone.app.caching',
           'z3c.form',
           'z3c.zcmlhook',
       ],
-      extras_require={'tests': ['collective.testcaselayer']},
+      extras_require={'test': ['plone.app.testing']},
       entry_points="""
       [z3c.autoinclude.plugin]
       target = plone

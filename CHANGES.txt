@@ -4,6 +4,10 @@ Changelog
 1.0b2 - unreleased
 ~~~~~~~~~~~~~~~~~~
 
+* Use plone.registry ``FieldRefs`` to manage parameter overrides. This 
+  requires plone.app.registry 1.0b3 and plone.app.registry 1.0b3 or later. 
+  [optilude]
+
 * Update distribution metadata to current best practice.
   [hannosch]
 

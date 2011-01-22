@@ -1,7 +1,7 @@
-import unittest
-from StringIO import StringIO
+import unittest2 as unittest
+from plone.testing.zca import UNIT_TESTING
 
-import zope.component.testing
+from StringIO import StringIO
 
 from zope.component import provideUtility, provideAdapter, getUtility
 
@@ -22,11 +22,10 @@ class DummyPublished(object):
 
 class TestGZip(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(persistentFieldAdapter)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
     
     def test_no_registry(self):
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
@@ -85,6 +84,3 @@ class TestGZip(unittest.TestCase):
         GZipTransform(published, request).transformUnicode(u"", "utf-8")
         
         self.assertEquals(1, response.enableHTTPCompression(query=True)) 
-    
-def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)

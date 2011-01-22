@@ -1,5 +1,5 @@
-import unittest
-import zope.component.testing
+import unittest2 as unittest
+from plone.testing.zca import UNIT_TESTING
 
 from zope.interface import implements
 from zope.component import provideUtility, provideAdapter, getUtility
@@ -62,11 +62,10 @@ class DummyNotBrowserDefault(Explicit):
 
 class TestIsPurged(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(persistentFieldAdapter)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
     
     def test_no_registry(self):
         content = DummyContent()
@@ -112,8 +111,7 @@ class TestIsPurged(unittest.TestCase):
 
 class TestGetObjectDefaultPath(unittest.TestCase):
     
-    def tearDown(self):
-        zope.component.testing.tearDown()
+    layer = UNIT_TESTING
     
     def test_not_content(self):
         context = DummyNotContent()
@@ -134,6 +132,3 @@ class TestGetObjectDefaultPath(unittest.TestCase):
     def test_not_IBrowserDefault_actiononly(self):
         context = DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView')
         self.assertEquals('defaultView', getObjectDefaultView(context))
-
-def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)

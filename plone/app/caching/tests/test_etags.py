@@ -1,5 +1,5 @@
-import unittest
-import zope.component.testing
+import unittest2 as unittest
+from plone.testing.zca import UNIT_TESTING
 
 import time
 from datetime import datetime
@@ -37,12 +37,10 @@ class DummyPublished(object):
 
 class TestETags(unittest.TestCase):
     
+    layer = UNIT_TESTING
+    
     def setUp(self):
         provideAdapter(persistentFieldAdapter)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
-    
     
     # UserID
     
@@ -488,7 +486,3 @@ class TestETags(unittest.TestCase):
         etag = Skin(published, request)
         
         self.assertEquals('defaultskin', etag())
-    
-
-def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
