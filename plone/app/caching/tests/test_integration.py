@@ -2,7 +2,7 @@ import unittest2 as unittest
 
 from plone.testing.z2 import Browser
 
-from plone.app.testing import TEST_USER_NAME, TEST_USER_PASSWORD
+from plone.app.testing import TEST_USER_ID, TEST_USER_PASSWORD
 from plone.app.testing import applyProfile
 from plone.app.testing import setRoles
 
@@ -76,7 +76,7 @@ class TestOperations(unittest.TestCase):
     def test_disabled(self):
         self.cacheSettings.enabled = False
         
-        setRoles(self.portal, TEST_USER_NAME, ('Manager',))
+        setRoles(self.portal, TEST_USER_ID, ('Manager',))
         
         # Folder content
         self.portal.invokeFactory('Folder', 'f1')
@@ -111,7 +111,7 @@ class TestOperations(unittest.TestCase):
         # Resource registries resource
         cssResourcePath = self.portal['portal_css'].getEvaluatedResources(self.portal)[0].getId()
         
-        setRoles(self.portal, TEST_USER_NAME, ('Member',))
+        setRoles(self.portal, TEST_USER_ID, ('Member',))
         
         import transaction; transaction.commit()
         browser = Browser(self.app)
@@ -146,7 +146,7 @@ class TestOperations(unittest.TestCase):
     def test_gzip_setting(self):
         self.cacheSettings.enabled = True
         
-        setRoles(self.portal, TEST_USER_NAME, ('Manager',))
+        setRoles(self.portal, TEST_USER_ID, ('Manager',))
         
         # Folder content
         self.portal.invokeFactory('Folder', 'f1')
@@ -207,7 +207,7 @@ class TestOperations(unittest.TestCase):
         
         browser = Browser(self.app)
         browser.addHeader('Accept-Encoding', 'gzip')
-        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
         
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.failUnless('Accept-Encoding' in browser.headers['Vary'])
@@ -215,7 +215,7 @@ class TestOperations(unittest.TestCase):
     
     def test_auto_purge_content_types(self):
         
-        setRoles(self.portal, TEST_USER_NAME, ('Manager',))
+        setRoles(self.portal, TEST_USER_ID, ('Manager',))
         
         # Non-folder content
         self.portal.invokeFactory('Document', 'd1')
@@ -224,7 +224,7 @@ class TestOperations(unittest.TestCase):
         self.portal['d1'].setText("<p>Body one</p>")
         self.portal['d1'].reindexObject()
         
-        setRoles(self.portal, TEST_USER_NAME, ('Member',))
+        setRoles(self.portal, TEST_USER_ID, ('Member',))
         
         # Purging disabled
         self.cachePurgingSettings.enabled = False
@@ -239,7 +239,7 @@ class TestOperations(unittest.TestCase):
         browser.handleErrors = False
         
         browser.open(self.portal.absolute_url() + '/login')
-        browser.getControl(name='__ac_name').value = TEST_USER_NAME
+        browser.getControl(name='__ac_name').value = TEST_USER_ID
         browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
         browser.getControl('Log in').click()
         
