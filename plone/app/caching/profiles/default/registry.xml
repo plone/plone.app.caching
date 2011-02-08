@@ -25,6 +25,7 @@
           <element key="accessibility-info">plone.content.itemView</element>
           <element key="file_view">plone.content.itemView</element>
           <element key="image_view">plone.content.itemView</element>
+          <element key="image_view_fullscreen">plone.content.itemView</element>
         </value>
     </record>
     

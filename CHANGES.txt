@@ -4,9 +4,10 @@ Changelog
 1.0b2 - unreleased
 ~~~~~~~~~~~~~~~~~~
 
-* Associated `file_view` and `image_view` by default with the
-  `plone.content.itemView` ruleset, since neither is the default view of their
-  respective content type, they didn't get the automated handling.
+* Associated `file_view`, `image_view` and `image_view_fullscreen` by default
+  with the `plone.content.itemView` ruleset, since none of them is the default
+  view of their respective content type, they didn't get the automated
+  handling.
   [stefan, hannosch]
 
 * Added purging for plone.app.blob's BlobFields.
