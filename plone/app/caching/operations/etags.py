@@ -205,7 +205,7 @@ class Skin(object):
         return portal_skins.getDefaultSkin()
 
 class ResourceRegistries(object):
-    """The ``resourceRegistry`` etag component, returning the most recent
+    """The ``resourceRegistries`` etag component, returning the most recent
     last modified timestamp from all three Resource Registries.  This is
     useful for avoiding requests for expired resources from cached pages.
     """

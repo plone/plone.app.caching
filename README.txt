@@ -790,7 +790,7 @@ The ETag names tokens supported by default are:
 * skin
     The name of the current skin (theme)
 
-* resourceRegistry
+* resourceRegistries
     A timestamp indicating the most recent last-modified date for all three
     Resource Registries. This is useful for avoiding requests for expired
     resources from cached pages.
