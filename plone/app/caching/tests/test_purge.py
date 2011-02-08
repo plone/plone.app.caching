@@ -304,13 +304,15 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
         self.assertEquals([], list(purger.getAbsolutePaths()))
     
     def test_file_image_fields(self):
-        
+        from plone.app.blob.field import BlobField
+
         class ATMultipleFields(atapi.BaseContent):
             schema = atapi.Schema((
                     atapi.StringField('foo'),
                     atapi.FileField('file1'),
                     atapi.ImageField('image1'),
                     atapi.ImageField('image2', sizes={'mini': (50,50), 'normal' : (100,100)}),
+                    BlobField('blob1'),
                 ))
         
         context = ATMultipleFields('foo')
@@ -319,7 +321,8 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
         self.assertEquals(['foo/download', 'foo/at_download',
                            'foo/at_download/file1', 'foo/file1',
                            'foo/at_download/image1', 'foo/image1','foo/image1_thumb',
-                           'foo/at_download/image2', 'foo/image2', 'foo/image2_mini', 'foo/image2_normal'],
+                           'foo/at_download/image2', 'foo/image2', 'foo/image2_mini', 'foo/image2_normal',
+                           'foo/at_download/blob1', 'foo/blob1'],
                            list(purger.getRelativePaths()))
         self.assertEquals([], list(purger.getAbsolutePaths()))
     

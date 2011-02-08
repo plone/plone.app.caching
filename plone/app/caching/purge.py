@@ -24,6 +24,7 @@ from plone.memoize.instance import memoize
 from Acquisition import aq_parent
 
 try:
+    from plone.app.blob.interfaces import IBlobField
     from Products.Archetypes.interfaces import IBaseObject
     from Products.Archetypes.interfaces import IFileField, IImageField, ITextField
     HAVE_AT = True
@@ -154,11 +155,11 @@ if HAVE_AT:
             schema = self.context.Schema()
 
             def fieldFilter(field):
-                return (
-                    (IFileField.providedBy(field) or IImageField.providedBy(field))
-                    and not ITextField.providedBy(field)
-                )
-            
+                return ((IBlobField.providedBy(field) or
+                    IFileField.providedBy(field) or
+                    IImageField.providedBy(field))
+                    and not ITextField.providedBy(field))
+
             seenDownloads = False
             
             for field in schema.filterFields(fieldFilter):
