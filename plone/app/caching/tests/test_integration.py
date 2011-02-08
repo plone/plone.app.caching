@@ -237,12 +237,9 @@ class TestOperations(unittest.TestCase):
         
         browser = Browser(self.app)
         browser.handleErrors = False
-        
-        browser.open(self.portal.absolute_url() + '/login')
-        browser.getControl(name='__ac_name').value = TEST_USER_ID
-        browser.getControl(name='__ac_password').value = TEST_USER_PASSWORD
-        browser.getControl('Log in').click()
-        
+        browser.addHeader('Authorization',
+            'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
+
         browser.open(editURL)
         browser.getControl(name='title').value = u"Title 1"
         browser.getControl(name='form.button.save').click()
