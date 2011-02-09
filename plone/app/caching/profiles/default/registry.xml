@@ -33,6 +33,7 @@
         <value purge="False">
           <element>File</element>
           <element>Image</element>
+          <element>News Item</element>
         </value>
     </record>
     

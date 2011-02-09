@@ -4,6 +4,10 @@ Changelog
 1.0b2 - unreleased
 ~~~~~~~~~~~~~~~~~~
 
+* Added `News Item` to the list of `purgedContentTypes`, so the image field
+  and its scales gets purged.
+  [stefan, hannosch]
+
 * Associated `file_view`, `image_view` and `image_view_fullscreen` by default
   with the `plone.content.itemView` ruleset, since none of them is the default
   view of their respective content type, they didn't get the automated
