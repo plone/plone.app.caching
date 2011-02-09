@@ -59,7 +59,7 @@ class IPloneCacheSettings(Interface):
             title=_(u"Content types to purge"),
             description=_(u"List content types which should be purged when modified"),
             value_type=schema.ASCIILine(title=_(u"Content type name")),
-            default=('File', 'Image',),
+            default=('File', 'Image', 'News Item', ),
         )
     
     cacheStopRequestVariables = schema.Tuple(
