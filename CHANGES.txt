@@ -1,8 +1,8 @@
 Changelog
 ---------
 
-1.0b2 - unreleased
-~~~~~~~~~~~~~~~~~~
+1.0b2 - 2011-02-10
+------------------
 
 * Added `News Item` to the list of `purgedContentTypes`, so the image field
   and its scales gets purged.
@@ -36,7 +36,7 @@ Changelog
 
 
 1.0b1 - 2010-08-04
-~~~~~~~~~~~~~~~~~~
+------------------
 
 * Add an option for "anonymous only" caching to the default operations.
   This is a simple way to switch off caching for logged-in users. See
@@ -55,7 +55,7 @@ Changelog
 
 
 1.0a1 - 2010-04-24
-~~~~~~~~~~~~~~~~~~
+------------------
 
 * Initial release.
   [optilude, newbery, smcmahon]
