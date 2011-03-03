@@ -4,6 +4,11 @@ Changelog
 1.0b3 - Unreleased
 ------------------
 
+* Add an ILastModified adapter for FSPageTemplate as the FSObject adapter
+  would otherwise take precedence.
+  [stefan]
+
+
 1.0b2 - 2011-02-10
 ------------------
 

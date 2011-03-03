@@ -17,6 +17,7 @@ from OFS.Image import File
 from Products.Archetypes.Field import Image as ImageScale
 from Products.CMFCore.interfaces import ICatalogableDublinCore
 from Products.CMFCore.FSObject import FSObject
+from Products.CMFCore.FSPageTemplate import FSPageTemplate
 
 from plone.app.caching.operations.utils import getContext
 from Products.ResourceRegistries.interfaces import ICookedFile
@@ -25,12 +26,21 @@ from Products.ResourceRegistries.interfaces import IResourceRegistry
 
 @implementer(ILastModified)
 @adapter(IPageTemplate)
-def pageTemplateDelegateLastModified(template):
+def PageTemplateDelegateLastModified(template):
     """When looking up an ILastModified for a page template, look up an
     ILastModified for its context. May return None, in which case adaptation
     will fail.
     """
     return ILastModified(template.__parent__, None)
+
+@implementer(ILastModified)
+@adapter(FSPageTemplate)
+def FSPageTemplateDelegateLastModified(template):
+    """When looking up an ILastModified for a page template, look up an
+    ILastModified for its context. Must register separately or the FSObject
+    adapter would otherwise take precedence.
+    """
+    return PageTemplateDelegateLastModified(template)
 
 class PersistentLastModified(object):
     """General ILastModified adapter for persistent objects that have a

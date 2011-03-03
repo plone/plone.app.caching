@@ -31,14 +31,15 @@ class TestLastModified(unittest.TestCase):
     layer = UNIT_TESTING
     
     def setUp(self):
-        provideAdapter(lastmodified.pageTemplateDelegateLastModified)
+        provideAdapter(lastmodified.PageTemplateDelegateLastModified)
+        provideAdapter(lastmodified.FSPageTemplateDelegateLastModified)
         provideAdapter(lastmodified.OFSFileLastModified)
         provideAdapter(lastmodified.FSObjectLastModified)
         provideAdapter(lastmodified.CatalogableDublinCoreLastModified)
         provideAdapter(lastmodified.DCTimesLastModified)
         provideAdapter(lastmodified.ResourceLastModified)
     
-    def test_pageTemplateDelegateLastModified(self):
+    def test_PageTemplateDelegateLastModified(self):
         from persistent import Persistent
         from Acquisition import Explicit
         
@@ -62,6 +63,30 @@ class TestLastModified(unittest.TestCase):
         d._p_mtime = 987654321.0
         self.assertEquals(mod, ILastModified(zpt)())
     
+    def test_FSPageTemplateDelegateLastModified(self):
+        from persistent import Persistent
+        from Acquisition import Explicit
+
+        class Dummy(Persistent, Explicit):
+            _p_mtime = None
+
+        provideAdapter(lastmodified.PersistentLastModified, adapts=(Dummy,))
+
+        d = Dummy()
+
+        from Products.CMFCore.FSPageTemplate import FSPageTemplate
+        zpt = FSPageTemplate('zpt', __file__).__of__(d)
+        self.assertEquals(None, ILastModified(zpt)())
+
+
+        timestamp = 987654321.0 # time stamp (in UTC)
+        # equivalent in local time, which is what the last-modified adapter
+        # should return
+        mod = datetime.datetime.fromtimestamp(timestamp, tzlocal())
+
+        d._p_mtime = 987654321.0
+        self.assertEquals(mod, ILastModified(zpt)())
+
     def test_OFSFileLastModified_File(self):
         from OFS.Image import File
         
