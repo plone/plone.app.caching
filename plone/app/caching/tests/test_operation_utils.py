@@ -36,6 +36,14 @@ class DummyPublished(object):
     
     def __init__(self, parent=None):
         self.__parent__ = parent
+        
+def normalize_response_cache(value):
+    # Zope < 2.13 incorrectly includes the HTTP status as a header;
+    # Zope 2.13 does not
+    if isinstance(value, tuple) and 'status' in value[1]:
+        del value[1]['status']
+    return value
+    
 
 class ResponseModificationHelpersTest(unittest.TestCase):
     
@@ -1270,7 +1278,8 @@ class RAMCacheTest(unittest.TestCase):
         storeResponseInRAMCache(request, response, result)
         
         self.assertEquals(1, len(cache))
-        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body', 0), cache['foo'])
+        cached = normalize_response_cache(cache['foo'])
+        self.assertEquals((200, {'x-foo': 'bar'}, u'Body', 0), cached)
     
     def test_storeResponseInRAMCache_gzip(self):
         from plone.app.caching.operations.utils import storeResponseInRAMCache
@@ -1304,7 +1313,8 @@ class RAMCacheTest(unittest.TestCase):
         storeResponseInRAMCache(request, response, result)
         
         self.assertEquals(1, len(cache))
-        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body', 1), cache['foo'])
+        cached = normalize_response_cache(cache['foo'])
+        self.assertEquals((200, {'x-foo': 'bar'}, u'Body', 1), cached)
     
     def test_storeResponseInRAMCache_custom_keys(self):
         from plone.app.caching.operations.utils import storeResponseInRAMCache
@@ -1335,7 +1345,8 @@ class RAMCacheTest(unittest.TestCase):
         storeResponseInRAMCache(request, response, result, globalKey='cachekey', annotationsKey='annkey')
         
         self.assertEquals(1, len(cache))
-        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body', 0), cache['foo'])
+        cached = normalize_response_cache(cache['foo'])
+        self.assertEquals((200, {'x-foo': 'bar'}, u'Body', 0), cached)
     
     # fetchFromRAMCache()
     
@@ -1375,10 +1386,10 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        cache['/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
         
-        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'),
-                          fetchFromRAMCache(request))
+        cached = normalize_response_cache(fetchFromRAMCache(request))
+        self.assertEquals((200, {'x-foo': 'bar'}, u'Body'), cached)
     
     def test_fetchFromRAMCache_with_etag(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1404,10 +1415,10 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['||a|b||/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        cache['||a|b||/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
         
-        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'),
-                          fetchFromRAMCache(request, etag="|a|b"))
+        cached = normalize_response_cache(fetchFromRAMCache(request, etag="|a|b"))
+        self.assertEquals((200, {'x-foo': 'bar'}, u'Body'), cached)
     
     def test_fetchFromRAMCache_custom_key(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1433,10 +1444,10 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        cache['/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
         
-        self.assertEquals((200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body'),
-                          fetchFromRAMCache(request, globalKey='cachekey'))
+        cached = normalize_response_cache(fetchFromRAMCache(request, globalKey='cachekey'))
+        self.assertEquals((200, {'x-foo': 'bar'}, u'Body'), cached)
     
     def test_fetchFromRAMCache_miss(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1462,9 +1473,10 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        cache['/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
         
-        self.assertEquals(None, fetchFromRAMCache(request, etag='|foo'))
+        cached = normalize_response_cache(fetchFromRAMCache(request, etag='|foo'))
+        self.assertEquals(None, cached)
     
     def test_fetchFromRAMCache_miss_custom_default(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1490,7 +1502,8 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['/foo/bar?'] = (200, {'status': '200 OK', 'x-foo': 'bar'}, u'Body')
+        cache['/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
         
         marker = object()
-        self.failUnless(fetchFromRAMCache(request, etag='|foo', default=marker) is marker)
+        cached = normalize_response_cache(fetchFromRAMCache(request, etag='|foo', default=marker))
+        self.failUnless(cached is marker)
