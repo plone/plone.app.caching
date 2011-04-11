@@ -1,14 +1,18 @@
 Changelog
----------
+=========
+
 
 1.0b3 - Unreleased
 ------------------
 
-* Fixed tests failing on Zope 2.13 due to the HTTP status no longer being
+- Add MANIFEST.in.
+  [WouterVH]
+
+- Fixed tests failing on Zope 2.13 due to the HTTP status no longer being
   included in the response headers.
   [davisagli]
 
-* Add an ILastModified adapter for FSPageTemplate as the FSObject adapter
+- Add an ILastModified adapter for FSPageTemplate as the FSObject adapter
   would otherwise take precedence.
   [stefan]
 
@@ -16,58 +20,58 @@ Changelog
 1.0b2 - 2011-02-10
 ------------------
 
-* Added `News Item` to the list of `purgedContentTypes`, so the image field
+- Added `News Item` to the list of `purgedContentTypes`, so the image field
   and its scales gets purged.
   [stefan, hannosch]
 
-* Associated `file_view`, `image_view` and `image_view_fullscreen` by default
+- Associated `file_view`, `image_view` and `image_view_fullscreen` by default
   with the `plone.content.itemView` ruleset, since none of them is the default
   view of their respective content type, they didn't get the automated
   handling.
   [stefan, hannosch]
 
-* Added purging for plone.app.blob's BlobFields.
+- Added purging for plone.app.blob's BlobFields.
   [stefan, hannosch]
 
-* Fix documentation to refer to the correct `resourceRegistries` instead of
+- Fix documentation to refer to the correct `resourceRegistries` instead of
   the singular version.
   [stefan, hannosch]
 
-* Use plone.registry ``FieldRefs`` to manage parameter overrides. This
+- Use plone.registry ``FieldRefs`` to manage parameter overrides. This
   requires plone.app.registry 1.0b3 and plone.app.registry 1.0b3 or later.
   [optilude]
 
-* Update distribution metadata to current best practice.
+- Update distribution metadata to current best practice.
   [hannosch]
 
-* Added an etag component to track the existence of a copy/cut cookie
+- Added an etag component to track the existence of a copy/cut cookie
   [newbery]
 
-* Fixed various i18n issues.
+- Fixed various i18n issues.
   [vincentfretin]
 
 
 1.0b1 - 2010-08-04
 ------------------
 
-* Add an option for "anonymous only" caching to the default operations.
+- Add an option for "anonymous only" caching to the default operations.
   This is a simple way to switch off caching for logged-in users. See
   the README for more details.
   [optilude]
 
-* Add basic plone.namedfile caching rules, if plone.namedfile is installed
+- Add basic plone.namedfile caching rules, if plone.namedfile is installed
   [optilude]
 
-* Implement lookup based on portal type class/interface as well as name,
+- Implement lookup based on portal type class/interface as well as name,
   and set up defaults for items and folders.
   [optilude]
 
-* template fixes for cmf.pt compatibility
+- template fixes for cmf.pt compatibility
   [pilz]
 
 
 1.0a1 - 2010-04-24
 ------------------
 
-* Initial release.
+- Initial release.
   [optilude, newbery, smcmahon]
