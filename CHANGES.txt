@@ -5,6 +5,9 @@ Changelog
 1.0b3 - Unreleased
 ------------------
 
+- Declare plone.namedfile.scaling.ImageScale to be a plone.stableResource.
+  [elro]
+
 - Add MANIFEST.in.
   [WouterVH]
 
