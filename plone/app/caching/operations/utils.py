@@ -627,13 +627,13 @@ def getRAMCacheKey(request, etag=None, lastModified=None):
     ``lastModified`` is a datetime object giving the last=modified
      date for the resource.
     
-    The cache key is a combination of the resource's path, the etag,
+    The cache key is a combination of the resource's URL, the etag,
     and the last-modified date. Both the etag and last=modified are
     optional but in most cases that are worth caching in RAM, the etag
     is needed to ensure the key changes when the resource view changes.
     """
     
-    resourceKey = request.get('PATH_INFO', '') + '?' + request.get('QUERY_STRING', '')
+    resourceKey = request.get('ACTUAL_URL', '') + '?' + request.get('QUERY_STRING', '')
     if etag:
         resourceKey = '|' + etag + '||' + resourceKey
     if lastModified:
