@@ -5,6 +5,11 @@ Changelog
 1.0b3 - Unreleased
 ------------------
 
+- Use the userLanuage ETag component in place of the language ETag component
+  in the default configs to allow ETags to be used for anonymous users with
+  caching.
+  [elro]
+
 - Add the SERVER_URL to the RAM cache key.
   [elro]
 

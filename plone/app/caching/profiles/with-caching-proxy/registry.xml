@@ -18,7 +18,7 @@
       <value>
           <element>userid</element>
           <element>catalogCounter</element>
-          <element>language</element>
+          <element>userLanguage</element>
           <element>gzip</element>
           <element>skin</element>
           <element>locked</element>
@@ -37,7 +37,7 @@
       <value>
           <element>userid</element>
           <element>catalogCounter</element>
-          <element>language</element>
+          <element>userLanguage</element>
           <element>gzip</element>
           <element>skin</element>
           <element>locked</element>
@@ -61,7 +61,7 @@
       <value>
           <element>userid</element>
           <element>catalogCounter</element>
-          <element>language</element>
+          <element>userLanguage</element>
           <element>gzip</element>
           <element>skin</element>
       </value>
