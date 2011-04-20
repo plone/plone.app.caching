@@ -633,7 +633,11 @@ def getRAMCacheKey(request, etag=None, lastModified=None):
     is needed to ensure the key changes when the resource view changes.
     """
     
-    resourceKey = request.get('ACTUAL_URL', '') + '?' + request.get('QUERY_STRING', '')
+    resourceKey = "%s%s?%s" % (
+        request.get('SERVER_URL', ''),
+        request.get('PATH_INFO', ''),
+        request.get('QUERY_STRING', ''),
+        )
     if etag:
         resourceKey = '|' + etag + '||' + resourceKey
     if lastModified:

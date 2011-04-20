@@ -5,7 +5,7 @@ Changelog
 1.0b3 - Unreleased
 ------------------
 
-- Add the URL in the RAM cache key.
+- Add the SERVER_URL to the RAM cache key.
   [elro]
 
 - Declare plone.namedfile.scaling.ImageScale to be a plone.stableResource.

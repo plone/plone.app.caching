@@ -303,7 +303,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInRAM(published, request, response)
         
         annotations = IAnnotations(request)
-        self.assertEquals("/foo?", annotations[PAGE_CACHE_ANNOTATION_KEY])
+        self.assertEquals("http://example.com/foo?", annotations[PAGE_CACHE_ANNOTATION_KEY])
         self.failUnless(IRAMCached.providedBy(request))
     
     def test_cacheInRAM_etag(self):
@@ -325,7 +325,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInRAM(published, request, response, etag=etag)
         
         annotations = IAnnotations(request)
-        self.assertEquals("||foo|bar|||/foo?", annotations[PAGE_CACHE_ANNOTATION_KEY])
+        self.assertEquals("||foo|bar|||http://example.com/foo?", annotations[PAGE_CACHE_ANNOTATION_KEY])
         self.failUnless(IRAMCached.providedBy(request))
     
     def test_cacheInRAM_etag_alternate_key(self):
@@ -346,7 +346,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInRAM(published, request, response, etag=etag, annotationsKey="alt.key")
         
         annotations = IAnnotations(request)
-        self.assertEquals("||foo|bar|||/foo?", annotations["alt.key"])
+        self.assertEquals("||foo|bar|||http://example.com/foo?", annotations["alt.key"])
         self.failUnless(IRAMCached.providedBy(request))
         
 
@@ -1178,7 +1178,7 @@ class RAMCacheTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         
-        self.assertEquals('?', getRAMCacheKey(request))
+        self.assertEquals('http://example.com?', getRAMCacheKey(request))
     
     def test_getRAMCacheKey_normal(self):
         from plone.app.caching.operations.utils import getRAMCacheKey
@@ -1190,7 +1190,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = 'x=1&y=2'
         
-        self.assertEquals('/foo/bar?x=1&y=2', getRAMCacheKey(request))
+        self.assertEquals('http://example.com/foo/bar?x=1&y=2', getRAMCacheKey(request))
     
     def test_getRAMCacheKey_etag(self):
         from plone.app.caching.operations.utils import getRAMCacheKey
@@ -1202,7 +1202,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = 'x=1&y=2'
         
-        self.assertEquals('||foo|bar||/foo/bar?x=1&y=2', getRAMCacheKey(request, etag="|foo|bar"))
+        self.assertEquals('||foo|bar||http://example.com/foo/bar?x=1&y=2', getRAMCacheKey(request, etag="|foo|bar"))
     
     
     # storeResponseInRAMCache()
@@ -1386,7 +1386,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
+        cache['http://example.com/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
         
         cached = normalize_response_cache(fetchFromRAMCache(request))
         self.assertEquals((200, {'x-foo': 'bar'}, u'Body'), cached)
@@ -1415,7 +1415,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['||a|b||/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
+        cache['||a|b||http://example.com/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
         
         cached = normalize_response_cache(fetchFromRAMCache(request, etag="|a|b"))
         self.assertEquals((200, {'x-foo': 'bar'}, u'Body'), cached)
@@ -1444,7 +1444,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
+        cache['http://example.com/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
         
         cached = normalize_response_cache(fetchFromRAMCache(request, globalKey='cachekey'))
         self.assertEquals((200, {'x-foo': 'bar'}, u'Body'), cached)
@@ -1473,7 +1473,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
+        cache['http://example.com/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
         
         cached = normalize_response_cache(fetchFromRAMCache(request, etag='|foo'))
         self.assertEquals(None, cached)
@@ -1502,7 +1502,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
         
-        cache['/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
+        cache['http://example.com/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
         
         marker = object()
         cached = normalize_response_cache(fetchFromRAMCache(request, etag='|foo', default=marker))
