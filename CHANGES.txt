@@ -1,11 +1,10 @@
 Changelog
 =========
 
+1.0 - 2011-05-12
+----------------
 
-1.0b3 - Unreleased
-------------------
-
-- Use the userLanuage ETag component in place of the language ETag component
+- Use the `userLanguage` ETag component in place of the language ETag component
   in the default configs to allow ETags to be used for anonymous users with
   caching.
   [elro]
@@ -13,7 +12,7 @@ Changelog
 - Add the SERVER_URL to the RAM cache key.
   [elro]
 
-- Declare plone.namedfile.scaling.ImageScale to be a plone.stableResource.
+- Declare `plone.namedfile.scaling.ImageScale` to be a `plone.stableResource`.
   [elro]
 
 - Add MANIFEST.in.
