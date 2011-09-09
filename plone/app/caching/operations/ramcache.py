@@ -52,7 +52,7 @@ class Store(object):
 
     def inError(self):
         status = self.request.response.getStatus()
-        annotations = IAnnotations(self.request.response, None)
+        annotations = IAnnotations(self.request, None)
         if annotations is None:
             error_status = None
         else:
