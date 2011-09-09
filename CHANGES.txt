@@ -4,6 +4,12 @@ Changelog
 1.0.1 - unreleased
 ~~~~~~~~~~~~~~~~~~
 
+- When there was an error like Unauthorized, 200 status and empty body would be 
+  cached in RAMCache instead of not caching anything. 
+  This is due to a bug with Zope 2.13 publication events : 
+  response.status is not set when IPubBeforeAbort is notified.
+  Fixed by using error_status stored on request by plone.transformchain.
+  [gotcha]
 
 1.0 - 2011-05-12
 ~~~~~~~~~~~~~~~~
