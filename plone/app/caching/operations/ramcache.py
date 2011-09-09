@@ -12,6 +12,7 @@ from plone.app.caching.operations.utils import storeResponseInRAMCache
 
 GLOBAL_KEY = 'plone.app.caching.operations.ramcache'
 
+
 class Store(object):
     """Transform chain element which actually saves the page in RAM.
 
@@ -33,7 +34,8 @@ class Store(object):
         if not IRAMCached.providedBy(self.request) or self.inError():
             return None
 
-        storeResponseInRAMCache(self.request, self.request.response, result.encode(encoding))
+        storeResponseInRAMCache(self.request, self.request.response,
+                result.encode(encoding))
         return None
 
     def transformBytes(self, result, encoding):
@@ -47,7 +49,8 @@ class Store(object):
         if not IRAMCached.providedBy(self.request) or self.inError():
             return None
 
-        storeResponseInRAMCache(self.request, self.request.response,''.join(result))
+        storeResponseInRAMCache(self.request, self.request.response,
+                ''.join(result))
         return None
 
     def inError(self):
