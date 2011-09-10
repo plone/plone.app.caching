@@ -59,5 +59,5 @@ class Store(object):
         if annotations is None:
             error_status = None
         else:
-            error_status = annotations['error_status']
+            error_status = annotations.get('error_status', None)
         return status != 200 or error_status and error_status != 200
