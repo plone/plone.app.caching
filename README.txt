@@ -657,6 +657,25 @@ and hopefully more educational, template-based approach. Even if you decide to
 use one of the automated recipes, it will probably be worth your while to
 study the examples included in this package to get a few pointers.
 
+Running Plone behind Apache 2.2 with mod_cache
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Apache 2.2 has a known bug around its handling of the HTTP response header 
+CacheControl with value max-age=0 or headers Expires with a date in the past.
+In these scenarios mod_cache will not cache the response no matter what value
+of s-maxage is set.
+
+https://issues.apache.org/bugzilla/show_bug.cgi?id=35247
+
+One possible workaround for this is to use mod_headers directives in your
+Apache configuration to set max-age=1 if s-maxage is positive and max-age is 0
+and also to drop the Expires header
+
+Header edit Cache-Control max-age=0(.*s-maxage=[1-9].*) max-age=1$1
+Header unset Expires
+
+Dropping the Expires header has the disadvantage that HTTP 1.0 clients and 
+proxies may not cache your responses as you wish.
 
 The RAM cache
 -------------
