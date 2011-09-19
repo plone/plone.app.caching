@@ -128,33 +128,33 @@ class TestOperations(unittest.TestCase):
 
         # Check that we can open all without errors and without cache headers
         browser.open(self.portal.absolute_url())
-        self.failIf('Cache-Control' in browser.headers)
+        self.assertFalse('Cache-Control' in browser.headers)
 
         browser.open(self.portal['f1'].absolute_url())
-        self.failIf('Cache-Control' in browser.headers)
+        self.assertFalse('Cache-Control' in browser.headers)
 
         browser.open(self.portal['f1']['d1'].absolute_url())
-        self.failIf('Cache-Control' in browser.headers)
+        self.assertFalse('Cache-Control' in browser.headers)
 
         browser.open(self.portal['f1']['i1'].absolute_url())
-        self.failIf('Cache-Control' in browser.headers)
+        self.assertFalse('Cache-Control' in browser.headers)
 
         browser.open(self.portal['f1']['f1'].absolute_url())
-        self.failIf('Cache-Control' in browser.headers)
+        self.assertFalse('Cache-Control' in browser.headers)
 
         browser.open(self.portal.absolute_url() +
                 '/portal_skins/custom/test.gif')
-        self.failIf('Cache-Control' in browser.headers)
+        self.assertFalse('Cache-Control' in browser.headers)
 
         browser.open(self.portal.absolute_url() +
                 '/++resource++plone.app.caching.gif')
         # Set by resources themselves, but irrelevant to this test:
-        # self.failUnless('Cache-Control' in browser.headers)
+        # self.assertTrue('Cache-Control' in browser.headers)
 
         browser.open(self.portal.absolute_url() +
                 '/portal_css/' + cssResourcePath)
         # Set by ResourceRegistries, btu irrelevant ot this test
-        # self.failUnless('Cache-Control' in browser.headers)
+        # self.assertTrue('Cache-Control' in browser.headers)
 
     def test_gzip_setting(self):
         self.cacheSettings.enabled = True
@@ -182,8 +182,8 @@ class TestOperations(unittest.TestCase):
         transaction.commit()
         browser = Browser(self.app)
         browser.open(self.portal['f1']['d1'].absolute_url())
-        self.failIf('Vary' in browser.headers)
-        self.failIf('gzip' in browser.headers.get('Content-Encoding', ''))
+        self.assertFalse('Vary' in browser.headers)
+        self.assertFalse('gzip' in browser.headers.get('Content-Encoding', ''))
 
         # GZip disabled, accepted
 
@@ -193,8 +193,8 @@ class TestOperations(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader('Accept-Encoding', 'gzip')
         browser.open(self.portal['f1']['d1'].absolute_url())
-        self.failIf('Vary' in browser.headers)
-        self.failIf('gzip' in browser.headers.get('Content-Encoding', ''))
+        self.assertFalse('Vary' in browser.headers)
+        self.assertFalse('gzip' in browser.headers.get('Content-Encoding', ''))
 
         # GZip enabled, not accepted
         self.ploneCacheSettings.enableCompression = True
@@ -202,8 +202,8 @@ class TestOperations(unittest.TestCase):
 
         browser = Browser(self.app)
         browser.open(self.portal['f1']['d1'].absolute_url())
-        self.failIf('Vary' in browser.headers)
-        self.failIf('gzip' in browser.headers.get('Content-Encoding', ''))
+        self.assertFalse('Vary' in browser.headers)
+        self.assertFalse('gzip' in browser.headers.get('Content-Encoding', ''))
 
         # GZip enabled, accepted
         self.ploneCacheSettings.enableCompression = True
@@ -212,7 +212,7 @@ class TestOperations(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader('Accept-Encoding', 'gzip')
         browser.open(self.portal['f1']['d1'].absolute_url())
-        self.failUnless('Accept-Encoding' in browser.headers['Vary'])
+        self.assertTrue('Accept-Encoding' in browser.headers['Vary'])
         self.assertEquals('gzip', browser.headers['Content-Encoding'])
 
         # Test as logged in (should not make any difference)
@@ -225,7 +225,7 @@ class TestOperations(unittest.TestCase):
                 (TEST_USER_ID, TEST_USER_PASSWORD,))
 
         browser.open(self.portal['f1']['d1'].absolute_url())
-        self.failUnless('Accept-Encoding' in browser.headers['Vary'])
+        self.assertTrue('Accept-Encoding' in browser.headers['Vary'])
         self.assertEquals('gzip', browser.headers['Content-Encoding'])
 
     def test_auto_purge_content_types(self):
