@@ -89,12 +89,19 @@ class TestOperations(unittest.TestCase):
         self.portal['f1'].setDescription(u"Folder one description")
         self.portal['f1'].reindexObject()
 
+        # Publish the folder
+        self.portal.portal_workflow.doActionFor(self.portal['f1'], 'publish')
+
         # Non-folder content
         self.portal['f1'].invokeFactory('Document', 'd1')
         self.portal['f1']['d1'].setTitle(u"Document one")
         self.portal['f1']['d1'].setDescription(u"Document one description")
         self.portal['f1']['d1'].setText("<p>Body one</p>")
         self.portal['f1']['d1'].reindexObject()
+
+        # Publish the document
+        self.portal.portal_workflow.doActionFor(self.portal['f1']['d1'],
+                'publish')
 
         # Content image
         self.portal['f1'].invokeFactory('Image', 'i1')
@@ -131,9 +138,11 @@ class TestOperations(unittest.TestCase):
         self.assertFalse('Cache-Control' in browser.headers)
 
         browser.open(self.portal['f1'].absolute_url())
+        self.assertTrue('Folder one description' in browser.contents)
         self.assertFalse('Cache-Control' in browser.headers)
 
         browser.open(self.portal['f1']['d1'].absolute_url())
+        self.assertTrue('Document one description' in browser.contents)
         self.assertFalse('Cache-Control' in browser.headers)
 
         browser.open(self.portal['f1']['i1'].absolute_url())
