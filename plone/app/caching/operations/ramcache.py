@@ -31,33 +31,30 @@ class Store(object):
         self.request = request
 
     def transformUnicode(self, result, encoding):
-        if not IRAMCached.providedBy(self.request) or self.inError():
-            return None
-
-        storeResponseInRAMCache(self.request, self.request.response,
-                result.encode(encoding))
+        if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
+            storeResponseInRAMCache(self.request, self.request.response,
+                    result.encode(encoding))
         return None
 
     def transformBytes(self, result, encoding):
-        if not IRAMCached.providedBy(self.request) or self.inError():
-            return None
-
-        storeResponseInRAMCache(self.request, self.request.response, result)
+        if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
+            storeResponseInRAMCache(self.request, self.request.response,
+                    result)
         return None
 
     def transformIterable(self, result, encoding):
-        if not IRAMCached.providedBy(self.request) or self.inError():
-            return None
-
-        storeResponseInRAMCache(self.request, self.request.response,
-                ''.join(result))
+        if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
+            storeResponseInRAMCache(self.request, self.request.response,
+                    ''.join(result))
         return None
 
-    def inError(self):
+    def responseIsSuccess(self):
         status = self.request.response.getStatus()
         annotations = IAnnotations(self.request, None)
         if annotations is None:
             error_status = None
         else:
             error_status = annotations.get('error_status', None)
-        return status != 200 or error_status and error_status != 200
+        return ((error_status is None or error_status == 200)
+                and
+                status == 200)
