@@ -2,8 +2,6 @@ from zope.interface import implements
 from zope.interface import Interface
 
 from zope.component import adapts
-from zope.annotation.interfaces import IAnnotations
-
 from plone.transformchain.interfaces import ITransform
 
 from plone.app.caching.interfaces import IRAMCached
@@ -50,11 +48,4 @@ class Store(object):
 
     def responseIsSuccess(self):
         status = self.request.response.getStatus()
-        annotations = IAnnotations(self.request, None)
-        if annotations is None:
-            error_status = None
-        else:
-            error_status = annotations.get('error_status', None)
-        return ((error_status is None or error_status == 200)
-                and
-                status == 200)
+        return status == 200
