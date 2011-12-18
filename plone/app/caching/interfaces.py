@@ -3,7 +3,7 @@ import zope.i18nmessageid
 from zope.interface import Interface
 from zope import schema
 
-_ = zope.i18nmessageid.MessageFactory('plone.caching')
+_ = zope.i18nmessageid.MessageFactory('plone.app.caching')
 
 class ICacheProfiles(Interface):
     """Marker interface for extension profiles that contain cache settings.

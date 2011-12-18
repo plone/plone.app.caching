@@ -15,6 +15,9 @@ Changelog
   strings have been added in plone.app.caching-manual.pot in PloneTranslations
   [giacomos]
 
+- Changed wrong i18n domain in the messagefactory. plone.caching -> plone.app.caching.
+  [giacomos]
+
 1.0 - 2011-05-12
 ~~~~~~~~~~~~~~~~
 
