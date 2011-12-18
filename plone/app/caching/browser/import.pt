@@ -89,10 +89,10 @@
     
                             <label
                                 tal:attributes="for string:profile-${repeat/profile/index}"
-                                tal:content="profile/title"
+                                tal:content="profile/title" i18n:translate=""
                                 />
     
-                            <p class="discreet" tal:content="profile/description" />
+                            <p class="discreet" tal:content="profile/description" i18n:translate=""/>
     
                         </div>
                     </div>

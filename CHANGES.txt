@@ -11,7 +11,11 @@ Changelog
   Fixed by using error_status stored on request by plone.transformchain.
   [gotcha]
 
-- Added translation of ruleset's title and description. Corresponding translation
+- Added 12 translation strings for ruleset's title and description. Corresponding translation
+  strings have been added in plone.app.caching-manual.pot in PloneTranslations
+  [giacomos]
+
+- Added 6 translation strings for caching profiles' title and description. Corresponding translation
   strings have been added in plone.app.caching-manual.pot in PloneTranslations
   [giacomos]
 

@@ -517,8 +517,7 @@
                                                                         title    contentType/description;
                                                                         selected python:'selected' if contentType['name'] in selected else None;"
                                                         tal:content="contentType/title"
-                                                        i18n:domain="plone" i18n:attributes="title" i18n:translate=""
-                                                        />
+                                                        i18n:domain="plone" i18n:attributes="title" i18n:translate="" />
                                                 </select>
                                             </div>
                                         </td>
