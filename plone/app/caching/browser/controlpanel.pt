@@ -430,8 +430,8 @@
                             <tbody>
                                 <tr tal:repeat="ruleType view/ruleTypes">
                                     <td>
-                                        <div tal:content="ruleType/title" />
-                                        <p class="discreet" tal:content="ruleType/description" />
+                                        <div tal:content="ruleType/title" i18n:translate=""/>
+                                        <p class="discreet" tal:content="ruleType/description" i18n:translate=""/>
                                     </td>
                                     <td tal:define="selected python:request.get('operations', view.operationMapping).get(ruleType['safeName'], None)">
                                         <select
@@ -497,8 +497,8 @@
                                     <tr tal:define="contentTypeError python:errors.get('contenttypes', {}).get(ruleType['name'], None);
                                                     templateError    python:errors.get('templates', {}).get(ruleType['name'], None);">
                                         <td>
-                                            <div tal:content="ruleType/title" />
-                                            <p class="discreet" tal:content="ruleType/description" />
+                                            <div tal:content="ruleType/title" i18n:translate=""/>
+                                            <p class="discreet" tal:content="ruleType/description" i18n:translate=""/>
                                             <div class="error" tal:condition="python:contentTypeError or templateError">
                                                 <div tal:content="contentTypeError" tal:condition="contentTypeError" />
                                                 <div tal:content="templateError" tal:condition="templateError" />
@@ -588,8 +588,8 @@
                             <tbody>
                                 <tr tal:repeat="ruleType view/ruleTypes">
                                     <td>
-                                        <div tal:content="ruleType/title" />
-                                        <p class="discreet" tal:content="ruleType/description" />
+                                        <div tal:content="ruleType/title" i18n:translate=""/>
+                                        <p class="discreet" tal:content="ruleType/description" i18n:translate=""/>
                                     </td>
                                     <td tal:define="operationName python:view.operationMapping.get(ruleType['safeName'], None)">
                                         <tal:block condition="not:operationName" i18n:translate="help_not_mapped">
