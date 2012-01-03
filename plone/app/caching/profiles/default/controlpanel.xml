@@ -3,7 +3,7 @@
     name="portal_controlpanel"
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     i18n:domain="plone.app.caching">
-    
+
     <configlet
         title="Caching"
         action_id="plone.app.caching"

@@ -10,23 +10,23 @@ def enableExplicitMode():
         registry.explicit = True
 
 def importVarious(context):
-    
+
     if not context.readDataFile('plone.app.caching.txt'):
         return
-    
+
     site = context.getSite()
-    
+
     error_log = getToolByName(site, 'error_log')
-    
+
     properties = error_log.getProperties()
     ignored = properties.get('ignored_exceptions', ())
-    
+
     modified = False
     for exceptionName in ('Intercepted',):
         if exceptionName not in ignored:
             ignored += (exceptionName,)
             modified = True
-    
+
     if modified:
         error_log.setProperties(properties.get('keep_entries', 10),
                                 properties.get('copy_to_zlog', True),

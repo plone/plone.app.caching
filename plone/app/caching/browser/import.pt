@@ -11,7 +11,7 @@
 <div metal:fill-slot="prefs_configlet_content">
 
       <div id="region-content" class="documentEditable">
-          
+
         <div id="edit-bar">
             <ul class="contentViews" id="content-views">
               <li>
@@ -36,7 +36,7 @@
               </li>
             </ul>
         </div>
-        
+
         <div class="contentActions">
           &#160;
         </div>
@@ -49,7 +49,7 @@
             </div>
 
             <div class="configlet">
-                
+
                 <h1 class="documentFirstHeading"
                     i18n:translate="heading_caching_import">Import caching profiles</h1>
 
@@ -71,29 +71,29 @@
                     tal:define="errors view/errors">
 
                     <div class="field">
-    
+
                         <div
                             class="error"
                             tal:condition="errors/profile | nothing"
                             tal:content="errors/profile"
                             />
-    
+
                         <div tal:repeat="profile view/profiles">
-    
+
                             <input
                                 type="radio"
                                 name="profile"
                                 tal:attributes="id string:profile-${repeat/profile/index};
                                                 value profile/id"
                                 />
-    
+
                             <label
                                 tal:attributes="for string:profile-${repeat/profile/index}"
                                 tal:content="profile/title" i18n:translate=""
                                 />
-    
+
                             <p class="discreet" tal:content="profile/description" i18n:translate=""/>
-    
+
                         </div>
                     </div>
 
@@ -106,7 +106,7 @@
                             value="1"
                             tal:attributes="checked python:'checked' if request.get('snapshot', True) else None"
                             />
-    
+
                         <label for="snapshot" i18n:translate="label_snapshot">
                             Take a snapshot of the site prior to importing new
                             setting.
@@ -125,9 +125,9 @@
                             value="Import"
                             i18n:attributes="value" />
                     </div>
-                    
+
                     <input tal:replace="structure context/@@authenticator/authenticator" />
-                    
+
                 </form>
             </div>
         </div>

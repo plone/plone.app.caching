@@ -33,9 +33,9 @@ except ImportError:
 
 class ContentPurgePaths(object):
     """Paths to purge for content items
-    
+
     Includes:
-    
+
     * ${object_path}/ (e.g. for folders)
     * ${object_path}/view
     * ${object_path}/${object_default_view}
@@ -45,23 +45,23 @@ class ContentPurgePaths(object):
     * ${parent_path}
     * ${parent_path}/
     """
-    
+
     implements(IPurgePaths)
     adapts(IDynamicType)
-    
+
     def __init__(self, context):
         self.context = context
-    
+
     def getRelativePaths(self):
         prefix = self.context.absolute_url_path()
-        
+
         yield prefix + '/'
         yield prefix + '/view'
-        
+
         defaultView = getObjectDefaultView(self.context)
         if defaultView:
             yield prefix + '/' + defaultView
-        
+
         parent = aq_parent(self.context)
         if parent is not None:
             parentDefaultView = getObjectDefaultView(parent)
@@ -70,19 +70,19 @@ class ContentPurgePaths(object):
                 yield parentPrefix
                 yield parentPrefix + '/'
                 yield parentPrefix + '/view'
-    
+
     def getAbsolutePaths(self):
         return []
 
 class DiscussionItemPurgePaths(object):
     """Paths to purge for Discussion Item.
-    
+
     Looks up paths for the ultimate parent.
     """
-    
+
     implements(IPurgePaths)
     adapts(IDiscussionResponse)
-    
+
     def __init__(self, context):
         self.context = context
 
@@ -90,11 +90,11 @@ class DiscussionItemPurgePaths(object):
         root = self._getRoot()
         if root is None:
             return
-        
+
         request = getRequest()
         if request is None:
             return
-        
+
         rewriter = IPurgePathRewriter(request, None)
         for name, pathProvider in getAdapters((root,), IPurgePaths):
             # add relative paths, which are rewritten
@@ -107,35 +107,35 @@ class DiscussionItemPurgePaths(object):
                         rewrittenPaths = rewriter(relativePath) or [] # None -> []
                         for rewrittenPath in rewrittenPaths:
                             yield rewrittenPath
-        
-        
+
+
     def getAbsolutePaths(self):
         root = self._getRoot()
         if root is None:
             return
-        
+
         request = getRequest()
         if request is None:
             return
-        
+
         for name, pathProvider in getAdapters((root,), IPurgePaths):
             # add absoute paths, which are not
             absolutePaths = pathProvider.getAbsolutePaths()
             if absolutePaths:
                 for absolutePath in absolutePaths:
                     yield absolutePath
-    
+
     @memoize
     def _getRoot(self):
-        
+
         plone_utils = getToolByName(self.context, 'plone_utils', None)
         if plone_utils is None:
             return None
-        
+
         thread = plone_utils.getDiscussionThread(self.context)
         if not thread:
             return None
-        
+
         return thread[0]
 
 if HAVE_AT:
@@ -143,13 +143,13 @@ if HAVE_AT:
     class ObjectFieldPurgePaths(object):
         """Paths to purge for Archetypes object fields
         """
-    
+
         implements(IPurgePaths)
         adapts(IBaseObject)
-        
+
         def __init__(self, context):
             self.context = context
-        
+
         def getRelativePaths(self):
             prefix = self.context.absolute_url_path()
             schema = self.context.Schema()
@@ -161,23 +161,23 @@ if HAVE_AT:
                     and not ITextField.providedBy(field))
 
             seenDownloads = False
-            
+
             for field in schema.filterFields(fieldFilter):
-                
+
                 if not seenDownloads:
                     yield prefix + '/download'
                     yield prefix + '/at_download'
                     seenDownloads = True
-                
+
                 yield prefix + '/at_download/' + field.getName()
-                    
+
                 fieldURL = "%s/%s" % (prefix, field.getName(),)
                 yield fieldURL
-                
+
                 if IImageField.providedBy(field):
                     for size in field.getAvailableSizes(self.context).keys():
                         yield "%s_%s" % (fieldURL, size,)
-        
+
         def getAbsolutePaths(self):
             return []
 

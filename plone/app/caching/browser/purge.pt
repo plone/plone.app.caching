@@ -11,7 +11,7 @@
 <div metal:fill-slot="prefs_configlet_content">
 
       <div id="region-content" class="documentEditable">
-          
+
         <div id="edit-bar">
             <ul class="contentViews" id="content-views">
               <li>
@@ -36,7 +36,7 @@
               </li>
             </ul>
         </div>
-        
+
         <div class="contentActions">
           &#160;
         </div>
@@ -49,7 +49,7 @@
             </div>
 
             <div class="configlet">
-                
+
                 <h1 class="documentFirstHeading"
                     i18n:translate="heading_caching_purging">Purge caching proxy</h1>
 
@@ -75,25 +75,25 @@
                     </dd>
                     <dd tal:repeat="log view/purgeLog" tal:content="log" />
                 </dl>
-    
+
                 <form name="purge" tal:attributes="action string:${request/URL}" method="post"
                     tal:define="errors view/errors">
-        
+
                     <div tal:define="error errors/urls | nothing"
                          tal:attributes="class python:'field error' if error else 'field'">
-    
+
                         <label for="purgeURLs" i18n:translate="label_urls">URLs to purge</label>
-                        
+
                         <div class="formHelp" i18n:translate="help_urls">
                             Enter URLs to purge, one per line, below. You can
                             either enter a full URL including a domain, or a path
                             relative to the site root, starting with a <em>/</em>.
                         </div>
-                        
-                        <div tal:content="error" tal:condition="error" /> 
-            
+
+                        <div tal:content="error" tal:condition="error" />
+
                         <textarea id="purgeURLs" name="urls:lines" cols="40" rows="4"></textarea>
-            
+
                     </div>
 
                     <div class="field">
@@ -105,7 +105,7 @@
                             value="1"
                             checked="checked"
                             />
-    
+
                         <label for="purgeSynchronous" i18n:translate="label_synchronous">
                             Purge synchronously
                         </label>
@@ -117,7 +117,7 @@
                             to see if the purge actually succeeded.
                         </div>
                     </div>
-        
+
                     <div class="formControls">
                         <input
                             type="submit"
@@ -126,7 +126,7 @@
                             value="Purge"
                             i18n:attributes="value" />
                     </div>
-                    
+
                     <input tal:replace="structure context/@@authenticator/authenticator" />
 
                 </form>

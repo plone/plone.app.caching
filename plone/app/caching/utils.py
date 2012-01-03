@@ -9,22 +9,22 @@ from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
 
 def isPurged(object):
     """Determine if object is of a content type that should be purged.
-    
+
     This inspects ``purgedContentTypes`` in the registry.
     """
-    
+
     registry = queryUtility(IRegistry)
     if registry is None:
         return False
-    
+
     settings = registry.forInterface(IPloneCacheSettings, check=False)
     if not settings.purgedContentTypes:
         return False
-    
+
     portal_type = getattr(aq_base(object), 'portal_type', None)
     if portal_type is None:
         return False
-    
+
     return (portal_type in settings.purgedContentTypes)
 
 def getObjectDefaultView(context):
@@ -41,10 +41,10 @@ def getObjectDefaultView(context):
         except AttributeError:
             # Might happen if FTI didn't migrate yet.
             pass
-    
+
     if not IDynamicType.providedBy(context):
         return None
-    
+
     fti = context.getTypeInfo()
     try:
         # XXX: This isn't quite right since it assumes the action starts with ${object_url}

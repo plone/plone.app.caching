@@ -11,7 +11,7 @@
 <div metal:fill-slot="prefs_configlet_content">
 
       <div id="region-content" class="documentEditable">
-          
+
         <div id="edit-bar">
             <ul class="contentViews" id="content-views">
               <li>
@@ -36,7 +36,7 @@
               </li>
             </ul>
         </div>
-        
+
         <div class="contentActions">
           &#160;
         </div>
@@ -49,7 +49,7 @@
             </div>
 
             <div class="configlet">
-                
+
                 <h1 class="documentFirstHeading"
                     i18n:translate="heading_ramcache_stats">RAM cache statistics</h1>
 
@@ -61,15 +61,15 @@
                 </a>
 
                 <p i18n:translate="description_ramcache_stats">
-                    The table below shows statistics for the default RAM 
+                    The table below shows statistics for the default RAM
                     cache. You can use the <em>Purge</em> button to manually
                     clear the cache if you suspect there are stale items there.
                 </p>
-                
+
                 <table tal:define="stats view/ramCache/getStatistics"
                        class="listing nosort" summary="RAM cache statistics"
                        i18n:attributes="summary heading_ramcache_stats;">
-                  <thead> 
+                  <thead>
                     <th i18n:translate="label_cache_key">Key</th>
                     <th i18n:translate="label_cache_hits">Hits</th>
                     <th i18n:translate="label_cache_misses">Misses</th>
@@ -86,10 +86,10 @@
                     </tr>
                   </tbody>
                 </table>
-                
+
                 <form name="purge" tal:attributes="action string:${request/URL}" method="post"
                     tal:define="errors view/errors">
-        
+
                     <div class="formControls">
                         <input
                             type="submit"
@@ -98,7 +98,7 @@
                             value="Purge"
                             i18n:attributes="value" />
                     </div>
-                    
+
                     <input tal:replace="structure context/@@authenticator/authenticator" />
 
                 </form>

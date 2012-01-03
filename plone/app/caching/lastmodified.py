@@ -49,12 +49,12 @@ class PersistentLastModified(object):
     precedence over other adapters. Instead, this can be registered on an
     as-needed basis with ZCML.
     """
-    
+
     implements(ILastModified)
-    
+
     def __init__(self, context):
         self.context = context
-    
+
     def __call__(self):
         context = aq_base(self.context)
         mtime = getattr(context, '_p_mtime', None)
@@ -70,13 +70,13 @@ class OFSFileLastModified(PersistentLastModified):
 class ImageScaleLastModified(object):
     """ILastModified adapter for Products.Archetypes.Field.Image
     """
-    
+
     implements(ILastModified)
     adapts(ImageScale)
-    
+
     def __init__(self, context):
         self.context = context
-    
+
     def __call__(self):
         parent = getContext(self.context)
         if parent is not None:
@@ -86,13 +86,13 @@ class ImageScaleLastModified(object):
 class FSObjectLastModified(object):
     """ILastModified adapter for FSFile and FSImage
     """
-    
+
     implements(ILastModified)
     adapts(FSObject)
-    
+
     def __init__(self, context):
         self.context = context
-    
+
     def __call__(self):
         # Update from filesystem if we are in debug mode (only)
         self.context._updateFromFS()
@@ -105,13 +105,13 @@ class CatalogableDublinCoreLastModified(object):
     """ILastModified adapter for ICatalogableDublinCore, which includes
     most CMF, Archetypes and Dexterity content
     """
-    
+
     implements(ILastModified)
     adapts(ICatalogableDublinCore)
-    
+
     def __init__(self, context):
         self.context = context
-    
+
     def __call__(self):
         modified = self.context.modified()
         if modified is None:
@@ -121,26 +121,26 @@ class CatalogableDublinCoreLastModified(object):
 class DCTimesLastModified(object):
     """ILastModified adapter for zope.dublincore IDCTimes
     """
-    
+
     implements(ILastModified)
     adapts(IDCTimes)
-    
+
     def __init__(self, context):
         self.context = context
-    
+
     def __call__(self):
         return self.context.modified
 
 class ResourceLastModified(object):
     """ILastModified for Zope 3 style browser resources
     """
-    
+
     implements(ILastModified)
     adapts(IResource)
-    
+
     def __init__(self, context):
         self.context = context
-    
+
     def __call__(self):
         lmt = getattr(self.context.context, 'lmt', None)
         if lmt is not None:
@@ -150,13 +150,13 @@ class ResourceLastModified(object):
 class CookedFileLastModified(object):
     """ILastModified for Resource Registry `cooked` files
     """
-    
+
     implements(ILastModified)
     adapts(ICookedFile)
-    
+
     def __init__(self, context):
         self.context = context
-    
+
     def __call__(self):
         registry = getContext(self.context, IResourceRegistry)
         if registry is not None:

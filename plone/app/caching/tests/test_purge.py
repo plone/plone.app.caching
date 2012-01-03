@@ -45,10 +45,10 @@ from plone.app.caching.purge import DiscussionItemPurgePaths
 from plone.app.caching.purge import ObjectFieldPurgePaths
 
 class Handler(object):
-    
+
     def __init__(self):
         self.invocations = []
-    
+
     @adapter(IPurgeEvent)
     def handler(self, event):
         self.invocations.append(event)
@@ -58,14 +58,14 @@ class FauxRequest(dict):
 
 class FauxNonContent(Explicit):
     implements(IContentish)
-    
+
     def __init__(self, name=None):
         self.__name__ = name
         self.__parent__ = None # may be overridden by acquisition
-    
+
     def getId(self):
         return self.__name__
-    
+
     def absolute_url_path(self):
         parent = aq_base(self.__parent__)
         if parent is not None:
@@ -75,9 +75,9 @@ class FauxNonContent(Explicit):
 
 class FauxContent(FauxNonContent):
     implements(IBrowserDefault)
-    
+
     portal_type = 'testtype'
-    
+
     def defaultView(self):
         return 'default-view'
 
@@ -85,224 +85,224 @@ class FauxDiscussable(Explicit):
     implements(IDiscussionResponse)
 
 class TestPurgeRedispatch(unittest.TestCase):
-    
+
     layer = UNIT_TESTING
-    
+
     def setUp(self):
         self.handler = Handler()
         provideHandler(self.handler.handler)
-        
+
         provideHandler(objectEventNotify)
         provideHandler(purgeOnModified)
         provideHandler(purgeOnMovedOrRemoved)
-        
+
         provideAdapter(persistentFieldAdapter)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(IPloneCacheSettings)
-        
+
         ploneSettings = registry.forInterface(IPloneCacheSettings)
         ploneSettings.purgedContentTypes = ('testtype',)
-    
+
     def test_not_purged(self):
         context = FauxNonContent('new').__of__(FauxContent())
-        
+
         notify(ObjectModifiedEvent(context))
         notify(ObjectAddedEvent(context))
         notify(ObjectRemovedEvent(context))
-        
+
         self.assertEquals(0, len(self.handler.invocations))
-    
+
     def test_modified(self):
         context = FauxContent()
-        
+
         notify(ObjectModifiedEvent(context))
-        
+
         self.assertEquals(1, len(self.handler.invocations))
         self.assertEquals(context, self.handler.invocations[0].object)
-    
+
     def test_added(self):
         context = FauxContent('new').__of__(FauxContent())
-        
+
         notify(ObjectAddedEvent(context, context.__parent__, 'new'))
-        
+
         self.assertEquals(0, len(self.handler.invocations))
-    
+
     def test_moved(self):
         context = FauxContent('new').__of__(FauxContent())
-        
+
         notify(ObjectMovedEvent(context, FauxContent(), 'old',
                                 context.__parent__, 'new'))
-        
+
         self.assertEquals(1, len(self.handler.invocations))
         self.assertEquals(context, self.handler.invocations[0].object)
-    
+
     def test_renamed(self):
         context = FauxContent('new').__of__(FauxContent())
-        
+
         notify(ObjectMovedEvent(context,
                                 context.__parent__, 'old',
                                 context.__parent__, 'new'))
-        
+
         self.assertEquals(1, len(self.handler.invocations))
         self.assertEquals(context, self.handler.invocations[0].object)
-    
+
     def test_removed(self):
         context = FauxContent('new').__of__(FauxContent())
-        
+
         notify(ObjectRemovedEvent(context, context.__parent__, 'new'))
-        
+
         self.assertEquals(1, len(self.handler.invocations))
         self.assertEquals(context, self.handler.invocations[0].object)
 
 class TestContentPurgePaths(unittest.TestCase):
-    
+
     layer = UNIT_TESTING
-    
+
     def test_no_default_view(self):
         context = FauxNonContent('foo')
         purger = ContentPurgePaths(context)
-        
+
         self.assertEquals(['/foo/', '/foo/view'],
                           list(purger.getRelativePaths()))
         self.assertEquals([], list(purger.getAbsolutePaths()))
-    
+
     def test_default_view(self):
         context = FauxContent('foo')
         purger = ContentPurgePaths(context)
-        
+
         self.assertEquals(['/foo/', '/foo/view', '/foo/default-view'],
                           list(purger.getRelativePaths()))
         self.assertEquals([], list(purger.getAbsolutePaths()))
-    
+
     def test_parent_not_default_view(self):
         context = FauxContent('foo').__of__(FauxContent('bar'))
         purger = ContentPurgePaths(context)
-        
+
         self.assertEquals(['/bar/foo/', '/bar/foo/view', '/bar/foo/default-view'],
                           list(purger.getRelativePaths()))
         self.assertEquals([], list(purger.getAbsolutePaths()))
-    
+
     def test_parent_default_view(self):
         context = FauxContent('default-view').__of__(FauxContent('bar'))
         purger = ContentPurgePaths(context)
-        
+
         self.assertEquals(['/bar/default-view/', '/bar/default-view/view', '/bar/default-view/default-view',
                            '/bar', '/bar/', '/bar/view'],
                           list(purger.getRelativePaths()))
         self.assertEquals([], list(purger.getAbsolutePaths()))
 
 class TestDiscussionItemPurgePaths(unittest.TestCase):
-    
+
     layer = UNIT_TESTING
-    
+
     def setUp(self):
-        
+
         class FauxContentPurgePaths(object):
             implements(IPurgePaths)
             adapts(FauxContent)
-            
+
             def __init__(self, context):
                 self.context = context
-            
+
             def getRelativePaths(self):
                 return [self.context.absolute_url_path()]
-            
+
             def getAbsolutePaths(self):
                 return ['/purgeme']
-        
+
         provideAdapter(FauxContentPurgePaths, name="testpurge")
-    
+
     def test_no_tool(self):
         root = FauxContent('')
         content = FauxContent('foo').__of__(root)
         discussable = FauxDiscussable().__of__(content)
-        
+
         request = FauxRequest()
         setRequest(request)
-        
+
         purge = DiscussionItemPurgePaths(discussable)
-        
+
         self.assertEquals([], list(purge.getRelativePaths()))
         self.assertEquals([], list(purge.getAbsolutePaths()))
-    
+
     def test_no_request(self):
         root = FauxContent('app')
         content = FauxContent('foo').__of__(root)
         discussable = FauxDiscussable().__of__(content)
-        
+
         class FauxPloneTool(object):
-            
+
             def getDiscussionThread(self, item):
                 return [content, item]
-        
+
         root.plone_utils = FauxPloneTool()
-        
+
         setRequest(None)
-        
+
         purge = DiscussionItemPurgePaths(discussable)
-        
+
         self.assertEquals([], list(purge.getRelativePaths()))
         self.assertEquals([], list(purge.getAbsolutePaths()))
-    
+
     def test_no_discussion_thread(self):
         root = FauxContent('app')
         content = FauxContent('foo').__of__(root)
         discussable = FauxDiscussable().__of__(content)
-        
+
         class FauxPloneTool(object):
-            
+
             def getDiscussionThread(self, item):
                 return []
-        
+
         root.plone_utils = FauxPloneTool()
-        
+
         request = FauxRequest()
         setRequest(request)
-        
+
         purge = DiscussionItemPurgePaths(discussable)
-        
+
         self.assertEquals([], list(purge.getRelativePaths()))
         self.assertEquals([], list(purge.getAbsolutePaths()))
-        
+
     def test_paths_of_root(self):
         root = FauxContent('app')
         content = FauxContent('foo').__of__(root)
         discussable = FauxDiscussable().__of__(content)
-        
+
         class FauxPloneTool(object):
-            
+
             def getDiscussionThread(self, item):
                 return [content, item]
-        
+
         root.plone_utils = FauxPloneTool()
-        
+
         request = FauxRequest()
         setRequest(request)
-        
+
         purge = DiscussionItemPurgePaths(discussable)
-        
+
         self.assertEquals(['/app/foo'], list(purge.getRelativePaths()))
         self.assertEquals(['/purgeme'], list(purge.getAbsolutePaths()))
 
 class TestObjectFieldPurgePaths(unittest.TestCase):
-    
+
     layer = UNIT_TESTING
-    
+
     def setUp(self):
         provideAdapter(instanceSchemaFactory)
-    
+
     def test_no_file_image_fields(self):
-        
+
         class ATNoFields(atapi.BaseContent):
             schema = atapi.Schema((atapi.StringField('foo'),))
-        
+
         context = ATNoFields('foo')
         purger = ObjectFieldPurgePaths(context)
-        
+
         self.assertEquals([], list(purger.getRelativePaths()))
         self.assertEquals([], list(purger.getAbsolutePaths()))
-    
+
     def test_file_image_fields(self):
         from plone.app.blob.field import BlobField
 
@@ -314,10 +314,10 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                     atapi.ImageField('image2', sizes={'mini': (50,50), 'normal' : (100,100)}),
                     BlobField('blob1'),
                 ))
-        
+
         context = ATMultipleFields('foo')
         purger = ObjectFieldPurgePaths(context)
-        
+
         self.assertEquals(['foo/download', 'foo/at_download',
                            'foo/at_download/file1', 'foo/file1',
                            'foo/at_download/image1', 'foo/image1','foo/image1_thumb',
@@ -325,9 +325,9 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                            'foo/at_download/blob1', 'foo/blob1'],
                            list(purger.getRelativePaths()))
         self.assertEquals([], list(purger.getAbsolutePaths()))
-    
+
     def test_file_image_text_fields(self):
-        
+
         class ATMultipleFields(atapi.BaseContent):
             schema = atapi.Schema((
                     atapi.StringField('foo'),
@@ -336,10 +336,10 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                     atapi.ImageField('image2', sizes={'mini': (50,50), 'normal' : (100,100)}),
                     atapi.TextField('text'),
                 ))
-        
+
         context = ATMultipleFields('foo')
         purger = ObjectFieldPurgePaths(context)
-        
+
         self.assertEquals(['foo/download', 'foo/at_download',
                            'foo/at_download/file1', 'foo/file1',
                            'foo/at_download/image1', 'foo/image1','foo/image1_thumb',
