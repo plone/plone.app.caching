@@ -327,7 +327,7 @@ def isModified(request, etag=None, lastModified=None):
     served will return an If-None-Match header, but the site will not be 
     configured for etags. In this case, force a refresh to load the 
     latest headers. I interpret this as the spec rule that the 
-    etags do NOT match, and therefor we must nnot return a 304.
+    etags do NOT match, and therefor we must not return a 304.
     """
     if ifNoneMatch and etag==None:
         return True

@@ -667,6 +667,32 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         self.assertEquals(False, isModified(request, etag=etag))
 
+    def test_isModified_inm_match_update(self):
+        """
+        If a site was previously configured to use etags and then the 
+        configuration updates, cached pages from the previous config 
+        will send and If-None-Match but will have no site configuration
+        for etags. In this case, modified should return True since the 
+        headers need to be updated with the new config. Additionally, 
+        last modified may be attached to the request header, but 
+        If-None-Match always takes precedence over these headers and 
+        therefor they should be ignored.
+        """
+        from plone.app.caching.operations.utils import isModified
+
+        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+
+        # at some point the code added dummy timestamps to this header
+        request.environ['HTTP_IF_NONE_MATCH'] = '"1232342354.65"'
+
+        etag = None
+
+        self.assertEquals(True, isModified(request, etag=etag, 
+                                           lastModified='doesnt_really_matter'))
+
+
     def test_isModified_inm_match_multiple(self):
         from plone.app.caching.operations.utils import isModified
 

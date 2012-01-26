@@ -3,6 +3,12 @@ Changelog
 
 1.0.1 - unreleased
 ~~~~~~~~~~~~~~~~~~
+- Properly handle a changed configuration from with etags to no etags by 
+  forcing a page refresh
+  [eleddy]
+
+- When not caching with etags, don't sent an etag header to stop caching
+  [eleddy]
 
 - When there was an error like Unauthorized, 200 status and empty body would be 
   cached in RAMCache instead of not caching anything. 
