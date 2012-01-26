@@ -145,8 +145,12 @@ class BaseCaching(object):
 
         # Check for cache stop request variables
         if cacheStop(self.request, rulename):
-            etag = "%s%d" % (time.time(), random.randint(0, 1000))
-            return setCacheHeaders(self.published, self.request, response, etag=etag)
+            # only stop with etags if configured
+            if etags:
+                etag = "%s%d" % (time.time(), random.randint(0, 1000))
+                return setCacheHeaders(self.published, self.request, response, etag=etag)
+            # XXX: should there be an else here? Last modified works without extra headers.
+            #      Are there other config options?
 
         # Do the maxage/smaxage settings allow for proxy caching?
         proxyCache = smaxage or (maxage and smaxage is None)
