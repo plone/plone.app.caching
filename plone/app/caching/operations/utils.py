@@ -322,6 +322,16 @@ def isModified(request, etag=None, lastModified=None):
 
         etagMatched = True
 
+    """
+    If a site turns off etags after having them on, the pages previously
+    served will return an If-None-Match header, but the site will not be 
+    configured for etags. In this case, force a refresh to load the 
+    latest headers. I interpret this as the spec rule that the 
+    etags do NOT match, and therefor we must nnot return a 304.
+    """
+    if ifNoneMatch and etag==None:
+        return True
+
     # Check the modification date
     if ifModifiedSince and lastModified is not None:
 
@@ -347,8 +357,10 @@ def isModified(request, etag=None, lastModified=None):
             if not etagMatched:
                 return True
 
+    # XXX Do we really want the default here to be false?
     return False
 
+ 
 def visibleToRole(published, role, permission='View'):
     """Determine if the published object would be visible to the given
     role.
