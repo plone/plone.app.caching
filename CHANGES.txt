@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.0.1 - unreleased
+1.0.1 (2012-01-26)
 ~~~~~~~~~~~~~~~~~~
 - Properly handle a changed configuration from with etags to no etags by 
   forcing a page refresh
