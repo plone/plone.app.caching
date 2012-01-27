@@ -129,17 +129,19 @@ class TestLastModified(unittest.TestCase):
         modtime = float(os.path.getmtime(__file__))
         mod = datetime.datetime.fromtimestamp(modtime, tzlocal())
 
-        self.assertEquals(mod, ILastModified(dummy)())
+        format = "%y%m%d%H%M%s" # see note in test_FSObjectLastModified_FSImage
+        self.assertEquals(mod.strftime(format), ILastModified(dummy)().strftime(format))
 
     def test_FSObjectLastModified_FSImage(self):
         from Products.CMFCore.FSImage import FSImage
 
         dummy = FSImage('dummy', __file__) # not really an image, but anyway
-
         modtime = float(os.path.getmtime(__file__))
         mod = datetime.datetime.fromtimestamp(modtime, tzlocal())
-
-        self.assertEquals(mod, ILastModified(dummy)())
+        # different filesystems seem to handle datetime differently. some use microseconds
+        # and others don't so to make jenkins happy lets omit the microseconds factor
+        format = "%y%m%d%H%M%s"
+        self.assertEquals(mod.strftime(format), ILastModified(dummy)().strftime(format))
 
     def test_CatalogableDublinCoreLastModified(self):
         from Products.CMFCore.interfaces import ICatalogableDublinCore
