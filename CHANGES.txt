@@ -3,8 +3,9 @@ Changelog
 
 1.0.2 (unreleased)
 ~~~~~~~~~~~~~~~~~~
-
-- Nothing changed yet.
+- Handle caching of resource registries in RAM cache by not storing empty 
+  bodies in the RAMCache
+  [eleddy with major tseaver support]
 
 
 1.0.1 (2012-01-26)

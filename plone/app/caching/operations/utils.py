@@ -680,6 +680,19 @@ def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY,
     cache = getRAMCache(globalKey)
     if cache is None:
         return
+    
+    """
+    Resource registries have no body. If we put them in the cache the content 
+    type headers will indicate length and the body will be '', causing the browser 
+    to just spin. Furthermore, I doubt we ever want to cache an empty result:
+    it's an indication that something went wrong somewhere.
+
+    This does mean that any resources will not be cached in ram. There is 
+    potentially another fix but I doubt long term it's ever the right thing to 
+    do.
+    """
+    if result == '':
+        return 
 
     status = response.getStatus()
     headers = dict(request.response.headers)
