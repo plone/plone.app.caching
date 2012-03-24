@@ -5,8 +5,8 @@ version = '1.0.2dev'
 setup(name='plone.app.caching',
       version=version,
       description="Plone UI and default rules for plone.caching/z3c.caching",
-      long_description=open("README.txt").read() + "\n" +
-                       open("CHANGES.txt").read(),
+      long_description=open("README.rst").read() + "\n" +
+                       open("CHANGES.rst").read(),
       classifiers=[
           "Environment :: Web Environment",
           "Framework :: Plone",
