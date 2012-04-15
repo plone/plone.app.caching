@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.0.2 (unreleased)
+1.0.2 (2012-04-15)
 ~~~~~~~~~~~~~~~~~~
 - Handle caching of resource registries in RAM cache by not storing empty 
   bodies in the RAMCache
