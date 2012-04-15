@@ -1,10 +1,11 @@
 Changelog
 ---------
 
-1.0.3 (unreleased)
+1.0.3 (2012-04-15)
 ~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Fix packaging issue.
+  [esteele]
 
 
 1.0.2 (2012-04-15)
