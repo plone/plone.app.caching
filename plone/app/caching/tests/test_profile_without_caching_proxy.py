@@ -4,7 +4,7 @@ import unittest2 as unittest
 
 from plone.testing.z2 import Browser
 
-from plone.app.testing import TEST_USER_ID, TEST_USER_PASSWORD
+from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
 from plone.app.testing import setRoles
 from plone.app.testing import applyProfile
 
@@ -98,7 +98,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Request the quthenticated folder
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal['f1'].absolute_url())
         self.assertEquals('plone.content.folderView', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -121,7 +121,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Request the authenticated page
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.failUnless(testText in browser.contents)
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
@@ -135,7 +135,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
 
         # Request the authenticated page again -- to test RAM cache.
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -146,7 +146,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         etag = browser.headers['ETag']
         browser = Browser(self.app)
         browser.raiseHttpErrors = False  # we really do want to see the 304
-        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal['f1']['d1'].absolute_url())
         # This should be a 304 response
@@ -278,7 +278,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Request the authenticated rss feed
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
@@ -289,7 +289,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
 
         # Request the authenticated rss feed again -- to test RAM cache
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEquals('plone.content.feed', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])

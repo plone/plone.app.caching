@@ -2,7 +2,7 @@ import unittest2 as unittest
 
 from plone.testing.z2 import Browser
 
-from plone.app.testing import TEST_USER_ID, TEST_USER_PASSWORD
+from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
 from plone.app.testing import setRoles
 
 from zope.component import getUtility
@@ -77,7 +77,7 @@ class TestOperationParameters(unittest.TestCase):
 
         # View the page as logged-in
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEquals('plone.content.itemView', browser.headers['X-Cache-Rule'])
         self.assertEquals('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])

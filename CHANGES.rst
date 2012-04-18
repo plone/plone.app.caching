@@ -4,7 +4,9 @@ Changelog
 1.0.4 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Fix possible test failures by logging in with the user name.
+  Note that user id and user name (login name) can differ.
+  [maurits]
 
 
 1.0.3 (2012-04-15)

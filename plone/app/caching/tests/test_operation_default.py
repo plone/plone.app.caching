@@ -2,7 +2,7 @@ import unittest2 as unittest
 
 from plone.testing.z2 import Browser
 
-from plone.app.testing import TEST_USER_ID, TEST_USER_PASSWORD
+from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
 from plone.app.testing import setRoles
 
 from zope.component import getUtility
@@ -56,7 +56,7 @@ class TestOperationDefault(unittest.TestCase):
 
         # log in and create a content type
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         url = "%s/portal_factory/Document/document.2012-01-26.4504738457/edit"%self.portal['f1'].absolute_url()
         browser.open(url)
         browser.getControl(name='title').value="dummy content"

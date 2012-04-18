@@ -2,7 +2,7 @@ import unittest2 as unittest
 
 from plone.testing.z2 import Browser
 
-from plone.app.testing import TEST_USER_ID, TEST_USER_PASSWORD
+from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
 from plone.app.testing import applyProfile
 from plone.app.testing import setRoles
 
@@ -231,7 +231,7 @@ class TestOperations(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader('Accept-Encoding', 'gzip')
         browser.addHeader('Authorization', 'Basic %s:%s' %
-                (TEST_USER_ID, TEST_USER_PASSWORD,))
+                (TEST_USER_NAME, TEST_USER_PASSWORD,))
 
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertTrue('Accept-Encoding' in browser.headers['Vary'])
@@ -263,7 +263,7 @@ class TestOperations(unittest.TestCase):
         browser = Browser(self.app)
         browser.handleErrors = False
         browser.addHeader('Authorization',
-            'Basic %s:%s' % (TEST_USER_ID, TEST_USER_PASSWORD,))
+            'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
 
         browser.open(editURL)
         browser.getControl(name='title').value = u"Title 1"
