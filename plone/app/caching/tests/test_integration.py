@@ -124,8 +124,14 @@ class TestOperations(unittest.TestCase):
             'test.gif', open(TEST_IMAGE, 'rb'))
 
         # Resource registries resource
-        cssResourcePath = self.portal['portal_css'].getEvaluatedResources(
-                self.portal)[0].getId()
+        css_tool = self.portal['portal_css']
+        # Cook resources to update bundles for theme.
+        css_tool.cookResources()
+
+        # Pass active skin for correct bundles.
+        active_theme = self.portal['portal_skins'].default_skin
+        resources = css_tool.getEvaluatedResources(self.portal, active_theme)
+        cssResourcePath = resources[0].getId()
 
         setRoles(self.portal, TEST_USER_ID, ('Member',))
 
