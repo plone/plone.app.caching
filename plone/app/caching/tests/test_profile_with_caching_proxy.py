@@ -455,14 +455,15 @@ class TestProfileWithCaching(unittest.TestCase):
 
     def test_stable_resources_resource_registries(self):
 
+        cssregistry = self.portal.portal_css
+        # Cook resources to update bundles for theme.
+        cssregistry.cookResources()
         import transaction; transaction.commit()
 
         # This is a clone of the same test for 'without-caching-proxy'
         # Can we just call that test from this context?
-        path = "/Sunburst%20Theme/public.css"
 
         # Request a ResourceRegistry resource
-        cssregistry = self.portal.portal_css
         path = cssregistry.absolute_url() + "/Sunburst%20Theme/public.css"
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser(self.app)

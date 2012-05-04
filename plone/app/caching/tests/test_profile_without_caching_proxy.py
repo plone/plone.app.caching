@@ -416,6 +416,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
         cssregistry = self.portal.portal_css
         path = cssregistry.absolute_url() + "/Sunburst%20Theme/public.css"
         cssregistry.setDebugMode(False)
+        # Cook resources to update bundles for theme.
+        cssregistry.cookResources()
 
         import transaction; transaction.commit()
 
