@@ -111,22 +111,22 @@ class TestPurgeRedispatch(unittest.TestCase):
         notify(ObjectAddedEvent(context))
         notify(ObjectRemovedEvent(context))
 
-        self.assertEquals(0, len(self.handler.invocations))
+        self.assertEqual(0, len(self.handler.invocations))
 
     def test_modified(self):
         context = FauxContent()
 
         notify(ObjectModifiedEvent(context))
 
-        self.assertEquals(1, len(self.handler.invocations))
-        self.assertEquals(context, self.handler.invocations[0].object)
+        self.assertEqual(1, len(self.handler.invocations))
+        self.assertEqual(context, self.handler.invocations[0].object)
 
     def test_added(self):
         context = FauxContent('new').__of__(FauxContent())
 
         notify(ObjectAddedEvent(context, context.__parent__, 'new'))
 
-        self.assertEquals(0, len(self.handler.invocations))
+        self.assertEqual(0, len(self.handler.invocations))
 
     def test_moved(self):
         context = FauxContent('new').__of__(FauxContent())
@@ -134,8 +134,8 @@ class TestPurgeRedispatch(unittest.TestCase):
         notify(ObjectMovedEvent(context, FauxContent(), 'old',
                                 context.__parent__, 'new'))
 
-        self.assertEquals(1, len(self.handler.invocations))
-        self.assertEquals(context, self.handler.invocations[0].object)
+        self.assertEqual(1, len(self.handler.invocations))
+        self.assertEqual(context, self.handler.invocations[0].object)
 
     def test_renamed(self):
         context = FauxContent('new').__of__(FauxContent())
@@ -144,16 +144,16 @@ class TestPurgeRedispatch(unittest.TestCase):
                                 context.__parent__, 'old',
                                 context.__parent__, 'new'))
 
-        self.assertEquals(1, len(self.handler.invocations))
-        self.assertEquals(context, self.handler.invocations[0].object)
+        self.assertEqual(1, len(self.handler.invocations))
+        self.assertEqual(context, self.handler.invocations[0].object)
 
     def test_removed(self):
         context = FauxContent('new').__of__(FauxContent())
 
         notify(ObjectRemovedEvent(context, context.__parent__, 'new'))
 
-        self.assertEquals(1, len(self.handler.invocations))
-        self.assertEquals(context, self.handler.invocations[0].object)
+        self.assertEqual(1, len(self.handler.invocations))
+        self.assertEqual(context, self.handler.invocations[0].object)
 
 class TestContentPurgePaths(unittest.TestCase):
 
@@ -163,34 +163,34 @@ class TestContentPurgePaths(unittest.TestCase):
         context = FauxNonContent('foo')
         purger = ContentPurgePaths(context)
 
-        self.assertEquals(['/foo/', '/foo/view'],
+        self.assertEqual(['/foo/', '/foo/view'],
                           list(purger.getRelativePaths()))
-        self.assertEquals([], list(purger.getAbsolutePaths()))
+        self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_default_view(self):
         context = FauxContent('foo')
         purger = ContentPurgePaths(context)
 
-        self.assertEquals(['/foo/', '/foo/view', '/foo/default-view'],
+        self.assertEqual(['/foo/', '/foo/view', '/foo/default-view'],
                           list(purger.getRelativePaths()))
-        self.assertEquals([], list(purger.getAbsolutePaths()))
+        self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_parent_not_default_view(self):
         context = FauxContent('foo').__of__(FauxContent('bar'))
         purger = ContentPurgePaths(context)
 
-        self.assertEquals(['/bar/foo/', '/bar/foo/view', '/bar/foo/default-view'],
+        self.assertEqual(['/bar/foo/', '/bar/foo/view', '/bar/foo/default-view'],
                           list(purger.getRelativePaths()))
-        self.assertEquals([], list(purger.getAbsolutePaths()))
+        self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_parent_default_view(self):
         context = FauxContent('default-view').__of__(FauxContent('bar'))
         purger = ContentPurgePaths(context)
 
-        self.assertEquals(['/bar/default-view/', '/bar/default-view/view', '/bar/default-view/default-view',
+        self.assertEqual(['/bar/default-view/', '/bar/default-view/view', '/bar/default-view/default-view',
                            '/bar', '/bar/', '/bar/view'],
                           list(purger.getRelativePaths()))
-        self.assertEquals([], list(purger.getAbsolutePaths()))
+        self.assertEqual([], list(purger.getAbsolutePaths()))
 
 class TestDiscussionItemPurgePaths(unittest.TestCase):
 
@@ -223,8 +223,8 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
 
         purge = DiscussionItemPurgePaths(discussable)
 
-        self.assertEquals([], list(purge.getRelativePaths()))
-        self.assertEquals([], list(purge.getAbsolutePaths()))
+        self.assertEqual([], list(purge.getRelativePaths()))
+        self.assertEqual([], list(purge.getAbsolutePaths()))
 
     def test_no_request(self):
         root = FauxContent('app')
@@ -242,8 +242,8 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
 
         purge = DiscussionItemPurgePaths(discussable)
 
-        self.assertEquals([], list(purge.getRelativePaths()))
-        self.assertEquals([], list(purge.getAbsolutePaths()))
+        self.assertEqual([], list(purge.getRelativePaths()))
+        self.assertEqual([], list(purge.getAbsolutePaths()))
 
     def test_no_discussion_thread(self):
         root = FauxContent('app')
@@ -262,8 +262,8 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
 
         purge = DiscussionItemPurgePaths(discussable)
 
-        self.assertEquals([], list(purge.getRelativePaths()))
-        self.assertEquals([], list(purge.getAbsolutePaths()))
+        self.assertEqual([], list(purge.getRelativePaths()))
+        self.assertEqual([], list(purge.getAbsolutePaths()))
 
     def test_paths_of_root(self):
         root = FauxContent('app')
@@ -282,8 +282,8 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
 
         purge = DiscussionItemPurgePaths(discussable)
 
-        self.assertEquals(['/app/foo'], list(purge.getRelativePaths()))
-        self.assertEquals(['/purgeme'], list(purge.getAbsolutePaths()))
+        self.assertEqual(['/app/foo'], list(purge.getRelativePaths()))
+        self.assertEqual(['/purgeme'], list(purge.getAbsolutePaths()))
 
 class TestObjectFieldPurgePaths(unittest.TestCase):
 
@@ -300,8 +300,8 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
         context = ATNoFields('foo')
         purger = ObjectFieldPurgePaths(context)
 
-        self.assertEquals([], list(purger.getRelativePaths()))
-        self.assertEquals([], list(purger.getAbsolutePaths()))
+        self.assertEqual([], list(purger.getRelativePaths()))
+        self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_file_image_fields(self):
         from plone.app.blob.field import BlobField
@@ -318,13 +318,13 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
         context = ATMultipleFields('foo')
         purger = ObjectFieldPurgePaths(context)
 
-        self.assertEquals(['foo/download', 'foo/at_download',
+        self.assertEqual(['foo/download', 'foo/at_download',
                            'foo/at_download/file1', 'foo/file1',
                            'foo/at_download/image1', 'foo/image1','foo/image1_thumb',
                            'foo/at_download/image2', 'foo/image2', 'foo/image2_mini', 'foo/image2_normal',
                            'foo/at_download/blob1', 'foo/blob1'],
                            list(purger.getRelativePaths()))
-        self.assertEquals([], list(purger.getAbsolutePaths()))
+        self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_file_image_text_fields(self):
 
@@ -340,9 +340,9 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
         context = ATMultipleFields('foo')
         purger = ObjectFieldPurgePaths(context)
 
-        self.assertEquals(['foo/download', 'foo/at_download',
+        self.assertEqual(['foo/download', 'foo/at_download',
                            'foo/at_download/file1', 'foo/file1',
                            'foo/at_download/image1', 'foo/image1','foo/image1_thumb',
                            'foo/at_download/image2', 'foo/image2', 'foo/image2_mini', 'foo/image2_normal'],
                            list(purger.getRelativePaths()))
-        self.assertEquals([], list(purger.getAbsolutePaths()))
+        self.assertEqual([], list(purger.getAbsolutePaths()))

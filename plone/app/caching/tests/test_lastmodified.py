@@ -52,7 +52,7 @@ class TestLastModified(unittest.TestCase):
 
         from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
         zpt = ZopePageTemplate('zpt').__of__(d)
-        self.assertEquals(None, ILastModified(zpt)())
+        self.assertEqual(None, ILastModified(zpt)())
 
 
         timestamp = 987654321.0 # time stamp (in UTC)
@@ -61,7 +61,7 @@ class TestLastModified(unittest.TestCase):
         mod = datetime.datetime.fromtimestamp(timestamp, tzlocal())
 
         d._p_mtime = 987654321.0
-        self.assertEquals(mod, ILastModified(zpt)())
+        self.assertEqual(mod, ILastModified(zpt)())
 
     def test_FSPageTemplateDelegateLastModified(self):
         from persistent import Persistent
@@ -76,7 +76,7 @@ class TestLastModified(unittest.TestCase):
 
         from Products.CMFCore.FSPageTemplate import FSPageTemplate
         zpt = FSPageTemplate('zpt', __file__).__of__(d)
-        self.assertEquals(None, ILastModified(zpt)())
+        self.assertEqual(None, ILastModified(zpt)())
 
 
         timestamp = 987654321.0 # time stamp (in UTC)
@@ -85,13 +85,13 @@ class TestLastModified(unittest.TestCase):
         mod = datetime.datetime.fromtimestamp(timestamp, tzlocal())
 
         d._p_mtime = 987654321.0
-        self.assertEquals(mod, ILastModified(zpt)())
+        self.assertEqual(mod, ILastModified(zpt)())
 
     def test_OFSFileLastModified_File(self):
         from OFS.Image import File
 
         dummy = File('dummy', 'Dummy', 'data')
-        self.assertEquals(None, ILastModified(dummy)())
+        self.assertEqual(None, ILastModified(dummy)())
 
         timestamp = 987654321.0 # time stamp (in UTC)
         ts = TimeStamp(*time.gmtime(timestamp)[:6]) # corresponding TimeStamp
@@ -102,13 +102,13 @@ class TestLastModified(unittest.TestCase):
 
         dummy._p_jar = FauxDataManager()
         dummy._p_serial = repr(ts)
-        self.assertEquals(mod, ILastModified(dummy)())
+        self.assertEqual(mod, ILastModified(dummy)())
 
     def test_OFSFileLastModified_Image(self):
         from OFS.Image import Image
 
         dummy = Image('dummy', 'Dummy', 'data')
-        self.assertEquals(None, ILastModified(dummy)())
+        self.assertEqual(None, ILastModified(dummy)())
 
         timestamp = 987654321.0 # time stamp (in UTC)
         ts = TimeStamp(*time.gmtime(timestamp)[:6]) # corresponding TimeStamp
@@ -119,7 +119,7 @@ class TestLastModified(unittest.TestCase):
 
         dummy._p_jar = FauxDataManager()
         dummy._p_serial = repr(ts)
-        self.assertEquals(mod, ILastModified(dummy)())
+        self.assertEqual(mod, ILastModified(dummy)())
 
     def test_FSObjectLastModified_FSFile(self):
         from Products.CMFCore.FSFile import FSFile
@@ -130,7 +130,7 @@ class TestLastModified(unittest.TestCase):
         mod = datetime.datetime.fromtimestamp(modtime, tzlocal())
 
         format = "%y%m%d%H%M%s" # see note in test_FSObjectLastModified_FSImage
-        self.assertEquals(mod.strftime(format), ILastModified(dummy)().strftime(format))
+        self.assertEqual(mod.strftime(format), ILastModified(dummy)().strftime(format))
 
     def test_FSObjectLastModified_FSImage(self):
         from Products.CMFCore.FSImage import FSImage
@@ -141,7 +141,7 @@ class TestLastModified(unittest.TestCase):
         # different filesystems seem to handle datetime differently. some use microseconds
         # and others don't so to make jenkins happy lets omit the microseconds factor
         format = "%y%m%d%H%M%s"
-        self.assertEquals(mod.strftime(format), ILastModified(dummy)().strftime(format))
+        self.assertEqual(mod.strftime(format), ILastModified(dummy)().strftime(format))
 
     def test_CatalogableDublinCoreLastModified(self):
         from Products.CMFCore.interfaces import ICatalogableDublinCore
@@ -158,10 +158,10 @@ class TestLastModified(unittest.TestCase):
 
         d = Dummy()
 
-        self.assertEquals(None, ILastModified(d)())
+        self.assertEqual(None, ILastModified(d)())
 
         d._mod = datetime.datetime(2001, 4, 19, 12, 25, 21, 120000)
-        self.assertEquals(d._mod, ILastModified(d)())
+        self.assertEqual(d._mod, ILastModified(d)())
 
     def test_DCTimesLastModified(self):
         from zope.dublincore.interfaces import IDCTimes
@@ -178,10 +178,10 @@ class TestLastModified(unittest.TestCase):
 
         d = Dummy()
 
-        self.assertEquals(None, ILastModified(d)())
+        self.assertEqual(None, ILastModified(d)())
 
         d._mod = datetime.datetime(2001, 4, 19, 12, 25, 21, 120000)
-        self.assertEquals(d._mod, ILastModified(d)())
+        self.assertEqual(d._mod, ILastModified(d)())
 
     def test_ResourceLastModified_zope_app(self):
         from zope.app.publisher.browser.fileresource import FileResource
@@ -198,7 +198,7 @@ class TestLastModified(unittest.TestCase):
         modtime = float(os.path.getmtime(__file__))
         mod = datetime.datetime.fromtimestamp(modtime, tz=tzlocal())
 
-        self.assertEquals(mod, ILastModified(r)())
+        self.assertEqual(mod, ILastModified(r)())
 
     def test_ResourceLastModified_Five(self):
         from Products.Five.browser.resource import FileResource
@@ -215,4 +215,4 @@ class TestLastModified(unittest.TestCase):
         modtime = float(os.path.getmtime(__file__))
         mod = datetime.datetime.fromtimestamp(modtime, tz=tzlocal())
 
-        self.assertEquals(mod, ILastModified(r)())
+        self.assertEqual(mod, ILastModified(r)())

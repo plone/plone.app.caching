@@ -69,12 +69,12 @@ class TestIsPurged(unittest.TestCase):
 
     def test_no_registry(self):
         content = DummyContent()
-        self.assertEquals(False, isPurged(content))
+        self.assertEqual(False, isPurged(content))
 
     def test_no_settings(self):
         provideUtility(Registry(), IRegistry)
         content = DummyContent()
-        self.assertEquals(False, isPurged(content))
+        self.assertEqual(False, isPurged(content))
 
     def test_no_portal_type(self):
         provideUtility(Registry(), IRegistry)
@@ -85,7 +85,7 @@ class TestIsPurged(unittest.TestCase):
         ploneSettings.purgedContentTypes = ('testtype',)
 
         content = DummyNotContent()
-        self.assertEquals(False, isPurged(content))
+        self.assertEqual(False, isPurged(content))
 
     def test_not_listed(self):
         provideUtility(Registry(), IRegistry)
@@ -96,7 +96,7 @@ class TestIsPurged(unittest.TestCase):
         ploneSettings.purgedContentTypes = ('File', 'Image',)
 
         content = DummyContent()
-        self.assertEquals(False, isPurged(content))
+        self.assertEqual(False, isPurged(content))
 
     def test_listed(self):
         provideUtility(Registry(), IRegistry)
@@ -107,7 +107,7 @@ class TestIsPurged(unittest.TestCase):
         ploneSettings.purgedContentTypes = ('File', 'Image', 'testtype',)
 
         content = DummyContent()
-        self.assertEquals(True, isPurged(content))
+        self.assertEqual(True, isPurged(content))
 
 class TestGetObjectDefaultPath(unittest.TestCase):
 
@@ -115,20 +115,20 @@ class TestGetObjectDefaultPath(unittest.TestCase):
 
     def test_not_content(self):
         context = DummyNotContent()
-        self.assertEquals(None, getObjectDefaultView(context))
+        self.assertEqual(None, getObjectDefaultView(context))
 
     def test_browserdefault(self):
         context = DummyContent()
-        self.assertEquals('defaultView', getObjectDefaultView(context))
+        self.assertEqual('defaultView', getObjectDefaultView(context))
 
     def test_not_IBrowserDefault_methodid(self):
         context = DummyNotBrowserDefault('testtype', 'string:${object_url}/view')
-        self.assertEquals('defaultView', getObjectDefaultView(context))
+        self.assertEqual('defaultView', getObjectDefaultView(context))
 
     def test_not_IBrowserDefault_default_method(self):
         context = DummyNotBrowserDefault('testtype', 'string:${object_url}/')
-        self.assertEquals('defaultView', getObjectDefaultView(context))
+        self.assertEqual('defaultView', getObjectDefaultView(context))
 
     def test_not_IBrowserDefault_actiononly(self):
         context = DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView')
-        self.assertEquals('defaultView', getObjectDefaultView(context))
+        self.assertEqual('defaultView', getObjectDefaultView(context))

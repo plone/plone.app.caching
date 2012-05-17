@@ -61,7 +61,7 @@ class TestOperationDefault(unittest.TestCase):
         browser.open(url)
         browser.getControl(name='title').value="dummy content"
         browser.getControl(name='form.button.save').click()        
-        self.failIf('Etag' in browser.headers)
+        self.assertFalse('Etag' in browser.headers)
 
         # now set up etags and make sure that a header is added 
         self.registry['plone.app.caching.weakCaching.etags'] = ('lastModified',)
@@ -70,4 +70,4 @@ class TestOperationDefault(unittest.TestCase):
         browser.open(url)
         browser.getControl(name='title').value="dummy content"
         browser.getControl(name='form.button.save').click()        
-        self.failUnless('Etag' in browser.headers)
+        self.assertTrue('Etag' in browser.headers)

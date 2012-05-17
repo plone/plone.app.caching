@@ -35,7 +35,7 @@ class TestGZip(unittest.TestCase):
         published = DummyPublished()
         GZipTransform(published, request).transformUnicode(u"", "utf-8")
 
-        self.assertEquals(0, response.enableHTTPCompression(query=True))
+        self.assertEqual(0, response.enableHTTPCompression(query=True))
 
     def test_disabled(self):
         provideUtility(Registry(), IRegistry)
@@ -49,7 +49,7 @@ class TestGZip(unittest.TestCase):
         published = DummyPublished()
         GZipTransform(published, request).transformUnicode(u"", "utf-8")
 
-        self.assertEquals(0, response.enableHTTPCompression(query=True))
+        self.assertEqual(0, response.enableHTTPCompression(query=True))
 
     def test_enabled_not_accepted(self):
         provideUtility(Registry(), IRegistry)
@@ -66,7 +66,7 @@ class TestGZip(unittest.TestCase):
         published = DummyPublished()
         GZipTransform(published, request).transformUnicode(u"", "utf-8")
 
-        self.assertEquals(0, response.enableHTTPCompression(query=True))
+        self.assertEqual(0, response.enableHTTPCompression(query=True))
 
     def test_enabled_accepted(self):
         provideUtility(Registry(), IRegistry)
@@ -83,4 +83,4 @@ class TestGZip(unittest.TestCase):
         published = DummyPublished()
         GZipTransform(published, request).transformUnicode(u"", "utf-8")
 
-        self.assertEquals(1, response.enableHTTPCompression(query=True))
+        self.assertEqual(1, response.enableHTTPCompression(query=True))

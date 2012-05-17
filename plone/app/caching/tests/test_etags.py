@@ -66,7 +66,7 @@ class TestETags(unittest.TestCase):
 
         etag = UserID(published, request)
 
-        self.assertEquals(None, etag())
+        self.assertEqual(None, etag())
 
     def test_UserID_member(self):
         from plone.app.caching.operations.etags import UserID
@@ -95,7 +95,7 @@ class TestETags(unittest.TestCase):
 
         etag = UserID(published, request)
 
-        self.assertEquals('bob', etag())
+        self.assertEqual('bob', etag())
 
 
     # Roles
@@ -125,7 +125,7 @@ class TestETags(unittest.TestCase):
 
         etag = Roles(published, request)
 
-        self.assertEquals('Anonymous', etag())
+        self.assertEqual('Anonymous', etag())
 
     def test_Roles_member(self):
         from plone.app.caching.operations.etags import Roles
@@ -157,7 +157,7 @@ class TestETags(unittest.TestCase):
 
         etag = Roles(published, request)
 
-        self.assertEquals('Manager;Member', etag())
+        self.assertEqual('Manager;Member', etag())
 
 
     # Language
@@ -172,7 +172,7 @@ class TestETags(unittest.TestCase):
 
         etag = Language(published, request)
 
-        self.assertEquals('', etag())
+        self.assertEqual('', etag())
 
     def test_Language_with_header(self):
         from plone.app.caching.operations.etags import Language
@@ -186,7 +186,7 @@ class TestETags(unittest.TestCase):
 
         etag = Language(published, request)
 
-        self.assertEquals('en', etag())
+        self.assertEqual('en', etag())
 
     # UserLanguage
 
@@ -212,7 +212,7 @@ class TestETags(unittest.TestCase):
 
         etag = UserLanguage(published, request)
 
-        self.assertEquals('en', etag())
+        self.assertEqual('en', etag())
 
 
     # GZip
@@ -227,7 +227,7 @@ class TestETags(unittest.TestCase):
 
         etag = GZip(published, request)
 
-        self.assertEquals('0', etag())
+        self.assertEqual('0', etag())
 
     def test_GZip_disabled(self):
         from plone.app.caching.operations.etags import GZip
@@ -248,7 +248,7 @@ class TestETags(unittest.TestCase):
 
         etag = GZip(published, request)
 
-        self.assertEquals('0', etag())
+        self.assertEqual('0', etag())
 
     def test_GZip_not_accepted(self):
         from plone.app.caching.operations.etags import GZip
@@ -269,7 +269,7 @@ class TestETags(unittest.TestCase):
 
         etag = GZip(published, request)
 
-        self.assertEquals('0', etag())
+        self.assertEqual('0', etag())
 
     def test_GZip_enabled(self):
         from plone.app.caching.operations.etags import GZip
@@ -290,7 +290,7 @@ class TestETags(unittest.TestCase):
 
         etag = GZip(published, request)
 
-        self.assertEquals('1', etag())
+        self.assertEqual('1', etag())
 
 
     # LastModified
@@ -305,7 +305,7 @@ class TestETags(unittest.TestCase):
 
         etag = LastModified(published, request)
 
-        self.assertEquals(None, etag())
+        self.assertEqual(None, etag())
 
     def test_LastModified_None(self):
         from plone.app.caching.operations.etags import LastModified
@@ -329,7 +329,7 @@ class TestETags(unittest.TestCase):
 
         etag = LastModified(published, request)
 
-        self.assertEquals(None, etag())
+        self.assertEqual(None, etag())
 
     def test_LastModified(self):
         from plone.app.caching.operations.etags import LastModified
@@ -355,7 +355,7 @@ class TestETags(unittest.TestCase):
         published = DummyPublished(DummyContext())
 
         etag = LastModified(published, request)
-        self.assertEquals(str(utcStamp), etag())
+        self.assertEqual(str(utcStamp), etag())
 
     # CatalogCounter
 
@@ -386,7 +386,7 @@ class TestETags(unittest.TestCase):
 
         etag = CatalogCounter(published, request)
 
-        self.assertEquals('10', etag())
+        self.assertEqual('10', etag())
 
 
     # ObjectLocked
@@ -413,7 +413,7 @@ class TestETags(unittest.TestCase):
 
         etag = ObjectLocked(published, request)
 
-        self.assertEquals('1', etag())
+        self.assertEqual('1', etag())
 
     def test_ObjectLocked_false(self):
         from plone.app.caching.operations.etags import ObjectLocked
@@ -437,7 +437,7 @@ class TestETags(unittest.TestCase):
 
         etag = ObjectLocked(published, request)
 
-        self.assertEquals('0', etag())
+        self.assertEqual('0', etag())
 
 
     # Skin
@@ -463,7 +463,7 @@ class TestETags(unittest.TestCase):
 
         etag = Skin(published, request)
 
-        self.assertEquals('otherskin', etag())
+        self.assertEqual('otherskin', etag())
 
     def test_Skin_default(self):
         from plone.app.caching.operations.etags import Skin
@@ -485,4 +485,4 @@ class TestETags(unittest.TestCase):
 
         etag = Skin(published, request)
 
-        self.assertEquals('defaultskin', etag())
+        self.assertEqual('defaultskin', etag())

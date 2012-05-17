@@ -228,7 +228,7 @@ class TestOperations(unittest.TestCase):
         browser.addHeader('Accept-Encoding', 'gzip')
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertTrue('Accept-Encoding' in browser.headers['Vary'])
-        self.assertEquals('gzip', browser.headers['Content-Encoding'])
+        self.assertEqual('gzip', browser.headers['Content-Encoding'])
 
         # Test as logged in (should not make any difference)
         self.ploneCacheSettings.enableCompression = True
@@ -241,7 +241,7 @@ class TestOperations(unittest.TestCase):
 
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertTrue('Accept-Encoding' in browser.headers['Vary'])
-        self.assertEquals('gzip', browser.headers['Content-Encoding'])
+        self.assertEqual('gzip', browser.headers['Content-Encoding'])
 
     def test_auto_purge_content_types(self):
 
@@ -275,8 +275,8 @@ class TestOperations(unittest.TestCase):
         browser.getControl(name='title').value = u"Title 1"
         browser.getControl(name='form.button.save').click()
 
-        self.assertEquals([], self.purger._sync)
-        self.assertEquals([], self.purger._async)
+        self.assertEqual([], self.purger._sync)
+        self.assertEqual([], self.purger._async)
 
         # Enable purging, but not the content type
         self.cachePurgingSettings.enabled = True
@@ -290,8 +290,8 @@ class TestOperations(unittest.TestCase):
         browser.getControl(name='title').value = u"Title 2"
         browser.getControl(name='form.button.save').click()
 
-        self.assertEquals([], self.purger._sync)
-        self.assertEquals([], self.purger._async)
+        self.assertEqual([], self.purger._sync)
+        self.assertEqual([], self.purger._async)
 
         # Enable the content type, but disable purging
         self.cachePurgingSettings.enabled = False
@@ -305,8 +305,8 @@ class TestOperations(unittest.TestCase):
         browser.getControl(name='title').value = u"Title 3"
         browser.getControl(name='form.button.save').click()
 
-        self.assertEquals([], self.purger._sync)
-        self.assertEquals([], self.purger._async)
+        self.assertEqual([], self.purger._sync)
+        self.assertEqual([], self.purger._async)
 
         # Enable properly
         self.cachePurgingSettings.enabled = True
@@ -320,8 +320,8 @@ class TestOperations(unittest.TestCase):
         browser.getControl(name='title').value = u"Title 4"
         browser.getControl(name='form.button.save').click()
 
-        self.assertEquals([], self.purger._sync)
-        self.assertEquals(set([
+        self.assertEqual([], self.purger._sync)
+        self.assertEqual(set([
                 'http://localhost:1234/plone/d1',
                 'http://localhost:1234/plone/d1/document_view',
                 'http://localhost:1234/plone/d1/',

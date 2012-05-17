@@ -3,6 +3,9 @@ Changelog
 1.1 (unreleased)
 ~~~~~~~~~~~~~~~~
 
+- Deprecated methods aliases were replaced on tests.
+  [hvelarde]
+
 
 1.0.4 (unreleased)
 ~~~~~~~~~~~~~~~~~~

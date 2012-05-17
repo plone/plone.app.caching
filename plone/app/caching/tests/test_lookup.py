@@ -88,7 +88,7 @@ class TestContentItemLookup(unittest.TestCase):
         published = ZopePageTemplate('someView')
         request = DummyRequest(published, DummyResponse())
 
-        self.assertEquals(None, ContentItemLookup(published, request)())
+        self.assertEqual(None, ContentItemLookup(published, request)())
 
     def test_no_mappings(self):
         provideUtility(Registry(), IRegistry)
@@ -97,7 +97,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('someView')
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(None, ContentItemLookup(published, request)())
+        self.assertEqual(None, ContentItemLookup(published, request)())
 
     def test_template_lookup(self):
         provideUtility(Registry(), IRegistry)
@@ -109,7 +109,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('someView')
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule1', ContentItemLookup(published, request)())
+        self.assertEqual('rule1', ContentItemLookup(published, request)())
 
     def test_contenttype_name_lookup(self):
         provideUtility(Registry(), IRegistry)
@@ -122,7 +122,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('defaultView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule1', ContentItemLookup(published, request)())
+        self.assertEqual('rule1', ContentItemLookup(published, request)())
 
     def test_contenttype_class_lookup_page_template(self):
         provideUtility(Registry(), IRegistry)
@@ -137,7 +137,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('defaultView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule1', ContentItemLookup(published, request)())
+        self.assertEqual('rule1', ContentItemLookup(published, request)())
 
     def test_contenttype_class_lookup_browser_view(self):
         provideUtility(Registry(), IRegistry)
@@ -154,7 +154,7 @@ class TestContentItemLookup(unittest.TestCase):
         request = DummyRequest(published, DummyResponse())
         published.request = published
 
-        self.assertEquals('rule1', ContentItemLookup(published, request)())
+        self.assertEqual('rule1', ContentItemLookup(published, request)())
 
     def test_contenttype_class_lookup_template_override(self):
         provideUtility(Registry(), IRegistry)
@@ -169,7 +169,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('defaultView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule2', ContentItemLookup(published, request)())
+        self.assertEqual('rule2', ContentItemLookup(published, request)())
 
     def test_contenttype_class_lookup_type_override(self):
         provideUtility(Registry(), IRegistry)
@@ -184,7 +184,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('defaultView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule2', ContentItemLookup(published, request)())
+        self.assertEqual('rule2', ContentItemLookup(published, request)())
 
     def test_contenttype_not_default_view(self):
         provideUtility(Registry(), IRegistry)
@@ -197,7 +197,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('someView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(None, ContentItemLookup(published, request)())
+        self.assertEqual(None, ContentItemLookup(published, request)())
 
     def test_parent_not_content(self):
         provideUtility(Registry(), IRegistry)
@@ -210,7 +210,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('defaultView').__of__(DummyNotContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals(None, ContentItemLookup(published, request)())
+        self.assertEqual(None, ContentItemLookup(published, request)())
 
     def test_parent_not_IBrowserDefault_methodid(self):
         provideUtility(Registry(), IRegistry)
@@ -223,7 +223,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/view'))
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule1', ContentItemLookup(published, request)())
+        self.assertEqual('rule1', ContentItemLookup(published, request)())
 
     def test_parent_not_IBrowserDefault_default_method(self):
         provideUtility(Registry(), IRegistry)
@@ -236,7 +236,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/'))
         request = DummyRequest(published, DummyResponse())
-        self.assertEquals('rule1', ContentItemLookup(published, request)())
+        self.assertEqual('rule1', ContentItemLookup(published, request)())
 
     def test_parent_not_IBrowserDefault_actiononly(self):
         provideUtility(Registry(), IRegistry)
@@ -250,7 +250,7 @@ class TestContentItemLookup(unittest.TestCase):
         published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView'))
         request = DummyRequest(published, DummyResponse())
 
-        self.assertEquals('rule1', ContentItemLookup(published, request)())
+        self.assertEqual('rule1', ContentItemLookup(published, request)())
 
     def test_match_template_and_content(self):
         provideUtility(Registry(), IRegistry)
@@ -264,4 +264,4 @@ class TestContentItemLookup(unittest.TestCase):
         published = ZopePageTemplate('defaultView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
 
-        self.assertEquals('rule1', ContentItemLookup(published, request)())
+        self.assertEqual('rule1', ContentItemLookup(published, request)())
