@@ -4,9 +4,9 @@ from dateutil.tz import tzlocal
 from zope.interface import implementer, implements
 from zope.component import adapter, adapts
 
+from zope.browserresource.interfaces import IResource
 from zope.pagetemplate.interfaces import IPageTemplate
 from zope.dublincore.interfaces import IDCTimes
-from zope.app.publisher.interfaces import IResource
 from z3c.caching.interfaces import ILastModified
 
 from Acquisition import aq_base

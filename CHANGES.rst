@@ -1,7 +1,11 @@
 Changelog
 ---------
+
 1.1 (unreleased)
 ~~~~~~~~~~~~~~~~
+
+- Use zope.browserresource instead of zope.app.publisher.
+  [hannosch]
 
 - Deprecated methods aliases were replaced on tests.
   [hvelarde]

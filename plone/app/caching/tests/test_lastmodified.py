@@ -184,8 +184,8 @@ class TestLastModified(unittest.TestCase):
         self.assertEqual(d._mod, ILastModified(d)())
 
     def test_ResourceLastModified_zope_app(self):
-        from zope.app.publisher.browser.fileresource import FileResource
-        from zope.app.publisher.fileresource import File
+        from zope.browserresource.file import FileResource
+        from zope.browserresource.file import File
 
         class DummyRequest(dict):
             pass
@@ -202,14 +202,14 @@ class TestLastModified(unittest.TestCase):
 
     def test_ResourceLastModified_Five(self):
         from Products.Five.browser.resource import FileResource
-        from zope.app.publisher.fileresource import Image
+        from zope.browserresource.file import File
 
         class DummyRequest(dict):
             pass
 
         request = DummyRequest()
 
-        f = Image(__file__, 'test_lastmodified.py') # not really an image
+        f = File(__file__, 'test_lastmodified.py')  # not really an image
         r = FileResource(f, request)
 
         modtime = float(os.path.getmtime(__file__))

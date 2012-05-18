@@ -97,12 +97,8 @@
 
     </configure>
 
-    <!-- Zope 3 style resources (including those in resource directories) -->
-    <configure zcml:condition="installed zope.app.publisher">
-
-        <cache:ruleset ruleset="plone.resource" for="zope.app.publisher.interfaces.IResource" />
-
-    </configure>
+    <!-- Zope resources (including those in resource directories) -->
+    <cache:ruleset ruleset="plone.resource" for="zope.browserresource.interfaces.IResource" />
 
     <!-- Resources cooked in ResourceRegistries -->
     <configure zcml:condition="installed Products.ResourceRegistries">
