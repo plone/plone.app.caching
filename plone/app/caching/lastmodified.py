@@ -1,13 +1,18 @@
 from datetime import datetime
 from dateutil.tz import tzlocal
 
-from zope.interface import implementer, implements
+from zope.interface import implementer, implements, Interface
 from zope.component import adapter, adapts
 
 from zope.browserresource.interfaces import IResource
 from zope.pagetemplate.interfaces import IPageTemplate
-from zope.dublincore.interfaces import IDCTimes
 from z3c.caching.interfaces import ILastModified
+
+try:
+    from zope.dublincore.interfaces import IDCTimes
+except ImportError:
+    class IDCTimes(Interface):
+        pass
 
 from Acquisition import aq_base
 from Acquisition import aq_parent
