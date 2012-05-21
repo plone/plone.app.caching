@@ -164,7 +164,10 @@ class TestLastModified(unittest.TestCase):
         self.assertEqual(d._mod, ILastModified(d)())
 
     def test_DCTimesLastModified(self):
-        from zope.dublincore.interfaces import IDCTimes
+        try:
+            from zope.dublincore.interfaces import IDCTimes
+        except ImportError:
+            return
         from zope.interface import implements
 
         class Dummy(object):
