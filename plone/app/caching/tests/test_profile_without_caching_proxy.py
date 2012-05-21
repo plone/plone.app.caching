@@ -360,7 +360,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Request a skin image
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser(self.app)
-        browser.open(self.portal.absolute_url() + '/rss.gif')
+        browser.open(self.portal.absolute_url() + '/rss.png')
         self.assertEqual('plone.resource', browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowserAndProxy
@@ -375,7 +375,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.raiseHttpErrors = False
         browser.addHeader('If-Modified-Since', lastmodified)
-        browser.open(self.portal.absolute_url() + '/rss.gif')
+        browser.open(self.portal.absolute_url() + '/rss.png')
         self.assertEqual('plone.resource', browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
