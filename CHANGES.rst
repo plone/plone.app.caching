@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.1 (unreleased)
+1.1 (2012-05-25)
 ~~~~~~~~~~~~~~~~
 
 - Use zope.browserresource instead of zope.app.publisher.
