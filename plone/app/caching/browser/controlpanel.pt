@@ -18,7 +18,7 @@
             subtype: 'ajax',
             filter: '#content>*:not(div.configlet),dl.portalMessage.error,dl.portalMessage.info',
             formselector: 'form:has(div[id^=formfield-form-widgets])',
-            closeselector: '[name=form.buttons.cancel]',
+            closeselector: '[name="form.buttons.cancel"]',
             noform: 'close'
         });
     });
