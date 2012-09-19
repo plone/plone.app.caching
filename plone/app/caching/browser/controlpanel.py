@@ -100,7 +100,7 @@ class ControlPanel(BaseView):
         /edit-operation-global/${operation-name}
             Render an edit form for global operation parameters
 
-        /edit-operation-rulset/${operation-name}/${ruleset-name}
+        /edit-operation-ruleset/${operation-name}/${ruleset-name}
             Render an edit form for per-ruleset operation parameters
         """
 

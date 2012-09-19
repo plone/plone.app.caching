@@ -199,7 +199,7 @@ applied in ZCML by the author of a particular view. There are also some
 default rulesets applied to general resources - see below.
 
 Please note that ``plone.app.caching`` places the caching ruleset registry
-into "explicit" mode. This means that you *must* declare a caching rulset
+into "explicit" mode. This means that you *must* declare a caching ruleset
 (with the ``<cache:rulesetType />`` directive) before you can use it.
 
 Caching operations are components written in Python which either interrupt
@@ -497,7 +497,7 @@ plone.app.caching installs a special ruleset lookup adapter that is invoked
 for skin layer page templates and browser views not assigned a more specific
 rule set. This adapter allows you to declare a ruleset for the *default view*
 of a given content type by supplying a content type class or interface to the
-``<cache:rulset />`` directive::
+``<cache:ruleset />`` directive::
 
     <cache:ruleset
         ruleset="plone.content.itemView"

@@ -36,7 +36,7 @@ class EditForm(form.Form):
     If a global record cannot be found, the option is ignored, i.e. no field
     is rendered for it.
 
-    If we are editing ruleset-specific options and a particular rulset-
+    If we are editing ruleset-specific options and a particular ruleset-
     specific option does not exist, we take the global option field as a
     basis, and create a new record on the fly in ``applyChanges()``.
 
@@ -139,7 +139,7 @@ class EditForm(form.Form):
         for option in options:
             recordName = "%s.%s" % (prefix, option,)
 
-            # If a rulset-specific record does not exist, we can fall back on
+            # If a ruleset-specific record does not exist, we can fall back on
             # a global record, since the per-ruleset records will be created
             # as necessary in applyChanges()
 
