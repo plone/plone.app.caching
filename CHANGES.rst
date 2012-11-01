@@ -4,7 +4,8 @@ Changelog
 1.1.2 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Fixed purge paths for virtual hosting scenarios using virtual path components.
+  [dokai]
 
 
 1.1.1 (2012-08-30)
@@ -40,23 +41,23 @@ Changelog
 
 1.0.2 (2012-04-15)
 ~~~~~~~~~~~~~~~~~~
-- Handle caching of resource registries in RAM cache by not storing empty 
+- Handle caching of resource registries in RAM cache by not storing empty
   bodies in the RAMCache
   [eleddy with major tseaver support]
 
 
 1.0.1 (2012-01-26)
 ~~~~~~~~~~~~~~~~~~
-- Properly handle a changed configuration from with etags to no etags by 
+- Properly handle a changed configuration from with etags to no etags by
   forcing a page refresh
   [eleddy]
 
 - When not caching with etags, don't sent an etag header to stop caching
   [eleddy]
 
-- When there was an error like Unauthorized, 200 status and empty body would be 
-  cached in RAMCache instead of not caching anything. 
-  This is due to a bug with Zope 2.13 publication events : 
+- When there was an error like Unauthorized, 200 status and empty body would be
+  cached in RAMCache instead of not caching anything.
+  This is due to a bug with Zope 2.13 publication events :
   response.status is not set when IPubBeforeAbort is notified.
   Fixed by using error_status stored on request by plone.transformchain.
   [gotcha]
