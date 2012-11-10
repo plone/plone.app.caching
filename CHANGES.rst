@@ -4,7 +4,9 @@ Changelog
 1.1.2 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Fix bug where resource registries etag is calculated incorrectly if a registry
+  is missing.
+  [davisagli]
 
 
 1.1.1 (2012-08-30)
