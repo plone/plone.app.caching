@@ -15,6 +15,7 @@ import dateutil.parser
 import dateutil.tz
 
 import OFS.Image
+from Products.CMFCore.utils import getToolByName
 
 from zope.component import getUtility
 
@@ -232,7 +233,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
 
         # Enable syndication
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
-        self.syndication = self.portal.portal_syndication
+        self.syndication = getToolByName(self.portal, 'portal_syndication')
         self.syndication.editProperties(isAllowed=True)
         self.syndication.enableSyndication(self.portal)
 
