@@ -42,8 +42,11 @@ class Store(object):
 
     def transformIterable(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
+            result = ''.join(result)
             storeResponseInRAMCache(self.request, self.request.response,
-                    ''.join(result))
+                result)
+            # as we have iterated the iterable, we must return a new one
+            return iter(result)
         return None
 
     def responseIsSuccess(self):

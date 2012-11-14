@@ -4,7 +4,7 @@ Changelog
 1.1.2 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Fix bug `12038 <https://dev.plone.org/ticket/12038>`_ [ebrehault]
 
 
 1.1.1 (2012-08-30)
