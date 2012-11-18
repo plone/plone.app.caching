@@ -231,7 +231,7 @@ class ResourceRegistries(object):
             mtime = now
             if registry is not None:
                 mtime = getattr(registry.aq_base, '_p_mtime', now)
-            mtimes.append(mtime)
+                mtimes.append(mtime)
 
         mtimes.sort()
         return str(mtimes[-1])
