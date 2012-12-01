@@ -4,6 +4,8 @@ Changelog
 1.1.2 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
+- Add other feed types to plone.content.feed purge policy
+  [vangheem]
 - Fix bug where resource registries etag is calculated incorrectly if a registry
   is missing.
   [davisagli]
