@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.1.2 (unreleased)
+1.1.2 (2012-12-27)
 ~~~~~~~~~~~~~~~~~~
 
 - Add other feed types to plone.content.feed purge policy
