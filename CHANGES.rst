@@ -6,10 +6,12 @@ Changelog
 
 - Add other feed types to plone.content.feed purge policy
   [vangheem]
+
 - Fix bug where resource registries etag is calculated incorrectly if a registry
   is missing.
   [davisagli]
-- Fix bug `12038 <https://dev.plone.org/ticket/12038>`_. If transformIterable
+
+- Fix bug `12038 <http://dev.plone.org/ticket/12038>`_. If transformIterable
   iterates on the 'result' iterable, it must return a new one.
   [ebrehault]
 
