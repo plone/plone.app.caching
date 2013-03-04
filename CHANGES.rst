@@ -4,7 +4,10 @@ Changelog
 1.1.3 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Provide message for newbies to suggest importing
+  pre-defined caching rule set.
+  [vangheem]
+
 
 
 1.1.2 (2012-12-27)

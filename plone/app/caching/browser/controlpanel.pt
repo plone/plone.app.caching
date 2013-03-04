@@ -63,6 +63,19 @@
             <div metal:use-macro="context/global_statusmessage/macros/portal_message">
             Portal status message
             </div>
+            <dl class="portalMessage info" tal:condition="not: view/settings/enabled">
+                <dt i18n:translate="">
+                    Info
+                </dt>
+                <dd i18n:translate="label_caching_first_time_here?">
+                    First time here? We recommend that you get started by
+                    <a href="@@caching-controlpanel-import"
+                       tal:attributes="href string:${context/absolute_url}/@@caching-controlpanel-import"
+                       title="Import caching rules"
+                       i18n:translate="label_caching_first_time_here_link"
+                       >importing a preconfigured caching set of rules</a>.
+                </dd>
+            </dl>
 
             <div class="configlet">
 
