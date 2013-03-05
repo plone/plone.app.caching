@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.1.3 (unreleased)
+1.1.3 (2013-03-05)
 ~~~~~~~~~~~~~~~~~~
 
 - Provide message for newbies to suggest importing
