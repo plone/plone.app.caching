@@ -66,12 +66,15 @@ class FauxNonContent(Explicit):
     def getId(self):
         return self.__name__
 
-    def absolute_url_path(self):
+    def virtual_url_path(self):
         parent = aq_base(self.__parent__)
         if parent is not None:
-            return parent.absolute_url_path() + '/' + self.__name__
+            return parent.virtual_url_path() + '/' + self.__name__
         else:
-            return '/' + self.__name__
+            return self.__name__
+
+    def getPhysicalPath(self):
+        return ('', )
 
 class FauxContent(FauxNonContent):
     implements(IBrowserDefault)
@@ -206,7 +209,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
                 self.context = context
 
             def getRelativePaths(self):
-                return [self.context.absolute_url_path()]
+                return ['/' + self.context.virtual_url_path()]
 
             def getAbsolutePaths(self):
                 return ['/purgeme']
@@ -287,6 +290,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
 
 class TestObjectFieldPurgePaths(unittest.TestCase):
 
+    maxDiff = None
     layer = UNIT_TESTING
 
     def setUp(self):
@@ -315,14 +319,15 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                     BlobField('blob1'),
                 ))
 
-        context = ATMultipleFields('foo')
+        root = FauxContent('')
+        context = ATMultipleFields('foo').__of__(root)
         purger = ObjectFieldPurgePaths(context)
 
-        self.assertEqual(['foo/download', 'foo/at_download',
-                           'foo/at_download/file1', 'foo/file1',
-                           'foo/at_download/image1', 'foo/image1','foo/image1_thumb',
-                           'foo/at_download/image2', 'foo/image2', 'foo/image2_mini', 'foo/image2_normal',
-                           'foo/at_download/blob1', 'foo/blob1'],
+        self.assertEqual(['/foo/download', '/foo/at_download',
+                           '/foo/at_download/file1', '/foo/file1',
+                           '/foo/at_download/image1', '/foo/image1','/foo/image1_thumb',
+                           '/foo/at_download/image2', '/foo/image2', '/foo/image2_mini', '/foo/image2_normal',
+                           '/foo/at_download/blob1', '/foo/blob1'],
                            list(purger.getRelativePaths()))
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
@@ -337,12 +342,13 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                     atapi.TextField('text'),
                 ))
 
-        context = ATMultipleFields('foo')
+        root = FauxContent('')
+        context = ATMultipleFields('foo').__of__(root)
         purger = ObjectFieldPurgePaths(context)
 
-        self.assertEqual(['foo/download', 'foo/at_download',
-                           'foo/at_download/file1', 'foo/file1',
-                           'foo/at_download/image1', 'foo/image1','foo/image1_thumb',
-                           'foo/at_download/image2', 'foo/image2', 'foo/image2_mini', 'foo/image2_normal'],
+        self.assertEqual(['/foo/download', '/foo/at_download',
+                           '/foo/at_download/file1', '/foo/file1',
+                           '/foo/at_download/image1', '/foo/image1','/foo/image1_thumb',
+                           '/foo/at_download/image2', '/foo/image2', '/foo/image2_mini', '/foo/image2_normal'],
                            list(purger.getRelativePaths()))
         self.assertEqual([], list(purger.getAbsolutePaths()))
