@@ -53,7 +53,7 @@ class ContentPurgePaths(object):
         self.context = context
 
     def getRelativePaths(self):
-        prefix = self.context.absolute_url_path()
+        prefix = '/' + self.context.virtual_url_path()
 
         yield prefix + '/'
         yield prefix + '/view'
@@ -66,7 +66,7 @@ class ContentPurgePaths(object):
         if parent is not None:
             parentDefaultView = getObjectDefaultView(parent)
             if parentDefaultView == self.context.getId():
-                parentPrefix = parent.absolute_url_path()
+                parentPrefix = '/' + parent.virtual_url_path()
                 yield parentPrefix
                 yield parentPrefix + '/'
                 yield parentPrefix + '/view'
@@ -151,7 +151,7 @@ if HAVE_AT:
             self.context = context
 
         def getRelativePaths(self):
-            prefix = self.context.absolute_url_path()
+            prefix = '/' + self.context.virtual_url_path()
             schema = self.context.Schema()
 
             def fieldFilter(field):
