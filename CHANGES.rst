@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.1.4 (unreleased)
+1.1.4 (2013-06-13)
 ~~~~~~~~~~~~~~~~~~
 
 - Fixed purge paths for virtual hosting scenarios using virtual path components.
