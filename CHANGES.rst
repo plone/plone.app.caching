@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+3 (unreleased)
+~~~~~~~~~~~~~~
+
+- Nothing changed yet.
+
+
 1.1.4 (2013-06-13)
 ~~~~~~~~~~~~~~~~~~
 
