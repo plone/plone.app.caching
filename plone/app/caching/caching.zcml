@@ -165,8 +165,10 @@
     <adapter factory=".purge.DiscussionItemPurgePaths" name="plone.content" />
 
     <!-- Archetypes object fields -->
+    <configure zcml:condition="installed plone.app.blob">
     <configure zcml:condition="installed Products.Archetypes">
         <adapter factory=".purge.ObjectFieldPurgePaths" name="plone.atobjectfields" />
+    </configure>
     </configure>
 
 </configure>
