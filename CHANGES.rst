@@ -1,8 +1,8 @@
 Changelog
 ---------
 
-3 (unreleased)
-~~~~~~~~~~~~~~
+1.1.5 (2013-08-13)
+~~~~~~~~~~~~~~~~~~
 
 - Register the plone.atobjectfields adapter not only when Products.Archetypes
   but also plone.app.blob is installed.
