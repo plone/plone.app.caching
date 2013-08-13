@@ -54,22 +54,24 @@ class ContentPurgePaths(object):
 
     def getRelativePaths(self):
         prefix = '/' + self.context.virtual_url_path()
-
-        yield prefix + '/'
-        yield prefix + '/view'
+        paths = [prefix + '/', prefix + '/view']
 
         defaultView = getObjectDefaultView(self.context)
         if defaultView:
-            yield prefix + '/' + defaultView
+            path = prefix + '/' + defaultView
+            if path not in paths:  # it could be
+                paths.append(path)
 
         parent = aq_parent(self.context)
         if parent is not None:
             parentDefaultView = getObjectDefaultView(parent)
             if parentDefaultView == self.context.getId():
                 parentPrefix = '/' + parent.virtual_url_path()
-                yield parentPrefix
-                yield parentPrefix + '/'
-                yield parentPrefix + '/view'
+                paths.append(parentPrefix)
+                paths.append(parentPrefix  + '/')
+                paths.append(parentPrefix  + '/view')
+
+        return paths
 
     def getAbsolutePaths(self):
         return []

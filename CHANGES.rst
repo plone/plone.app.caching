@@ -4,7 +4,8 @@ Changelog
 1.1.6 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Fix double purge of paths for items whose default view is the same as /view
+  [eleddy]
 
 
 1.1.5 (2013-08-13)
