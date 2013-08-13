@@ -72,6 +72,7 @@
                     <a href="@@caching-controlpanel-import"
                        tal:attributes="href string:${context/absolute_url}/@@caching-controlpanel-import"
                        title="Import caching rules"
+                       i18n:name="link"
                        i18n:translate="label_caching_first_time_here_link"
                        >importing a preconfigured caching set of rules</a>.
                 </dd>

@@ -1,14 +1,26 @@
 Changelog
 ---------
 
-1.1.4 (unreleased)
+1.1.6 (unreleased)
+~~~~~~~~~~~~~~~~~~
+
+- Fix double purge of paths for items whose default view is the same as /view
+  [eleddy]
+
+
+1.1.5 (2013-08-13)
+~~~~~~~~~~~~~~~~~~
+
+- Register the plone.atobjectfields adapter not only when Products.Archetypes
+  but also plone.app.blob is installed.
+  [thet]
+
+
+1.1.4 (2013-06-13)
 ~~~~~~~~~~~~~~~~~~
 
 - Fixed purge paths for virtual hosting scenarios using virtual path components.
   [dokai]
-
-- Fix double purge of paths for items whose default view is the same as /view
-  [eleddy]
 
 
 1.1.3 (2013-03-05)
