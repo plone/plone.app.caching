@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.1.6 (unreleased)
+1.1.6 (2013-08-14)
 ~~~~~~~~~~~~~~~~~~
 
 - Fix double purge of paths for items whose default view is the same as /view
