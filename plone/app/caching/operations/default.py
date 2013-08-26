@@ -125,8 +125,8 @@ class BaseCaching(object):
     def modifyResponse(self, rulename, response, class_=None):
         options = lookupOptions(class_ or self.__class__, rulename)
 
-        maxage   = options.get('maxage') or self.maxage
-        smaxage  = options.get('smaxage') or self.smaxage
+        maxage   = options.get('maxage', self.maxage)
+        smaxage  = options.get('smaxage', self.smaxage)
         etags    = options.get('etags') or self.etags
 
         anonOnly = options.get('anonOnly', self.anonOnly)
@@ -166,13 +166,8 @@ class BaseCaching(object):
             public = public and visibleToRole(self.published, role='Anonymous')
 
         if proxyCache and not public:
-            # This is private so keep it out of proxy caches
-            if maxage == 0:
-                # maxage is zero so just omit smaxage
-                smaxage=None
-            else:
-                # maxage is missing or non-zero so expire smaxage
-                smaxage=0
+            # This is private so keep it out of both shared and browser caches
+            maxage = smaxage = 0
 
         setCacheHeaders(self.published, self.request, response, maxage=maxage, smaxage=smaxage,
             etag=etag, lastModified=lastModified, vary=vary)
