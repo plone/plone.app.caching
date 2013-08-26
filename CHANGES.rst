@@ -4,7 +4,9 @@ Changelog
 1.1.7 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Fix handling of anon-only flag for cases where maxage is not zero. It
+  was effectively ignored. Added operation test for strong caching.
+  [smcmahon]
 
 
 1.1.6 (2013-08-14)
