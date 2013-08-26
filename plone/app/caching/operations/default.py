@@ -125,8 +125,8 @@ class BaseCaching(object):
     def modifyResponse(self, rulename, response, class_=None):
         options = lookupOptions(class_ or self.__class__, rulename)
 
-        maxage   = options.get('maxage') or self.maxage
-        smaxage  = options.get('smaxage') or self.smaxage
+        maxage   = options.get('maxage', self.maxage)
+        smaxage  = options.get('smaxage', self.smaxage)
         etags    = options.get('etags') or self.etags
 
         anonOnly = options.get('anonOnly', self.anonOnly)
