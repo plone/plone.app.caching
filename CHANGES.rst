@@ -4,7 +4,16 @@ Changelog
 1.1.7 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Make it possible to set a maxage of zero in strong caching. This is
+  an edge case since this would ordinarily be handled by moderate caching.
+  [smcmahon]
+
+- Add some testing for weak caching operations.
+  [smcmahon]
+
+- Fix handling of anon-only flag for cases where maxage is not zero. It
+  was effectively ignored. Added operation test for strong caching.
+  [smcmahon]
 
 
 1.1.6 (2013-08-14)
