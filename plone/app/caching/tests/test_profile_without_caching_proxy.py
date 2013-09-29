@@ -4,6 +4,7 @@ import unittest2 as unittest
 
 from plone.testing.z2 import Browser
 
+from plone.app.textfield.value import RichTextValue
 from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
 from plone.app.testing import setRoles
 from plone.app.testing import applyProfile
@@ -13,6 +14,8 @@ from cStringIO import StringIO
 import datetime
 import dateutil.parser
 import dateutil.tz
+
+import os
 
 import OFS.Image
 from Products.CMFCore.utils import getToolByName
@@ -28,8 +31,17 @@ from plone.app.caching.interfaces import IPloneCacheSettings
 
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 
-TEST_IMAGE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
 TEST_FILE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
+
+
+def test_image():
+    from plone.namedfile.file import NamedBlobImage
+    filename = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
+    filename = os.path.join(os.path.dirname(__file__), u'test.gif')
+    return NamedBlobImage(
+        data=open(filename, 'r').read(),
+        filename=filename
+    )
 
 
 class TestProfileWithoutCaching(unittest.TestCase):
@@ -69,16 +81,20 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
         self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].setTitle(u"Folder one")
-        self.portal['f1'].setDescription(u"Folder one description")
+        self.portal['f1'].title = u"Folder one"
+        self.portal['f1'].description = u"Folder one description"
         self.portal['f1'].reindexObject()
 
         # Add page content
         self.portal['f1'].invokeFactory('Document', 'd1')
-        self.portal['f1']['d1'].setTitle(u"Document one")
-        self.portal['f1']['d1'].setDescription(u"Document one description")
+        self.portal['f1']['d1'].title = u"Document one"
+        self.portal['f1']['d1'].description = u"Document one description"
         testText = "Testing... body one"
-        self.portal['f1']['d1'].setText(testText)
+        self.portal['f1']['d1'].text = RichTextValue(
+            testText,
+            'text/plain',
+            'text/html'
+        )
         self.portal['f1']['d1'].reindexObject()
 
         # Publish the folder and page
@@ -211,7 +227,11 @@ class TestProfileWithoutCaching(unittest.TestCase):
 
         # Edit the page to update the etag
         testText2 = "Testing... body two"
-        self.portal['f1']['d1'].setText(testText2)
+        self.portal['f1']['d1'].text = RichTextValue(
+            testText2,
+            'text/plain',
+            'text/html'
+        )
         self.portal['f1']['d1'].reindexObject()
 
         transaction.commit()
@@ -302,15 +322,15 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
         self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].setTitle(u"Folder one")
-        self.portal['f1'].setDescription(u"Folder one description")
+        self.portal['f1'].title = u"Folder one"
+        self.portal['f1'].description = u"Folder one description"
         self.portal['f1'].reindexObject()
 
         # Add content image
         self.portal['f1'].invokeFactory('Image', 'i1')
-        self.portal['f1']['i1'].setTitle(u"Image one")
-        self.portal['f1']['i1'].setDescription(u"Image one description")
-        self.portal['f1']['i1'].setImage(OFS.Image.Image('test.gif', 'test.gif', open(TEST_IMAGE, 'rb')))
+        self.portal['f1']['i1'].title = u"Image one"
+        self.portal['f1']['i1'].description = u"Image one description"
+        self.portal['f1']['i1'].image = test_image()
         self.portal['f1']['i1'].reindexObject()
 
         # Publish the folder
@@ -345,7 +365,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Request an image scale
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser(self.app)
-        browser.open(self.portal['f1']['i1'].absolute_url() + '/image_preview')
+        browser.open(self.portal['f1']['i1'].absolute_url() + '/@@images/image/preview')
         self.assertEqual('plone.content.file', browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser

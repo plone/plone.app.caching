@@ -37,15 +37,15 @@ class TestOperationDefault(unittest.TestCase):
 
     def test_last_modified_no_etags(self):
         """
-        When a new content type is added, the resulting page should not be 
-        cached since it has messages. However, it should only trigger an etag 
+        When a new content type is added, the resulting page should not be
+        cached since it has messages. However, it should only trigger an etag
         if its been configured to use etags
         """
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
         self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].setTitle(u"Folder one")
-        self.portal['f1'].setDescription(u"Folder one description")
+        self.portal['f1'].title = u"Folder one"
+        self.portal['f1'].description = u"Folder one description"
         self.portal['f1'].reindexObject()
 
         self.cacheSettings.operationMapping = {'plone.content.itemView': 'plone.app.caching.weakCaching'}
@@ -57,17 +57,15 @@ class TestOperationDefault(unittest.TestCase):
         # log in and create a content type
         browser = Browser(self.app)
         browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
-        url = "%s/portal_factory/Document/document.2012-01-26.4504738457/edit"%self.portal['f1'].absolute_url()
-        browser.open(url)
-        browser.getControl(name='title').value="dummy content"
-        browser.getControl(name='form.button.save').click()        
+        browser.open("%s/++add++Document" % self.portal['f1'].absolute_url())
+        browser.getControl(name='form.widgets.IDublinCore.title').value="dummy content"
+        browser.getControl('Save').click()
         self.assertFalse('Etag' in browser.headers)
 
-        # now set up etags and make sure that a header is added 
+        # now set up etags and make sure that a header is added
         self.registry['plone.app.caching.weakCaching.etags'] = ('lastModified',)
         import transaction; transaction.commit()
-        url = "%s/portal_factory/Document/document.2012-01-27.34234234234/edit"%self.portal['f1'].absolute_url()
-        browser.open(url)
-        browser.getControl(name='title').value="dummy content"
-        browser.getControl(name='form.button.save').click()        
+        browser.open("%s/dummy-content/edit"%self.portal['f1'].absolute_url())
+        browser.getControl(name='form.widgets.IDublinCore.title').value="dummy content"
+        browser.getControl('Save').click()
         self.assertTrue('Etag' in browser.headers)

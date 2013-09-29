@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '1.1.7.dev0'
+version = '1.2.0.dev0'
 
 setup(name='plone.app.caching',
       version=version,
@@ -48,7 +48,12 @@ setup(name='plone.app.caching',
           'z3c.form',
           'z3c.zcmlhook',
       ],
-      extras_require={'test': ['plone.app.testing']},
+      extras_require={
+          'test': [
+              'plone.app.contenttypes',
+              'plone.app.testing',
+          ]
+      },
       entry_points="""
       [z3c.autoinclude.plugin]
       target = plone

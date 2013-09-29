@@ -1,8 +1,15 @@
 Changelog
 ---------
 
+1.2.0 (unreleased)
+------------------
+
+- Use the PLONE_APP_CONTENTTYPES_FIXTURE test layer for Plone 5 compatibility.
+  [timo]
+
+
 1.1.7 (unreleased)
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Make it possible to set a maxage of zero in strong caching. This is
   an edge case since this would ordinarily be handled by moderate caching.
@@ -17,14 +24,14 @@ Changelog
 
 
 1.1.6 (2013-08-14)
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Fix double purge of paths for items whose default view is the same as /view
   [eleddy]
 
 
 1.1.5 (2013-08-13)
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Register the plone.atobjectfields adapter not only when Products.Archetypes
   but also plone.app.blob is installed.
@@ -32,14 +39,14 @@ Changelog
 
 
 1.1.4 (2013-06-13)
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Fixed purge paths for virtual hosting scenarios using virtual path components.
   [dokai]
 
 
 1.1.3 (2013-03-05)
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Provide message for newbies to suggest importing
   pre-defined caching rule set.
@@ -48,7 +55,7 @@ Changelog
 
 
 1.1.2 (2012-12-27)
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Add other feed types to plone.content.feed purge policy
   [vangheem]
@@ -63,7 +70,7 @@ Changelog
 
 
 1.1.1 (2012-08-30)
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Nothing changed yet.
 
@@ -79,7 +86,7 @@ Changelog
 
 
 1.0.4 (unreleased)
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Fix possible test failures by logging in with the user name.
   Note that user id and user name (login name) can differ.
@@ -87,21 +94,21 @@ Changelog
 
 
 1.0.3 (2012-04-15)
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Fix packaging issue.
   [esteele]
 
 
 1.0.2 (2012-04-15)
-~~~~~~~~~~~~~~~~~~
+------------------
 - Handle caching of resource registries in RAM cache by not storing empty
   bodies in the RAMCache
   [eleddy with major tseaver support]
 
 
 1.0.1 (2012-01-26)
-~~~~~~~~~~~~~~~~~~
+------------------
 - Properly handle a changed configuration from with etags to no etags by
   forcing a page refresh
   [eleddy]
@@ -154,7 +161,7 @@ Changelog
 
 
 1.0b2 - 2011-02-10
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Added `News Item` to the list of `purgedContentTypes`, so the image field
   and its scales gets purged.
@@ -188,7 +195,7 @@ Changelog
 
 
 1.0b1 - 2010-08-04
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Add an option for "anonymous only" caching to the default operations.
   This is a simple way to switch off caching for logged-in users. See
@@ -207,7 +214,7 @@ Changelog
 
 
 1.0a1 - 2010-04-24
-~~~~~~~~~~~~~~~~~~
+------------------
 
 - Initial release.
   [optilude, newbery, smcmahon]

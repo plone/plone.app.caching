@@ -5,6 +5,7 @@ from plone.testing.z2 import Browser
 from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
 from plone.app.testing import applyProfile
 from plone.app.testing import setRoles
+from plone.app.textfield.value import RichTextValue
 
 import pkg_resources
 
@@ -85,8 +86,8 @@ class TestOperations(unittest.TestCase):
 
         # Folder content
         self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].setTitle(u"Folder one")
-        self.portal['f1'].setDescription(u"Folder one description")
+        self.portal['f1'].title = u"Folder one"
+        self.portal['f1'].description = u"Folder one description"
         self.portal['f1'].reindexObject()
 
         # Publish the folder
@@ -94,9 +95,13 @@ class TestOperations(unittest.TestCase):
 
         # Non-folder content
         self.portal['f1'].invokeFactory('Document', 'd1')
-        self.portal['f1']['d1'].setTitle(u"Document one")
-        self.portal['f1']['d1'].setDescription(u"Document one description")
-        self.portal['f1']['d1'].setText("<p>Body one</p>")
+        self.portal['f1']['d1'].title = u"Document one"
+        self.portal['f1']['d1'].description = u"Document one description"
+        self.portal['f1']['d1'].text = RichTextValue(
+            u"<p>Body one</p>",
+            'text/plain',
+            'text/html'
+        )
         self.portal['f1']['d1'].reindexObject()
 
         # Publish the document
@@ -105,18 +110,18 @@ class TestOperations(unittest.TestCase):
 
         # Content image
         self.portal['f1'].invokeFactory('Image', 'i1')
-        self.portal['f1']['i1'].setTitle(u"Image one")
-        self.portal['f1']['i1'].setDescription(u"Image one description")
-        self.portal['f1']['i1'].setImage(OFS.Image.Image('test.gif',
-            'test.gif', open(TEST_IMAGE, 'rb')))
+        self.portal['f1']['i1'].title = u"Image one"
+        self.portal['f1']['i1'].description = u"Image one description"
+        self.portal['f1']['i1'].image = OFS.Image.Image('test.gif',
+            'test.gif', open(TEST_IMAGE, 'rb'))
         self.portal['f1']['i1'].reindexObject()
 
         # Content file
         self.portal['f1'].invokeFactory('File', 'f1')
-        self.portal['f1']['f1'].setTitle(u"File one")
-        self.portal['f1']['f1'].setDescription(u"File one description")
-        self.portal['f1']['f1'].setFile(OFS.Image.File('test.gif', 'test.gif',
-            open(TEST_FILE, 'rb')))
+        self.portal['f1']['f1'].title = u"File one"
+        self.portal['f1']['f1'].description = u"File one description"
+        self.portal['f1']['f1'].file = OFS.Image.File('test.gif', 'test.gif',
+            open(TEST_FILE, 'rb'))
         self.portal['f1']['f1'].reindexObject()
 
         # OFS image (custom folder)
@@ -178,15 +183,19 @@ class TestOperations(unittest.TestCase):
 
         # Folder content
         self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].setTitle(u"Folder one")
-        self.portal['f1'].setDescription(u"Folder one description")
+        self.portal['f1'].title = u"Folder one"
+        self.portal['f1'].description = u"Folder one description"
         self.portal['f1'].reindexObject()
 
         # Non-folder content
         self.portal['f1'].invokeFactory('Document', 'd1')
-        self.portal['f1']['d1'].setTitle(u"Document one")
-        self.portal['f1']['d1'].setDescription(u"Document one description")
-        self.portal['f1']['d1'].setText("<p>Body one</p>")
+        self.portal['f1']['d1'].title = u"Document one"
+        self.portal['f1']['d1'].description = u"Document one description"
+        self.portal['f1']['d1'].text = RichTextValue(
+            u"<p>Body one</p>",
+            'text/plain',
+            'text/html'
+        )
         self.portal['f1']['d1'].reindexObject()
 
         # GZip disabled, not accepted
@@ -249,9 +258,13 @@ class TestOperations(unittest.TestCase):
 
         # Non-folder content
         self.portal.invokeFactory('Document', 'd1')
-        self.portal['d1'].setTitle(u"Document one")
-        self.portal['d1'].setDescription(u"Document one description")
-        self.portal['d1'].setText("<p>Body one</p>")
+        self.portal['d1'].title = u"Document one"
+        self.portal['d1'].description = u"Document one description"
+        self.portal['d1'].text = RichTextValue(
+            u"<p>Body one</p>",
+            'text/plain',
+            'text/html'
+        )
         self.portal['d1'].reindexObject()
 
         setRoles(self.portal, TEST_USER_ID, ('Member',))
@@ -272,8 +285,9 @@ class TestOperations(unittest.TestCase):
             'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
 
         browser.open(editURL)
-        browser.getControl(name='title').value = u"Title 1"
-        browser.getControl(name='form.button.save').click()
+
+        browser.getControl(name='form.widgets.IDublinCore.title').value = u"Title 1"
+        browser.getControl('Save').click()
 
         self.assertEqual([], self.purger._sync)
         self.assertEqual([], self.purger._async)
@@ -287,8 +301,8 @@ class TestOperations(unittest.TestCase):
         transaction.commit()
 
         browser.open(editURL)
-        browser.getControl(name='title').value = u"Title 2"
-        browser.getControl(name='form.button.save').click()
+        browser.getControl(name='form.widgets.IDublinCore.title').value = u"Title 2"
+        browser.getControl('Save').click()
 
         self.assertEqual([], self.purger._sync)
         self.assertEqual([], self.purger._async)
@@ -302,8 +316,8 @@ class TestOperations(unittest.TestCase):
         transaction.commit()
 
         browser.open(editURL)
-        browser.getControl(name='title').value = u"Title 3"
-        browser.getControl(name='form.button.save').click()
+        browser.getControl(name='form.widgets.IDublinCore.title').value = u"Title 3"
+        browser.getControl('Save').click()
 
         self.assertEqual([], self.purger._sync)
         self.assertEqual([], self.purger._async)
@@ -317,8 +331,8 @@ class TestOperations(unittest.TestCase):
         transaction.commit()
 
         browser.open(editURL)
-        browser.getControl(name='title').value = u"Title 4"
-        browser.getControl(name='form.button.save').click()
+        browser.getControl(name='form.widgets.IDublinCore.title').value = u"Title 4"
+        browser.getControl('Save').click()
 
         self.assertEqual([], self.purger._sync)
         self.assertEqual(set([
