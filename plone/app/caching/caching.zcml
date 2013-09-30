@@ -145,7 +145,7 @@
 
         <!-- These rely on the ContentItemLookup delegation -->
         <cache:ruleset ruleset="plone.content.file"   for="plone.namedfile.browser.Download" />
-        <cache:ruleset ruleset="plone.stableResource" for="plone.namedfile.scaling.ImageScale" />
+        <cache:ruleset ruleset="plone.content.file" for="plone.namedfile.scaling.ImageScale" />
 
     </configure>
 
