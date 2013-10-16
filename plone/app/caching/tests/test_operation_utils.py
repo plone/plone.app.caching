@@ -279,8 +279,14 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual('Accept-Language', response.getHeader('Vary'))
 
         timedelta = dateutil.parser.parse(response.getHeader('Expires')) - now
-        self.assertFalse(timedelta < datetime.timedelta(seconds=59))
-        self.assertFalse(timedelta > datetime.timedelta(seconds=60))
+        self.assertFalse(
+            timedelta < datetime.timedelta(seconds=58),
+            "%s is not < %s" % (timedelta, datetime.timedelta(seconds=58))
+        )
+        self.assertFalse(
+            timedelta > datetime.timedelta(seconds=61),
+            "%s is not > %s" % (timedelta, datetime.timedelta(seconds=61))
+        )
 
 
     # cacheInRAM()
@@ -669,13 +675,13 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
     def test_isModified_inm_match_update(self):
         """
-        If a site was previously configured to use etags and then the 
-        configuration updates, cached pages from the previous config 
+        If a site was previously configured to use etags and then the
+        configuration updates, cached pages from the previous config
         will send and If-None-Match but will have no site configuration
-        for etags. In this case, modified should return True since the 
-        headers need to be updated with the new config. Additionally, 
-        last modified may be attached to the request header, but 
-        If-None-Match always takes precedence over these headers and 
+        for etags. In this case, modified should return True since the
+        headers need to be updated with the new config. Additionally,
+        last modified may be attached to the request header, but
+        If-None-Match always takes precedence over these headers and
         therefor they should be ignored.
         """
         from plone.app.caching.operations.utils import isModified
@@ -689,7 +695,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = None
 
-        self.assertEqual(True, isModified(request, etag=etag, 
+        self.assertEqual(True, isModified(request, etag=etag,
                                            lastModified='doesnt_really_matter'))
 
 
