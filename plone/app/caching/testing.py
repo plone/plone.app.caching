@@ -13,7 +13,9 @@ from zope.configuration import xmlconfig
 
 from plone.cachepurging.interfaces import IPurger
 
+
 class FauxPurger(object):
+
     implements(IPurger)
 
     def __init__(self):
@@ -34,6 +36,7 @@ class FauxPurger(object):
 
     errorHeaders = ('X-Squid-Error',)
     http_1_1 = True
+
 
 class PloneAppCaching(PloneSandboxLayer):
 
@@ -57,6 +60,7 @@ class PloneAppCaching(PloneSandboxLayer):
     def tearDownZope(self, app):
         # Store old purger
         provideUtility(self.oldPurger, IPurger)
+
 
 PLONE_APP_CACHING_FIXTURE = PloneAppCaching()
 PLONE_APP_CACHING_INTEGRATION_TESTING = \
