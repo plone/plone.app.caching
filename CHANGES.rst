@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.1.7 (unreleased)
+1.1.7 (2013-12-07)
 ~~~~~~~~~~~~~~~~~~
 
 - Make it possible to set a maxage of zero in strong caching. This is
