@@ -4,7 +4,9 @@ Changelog
 1.1.8 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- #13848 Update installation instructions to reflect fact it has shipped with
+  Plone since version 4.1
+  [anthonygerrard]
 
 
 1.1.7 (2013-12-07)
