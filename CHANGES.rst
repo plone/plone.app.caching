@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.1.8 (unreleased)
+1.1.8 (2014-01-27)
 ~~~~~~~~~~~~~~~~~~
 
 - #13848 Update installation instructions to reflect fact it has shipped with
