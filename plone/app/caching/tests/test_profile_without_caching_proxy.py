@@ -16,6 +16,7 @@ import dateutil.parser
 import dateutil.tz
 
 import os
+import urllib
 
 import OFS.Image
 from Products.CMFCore.utils import getToolByName
@@ -42,6 +43,12 @@ def test_image():
         data=open(filename, 'r').read(),
         filename=filename
     )
+
+
+def _normalize_etag(s):
+    s = s.split('|')
+    s.pop()  # remove time-based component
+    return '|'.join(s)
 
 
 class TestProfileWithoutCaching(unittest.TestCase):
@@ -77,6 +84,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
     def test_composite_views(self):
 
         catalog = self.portal['portal_catalog']
+        default_skin = self.portal['portal_skins'].default_skin
 
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
@@ -121,9 +129,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        # XXX - Fix this.  The RR mod date element changes with each test run
-        #self.assertEqual('|test_user_1_|51|en|0|Sunburst Theme|0', browser.headers['ETag'])
-        self.assertEqual('"|test_user_1_|%d|en|0|Sunburst Theme|0|0|' % catalog.getCounter(), browser.headers['ETag'][:42])
+        self.assertEqual('"|test_user_1_|%d|en|0|%s|0|0' % (catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Set the copy/cut cookie and then request the folder view again
@@ -133,7 +139,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('plone.content.folderView', browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"|test_user_1_|%d|en|0|Sunburst Theme|0|1|' % catalog.getCounter(), browser.headers['ETag'][:42])
+        self.assertEqual('"|test_user_1_|%d|en|0|%s|0|1' % (catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
 
         # Request the authenticated page
         now = datetime.datetime.now(dateutil.tz.tzlocal())
@@ -145,9 +151,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        # XXX - Fix this.  The RR mod date element changes with each test run
-        #self.assertEqual('"|test_user_1_|50|en|0|Sunburst Theme|0', browser.headers['ETag'])
-        self.assertEqual('"|test_user_1_|%d|en|0|Sunburst Theme|0' % catalog.getCounter(), browser.headers['ETag'][:39])
+        self.assertEqual('"|test_user_1_|%d|en|0|%s|0' % (catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the authenticated page again -- to test RAM cache.
@@ -178,9 +182,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        # XXX - Fix this.  The RR mod date element changes with each test run
-        #self.assertEqual('"||50|en|0|Sunburst Theme|0|', browser.headers['ETag'])
-        self.assertEqual('"||%d|en|0|Sunburst Theme|0|'  % catalog.getCounter(), browser.headers['ETag'][:28])
+        self.assertEqual('"||%d|en|0|%s|0|0'  % (catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the anonymous page
@@ -192,9 +194,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertTrue(testText in browser.contents)
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        # XXX - Fix this.  The RR mod date element changes with each test run
-        #self.assertEqual('"||50|en|0|Sunburst Theme|0|', browser.headers['ETag'])
-        self.assertEqual('"||%d|en|0|Sunburst Theme|0|' % catalog.getCounter(), browser.headers['ETag'][:28])
+        self.assertEqual('"||%d|en|0|%s|0' % (catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the anonymous page again -- to test RAM cache.
@@ -208,9 +208,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.assertTrue(testText in browser.contents)
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        # XXX - Fix this.  The RR mod date element changes with each test run
-        #self.assertEqual('"||50|en|0|Sunburst Theme|0|', browser.headers['ETag'])
-        self.assertEqual('"||%d|en|0|Sunburst Theme|0|'% catalog.getCounter(), browser.headers['ETag'][:28])
+        self.assertEqual('"||%d|en|0|%s|0'% (catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the anonymous page again -- with an INM header to test 304.
@@ -250,6 +248,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
     def test_content_feeds(self):
 
         catalog = self.portal['portal_catalog']
+        default_skin = self.portal['portal_skins'].default_skin
 
         # Enable syndication
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
@@ -267,7 +266,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|0|Sunburst Theme"' % catalog.getCounter(), browser.headers['ETag'])
+        self.assertEqual('"||%d|en|0|%s"' % (catalog.getCounter(), default_skin), browser.headers['ETag'])
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the rss feed again -- to test RAM cache
@@ -281,7 +280,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.assertEqual(rssText, browser.contents)
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|0|Sunburst Theme"' % catalog.getCounter(), browser.headers['ETag'])
+        self.assertEqual('"||%d|en|0|%s"' % (catalog.getCounter(), default_skin), browser.headers['ETag'])
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the rss feed again -- with an INM header to test 304.
@@ -305,7 +304,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"|test_user_1_|%d|en|0|Sunburst Theme"' % catalog.getCounter(), browser.headers['ETag'])
+        self.assertEqual('"|test_user_1_|%d|en|0|%s"' % (catalog.getCounter(), default_skin), browser.headers['ETag'])
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the authenticated rss feed again -- to test RAM cache
@@ -435,7 +434,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
 
         # Request a ResourceRegistry resource
         cssregistry = self.portal.portal_css
-        path = cssregistry.absolute_url() + "/Sunburst%20Theme/public.css"
+        default_skin = self.portal.portal_skins.default_skin
+        path = cssregistry.absolute_url() + '/' + urllib.quote(default_skin) + "/public.css"
         cssregistry.setDebugMode(False)
         # Cook resources to update bundles for theme.
         cssregistry.cookResources()
