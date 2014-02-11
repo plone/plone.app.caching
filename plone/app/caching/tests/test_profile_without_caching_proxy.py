@@ -20,6 +20,7 @@ import urllib
 
 import OFS.Image
 from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.FSFile import FSFile
 
 from zope.component import getUtility
 
@@ -65,6 +66,10 @@ class TestProfileWithoutCaching(unittest.TestCase):
     def setUp(self):
         self.app = self.layer['app']
         self.portal = self.layer['portal']
+
+        test_css = FSFile('test.css', os.path.join(os.path.dirname(__file__), 'test.css'))
+        self.portal.portal_skins.custom._setOb('test.css', test_css)
+        self.portal.portal_css.registerStylesheet('test.css')
 
         setRequest(self.portal.REQUEST)
 
@@ -435,7 +440,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Request a ResourceRegistry resource
         cssregistry = self.portal.portal_css
         default_skin = self.portal.portal_skins.default_skin
-        path = cssregistry.absolute_url() + '/' + urllib.quote(default_skin) + "/public.css"
+        path = cssregistry.absolute_url() + '/' + urllib.quote(default_skin) + "/test.css"
         cssregistry.setDebugMode(False)
         # Cook resources to update bundles for theme.
         cssregistry.cookResources()
