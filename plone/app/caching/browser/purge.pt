@@ -68,13 +68,16 @@
                     them manually below.
                 </p>
 
-                <dl tal:condition="view/purgeLog | nothing" class="portalMessage info">
-                    <dt i18n:translate="heading_purged">Status</dt>
-                    <dd i18n:translate="description_purged">
+                <div class="portalMessage info"
+                     tal:condition="view/purgeLog | nothing">
+                    <strong i18n:translate="heading_purged">Status</strong>
+                    <span tal:omit-tag="" i18n:translate="description_purged">
                         The following items were purged:
-                    </dd>
-                    <dd tal:repeat="log view/purgeLog" tal:content="log" />
-                </dl>
+                    </span>
+                    <ul>
+                      <li tal:repeat="log view/purgeLog" tal:content="log" />
+                    </ul>
+                </div>
 
                 <form name="purge" tal:attributes="action string:${request/URL}" method="post"
                     tal:define="errors view/errors">
