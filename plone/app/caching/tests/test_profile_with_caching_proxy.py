@@ -20,6 +20,7 @@ import urllib
 
 import OFS.Image
 from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.FSFile import FSFile
 
 from zope.component import getUtility
 
@@ -67,6 +68,10 @@ class TestProfileWithCaching(unittest.TestCase):
     def setUp(self):
         self.app = self.layer['app']
         self.portal = self.layer['portal']
+
+        test_css = FSFile('test.css', os.path.join(os.path.dirname(__file__), 'test.css'))
+        self.portal.portal_skins.custom._setOb('test.css', test_css)
+        self.portal.portal_css.registerStylesheet('test.css')
 
         setRequest(self.portal.REQUEST)
 
@@ -485,7 +490,7 @@ class TestProfileWithCaching(unittest.TestCase):
         # Can we just call that test from this context?
 
         # Request a ResourceRegistry resource
-        path = cssregistry.absolute_url() + '/' + urllib.quote(skins_tool.default_skin) + "/public.css"
+        path = cssregistry.absolute_url() + '/' + urllib.quote(skins_tool.default_skin) + "/test.css"
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         browser = Browser(self.app)
         browser.open(path)
