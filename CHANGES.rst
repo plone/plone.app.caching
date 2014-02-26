@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.2.0 (unreleased)
+1.2.0 (2014-02-26)
 ------------------
 
 - Use the PLONE_APP_CONTENTTYPES_FIXTURE test layer for Plone 5 compatibility.
