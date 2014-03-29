@@ -19,7 +19,7 @@ import unittest2 as unittest
 TEST_TIMEZONE = 'Europe/Vienna'
 
 
-def patched_now():
+def stable_now():
     """Patch localized_now to allow stable results in tests.
     """
     tzinfo = pytz.timezone(TEST_TIMEZONE)

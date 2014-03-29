@@ -4,7 +4,7 @@ import unittest2 as unittest
 
 from plone.testing.z2 import Browser
 
-from plone.app.caching.tests.test_utils import patched_now as PN
+from plone.app.caching.tests.test_utils import stable_now
 from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
 from plone.app.testing import SITE_OWNER_NAME, SITE_OWNER_PASSWORD
 from plone.app.testing import setRoles
@@ -134,7 +134,7 @@ class TestProfileWithCaching(unittest.TestCase):
         import transaction; transaction.commit()
 
         # Request the authenticated folder
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal['f1'].absolute_url())
@@ -155,7 +155,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('"|test_user_1_|%d|en|0|%s|0|1' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
 
         # Request the authenticated page
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal['f1']['d1'].absolute_url())
@@ -188,7 +188,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('', browser.contents)
 
         # Request the anonymous folder
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.open(self.portal['f1'].absolute_url())
         self.assertEqual('plone.content.folderView', browser.headers['X-Cache-Rule'])
@@ -199,7 +199,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the anonymous page
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEqual('plone.content.itemView', browser.headers['X-Cache-Rule'])
@@ -212,7 +212,7 @@ class TestProfileWithCaching(unittest.TestCase):
 
         # Request the anonymous page again -- to test RAM cache.
         # Anonymous should be RAM cached
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEqual('plone.content.itemView', browser.headers['X-Cache-Rule'])
@@ -272,7 +272,7 @@ class TestProfileWithCaching(unittest.TestCase):
         import transaction; transaction.commit()
 
         # Request the rss feed
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEqual('plone.content.feed', browser.headers['X-Cache-Rule'])
@@ -283,7 +283,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the rss feed again -- to test RAM cache
-        now = PN()
+        now = stable_now()
         rssText = browser.contents
         browser = Browser(self.app)
         browser.open(self.portal.absolute_url() + '/RSS')
@@ -309,7 +309,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('', browser.contents)
 
         # Request the authenticated rss feed
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open(self.portal.absolute_url() + '/RSS')
@@ -348,7 +348,7 @@ class TestProfileWithCaching(unittest.TestCase):
         import transaction; transaction.commit()
 
         # Request the image with Manager role
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.addHeader('Authorization', 'Basic %s:%s' % (SITE_OWNER_NAME, SITE_OWNER_PASSWORD,))
         browser.open(self.portal['f1']['i1'].absolute_url())
@@ -362,7 +362,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request an image scale with Manager role
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.addHeader('Authorization', 'Basic %s:%s' % (SITE_OWNER_NAME, SITE_OWNER_PASSWORD,))
         browser.open(self.portal['f1']['i1'].absolute_url() + '/@@images/image/preview')
@@ -381,7 +381,7 @@ class TestProfileWithCaching(unittest.TestCase):
         import transaction; transaction.commit()
 
         # Request the image
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.open(self.portal['f1']['i1'].absolute_url())
         self.assertEqual('plone.content.file', browser.headers['X-Cache-Rule'])
@@ -405,7 +405,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('', browser.contents)
 
         # Request an image scale
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.open(self.portal['f1']['i1'].absolute_url() + '/@@images/image/preview')
         self.assertEqual('plone.content.file', browser.headers['X-Cache-Rule'])
@@ -423,9 +423,9 @@ class TestProfileWithCaching(unittest.TestCase):
         import transaction; transaction.commit()
 
         # Request a skin image
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
-        browser.open(self.portal.absolute_url() + '/rss.png')
+        browser.open(self.portal.absolute_url() + '/rss.stable_nowg')
         self.assertEqual('plone.resource', browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowserAndProxy
@@ -440,7 +440,7 @@ class TestProfileWithCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.raiseHttpErrors = False
         browser.addHeader('If-Modified-Since', lastmodified)
-        browser.open(self.portal.absolute_url() + '/rss.png')
+        browser.open(self.portal.absolute_url() + '/rss.stable_nowg')
         self.assertEqual('plone.resource', browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
         # This should be a 304 response
@@ -492,7 +492,7 @@ class TestProfileWithCaching(unittest.TestCase):
 
         # Request a ResourceRegistry resource
         path = cssregistry.absolute_url() + '/' + urllib.quote(skins_tool.default_skin) + "/test.css"
-        now = PN()
+        now = stable_now()
         browser = Browser(self.app)
         browser.open(path)
         self.assertEqual('plone.stableResource', browser.headers['X-Cache-Rule'])
@@ -518,7 +518,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual(None, browser.headers.get('Cache-Control'))
 
         # Request the ResourceRegistry resource -- with RR in debug mode
-        now = PN()
+        now = stable_now()
         cssregistry.setDebugMode(True)
 
         transaction.commit()
