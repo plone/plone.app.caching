@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.2.1 (unreleased)
+1.2.1 (2014-04-01)
 ------------------
 
 - Fix tests that fail on the day before the switch to daylight saving time.
