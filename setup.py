@@ -50,7 +50,7 @@ setup(name='plone.app.caching',
       ],
       extras_require={
           'test': [
-              'plone.app.contenttypes',
+              'plone.app.contenttypes[test]',
               'plone.app.testing',
           ]
       },
