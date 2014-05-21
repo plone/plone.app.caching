@@ -3,14 +3,24 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to plone.app.caching's documentation!
-=============================================
+.. include:: ../README.rst
+
+Documentation
+=============
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
+   caching-control-panel
+   caching-profiles
+   rulesets-and-caching-operations
+   caching-proxies
+   ram-cache
+   etags
+   composite-views
+   split-views
 
 
 Indices and tables
