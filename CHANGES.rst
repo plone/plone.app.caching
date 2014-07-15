@@ -4,7 +4,8 @@ Changelog
 1.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix ruleset registry test isolation so that is no longer order dependent.
+  [jone]
 
 
 1.2.1 (2014-04-01)
