@@ -85,14 +85,8 @@
                 <h1 class="documentFirstHeading"
                     i18n:translate="heading_caching_settings">Caching settings</h1>
 
-                <a href=""
-                    class="link-parent"
-                    tal:attributes="href string:${portal_url}/plone_control_panel"
-                    i18n:translate="label_up_to_plone_setup">
-                        Up to Site Setup
-                </a>
 
-                <p i18n:translate="description_cache_settings">
+                <p i18n:translate="description_cache_settings" class="documentDescription">
                     Control how pages, images, style sheets and other resources are
                     cached.
                 </p>
@@ -664,7 +658,7 @@
                         <input
                             type="submit"
                             name="form.button.Cancel"
-                            class="context"
+                            class="standalone"
                             value="Cancel"
                             i18n:attributes="value" />
                     </div>
