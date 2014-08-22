@@ -324,9 +324,9 @@ def isModified(request, etag=None, lastModified=None):
 
     """
     If a site turns off etags after having them on, the pages previously
-    served will return an If-None-Match header, but the site will not be 
-    configured for etags. In this case, force a refresh to load the 
-    latest headers. I interpret this as the spec rule that the 
+    served will return an If-None-Match header, but the site will not be
+    configured for etags. In this case, force a refresh to load the
+    latest headers. I interpret this as the spec rule that the
     etags do NOT match, and therefor we must not return a 304.
     """
     if ifNoneMatch and etag==None:
@@ -360,7 +360,7 @@ def isModified(request, etag=None, lastModified=None):
     # XXX Do we really want the default here to be false?
     return False
 
- 
+
 def visibleToRole(published, role, permission='View'):
     """Determine if the published object would be visible to the given
     role.
@@ -680,19 +680,19 @@ def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY,
     cache = getRAMCache(globalKey)
     if cache is None:
         return
-    
+
     """
-    Resource registries have no body. If we put them in the cache the content 
-    type headers will indicate length and the body will be '', causing the browser 
+    Resource registries have no body. If we put them in the cache the content
+    type headers will indicate length and the body will be '', causing the browser
     to just spin. Furthermore, I doubt we ever want to cache an empty result:
     it's an indication that something went wrong somewhere.
 
-    This does mean that any resources will not be cached in ram. There is 
-    potentially another fix but I doubt long term it's ever the right thing to 
+    This does mean that any resources will not be cached in ram. There is
+    potentially another fix but I doubt long term it's ever the right thing to
     do.
     """
     if result == '':
-        return 
+        return
 
     status = response.getStatus()
     headers = dict(request.response.headers)

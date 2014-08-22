@@ -1,4 +1,4 @@
-# Apache configuration example for Varnish-behind-Apache setup 
+# Apache configuration example for Varnish-behind-Apache setup
 
 # Include the following in the Apache config like so:
 #
@@ -12,7 +12,7 @@
 <VirtualHost *:80>
   ServerName ${apache-vhost:hostname}
   RewriteEngine On
-  
+
   # Remove trailing slash to avoid duplicates in caching proxy,
   # 1) for search engines, redirect to normalized version
   # 2) for everyone else, just strip the trailing slash
@@ -21,9 +21,9 @@
   RewriteCond %{HTTP_USER_AGENT} ^msnbot.* [NC]
   RewriteRule ^/(.*)/$ /$1 [R=301]
   RewriteRule ^/(.*)/$ /$1
-  
+
   RewriteRule ^/(.*) http://${apache-vhost:backend}/VirtualHostBase/http/${apache-vhost:hostname}:80/${apache-vhost:zope-path}/VirtualHostRoot/$1 [P]
-  
+
 </VirtualHost>
 
 

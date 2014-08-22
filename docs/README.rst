@@ -21,7 +21,7 @@ Installation on Plone 4.0
 
 To install ``plone.app.caching``, add it to the ``eggs`` list in your ``buildout.cfg``, or as a dependency of one of your own packages in ``setup.py``. ZCML configuration will be automatically loaded via a ``z3c.autoinclude`` entry point. You will also need to install the package in Plone's Add-ons control panel as normal.
 
-This package depends on a number of other packages, including ``z3c.form`` and ``plone.app.registry``, that do not ship with Plone. 
+This package depends on a number of other packages, including ``z3c.form`` and ``plone.app.registry``, that do not ship with Plone.
 You will probably want to lock down the versions for those packages using a known good set. Add this to the the ``extends`` line in your ``buildout.cfg``, *after* the line that includes the Plone KGS::
 
     extends =
