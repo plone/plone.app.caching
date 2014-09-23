@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '1.2.0.dev0'
+version = '1.2.2.dev0'
 
 setup(name='plone.app.caching',
       version=version,
@@ -50,7 +50,7 @@ setup(name='plone.app.caching',
       ],
       extras_require={
           'test': [
-              'plone.app.contenttypes',
+              'plone.app.contenttypes[test]',
               'plone.app.testing',
           ]
       },

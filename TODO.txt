@@ -5,7 +5,6 @@ plone.app.caching
 -----------------
 
  [ ] Update KGS
- 
+
  [ ] Add caching declarations to plone.namedfile
         - IPurgeURL adapter should include full path to view plus sub-paths
- 

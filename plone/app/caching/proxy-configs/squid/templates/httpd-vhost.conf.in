@@ -1,4 +1,4 @@
-# Apache configuration example for Squid-behind-Apache setup 
+# Apache configuration example for Squid-behind-Apache setup
 
 # Include the following in the Apache config like so:
 #
@@ -12,17 +12,17 @@
 <VirtualHost *:80>
   ServerName ${apache-vhost:hostname}
   RewriteEngine On
-  
+
   # Split-view caching: Add "X-Anonymous" to request
   # to segregate authenticated/anonymous responses
   SetEnvIf Authorization .+ is_authenticated
   SetEnvIf Cookie "(^|.*; )__ac=" is_authenticated
   RequestHeader set X-Anonymous True env=!is_authenticated
-  
+
   # Split-view caching: Rewrite s-maxage in response
   # to exclude from intermediary caching proxies
-  Header edit Cache-Control "^(.*)s-maxage=[0-9]+(.*)$" "$1s-maxage=0$2" 
-  
+  Header edit Cache-Control "^(.*)s-maxage=[0-9]+(.*)$" "$1s-maxage=0$2"
+
   # Normalize Accept-Encoding header to optimize variant caching
   # 1) if gzip is allowed, rewrite Accept-Encoding to just "gzip"
   # 2) if gzip is not allowed, unset Accept-Encoding header
@@ -32,7 +32,7 @@
   SetEnvIf Accept-Encoding ".*gzip.*" set_accept_encoding !env=unset_accept_encoding
   RequestHeader unset Accept-Encoding
   RequestHeader set Accept-Encoding gzip env=set_accept_encoding
-  
+
   # Remove trailing slash to avoid duplicates in caching proxy,
   # 1) for search engines, redirect to normalized version
   # 2) for everyone else, just strip the trailing slash
@@ -41,10 +41,10 @@
   RewriteCond  %{HTTP_USER_AGENT}  ^msnbot.* [NC]
   RewriteRule ^/(.*)/$ /$1 [R=301]
   RewriteRule ^/(.*)/$ /$1
-  
+
   # And finally, pass the request to the backend
   RewriteRule ^/(.*)$ http://${apache-vhost:backend}/VirtualHostBase/http/${apache-vhost:hostname}:80/${apache-vhost:zope-path}/VirtualHostRoot/$1 [P]
-  
+
 </VirtualHost>
 
 

@@ -1,22 +1,31 @@
-import unittest2 as unittest
-from plone.testing.zca import UNIT_TESTING
-
-from zope.interface import implements
-from zope.component import provideUtility, provideAdapter, getUtility
-
-from plone.registry.interfaces import IRegistry
-
-from plone.registry import Registry
-from plone.registry.fieldfactory import persistentFieldAdapter
-
-from plone.app.caching.interfaces import IPloneCacheSettings
-
 from Acquisition import Explicit
 from Products.CMFCore.interfaces import IDynamicType
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
-
-from plone.app.caching.utils import isPurged
+from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.utils import getObjectDefaultView
+from plone.app.caching.utils import isPurged
+from plone.registry import Registry
+from plone.registry.fieldfactory import persistentFieldAdapter
+from plone.registry.interfaces import IRegistry
+from plone.testing.zca import UNIT_TESTING
+from datetime import datetime
+from zope.component import provideUtility, provideAdapter, getUtility
+from zope.interface import implements
+
+import pytz
+import unittest2 as unittest
+
+
+TEST_TIMEZONE = 'Europe/Vienna'
+
+
+def stable_now():
+    """Patch localized_now to allow stable results in tests.
+    """
+    tzinfo = pytz.timezone(TEST_TIMEZONE)
+    now = datetime(2013, 5, 5, 10, 0, 0).replace(microsecond=0)
+    now = tzinfo.localize(now)  # set tzinfo with correct DST offset
+    return now
 
 
 class DummyContent(Explicit):

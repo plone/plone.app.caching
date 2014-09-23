@@ -1,7 +1,21 @@
 Changelog
 ---------
 
-1.2.0 (unreleased)
+1.2.2 (unreleased)
+------------------
+
+- Fix ruleset registry test isolation so that is no longer order dependent.
+  [jone]
+
+
+1.2.1 (2014-04-01)
+------------------
+
+- Fix tests that fail on the day before the switch to daylight saving time.
+  [pbauer]
+
+
+1.2.0 (2014-02-26)
 ------------------
 
 - Remove DL's from portal message templates.

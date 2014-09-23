@@ -45,6 +45,7 @@ _isuri = re.compile(
     r"\S*$"               # non space (should be pickier)
     ).match
 
+
 class BaseView(object):
 
     def __init__(self, context, request):
@@ -79,6 +80,7 @@ class BaseView(object):
     def purgingEnabled(self):
         return isCachePurgingEnabled()
 
+
 class ControlPanel(BaseView):
     """Control panel view
     """
@@ -112,7 +114,7 @@ class ControlPanel(BaseView):
                 self.editRuleset = True
             else:
                 raise NotFound(self, name)
-            return self # traverse again to get operation name
+            return self  # traverse again to get operation name
 
         # Step 2 - get operation name
         if (self.editGlobal or self.editRuleset) and not self.editOperationName:
@@ -126,7 +128,7 @@ class ControlPanel(BaseView):
 
                 return EditForm(self.context, self.request, self.editOperationName, operation)
             elif self.editRuleset:
-                return self # traverse again to get ruleset name
+                return self  # traverse again to get ruleset name
             else:
                 raise NotFound(self, name)
 
@@ -459,6 +461,7 @@ class ControlPanel(BaseView):
 
         return False
 
+
 class Import(BaseView):
     """The import control panel
     """
@@ -499,6 +502,7 @@ class Import(BaseView):
         return [profile for profile in portal_setup.listProfileInfo(ICacheProfiles)
                   if profile.get('type', BASE) == EXTENSION and profile.get('for') is not None]
 
+
 class Purge(BaseView):
     """The purge control panel
     """
@@ -509,9 +513,7 @@ class Purge(BaseView):
             if 'form.button.Purge' in self.request.form:
                 self.processPurge()
 
-
     def processPurge(self):
-
         urls = self.request.form.get('urls', [])
         sync = self.request.form.get('synchronous', True)
 
@@ -579,6 +581,7 @@ class Purge(BaseView):
             for path in getPathsToPurge(obj, self.request):
                 for newURL in getURLsToPurge(path, proxies):
                     purge(newURL)
+
 
 class RAMCache(BaseView):
     """The RAM cache control panel

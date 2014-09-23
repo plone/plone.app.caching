@@ -24,7 +24,7 @@ access_log none
 # (for a faster cache storage option see,
 #  http://wiki.squid-cache.org/Features/CyclicObjectStorageSystem)
 cache_dir ufs ${squid-config:cache-dir} ${squid-config:cache-size} 16 256
-cache_mem 256 MB                     
+cache_mem 256 MB
 maximum_object_size 5 MB
 maximum_object_size_in_memory 1 MB
 
@@ -40,7 +40,7 @@ http_access deny purge
 acl post_requests method POST
 cache deny post_requests
 
-# Cache Peers 
+# Cache Peers
 cache_peer ${squid-config:backend-host} parent ${squid-config:backend-port} 0 no-query originserver login=PASS name=peer_0
 
 # Cache Peer Access
