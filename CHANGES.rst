@@ -4,6 +4,10 @@ Changelog
 1.2.2 (unreleased)
 ------------------
 
+- Remove DL's from portal message templates.
+  https://github.com/plone/Products.CMFPlone/issues/153
+  [khink]
+
 - Fix ruleset registry test isolation so that is no longer order dependent.
   [jone]
 
@@ -17,10 +21,6 @@ Changelog
 
 1.2.0 (2014-02-26)
 ------------------
-
-- Remove DL's from portal message templates.
-  https://github.com/plone/Products.CMFPlone/issues/153
-  [khink]
 
 - Use the PLONE_APP_CONTENTTYPES_FIXTURE test layer for Plone 5 compatibility.
   [timo]
