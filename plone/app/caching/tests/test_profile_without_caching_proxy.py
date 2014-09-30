@@ -70,7 +70,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
 
         test_css = FSFile('test.css', os.path.join(os.path.dirname(__file__), 'test.css'))
         self.portal.portal_skins.custom._setOb('test.css', test_css)
-        self.portal.portal_css.registerStylesheet('test.css')
 
         setRequest(self.portal.REQUEST)
 
@@ -435,55 +434,3 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # What is the best way to test this?
         # Maybe not important since the RR test exercises the same code?
         pass
-
-    def test_stable_resources_resource_registries(self):
-
-        # Request a ResourceRegistry resource
-        cssregistry = self.portal.portal_css
-        default_skin = self.portal.portal_skins.default_skin
-        path = cssregistry.absolute_url() + '/' + urllib.quote(default_skin) + "/test.css"
-        cssregistry.setDebugMode(False)
-        # Cook resources to update bundles for theme.
-        cssregistry.cookResources()
-
-        import transaction; transaction.commit()
-
-        now = stable_now()
-        browser = Browser(self.app)
-        browser.open(path)
-        self.assertEqual('plone.stableResource', browser.headers['X-Cache-Rule'])
-        self.assertEqual('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
-        # This should use cacheInBrowserAndProxy
-        self.assertEqual('max-age=31536000, proxy-revalidate, public', browser.headers['Cache-Control'])
-        self.assertFalse(None == browser.headers.get('Last-Modified'))
-        timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
-        self.assertTrue(timedelta > datetime.timedelta(seconds=31535990))
-
-        # Request the ResourceRegistry resource again -- with IMS header to test 304
-        lastmodified = browser.headers['Last-Modified']
-        browser = Browser(self.app)
-        browser.raiseHttpErrors = False
-        browser.addHeader('If-Modified-Since', lastmodified)
-        browser.open(path)
-        self.assertEqual('plone.stableResource', browser.headers['X-Cache-Rule'])
-        self.assertEqual('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
-        self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
-        self.assertEqual(None, browser.headers.get('Last-Modified'))
-        self.assertEqual(None, browser.headers.get('Expires'))
-        self.assertEqual(None, browser.headers.get('Cache-Control'))
-
-        # Request the ResourceRegistry resource -- with RR in debug mode
-        now = stable_now()
-        cssregistry.setDebugMode(True)
-
-        import transaction; transaction.commit()
-
-        browser = Browser(self.app)
-        browser.open(path)
-        self.assertEqual('plone.stableResource', browser.headers['X-Cache-Rule'])
-        self.assertEqual('plone.app.caching.strongCaching', browser.headers['X-Cache-Operation'])
-        # This should use doNotCache
-        self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual(None, browser.headers.get('Last-Modified'))
-        self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
