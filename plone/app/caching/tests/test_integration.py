@@ -128,16 +128,6 @@ class TestOperations(unittest.TestCase):
         OFS.Image.manage_addImage(self.portal['portal_skins']['custom'],
             'test.gif', open(TEST_IMAGE, 'rb'))
 
-        # Resource registries resource
-        css_tool = self.portal['portal_css']
-        # Cook resources to update bundles for theme.
-        css_tool.cookResources()
-
-        # Pass active skin for correct bundles.
-        active_theme = self.portal['portal_skins'].default_skin
-        resources = css_tool.getEvaluatedResources(self.portal, active_theme)
-        cssResourcePath = resources[0].getId()
-
         setRoles(self.portal, TEST_USER_ID, ('Member',))
 
         import transaction
@@ -169,11 +159,6 @@ class TestOperations(unittest.TestCase):
         browser.open(self.portal.absolute_url() +
                 '/++resource++plone.app.caching.gif')
         # Set by resources themselves, but irrelevant to this test:
-        # self.assertTrue('Cache-Control' in browser.headers)
-
-        browser.open(self.portal.absolute_url() +
-                '/portal_css/' + cssResourcePath)
-        # Set by ResourceRegistries, btu irrelevant ot this test
         # self.assertTrue('Cache-Control' in browser.headers)
 
     def test_gzip_setting(self):
