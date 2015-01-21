@@ -27,6 +27,17 @@ def isPurged(object):
 
     return (portal_type in settings.purgedContentTypes)
 
+def stripLeadingCharacters(name):
+    """Strip off leading / and/or @@
+    """
+
+    if name and name[0] == '/':
+        name = name[1:]
+    if name and name.startswith('@@'):
+        name = name[2:]
+
+    return name
+
 def getObjectDefaultView(context):
     """Get the id of an object's default view
     """
@@ -37,7 +48,7 @@ def getObjectDefaultView(context):
 
     if browserDefault is not None:
         try:
-            return browserDefault.defaultView()
+            return stripLeadingCharacters(browserDefault.defaultView())
         except AttributeError:
             # Might happen if FTI didn't migrate yet.
             pass
@@ -47,7 +58,8 @@ def getObjectDefaultView(context):
 
     fti = context.getTypeInfo()
     try:
-        # XXX: This isn't quite right since it assumes the action starts with ${object_url}
+        # XXX: This isn't quite right since it assumes the action starts
+        #with ${object_url}
         action = fti.getActionInfo('object/view')['url'].split('/')[-1]
     except ValueError:
         # If the action doesn't exist, stop
@@ -57,13 +69,7 @@ def getObjectDefaultView(context):
     if action:
         action = fti.queryMethodID(action, default = action, context = context)
     else:
-        action = fti.queryMethodID('(Default)', default = action, context = context)
+        action = fti.queryMethodID('(Default)', default = action,
+                                   context = context)
 
-    # Strip off leading / and/or @@
-    if action and action[0] == '/':
-        action = action[1:]
-    if action and action.startswith('@@'):
-        action = action[2:]
-    return action
-
-
+    return stripLeadingCharacters(action)

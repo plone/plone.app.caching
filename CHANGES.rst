@@ -4,7 +4,8 @@ Changelog
 1.2.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fixed getObjectDefaultView method to strip off leading / and/or @@.
+  [alecghica]
 
 
 1.2.2 (2014-10-23)
