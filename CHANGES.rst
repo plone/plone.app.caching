@@ -4,6 +4,9 @@ Changelog
 1.1.9 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
+- Fixed getObjectDefaultView method to strip off leading / and/or @@.
+  [alecghica]
+
 - Fix tests that fail on the day before the switch to daylight saving time.
   [pbauer]
 

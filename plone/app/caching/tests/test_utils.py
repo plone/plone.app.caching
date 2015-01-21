@@ -130,6 +130,10 @@ class TestGetObjectDefaultPath(unittest.TestCase):
         context = DummyContent()
         self.assertEqual('defaultView', getObjectDefaultView(context))
 
+    def test_browserviewdefault(self):
+        context = DummyContent(defaultView="@@defaultView")
+        self.assertEqual('defaultView', getObjectDefaultView(context))
+
     def test_not_IBrowserDefault_methodid(self):
         context = DummyNotBrowserDefault('testtype', 'string:${object_url}/view')
         self.assertEqual('defaultView', getObjectDefaultView(context))
