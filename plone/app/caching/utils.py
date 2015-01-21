@@ -47,7 +47,8 @@ def getObjectDefaultView(context):
 
     fti = context.getTypeInfo()
     try:
-        # XXX: This isn't quite right since it assumes the action starts with ${object_url}
+        # XXX: This isn't quite right since it assumes the action starts
+        #with ${object_url}
         action = fti.getActionInfo('object/view')['url'].split('/')[-1]
     except ValueError:
         # If the action doesn't exist, stop
@@ -57,7 +58,8 @@ def getObjectDefaultView(context):
     if action:
         action = fti.queryMethodID(action, default = action, context = context)
     else:
-        action = fti.queryMethodID('(Default)', default = action, context = context)
+        action = fti.queryMethodID('(Default)', default = action,
+                                   context = context)
 
     # Strip off leading / and/or @@
     if action and action[0] == '/':
@@ -65,5 +67,3 @@ def getObjectDefaultView(context):
     if action and action.startswith('@@'):
         action = action[2:]
     return action
-
-
