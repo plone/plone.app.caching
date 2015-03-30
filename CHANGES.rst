@@ -7,6 +7,10 @@ Changelog
 - Fixed getObjectDefaultView method to strip off leading / and/or @@.
   [alecghica]
 
+- Fix the portalPath used in the controlpanel for manual purging URL's.
+  This bug resulted in rarely doing all the purging required.
+  [puittenbroek]
+
 
 1.2.2 (2014-10-23)
 ------------------
