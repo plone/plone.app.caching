@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.1.9 (unreleased)
+1.1.9 (2015-04-30)
 ~~~~~~~~~~~~~~~~~~
 
 - Fixed getObjectDefaultView method to strip off leading / and/or @@.
