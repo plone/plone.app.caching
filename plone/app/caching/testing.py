@@ -13,6 +13,10 @@ from zope.configuration import xmlconfig
 
 from plone.cachepurging.interfaces import IPurger
 
+from plone.protect.authenticator import _getKeyring
+import hmac
+from hashlib import sha1 as sha
+
 
 class FauxPurger(object):
 
@@ -63,7 +67,13 @@ class PloneAppCaching(PloneSandboxLayer):
 
 
 PLONE_APP_CACHING_FIXTURE = PloneAppCaching()
-PLONE_APP_CACHING_INTEGRATION_TESTING = \
-    IntegrationTesting(bases=(PLONE_APP_CACHING_FIXTURE,), name="PloneAppCaching:Integration")
-PLONE_APP_CACHING_FUNCTIONAL_TESTING = \
-    FunctionalTesting(bases=(PLONE_APP_CACHING_FIXTURE,), name="PloneAppCaching:Functional")
+PLONE_APP_CACHING_INTEGRATION_TESTING = IntegrationTesting(
+    bases=(PLONE_APP_CACHING_FIXTURE,), name="PloneAppCaching:Integration")
+PLONE_APP_CACHING_FUNCTIONAL_TESTING = FunctionalTesting(
+    bases=(PLONE_APP_CACHING_FIXTURE,), name="PloneAppCaching:Functional")
+
+
+def getToken(username):
+    ring = _getKeyring(username)
+    secret = ring.random()
+    return hmac.new(secret, username, sha).hexdigest()

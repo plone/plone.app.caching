@@ -13,6 +13,7 @@ from plone.registry.interfaces import IRegistry
 from plone.caching.interfaces import ICacheSettings
 
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+from plone.app.caching.testing import getToken
 
 
 class TestOperationDefault(unittest.TestCase):
@@ -48,24 +49,32 @@ class TestOperationDefault(unittest.TestCase):
         self.portal['f1'].description = u"Folder one description"
         self.portal['f1'].reindexObject()
 
-        self.cacheSettings.operationMapping = {'plone.content.itemView': 'plone.app.caching.weakCaching'}
+        self.cacheSettings.operationMapping = {
+            'plone.content.itemView': 'plone.app.caching.weakCaching'}
         self.registry['plone.app.caching.weakCaching.lastModified'] = True
         self.registry['plone.app.caching.weakCaching.etags'] = None
 
-        import transaction; transaction.commit()
+        import transaction
+        transaction.commit()
 
         # log in and create a content type
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (
+            TEST_USER_NAME, TEST_USER_PASSWORD,))
         browser.open("%s/++add++Document" % self.portal['f1'].absolute_url())
-        browser.getControl(name='form.widgets.IDublinCore.title').value="dummy content"
+        browser.getControl(
+            name='form.widgets.IDublinCore.title').value = "dummy content"
         browser.getControl('Save').click()
         self.assertFalse('Etag' in browser.headers)
 
         # now set up etags and make sure that a header is added
         self.registry['plone.app.caching.weakCaching.etags'] = ('lastModified',)
-        import transaction; transaction.commit()
-        browser.open("%s/dummy-content/edit"%self.portal['f1'].absolute_url())
-        browser.getControl(name='form.widgets.IDublinCore.title').value="dummy content"
+        import transaction
+        transaction.commit()
+        browser.open("%s/dummy-content/edit?_authenticator=%s" % (
+            self.portal['f1'].absolute_url(),
+            getToken(TEST_USER_NAME)))
+        browser.getControl(
+            name='form.widgets.IDublinCore.title').value = "dummy content"
         browser.getControl('Save').click()
         self.assertTrue('Etag' in browser.headers)

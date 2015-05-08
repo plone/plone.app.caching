@@ -22,11 +22,13 @@ from plone.cachepurging.interfaces import IPurger
 from plone.app.caching.interfaces import IPloneCacheSettings
 
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+from plone.app.caching.testing import getToken
 
-TEST_IMAGE = pkg_resources.resource_filename('plone.app.caching.tests',
-    'test.gif')
-TEST_FILE = pkg_resources.resource_filename('plone.app.caching.tests',
-    'test.gif')
+
+TEST_IMAGE = pkg_resources.resource_filename(
+    'plone.app.caching.tests', 'test.gif')
+TEST_FILE = pkg_resources.resource_filename(
+    'plone.app.caching.tests', 'test.gif')
 
 
 class TestOperations(unittest.TestCase):
@@ -69,9 +71,9 @@ class TestOperations(unittest.TestCase):
 
         self.cacheSettings = self.registry.forInterface(ICacheSettings)
         self.cachePurgingSettings = self.registry.forInterface(
-                ICachePurgingSettings)
+            ICachePurgingSettings)
         self.ploneCacheSettings = self.registry.forInterface(
-                IPloneCacheSettings)
+            IPloneCacheSettings)
 
         self.purger = getUtility(IPurger)
         self.purger.reset()
@@ -105,28 +107,28 @@ class TestOperations(unittest.TestCase):
         self.portal['f1']['d1'].reindexObject()
 
         # Publish the document
-        self.portal.portal_workflow.doActionFor(self.portal['f1']['d1'],
-                'publish')
+        self.portal.portal_workflow.doActionFor(
+            self.portal['f1']['d1'], 'publish')
 
         # Content image
         self.portal['f1'].invokeFactory('Image', 'i1')
         self.portal['f1']['i1'].title = u"Image one"
         self.portal['f1']['i1'].description = u"Image one description"
-        self.portal['f1']['i1'].image = OFS.Image.Image('test.gif',
-            'test.gif', open(TEST_IMAGE, 'rb'))
+        self.portal['f1']['i1'].image = OFS.Image.Image(
+            'test.gif', 'test.gif', open(TEST_IMAGE, 'rb'))
         self.portal['f1']['i1'].reindexObject()
 
         # Content file
         self.portal['f1'].invokeFactory('File', 'f1')
         self.portal['f1']['f1'].title = u"File one"
         self.portal['f1']['f1'].description = u"File one description"
-        self.portal['f1']['f1'].file = OFS.Image.File('test.gif', 'test.gif',
-            open(TEST_FILE, 'rb'))
+        self.portal['f1']['f1'].file = OFS.Image.File(
+            'test.gif', 'test.gif', open(TEST_FILE, 'rb'))
         self.portal['f1']['f1'].reindexObject()
 
         # OFS image (custom folder)
-        OFS.Image.manage_addImage(self.portal['portal_skins']['custom'],
-            'test.gif', open(TEST_IMAGE, 'rb'))
+        OFS.Image.manage_addImage(
+            self.portal['portal_skins']['custom'], 'test.gif', open(TEST_IMAGE, 'rb'))
 
         setRoles(self.portal, TEST_USER_ID, ('Member',))
 
@@ -152,12 +154,12 @@ class TestOperations(unittest.TestCase):
         browser.open(self.portal['f1']['f1'].absolute_url())
         self.assertFalse('Cache-Control' in browser.headers)
 
-        browser.open(self.portal.absolute_url() +
-                '/portal_skins/custom/test.gif')
+        browser.open(
+            self.portal.absolute_url() + '/portal_skins/custom/test.gif')
         self.assertFalse('Cache-Control' in browser.headers)
 
-        browser.open(self.portal.absolute_url() +
-                '/++resource++plone.app.caching.gif')
+        browser.open(
+            self.portal.absolute_url() + '/++resource++plone.app.caching.gif')
         # Set by resources themselves, but irrelevant to this test:
         # self.assertTrue('Cache-Control' in browser.headers)
 
@@ -230,8 +232,8 @@ class TestOperations(unittest.TestCase):
 
         browser = Browser(self.app)
         browser.addHeader('Accept-Encoding', 'gzip')
-        browser.addHeader('Authorization', 'Basic %s:%s' %
-                (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader('Authorization', 'Basic %s:%s' % (
+            TEST_USER_NAME, TEST_USER_PASSWORD,))
 
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertTrue('Accept-Encoding' in browser.headers['Vary'])
@@ -259,14 +261,17 @@ class TestOperations(unittest.TestCase):
         self.cachePurgingSettings.cachingProxies = ()
         self.ploneCacheSettings.purgedContentTypes = ()
 
-        editURL = self.portal['d1'].absolute_url() + '/edit'
+        editURL = '%s/edit?_authenticator=%s' % (
+            self.portal['d1'].absolute_url(),
+            getToken(TEST_USER_NAME))
 
         import transaction
         transaction.commit()
 
         browser = Browser(self.app)
         browser.handleErrors = False
-        browser.addHeader('Authorization',
+        browser.addHeader(
+            'Authorization',
             'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
 
         browser.open(editURL)
@@ -321,8 +326,8 @@ class TestOperations(unittest.TestCase):
 
         self.assertEqual([], self.purger._sync)
         self.assertEqual(set([
-                'http://localhost:1234/plone/d1',
-                'http://localhost:1234/plone/d1/document_view',
-                'http://localhost:1234/plone/d1/',
-                'http://localhost:1234/plone/d1/view']),
-                set(self.purger._async))
+            'http://localhost:1234/plone/d1',
+            'http://localhost:1234/plone/d1/document_view',
+            'http://localhost:1234/plone/d1/',
+            'http://localhost:1234/plone/d1/view']),
+            set(self.purger._async))
