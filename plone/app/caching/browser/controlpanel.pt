@@ -620,7 +620,8 @@
                                                     No parameters
                                                 </div>
                                                 <div style="white-space: nowrap" class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
-                                                    <a  class="editGlobalOperationParameters"
+                                                    <a  class="editGlobalOperationParameters pat-plone-modal"
+                                                        data-pat-plone-modal='{"actionOptions": {"reloadWindowOnClose": false}}'
                                                         i18n:translate="link_view_edit"
                                                         tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-global/${operationName}"
                                                         >View/edit</a>
@@ -628,12 +629,14 @@
                                                 </div>
                                                 <div style="white-space: nowrap" class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
                                                     <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType['name'])">
-                                                        <a  class="editRulesetOperationParameters"
+                                                        <a  class="editRulesetOperationParameters pat-plone-modal"
+                                                            data-pat-plone-modal='{"actionOptions": {"reloadWindowOnClose": false}}'
                                                             tal:condition="hasRulesetOptions"
                                                             i18n:translate="link_view_edit_clear"
                                                             tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
                                                             >View/edit/clear</a>
-                                                        <a  class="editRulesetOperationParameters"
+                                                        <a  class="editRulesetOperationParameters pat-plone-modal"
+                                                            data-pat-plone-modal='{"actionOptions": {"reloadWindowOnClose": false}}'
                                                             tal:condition="not:hasRulesetOptions"
                                                             i18n:translate="link_create"
                                                             tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
