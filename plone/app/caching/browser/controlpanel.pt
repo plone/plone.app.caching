@@ -14,6 +14,7 @@
 (function($) {
 
     $().ready(function() {
+    debugger;
         $('a.editGlobalOperationParameters, a.editRulesetOperationParameters').prepOverlay({
             subtype: 'ajax',
             filter: '#content>*:not(div.configlet),dl.portalMessage.error,dl.portalMessage.info',
@@ -25,37 +26,6 @@
 
 })(jQuery);
 </script>
-
-      <div id="region-content" class="documentEditable">
-
-        <div id="edit-bar">
-            <ul class="contentViews" id="content-views">
-              <li class="selected">
-                <a href=""
-                   tal:attributes="href string:${portal_url}/@@caching-controlpanel"
-                   i18n:translate="label_settings">Change settings</a>
-              </li>
-              <li>
-                <a href=""
-                   tal:attributes="href string:${portal_url}/@@caching-controlpanel-import"
-                   i18n:translate="label_import">Import settings</a>
-              </li>
-              <li tal:condition="view/purgingEnabled">
-                <a href=""
-                   tal:attributes="href string:${portal_url}/@@caching-controlpanel-purge"
-                   i18n:translate="label_purging">Purge caching proxy</a>
-              </li>
-              <li>
-                <a href=""
-                   tal:attributes="href string:${portal_url}/@@caching-controlpanel-ramcache"
-                   i18n:translate="label_ramcache">RAM cache</a>
-              </li>
-            </ul>
-        </div>
-
-        <div class="contentActions">
-          &#160;
-        </div>
 
         <div class="documentContent" id="content">
             <a name="documentContent"></a>
@@ -94,9 +64,32 @@
                 <form
                     name="settings"
                     method="post"
-                    class="enableFormTabbing enableUnloadProtection"
+                    class="enableUnloadProtection autotabs"
                     tal:attributes="action request/URL"
                     tal:define="errors view/errors">
+                    <ul class="formTabs autotoc-nav">
+                        <li class="formTab firstFormTab">
+                            <a href=""
+                               class="active selected"
+                               tal:attributes="href string:${portal_url}/@@caching-controlpanel"
+                               i18n:translate="label_settings">Change settings</a>
+                          </li>
+                          <li class="formTab">
+                            <a href=""
+                               tal:attributes="href string:${portal_url}/@@caching-controlpanel-import"
+                               i18n:translate="label_import">Import settings</a>
+                          </li>
+                          <li tal:condition="view/purgingEnabled" class="formTab">
+                            <a href=""
+                               tal:attributes="href string:${portal_url}/@@caching-controlpanel-purge"
+                               i18n:translate="label_purging">Purge caching proxy</a>
+                          </li>
+                          <li class="formTab lastFormTab">
+                            <a href=""
+                               tal:attributes="href string:${portal_url}/@@caching-controlpanel-ramcache"
+                               i18n:translate="label_ramcache">RAM cache</a>
+                          </li>
+                    </ul>
 
                     <!-- Field set: global settings -->
                     <fieldset id="fieldset-global-settings">
@@ -669,7 +662,6 @@
             </div>
         </div>
     </div>
-</div>
 
 </body>
 </html>

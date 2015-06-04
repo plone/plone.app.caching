@@ -155,34 +155,35 @@ class ControlPanel(BaseView):
             if 'form.button.Save' in self.request.form:
                 self.processSave()
             elif 'form.button.Cancel' in self.request.form:
-                self.request.response.redirect("%s/plone_control_panel" % self.context.absolute_url())
+                self.request.response.redirect(
+                    "%s/plone_control_panel" % self.context.absolute_url())
 
     def processSave(self):
 
         form = self.request.form
 
         # Form data
-        enabled            = form.get('enabled', False)
-        enableCompression  = form.get('enableCompression', False)
-        contentTypesMap    = form.get('contenttypes', {})
-        templatesMap       = form.get('templates', {})
-        operations         = form.get('operations', {})
+        enabled = form.get('enabled', False)
+        enableCompression = form.get('enableCompression', False)
+        contentTypesMap = form.get('contenttypes', {})
+        templatesMap = form.get('templates', {})
+        operations = form.get('operations', {})
 
-        purgingEnabled     = form.get('purgingEnabled', False)
-        cachingProxies     = tuple(form.get('cachingProxies', ()))
+        purgingEnabled = form.get('purgingEnabled', False)
+        cachingProxies = tuple(form.get('cachingProxies', ()))
         purgedContentTypes = tuple(form.get('purgedContentTypes', ()))
-        virtualHosting     = form.get('virtualHosting', False)
-        domains            = tuple(form.get('domains', ()))
+        virtualHosting = form.get('virtualHosting', False)
+        domains = tuple(form.get('domains', ()))
 
-        ramCacheMaxEntries      = form.get('ramCacheMaxEntries', None)
-        ramCacheMaxAge          = form.get('ramCacheMaxAge', None)
+        ramCacheMaxEntries = form.get('ramCacheMaxEntries', None)
+        ramCacheMaxAge = form.get('ramCacheMaxAge', None)
         ramCacheCleanupInterval = form.get('ramCacheCleanupInterval', None)
 
         # Settings
 
-        operationMapping          = {}
+        operationMapping = {}
         contentTypeRulesetMapping = {}
-        templateRulesetMapping    = {}
+        templateRulesetMapping = {}
 
         # Process mappings and validate
 
@@ -191,10 +192,10 @@ class ControlPanel(BaseView):
             if not ruleset or not operation:
                 continue
 
-            if isinstance(ruleset, unicode): # should be ASCII
+            if isinstance(ruleset, unicode):  # should be ASCII
                 ruleset = ruleset.encode('utf-8')
 
-            if isinstance(operation, unicode): # should be ASCII
+            if isinstance(operation, unicode):  # should be ASCII
                 operation = operation.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
@@ -205,7 +206,7 @@ class ControlPanel(BaseView):
             if not ruleset:
                 continue
 
-            if isinstance(ruleset, unicode): # should be ASCII
+            if isinstance(ruleset, unicode):  # should be ASCII
                 ruleset = ruleset.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
@@ -215,14 +216,15 @@ class ControlPanel(BaseView):
                 if not contentType:
                     continue
 
-                if isinstance(contentType, unicode): # should be ASCII
+                if isinstance(contentType, unicode):  # should be ASCII
                     contentType = contentType.encode('utf-8')
 
                 if contentType in contentTypeRulesetMapping:
                     self.errors.setdefault('contenttypes', {})[ruleset] = \
                         _(u"Content type ${contentType} is already mapped to the rule ${ruleset}.",
-                            mapping={'contentType': self.contentTypesLookup.get(contentType, {}).get('title', contentType),
-                                     'ruleset': contentTypeRulesetMapping[contentType]})
+                            mapping={
+                                'contentType': self.contentTypesLookup.get(contentType, {}).get('title', contentType),  # noqa
+                                'ruleset': contentTypeRulesetMapping[contentType]})
                 else:
                     contentTypeRulesetMapping[contentType] = ruleset
 
@@ -231,7 +233,7 @@ class ControlPanel(BaseView):
             if not ruleset:
                 continue
 
-            if isinstance(ruleset, unicode): # should be ASCII
+            if isinstance(ruleset, unicode):  # should be ASCII
                 ruleset = ruleset.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
@@ -243,14 +245,15 @@ class ControlPanel(BaseView):
                 if not template:
                     continue
 
-                if isinstance(template, unicode): # should be ASCII
+                if isinstance(template, unicode):  # should be ASCII
                     template = template.encode('utf-8')
 
                 if template in templateRulesetMapping:
                     self.errors.setdefault('templates', {})[ruleset] = \
                         _(u"Template ${template} is already mapped to the rule ${ruleset}.",
-                            mapping={'template': template,
-                                      'ruleset': templateRulesetMapping[template]})
+                            mapping={
+                                'template': template,
+                                'ruleset': templateRulesetMapping[template]})
                 else:
                     templateRulesetMapping[template] = ruleset
 
@@ -258,7 +261,7 @@ class ControlPanel(BaseView):
 
         for cachingProxy in cachingProxies:
             if not _isuri(cachingProxy):
-                self.errors['cachingProxies'] = _(u"Invalid URL: ${url}", mapping={'url': cachingProxy})
+                self.errors['cachingProxies'] = _(u"Invalid URL: ${url}", mapping={'url': cachingProxy})  # noqa
 
         for domain in domains:
             if not _isuri(domain):
@@ -313,9 +316,7 @@ class ControlPanel(BaseView):
 
         IStatusMessage(self.request).addStatusMessage(_(u"Changes saved."), "info")
 
-
     # Rule types - used as the index column
-
     @property
     @memoize
     def ruleTypes(self):
@@ -325,7 +326,7 @@ class ControlPanel(BaseView):
                               title=type_.title or type_.name,
                               description=type_.description,
                               safeName=type_.name.replace('.', '-')))
-        types.sort(lambda x,y: cmp(x['title'], y['title']))
+        types.sort(lambda x, y: cmp(x['title'], y['title']))
         return types
 
     # Safe access to the main mappings, which may be None - we want to treat
@@ -335,28 +336,22 @@ class ControlPanel(BaseView):
     @property
     def operationMapping(self):
         return dict(
-            [
-                (k.replace('.', '-'), v,)
-                    for k, v in (self.settings.operationMapping or {}).items()
-            ]
+            [(k.replace('.', '-'), v,)
+             for k, v in (self.settings.operationMapping or {}).items()]
         )
 
     @property
     def templateMapping(self):
         return dict(
-            [
-                (k, v.replace('.', '-'),)
-                    for k, v in (self.ploneSettings.templateRulesetMapping or {}).items()
-            ]
+            [(k, v.replace('.', '-'),)
+             for k, v in (self.ploneSettings.templateRulesetMapping or {}).items()]
         )
 
     @property
     def contentTypeMapping(self):
         return dict(
-            [
-                (k, v.replace('.', '-'),)
-                    for k, v in (self.ploneSettings.contentTypeRulesetMapping or {}).items()
-            ]
+            [(k, v.replace('.', '-'),)
+             for k, v in (self.ploneSettings.contentTypeRulesetMapping or {}).items()]
         )
 
     # Type lookups (for accessing settings)
@@ -393,7 +388,7 @@ class ControlPanel(BaseView):
     @memoize
     def operationTypes(self):
         operations = [v for k, v in self.operationTypesLookup.items()]
-        operations.sort(lambda x,y: (cmp(x['sort'], y['sort']) or cmp(x['title'], y['title'])))
+        operations.sort(lambda x, y: (cmp(x['sort'], y['sort']) or cmp(x['title'], y['title'])))
         return operations
 
     @property
@@ -406,7 +401,7 @@ class ControlPanel(BaseView):
                 description=info['description']
             ) for name, info in self.contentTypesLookup.items()
         ]
-        types.sort(lambda x,y: cmp(x['title'], y['title']))
+        types.sort(lambda x, y: cmp(x['title'], y['title']))
         return types
 
     # We store template and content type mappings as template -> ruleset and
@@ -486,8 +481,8 @@ class Import(BaseView):
 
         # Create a snapshot
         if snapshot:
-            snapshotId = "plone.app.caching.beforeimport.%s" % \
-                            datetime.datetime.now().isoformat().replace(':', '.')
+            snapshotId = "plone.app.caching.beforeimport.%s" % (
+                datetime.datetime.now().isoformat().replace(':', '.'))
             portal_setup.createSnapshot(snapshotId)
 
         # Import the new profile
@@ -500,7 +495,7 @@ class Import(BaseView):
     def profiles(self):
         portal_setup = getToolByName(self.context, 'portal_setup')
         return [profile for profile in portal_setup.listProfileInfo(ICacheProfiles)
-                  if profile.get('type', BASE) == EXTENSION and profile.get('for') is not None]
+                if profile.get('type', BASE) == EXTENSION and profile.get('for') is not None]
 
 
 class Purge(BaseView):
@@ -549,10 +544,10 @@ class Purge(BaseView):
         proxies = self.purgingSettings.cachingProxies
 
         for inputURL in urls:
-            if not inputURL.startswith(serverURL): # not in the site
-                if '://' in inputURL: # Full URL?
+            if not inputURL.startswith(serverURL):  # not in the site
+                if '://' in inputURL:  # Full URL?
                     purge(inputURL)
-                else:                 # Path?
+                else:                  # Path?
                     for newURL in getURLsToPurge(inputURL, proxies):
                         purge(newURL)
                 continue
