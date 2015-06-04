@@ -4,6 +4,9 @@ Changelog
 1.2.4 (unreleased)
 ------------------
 
+- update first time here warning
+  [vangheem]
+
 - make control panel work for both plone 4 and plone 5 with tabs
   [vangheem]
 

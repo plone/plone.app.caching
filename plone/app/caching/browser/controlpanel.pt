@@ -71,7 +71,7 @@
                title="Import caching rules"
                i18n:name="link"
                i18n:translate="label_caching_first_time_here_link"
-               >importing a preconfigured caching set of rules</a>.
+               >importing a preconfigured set of caching rules</a>.
         </span>
     </div>
 
