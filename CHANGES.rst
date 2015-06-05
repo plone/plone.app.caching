@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.2.4 (unreleased)
+1.2.4 (2015-06-05)
 ------------------
 
 - update first time here warning
