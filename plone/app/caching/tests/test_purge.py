@@ -61,7 +61,7 @@ class FauxNonContent(Explicit):
 
     def __init__(self, name=None):
         self.__name__ = name
-        self.__parent__ = None # may be overridden by acquisition
+        self.__parent__ = None  # may be overridden by acquisition
 
     def getId(self):
         return self.__name__
@@ -167,7 +167,7 @@ class TestContentPurgePaths(unittest.TestCase):
         purger = ContentPurgePaths(context)
 
         self.assertEqual(['/foo/', '/foo/view'],
-                          list(purger.getRelativePaths()))
+                         list(purger.getRelativePaths()))
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_default_view(self):
@@ -175,7 +175,7 @@ class TestContentPurgePaths(unittest.TestCase):
         purger = ContentPurgePaths(context)
 
         self.assertEqual(['/foo/', '/foo/view', '/foo/default-view'],
-                          list(purger.getRelativePaths()))
+                         list(purger.getRelativePaths()))
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_parent_not_default_view(self):
@@ -183,16 +183,16 @@ class TestContentPurgePaths(unittest.TestCase):
         purger = ContentPurgePaths(context)
 
         self.assertEqual(['/bar/foo/', '/bar/foo/view', '/bar/foo/default-view'],
-                          list(purger.getRelativePaths()))
+                         list(purger.getRelativePaths()))
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_parent_default_view(self):
         context = FauxContent('default-view').__of__(FauxContent('bar'))
         purger = ContentPurgePaths(context)
 
-        self.assertEqual(['/bar/default-view/', '/bar/default-view/view', '/bar/default-view/default-view',
-                           '/bar', '/bar/', '/bar/view'],
-                          list(purger.getRelativePaths()))
+        self.assertEqual(['/bar/default-view/', '/bar/default-view/view',
+                          '/bar/default-view/default-view', '/bar', '/bar/', '/bar/view'],
+                         list(purger.getRelativePaths()))
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
 class TestDiscussionItemPurgePaths(unittest.TestCase):
@@ -312,43 +312,44 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
 
         class ATMultipleFields(atapi.BaseContent):
             schema = atapi.Schema((
-                    atapi.StringField('foo'),
-                    atapi.FileField('file1'),
-                    atapi.ImageField('image1'),
-                    atapi.ImageField('image2', sizes={'mini': (50,50), 'normal' : (100,100)}),
-                    BlobField('blob1'),
-                ))
+                atapi.StringField('foo'),
+                atapi.FileField('file1'),
+                atapi.ImageField('image1'),
+                atapi.ImageField('image2', sizes={'mini': (50, 50), 'normal': (100, 100)}),
+                BlobField('blob1'),
+            ))
 
         root = FauxContent('')
         context = ATMultipleFields('foo').__of__(root)
         purger = ObjectFieldPurgePaths(context)
 
         self.assertEqual(['/foo/download', '/foo/at_download',
-                           '/foo/at_download/file1', '/foo/file1',
-                           '/foo/at_download/image1', '/foo/image1','/foo/image1_thumb',
-                           '/foo/at_download/image2', '/foo/image2', '/foo/image2_mini', '/foo/image2_normal',
-                           '/foo/at_download/blob1', '/foo/blob1'],
-                           list(purger.getRelativePaths()))
+                          '/foo/at_download/file1', '/foo/file1',
+                          '/foo/at_download/image1', '/foo/image1', '/foo/image1_thumb',
+                          '/foo/at_download/image2', '/foo/image2', '/foo/image2_mini',
+                          '/foo/image2_normal', '/foo/at_download/blob1', '/foo/blob1'],
+                         list(purger.getRelativePaths()))
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_file_image_text_fields(self):
 
         class ATMultipleFields(atapi.BaseContent):
             schema = atapi.Schema((
-                    atapi.StringField('foo'),
-                    atapi.FileField('file1'),
-                    atapi.ImageField('image1'),
-                    atapi.ImageField('image2', sizes={'mini': (50,50), 'normal' : (100,100)}),
-                    atapi.TextField('text'),
-                ))
+                atapi.StringField('foo'),
+                atapi.FileField('file1'),
+                atapi.ImageField('image1'),
+                atapi.ImageField('image2', sizes={'mini': (50, 50), 'normal': (100, 100)}),
+                atapi.TextField('text'),
+            ))
 
         root = FauxContent('')
         context = ATMultipleFields('foo').__of__(root)
         purger = ObjectFieldPurgePaths(context)
 
         self.assertEqual(['/foo/download', '/foo/at_download',
-                           '/foo/at_download/file1', '/foo/file1',
-                           '/foo/at_download/image1', '/foo/image1','/foo/image1_thumb',
-                           '/foo/at_download/image2', '/foo/image2', '/foo/image2_mini', '/foo/image2_normal'],
-                           list(purger.getRelativePaths()))
+                          '/foo/at_download/file1', '/foo/file1',
+                          '/foo/at_download/image1', '/foo/image1', '/foo/image1_thumb',
+                          '/foo/at_download/image2', '/foo/image2', '/foo/image2_mini',
+                          '/foo/image2_normal'],
+                         list(purger.getRelativePaths()))
         self.assertEqual([], list(purger.getAbsolutePaths()))

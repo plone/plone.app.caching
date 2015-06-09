@@ -13,7 +13,15 @@ from zope.configuration import xmlconfig
 
 from plone.cachepurging.interfaces import IPurger
 
-from plone.protect.authenticator import _getKeyring
+try:
+    from plone.protect.authenticator import _getKeyring
+except ImportError:
+    # so we can run tests on plone 4.3
+    from plone.keyring.interfaces import IKeyManager
+    def _getKeyring(username):
+        manager = getUtility(IKeyManager)
+        return manager['_system']
+
 import hmac
 from hashlib import sha1 as sha
 
