@@ -10,8 +10,6 @@
 
 <div metal:fill-slot="prefs_configlet_main">
 
-    <metal:override fill-slot="content-title">
-        <metal:override define-slot="content-title">
             <div class="autotabs">
                 <ul class="formTabs autotoc-nav">
                     <li class="formTab firstFormTab">
@@ -37,8 +35,6 @@
                       </li>
                 </ul>
             </div>
-        </metal:override>
-    </metal:override>
 
             <div metal:use-macro="context/global_statusmessage/macros/portal_message">
             Portal status message

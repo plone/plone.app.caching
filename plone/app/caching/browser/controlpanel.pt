@@ -28,35 +28,31 @@
 })(jQuery);
 </script>
 
-    <metal:override fill-slot="content-title">
-        <metal:override define-slot="content-title">
-            <div class="autotabs">
-                <ul class="formTabs autotoc-nav">
-                    <li class="formTab firstFormTab">
-                        <a href=""
-                           class="active selected"
-                           tal:attributes="href string:${portal_url}/@@caching-controlpanel"
-                           i18n:translate="label_settings">Change settings</a>
-                      </li>
-                      <li class="formTab">
-                        <a href=""
-                           tal:attributes="href string:${portal_url}/@@caching-controlpanel-import"
-                           i18n:translate="label_import">Import settings</a>
-                      </li>
-                      <li tal:condition="view/purgingEnabled" class="formTab">
-                        <a href=""
-                           tal:attributes="href string:${portal_url}/@@caching-controlpanel-purge"
-                           i18n:translate="label_purging">Purge caching proxy</a>
-                      </li>
-                      <li class="formTab lastFormTab">
-                        <a href=""
-                           tal:attributes="href string:${portal_url}/@@caching-controlpanel-ramcache"
-                           i18n:translate="label_ramcache">RAM cache</a>
-                      </li>
-                </ul>
-            </div>
-        </metal:override>
-    </metal:override>
+    <div class="autotabs">
+        <ul class="formTabs autotoc-nav">
+            <li class="formTab firstFormTab">
+                <a href=""
+                   class="active selected"
+                   tal:attributes="href string:${portal_url}/@@caching-controlpanel"
+                   i18n:translate="label_settings">Change settings</a>
+              </li>
+              <li class="formTab">
+                <a href=""
+                   tal:attributes="href string:${portal_url}/@@caching-controlpanel-import"
+                   i18n:translate="label_import">Import settings</a>
+              </li>
+              <li tal:condition="view/purgingEnabled" class="formTab">
+                <a href=""
+                   tal:attributes="href string:${portal_url}/@@caching-controlpanel-purge"
+                   i18n:translate="label_purging">Purge caching proxy</a>
+              </li>
+              <li class="formTab lastFormTab">
+                <a href=""
+                   tal:attributes="href string:${portal_url}/@@caching-controlpanel-ramcache"
+                   i18n:translate="label_ramcache">RAM cache</a>
+              </li>
+        </ul>
+    </div>
 
     <div class="portalMessage info"
         tal:condition="not: view/settings/enabled">
