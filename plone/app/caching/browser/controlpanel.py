@@ -542,7 +542,7 @@ class Purge(BaseView):
 
         portal_url = getToolByName(self.context, 'portal_url')
         portal = portal_url.getPortalObject()
-        portalPath = '/'.join(portal.getPhysicalPath())
+        portalPath = portal.getPhysicalPath()
 
         proxies = self.purgingSettings.cachingProxies
 

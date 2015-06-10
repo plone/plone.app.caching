@@ -68,9 +68,20 @@ class ContentPurgePaths(object):
             if parentDefaultView == self.context.getId():
                 parentPrefix = '/' + parent.virtual_url_path()
                 paths.append(parentPrefix)
-                paths.append(parentPrefix  + '/')
-                paths.append(parentPrefix  + '/view')
-
+                if parentPrefix == '/':
+                    # special handling for site root since parentPrefix
+                    # does not make sense in that case.
+                    # Additionally, empty site roots were not getting
+                    # purge paths /VirtualHostBase/http/site.com:80/site1/VirtualHostRoot/_vh_site1/
+                    # was getting generated but not
+                    # /VirtualHostBase/http/site.com:80/site1/VirtualHostRoot/_vh_site1
+                    # which would translate to http://site.come/ getting invalidated
+                    # but not http://site.come
+                    paths.append('')
+                    paths.append('/view')
+                else:
+                    paths.append(parentPrefix + '/')
+                    paths.append(parentPrefix + '/view')
         return paths
 
     def getAbsolutePaths(self):

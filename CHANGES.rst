@@ -4,7 +4,14 @@ Changelog
 1.1.10 (unreleased)
 ~~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- correctly create purge paths for root of site, prevent double slashes
+  and the empty root of site(no trailing slash) not getting a purge
+  path generated
+  [vangheem]
+
+- Fix the portalPath used in the controlpanel for manual purging URL's.
+  This bug resulted in rarely doing all the purging required.
+  [puittenbroek]
 
 
 1.1.9 (2015-04-30)
