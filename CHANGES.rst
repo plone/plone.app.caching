@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.1.10 (unreleased)
+1.1.10 (2015-06-09)
 ~~~~~~~~~~~~~~~~~~~
 
 - correctly create purge paths for root of site, prevent double slashes
