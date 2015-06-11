@@ -103,26 +103,6 @@ class UserLanguage(object):
 
         return portal_state.language()
 
-class GZip(object):
-    """The ``gzip`` etag component, returning 1 or 0 depending on whether
-    GZip compression is enabled
-    """
-
-    implements(IETagValue)
-    adapts(Interface, Interface)
-
-    def __init__(self, published, request):
-        self.published = published
-        self.request = request
-
-    def __call__(self):
-        registry = queryUtility(IRegistry)
-        if registry is not None:
-            settings = registry.forInterface(IPloneCacheSettings, check=False)
-            gzip_capable = self.request.get('HTTP_ACCEPT_ENCODING', '').find('gzip') != -1
-            return str(int(settings.enableCompression and gzip_capable))
-        return '0'
-
 class LastModified(object):
     """The ``lastModified`` etag component, returning the last modification
     timestamp

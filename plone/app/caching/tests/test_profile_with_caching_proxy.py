@@ -141,7 +141,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"|test_user_1_|%d|en|0|%s|0|0' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertEqual('"|test_user_1_|%d|en|%s|0|0' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Set the copy/cut cookie and then request the folder view again
@@ -151,7 +151,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.content.folderView', browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"|test_user_1_|%d|en|0|%s|0|1' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertEqual('"|test_user_1_|%d|en|%s|0|1' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
 
         # Request the authenticated page
         now = stable_now()
@@ -163,7 +163,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"|test_user_1_|%d|en|0|%s|0' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertEqual('"|test_user_1_|%d|en|%s|0' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the authenticated page again -- to test RAM cache.
@@ -194,7 +194,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.weakCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|0|%s|0|0' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertEqual('"||%d|en|%s|0|0' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the anonymous page
@@ -206,7 +206,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertTrue(testText in browser.contents)
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|0|%s|0' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertEqual('"||%d|en|%s|0' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the anonymous page again -- to test RAM cache.
@@ -220,7 +220,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.assertTrue(testText in browser.contents)
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|0|%s|0' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertEqual('"||%d|en|%s|0' % (catalog.getCounter(), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the anonymous page again -- with an INM header to test 304.
@@ -278,7 +278,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInProxy
         self.assertEqual('max-age=0, s-maxage=86400, must-revalidate', browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|0|%s"' % (catalog.getCounter(), skins_tool.default_skin), browser.headers['ETag'])
+        self.assertEqual('"||%d|en|%s"' % (catalog.getCounter(), skins_tool.default_skin), browser.headers['ETag'])
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the rss feed again -- to test RAM cache
@@ -292,7 +292,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.operations.ramcache', browser.headers['X-RAMCache'])
         self.assertEqual(rssText, browser.contents)
         self.assertEqual('max-age=0, s-maxage=86400, must-revalidate', browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|0|%s"' % (catalog.getCounter(), skins_tool.default_skin), browser.headers['ETag'])
+        self.assertEqual('"||%d|en|%s"' % (catalog.getCounter(), skins_tool.default_skin), browser.headers['ETag'])
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the rss feed again -- with an INM header to test 304.
@@ -316,7 +316,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.moderateCaching', browser.headers['X-Cache-Operation'])
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private', browser.headers['Cache-Control'])
-        self.assertEqual('"|test_user_1_|%d|en|0|%s"' % (catalog.getCounter(), skins_tool.default_skin), browser.headers['ETag'])
+        self.assertEqual('"|test_user_1_|%d|en|%s"' % (catalog.getCounter(), skins_tool.default_skin), browser.headers['ETag'])
         self.assertTrue(now > dateutil.parser.parse(browser.headers['Expires']))
 
         # Request the authenticated rss feed again -- to test RAM cache

@@ -29,9 +29,6 @@ The ETag names tokens supported by default are:
 * userLanguage
     The current user's preferred language
 
-* gzip
-    Whether or not the content is going to be served compressed
-
 * lastModified
     A timestamp indicating the last-modified date of the given context
 

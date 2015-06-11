@@ -118,26 +118,6 @@
 
                         </div>
 
-                        <div
-                            class="field"
-                            tal:define="selected python:request.get('enableCompression', view.ploneSettings.enableCompression)">
-
-                            <input type="hidden" value="" name="enableCompression:boolean:default" />
-                            <input type="checkbox" value="1" name="enableCompression:boolean" id="enableCompression"
-                                tal:attributes="checked python:'checked' if selected else None"
-                                />
-                            <label for="enableCompression" i18n:translate="label_compression_enabled">Enable GZip compression</label>
-                            <div class="formHelp" i18n:translate="help_compression_enabled">
-                                Enable this to compress content before sending it to the
-                                client, if supported. (Almost all modern web browsers
-                                support GZip compression.) Compression places marginally
-                                more load on the server, but can make the site appear
-                                faster to end users by reducing the amount of data that
-                                has to be sent over the network.
-                            </div>
-
-                        </div>
-
                     </fieldset>
 
                     <!-- Field set: caching proxies -->

@@ -41,7 +41,6 @@
     <adapter factory=".etags.Roles"                     name="roles" />
     <adapter factory=".etags.Language"                  name="language" />
     <adapter factory=".etags.UserLanguage"              name="userLanguage" />
-    <adapter factory=".etags.GZip"                      name="gzip" />
     <adapter factory=".etags.LastModified"              name="lastModified" />
     <adapter factory=".etags.CatalogCounter"            name="catalogCounter" />
     <adapter factory=".etags.ObjectLocked"              name="locked" />

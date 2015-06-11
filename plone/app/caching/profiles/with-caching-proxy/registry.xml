@@ -19,7 +19,6 @@
           <element>userid</element>
           <element>catalogCounter</element>
           <element>userLanguage</element>
-          <element>gzip</element>
           <element>skin</element>
           <element>locked</element>
           <element>resourceRegistries</element>
@@ -38,7 +37,6 @@
           <element>userid</element>
           <element>catalogCounter</element>
           <element>userLanguage</element>
-          <element>gzip</element>
           <element>skin</element>
           <element>locked</element>
           <element>copy</element>
@@ -62,7 +60,6 @@
           <element>userid</element>
           <element>catalogCounter</element>
           <element>userLanguage</element>
-          <element>gzip</element>
           <element>skin</element>
       </value>
   </record>
