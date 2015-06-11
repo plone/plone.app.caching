@@ -164,7 +164,6 @@ class ControlPanel(BaseView):
 
         # Form data
         enabled = form.get('enabled', False)
-        enableCompression = form.get('enableCompression', False)
         contentTypesMap = form.get('contenttypes', {})
         templatesMap = form.get('templates', {})
         operations = form.get('operations', {})
@@ -302,7 +301,6 @@ class ControlPanel(BaseView):
         self.settings.enabled = enabled
         self.settings.operationMapping = operationMapping
 
-        self.ploneSettings.enableCompression = enableCompression
         self.ploneSettings.templateRulesetMapping = templateRulesetMapping
         self.ploneSettings.contentTypeRulesetMapping = contentTypeRulesetMapping
         self.ploneSettings.purgedContentTypes = purgedContentTypes

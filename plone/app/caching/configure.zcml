@@ -48,9 +48,6 @@
         factory=".lookup.ContentItemLookup"
         />
 
-    <!-- Add GZip compression: plone.transformchain order 10000 -->
-    <adapter factory=".gzip.GZipTransform" name="plone.app.caching.gzip" />
-
     <!-- Purging -->
     <subscriber handler=".purge.purgeOnModified" />
     <subscriber handler=".purge.purgeOnMovedOrRemoved" />

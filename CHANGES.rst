@@ -4,7 +4,8 @@ Changelog
 1.2.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- remove gzip option, silly to be done at this layer
+  [vangheem]
 
 
 1.2.5 (2015-06-09)
