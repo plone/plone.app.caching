@@ -7,6 +7,8 @@ Changelog
 - remove gzip option, silly to be done at this layer
   [vangheem]
 
+- Change the category of the configlet to 'plone-advanced' [sneridagh]
+
 
 1.2.5 (2015-06-09)
 ------------------
