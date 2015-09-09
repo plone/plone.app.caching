@@ -4,7 +4,9 @@ Changelog
 1.2.7 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- fix cache settings modal settings so they do not show content
+  inline on save.
+  [vangheem]
 
 
 1.2.6 (2015-07-18)
