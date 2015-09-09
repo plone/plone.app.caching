@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.2.7 (unreleased)
+1.2.7 (2015-09-09)
 ------------------
 
 - fix cache settings modal settings so they do not show content
