@@ -43,7 +43,7 @@ from Products.statusmessages.interfaces import IStatusMessage
 _isuri = re.compile(
     r"[a-zA-z0-9+.-]+:"   # scheme
     r"\S*$"               # non space (should be pickier)
-    ).match
+).match
 
 
 class BaseView(object):
@@ -156,7 +156,7 @@ class ControlPanel(BaseView):
                 self.processSave()
             elif 'form.button.Cancel' in self.request.form:
                 self.request.response.redirect(
-                    "%s/plone_control_panel" % self.context.absolute_url())
+                    "%s/@@overview-controlpanel" % self.context.absolute_url())
 
     def processSave(self):
 

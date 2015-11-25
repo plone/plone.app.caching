@@ -45,9 +45,8 @@
                 <h1 class="documentFirstHeading"
                     i18n:translate="heading_ramcache_stats">RAM cache statistics</h1>
 
-                <a href=""
-                    class="link-parent"
-                    tal:attributes="href string:${portal_url}/plone_control_panel"
+                <a id="setup-link" class="link-parent"
+                    tal:attributes="href string:${portal_url}/@@overview-controlpanel"
                     i18n:translate="label_up_to_plone_setup">
                         Up to Site Setup
                 </a>
@@ -61,7 +60,7 @@
                 <form name="purge" tal:attributes="action string:${request/URL}" method="post"
                     class="enableUnloadProtection"
                     tal:define="errors view/errors">
-                    
+
                   <table tal:define="stats view/ramCache/getStatistics"
                          class="listing nosort" summary="RAM cache statistics"
                          i18n:attributes="summary heading_ramcache_stats;">
