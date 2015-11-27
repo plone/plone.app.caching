@@ -5,16 +5,18 @@ version = '1.2.8.dev0'
 setup(name='plone.app.caching',
       version=version,
       description="Plone UI and default rules for plone.caching/z3c.caching",
-      long_description=open("README.rst").read() + "\n" +
-                       open("CHANGES.rst").read(),
+      long_description=(open("README.rst").read() + "\n" +
+                        open("CHANGES.rst").read()),
       classifiers=[
           "Environment :: Web Environment",
           "Framework :: Plone",
+          "Framework :: Plone :: 5.0",
           "Framework :: Zope2",
           "License :: OSI Approved :: GNU General Public License (GPL)",
           "Operating System :: OS Independent",
           "Programming Language :: Python",
-        ],
+          "Programming Language :: Python :: 2.7",
+      ],
       keywords='plone caching',
       author='Plone Foundation',
       author_email='plone-developers@lists.sourceforge.net',
