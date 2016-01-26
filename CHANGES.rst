@@ -10,7 +10,8 @@ New:
 
 Fixes:
 
-- *add item here*
+- Fix deprecated imports in tests.
+  [thet]
 
 
 1.2.8 (2015-11-28)
