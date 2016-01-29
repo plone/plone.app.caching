@@ -26,7 +26,7 @@ from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.annotation.attribute import AttributeAnnotations
 
 from ZPublisher.HTTPRequest import HTTPRequest
-from ZPublisher.HTTPRequest import HTTPResponse
+from ZPublisher.HTTPResponse import HTTPResponse
 
 from OFS.SimpleItem import SimpleItem
 

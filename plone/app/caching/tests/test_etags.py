@@ -24,7 +24,7 @@ from plone.app.caching.interfaces import IPloneCacheSettings
 
 from Acquisition import Explicit
 from ZPublisher.HTTPRequest import HTTPRequest
-from ZPublisher.HTTPRequest import HTTPResponse
+from ZPublisher.HTTPResponse import HTTPResponse
 from Products.CMFCore.interfaces import IContentish
 
 class DummyContext(Explicit):
