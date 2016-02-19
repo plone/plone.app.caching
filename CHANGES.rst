@@ -4,14 +4,9 @@ Changelog
 1.2.9 (unreleased)
 ------------------
 
-New:
-
-- *add item here*
-
 Fixes:
 
-- Fix deprecated imports in tests.
-  [thet]
+- Fixed deprecated imports in tests.  [thet]
 
 
 1.2.8 (2015-11-28)
