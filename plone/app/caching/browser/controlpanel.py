@@ -530,6 +530,8 @@ class Purge(BaseView):
                     log += " (X-Cache header: " + xcache + ")"
                 if xerror:
                     log += " -- " + xerror
+                if not str(status).startswith('2'):
+                    log += " -- WARNING status " + str(status)
                 self.purgeLog.append(log)
             else:
                 purger.purgeAsync(url)

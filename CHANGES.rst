@@ -6,7 +6,8 @@ Changelog
 
 New:
 
-- *add item here*
+- Show status after synchronous purge if it is an error status.
+  [maurits]
 
 Fixes:
 
