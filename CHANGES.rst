@@ -1,17 +1,13 @@
 Changelog
 ---------
 
-1.2.10 (unreleased)
+1.2.10 (2016-03-29)
 -------------------
 
 New:
 
 - Show status after synchronous purge if it is an error status.
   [maurits]
-
-Fixes:
-
-- *add item here*
 
 
 1.2.9 (2016-02-19)
