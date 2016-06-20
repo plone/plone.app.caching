@@ -15,6 +15,7 @@ from zope.component import getUtility
 
 from zope.globalrequest import setRequest
 
+from plone.namedfile.file import NamedImage
 from plone.registry.interfaces import IRegistry
 from plone.caching.interfaces import ICacheSettings
 from plone.cachepurging.interfaces import ICachePurgingSettings
@@ -114,8 +115,8 @@ class TestOperations(unittest.TestCase):
         self.portal['f1'].invokeFactory('Image', 'i1')
         self.portal['f1']['i1'].title = u"Image one"
         self.portal['f1']['i1'].description = u"Image one description"
-        self.portal['f1']['i1'].image = OFS.Image.Image(
-            'test.gif', 'test.gif', open(TEST_IMAGE, 'rb'))
+        self.portal['f1']['i1'].image = NamedImage(
+            open(TEST_IMAGE, 'rb'), 'image/gif', u'test.gif')
         self.portal['f1']['i1'].reindexObject()
 
         # Content file
@@ -135,6 +136,7 @@ class TestOperations(unittest.TestCase):
         import transaction
         transaction.commit()
         browser = Browser(self.app)
+        browser.handleErrors = False
 
         # Check that we can open all without errors and without cache headers
         browser.open(self.portal.absolute_url())
