@@ -10,7 +10,8 @@ Incompatibilities:
 
 New:
 
-- *add item here*
+- Use plone.namedfile for test image
+  [didrix]
 
 Fixes:
 
