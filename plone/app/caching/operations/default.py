@@ -1,8 +1,8 @@
 import time
 import random
 
-from zope.interface import implements
-from zope.interface import classProvides
+from zope.interface import implementer
+from zope.interface import provider
 from zope.interface import Interface
 from zope.component import adapts
 from zope.component import getMultiAdapter
@@ -38,6 +38,8 @@ try:
 except ImportError:
     HAVE_RESOURCE_REGISTRIES = False
 
+@implementer(ICachingOperation)
+@provider(ICachingOperationType)
 class BaseCaching(object):
     """A generic caching operation class that can do pretty much all the usual
     caching operations based on options settings. For UI simplicity, it might
@@ -61,11 +63,7 @@ class BaseCaching(object):
 
     ``vary`` is a string to add as a Vary header value in the response.
     """
-    implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
-
-    # Type metadata
-    classProvides(ICachingOperationType)
 
     title = _(u"Generic caching")
     description = _(u"Through this operation, all standard caching functions "
@@ -176,13 +174,11 @@ class BaseCaching(object):
             cacheInRAM(self.published, self.request, response, etag=etag, lastModified=lastModified)
 
 
+@provider(ICachingOperationType)
 class WeakCaching(BaseCaching):
     """Weak caching operation. A subclass of the generic BaseCaching
     operation to help make the UI approachable by mortals
     """
-
-    # Type metadata
-    classProvides(ICachingOperationType)
 
     title = _(u"Weak caching")
     description = _(u"Cache in browser but expire immediately and enable 304 "
@@ -203,13 +199,11 @@ class WeakCaching(BaseCaching):
     smaxage = etags = vary = None
     lastModified = ramCache = anonOnly = False
 
+@provider(ICachingOperationType)
 class ModerateCaching(BaseCaching):
     """Moderate caching operation. A subclass of the generic BaseCaching
     operation to help make the UI approachable by mortals
     """
-
-    # Type metadata
-    classProvides(ICachingOperationType)
 
     title = _(u"Moderate caching")
     description = _(u"Cache in browser but expire immediately (same as 'weak caching'), "
@@ -230,13 +224,11 @@ class ModerateCaching(BaseCaching):
     etags = vary = None
     lastModified = ramCache = anonOnly = False
 
+@provider(ICachingOperationType)
 class StrongCaching(BaseCaching):
     """Strong caching operation. A subclass of the generic BaseCaching
     operation to help make the UI approachable by mortals
     """
-
-    # Type metadata
-    classProvides(ICachingOperationType)
 
     title = _(u"Strong caching")
     description = _(u"Cache in browser and proxy (default: 24 hrs). "
@@ -276,15 +268,13 @@ if HAVE_RESOURCE_REGISTRIES:
 
             super(ResourceRegistriesCaching, self).modifyResponse(rulename, response, class_=StrongCaching)
 
+@implementer(ICachingOperation)
+@provider(ICachingOperationType)
 class NoCaching(object):
     """A caching operation that tries to keep the response
     out of all caches.
     """
-    implements(ICachingOperation)
     adapts(Interface, IHTTPRequest)
-
-    # Type metadata
-    classProvides(ICachingOperationType)
 
     title = _(u"No caching")
     description = _(u"Use this operation to keep the response "

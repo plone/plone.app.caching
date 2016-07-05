@@ -1,4 +1,4 @@
-from zope.interface import implements
+from zope.interface import implementer
 from zope.component import adapts, adapter, getAdapters
 from zope.event import notify
 from zope.globalrequest import getRequest
@@ -31,6 +31,7 @@ try:
 except ImportError:
     HAVE_AT = False
 
+@implementer(IPurgePaths)
 class ContentPurgePaths(object):
     """Paths to purge for content items
 
@@ -45,8 +46,6 @@ class ContentPurgePaths(object):
     * ${parent_path}
     * ${parent_path}/
     """
-
-    implements(IPurgePaths)
     adapts(IDynamicType)
 
     def __init__(self, context):
@@ -88,13 +87,12 @@ class ContentPurgePaths(object):
     def getAbsolutePaths(self):
         return []
 
+@implementer(IPurgePaths)
 class DiscussionItemPurgePaths(object):
     """Paths to purge for Discussion Item.
 
     Looks up paths for the ultimate parent.
     """
-
-    implements(IPurgePaths)
     adapts(IDiscussionResponse)
 
     def __init__(self, context):
@@ -153,11 +151,10 @@ class DiscussionItemPurgePaths(object):
 
 if HAVE_AT:
 
+    @implementer(IPurgePaths)
     class ObjectFieldPurgePaths(object):
         """Paths to purge for Archetypes object fields
         """
-
-        implements(IPurgePaths)
         adapts(IBaseObject)
 
         def __init__(self, context):

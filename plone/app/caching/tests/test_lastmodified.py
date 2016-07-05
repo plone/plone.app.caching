@@ -145,10 +145,10 @@ class TestLastModified(unittest.TestCase):
 
     def test_CatalogableDublinCoreLastModified(self):
         from Products.CMFCore.interfaces import ICatalogableDublinCore
-        from zope.interface import implements
+        from zope.interface import implementer
 
+        @implementer(ICatalogableDublinCore)
         class Dummy(object):
-            implements(ICatalogableDublinCore)
 
             _mod = None
 
@@ -168,10 +168,10 @@ class TestLastModified(unittest.TestCase):
             from zope.dublincore.interfaces import IDCTimes
         except ImportError:
             return
-        from zope.interface import implements
+        from zope.interface import implementer
 
+        @implementer(IDCTimes)
         class Dummy(object):
-            implements(IDCTimes)
 
             _mod = None
 

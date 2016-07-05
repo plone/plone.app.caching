@@ -8,7 +8,7 @@ import dateutil.tz
 import wsgiref.handlers
 from StringIO import StringIO
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 from zope.interface import classImplements
 from zope.interface import alsoProvides
@@ -801,8 +801,9 @@ class MiscHelpersTest(unittest.TestCase):
     def test_getContext(self):
         from plone.app.caching.operations.utils import getContext
 
+        @implementer(IContentish)
         class Parent(object):
-            implements(IContentish)
+            pass
 
         parent = Parent()
         published = DummyPublished(parent)
@@ -813,8 +814,8 @@ class MiscHelpersTest(unittest.TestCase):
     def test_getContext_custom_marker(self):
         from plone.app.caching.operations.utils import getContext
 
+        @implementer(IContentish)
         class Parent(object):
-            implements(IContentish)
 
             def __init__(self, parent=None):
                 self.__parent__ = parent
@@ -902,8 +903,8 @@ class MiscHelpersTest(unittest.TestCase):
     def test_getLastModified_none(self):
         from plone.app.caching.operations.utils import getLastModified
 
+        @implementer(ILastModified)
         class DummyLastModified(object):
-            implements(ILastModified)
             adapts(DummyPublished)
 
             def __init__(self, context):
@@ -920,8 +921,8 @@ class MiscHelpersTest(unittest.TestCase):
     def test_getLastModified_missing_timezone(self):
         from plone.app.caching.operations.utils import getLastModified
 
+        @implementer(ILastModified)
         class DummyLastModified(object):
-            implements(ILastModified)
             adapts(DummyPublished)
 
             def __init__(self, context):
@@ -939,8 +940,8 @@ class MiscHelpersTest(unittest.TestCase):
     def test_getLastModified_timezone(self):
         from plone.app.caching.operations.utils import getLastModified
 
+        @implementer(ILastModified)
         class DummyLastModified(object):
-            implements(ILastModified)
             adapts(DummyPublished)
 
             def __init__(self, context):
@@ -1020,8 +1021,8 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.operations.utils import getETag
         from plone.app.caching.interfaces import IETagValue
 
+        @implementer(IETagValue)
         class FooETag(object):
-            implements(IETagValue)
             adapts(DummyPublished, HTTPRequest)
 
             def __init__(self, published, request):
@@ -1033,8 +1034,8 @@ class MiscHelpersTest(unittest.TestCase):
 
         provideAdapter(FooETag, name=u"foo")
 
+        @implementer(IETagValue)
         class BarETag(object):
-            implements(IETagValue)
             adapts(DummyPublished, HTTPRequest)
 
             def __init__(self, published, request):
@@ -1057,8 +1058,8 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.operations.utils import getETag
         from plone.app.caching.interfaces import IETagValue
 
+        @implementer(IETagValue)
         class FooETag(object):
-            implements(IETagValue)
             adapts(DummyPublished, HTTPRequest)
 
             def __init__(self, published, request):
@@ -1070,8 +1071,8 @@ class MiscHelpersTest(unittest.TestCase):
 
         provideAdapter(FooETag, name=u"foo")
 
+        @implementer(IETagValue)
         class BarETag(object):
-            implements(IETagValue)
             adapts(DummyPublished, HTTPRequest)
 
             def __init__(self, published, request):
@@ -1172,8 +1173,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'foo'
@@ -1190,8 +1191,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'plone.app.caching.operations.ramcache'
@@ -1247,8 +1248,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'plone.app.caching.operations.ramcache'
@@ -1289,8 +1290,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'plone.app.caching.operations.ramcache'
@@ -1321,8 +1322,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'plone.app.caching.operations.ramcache'
@@ -1356,8 +1357,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'cachekey'
@@ -1402,8 +1403,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'plone.app.caching.operations.ramcache'
@@ -1431,8 +1432,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'plone.app.caching.operations.ramcache'
@@ -1460,8 +1461,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'cachekey'
@@ -1489,8 +1490,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'plone.app.caching.operations.ramcache'
@@ -1518,8 +1519,8 @@ class RAMCacheTest(unittest.TestCase):
 
         cache = Cache()
 
+        @implementer(ICacheChooser)
         class Chooser(object):
-            implements(ICacheChooser)
 
             def __call__(self, key):
                 assert key == 'plone.app.caching.operations.ramcache'

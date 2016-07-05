@@ -4,7 +4,7 @@ from plone.app.testing import IntegrationTesting
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import applyProfile
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from zope.component import getUtility
 from zope.component import provideUtility
@@ -26,9 +26,8 @@ import hmac
 from hashlib import sha1 as sha
 
 
+@implementer(IPurger)
 class FauxPurger(object):
-
-    implements(IPurger)
 
     def __init__(self):
         self.reset()

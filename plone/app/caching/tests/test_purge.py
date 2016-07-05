@@ -1,7 +1,7 @@
 import unittest2 as unittest
 from plone.testing.zca import UNIT_TESTING
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from zope.component import getUtility
 from zope.component import adapter
@@ -56,8 +56,8 @@ class Handler(object):
 class FauxRequest(dict):
     pass
 
+@implementer(IContentish)
 class FauxNonContent(Explicit):
-    implements(IContentish)
 
     def __init__(self, name=None):
         self.__name__ = name
@@ -76,16 +76,17 @@ class FauxNonContent(Explicit):
     def getPhysicalPath(self):
         return ('', )
 
+@implementer(IBrowserDefault)
 class FauxContent(FauxNonContent):
-    implements(IBrowserDefault)
 
     portal_type = 'testtype'
 
     def defaultView(self):
         return 'default-view'
 
+@implementer(IDiscussionResponse)
 class FauxDiscussable(Explicit):
-    implements(IDiscussionResponse)
+    pass
 
 class TestPurgeRedispatch(unittest.TestCase):
 
@@ -201,8 +202,8 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
 
     def setUp(self):
 
+        @implementer(IPurgePaths)
         class FauxContentPurgePaths(object):
-            implements(IPurgePaths)
             adapts(FauxContent)
 
             def __init__(self, context):

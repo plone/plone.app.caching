@@ -1,7 +1,7 @@
 import re
 import datetime
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.component import getUtility
 from zope.component import getUtilitiesFor
 from zope.component import queryUtility
@@ -81,11 +81,10 @@ class BaseView(object):
         return isCachePurgingEnabled()
 
 
+@implementer(IPublishTraverse)
 class ControlPanel(BaseView):
     """Control panel view
     """
-
-    implements(IPublishTraverse)
 
     # Used by the publishTraverse() method - see below
     editGlobal = False
