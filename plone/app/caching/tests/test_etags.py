@@ -6,7 +6,7 @@ from datetime import datetime
 from dateutil.tz import tzlocal
 from StringIO import StringIO
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 
 from zope.component import getUtility
@@ -27,8 +27,9 @@ from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPResponse import HTTPResponse
 from Products.CMFCore.interfaces import IContentish
 
+@implementer(IContentish)
 class DummyContext(Explicit):
-    implements(IContentish)
+    pass
 
 class DummyPublished(object):
 
@@ -47,8 +48,8 @@ class TestETags(unittest.TestCase):
     def test_UserID_anonymous(self):
         from plone.app.caching.operations.etags import UserID
 
+        @implementer(Interface)
         class DummyPortalState(object):
-            implements(Interface)
             adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
@@ -76,8 +77,8 @@ class TestETags(unittest.TestCase):
             def getId(self):
                 return 'bob'
 
+        @implementer(Interface)
         class DummyPortalState(object):
-            implements(Interface)
             adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
@@ -103,8 +104,8 @@ class TestETags(unittest.TestCase):
     def test_Roles_anonymous(self):
         from plone.app.caching.operations.etags import Roles
 
+        @implementer(Interface)
         class DummyPortalState(object):
-            implements(Interface)
             adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
@@ -135,8 +136,8 @@ class TestETags(unittest.TestCase):
             def getRolesInContext(self, context):
                 return ['Member', 'Manager']
 
+        @implementer(Interface)
         class DummyPortalState(object):
-            implements(Interface)
             adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
@@ -193,8 +194,8 @@ class TestETags(unittest.TestCase):
     def test_UserLanguage(self):
         from plone.app.caching.operations.etags import UserLanguage
 
+        @implementer(Interface)
         class DummyPortalState(object):
-            implements(Interface)
             adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
@@ -231,8 +232,8 @@ class TestETags(unittest.TestCase):
     def test_LastModified_None(self):
         from plone.app.caching.operations.etags import LastModified
 
+        @implementer(ILastModified)
         class DummyLastModified(object):
-            implements(ILastModified)
             adapts(DummyPublished)
 
             def __init__(self, context):
@@ -258,8 +259,8 @@ class TestETags(unittest.TestCase):
         mod = datetime(2010, 1, 2, 3, 4, 5, 6, tzlocal())
         utcStamp = time.mktime(mod.utctimetuple())
 
+        @implementer(ILastModified)
         class DummyLastModified(object):
-            implements(ILastModified)
             adapts(DummyPublished)
 
             def __init__(self, context):
@@ -288,8 +289,8 @@ class TestETags(unittest.TestCase):
             def getCounter(self):
                 return 10
 
+        @implementer(Interface)
         class DummyTools(object):
-            implements(Interface)
             adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
@@ -315,8 +316,8 @@ class TestETags(unittest.TestCase):
     def test_ObjectLocked_true(self):
         from plone.app.caching.operations.etags import ObjectLocked
 
+        @implementer(Interface)
         class DummyContextState(object):
-            implements(Interface)
             adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
@@ -339,8 +340,8 @@ class TestETags(unittest.TestCase):
     def test_ObjectLocked_false(self):
         from plone.app.caching.operations.etags import ObjectLocked
 
+        @implementer(Interface)
         class DummyContextState(object):
-            implements(Interface)
             adapts(DummyContext, Interface)
 
             def __init__(self, context, request):

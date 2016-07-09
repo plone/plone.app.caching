@@ -5,7 +5,7 @@ from z3c.caching.registry import RulesetRegistry
 import z3c.caching.registry
 
 from zope.component import provideUtility, provideAdapter, getUtility
-from zope.interface import implements
+from zope.interface import implementer
 
 from plone.registry.interfaces import IRegistry
 
@@ -22,8 +22,8 @@ from Products.CMFCore.interfaces import IDynamicType
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
 from Products.Five.browser import BrowserView
 
+@implementer(IBrowserDefault, IDynamicType)
 class DummyContent(Explicit):
-    implements(IBrowserDefault, IDynamicType)
 
     def __init__(self, portal_type='testtype', defaultView='defaultView'):
         self.portal_type = portal_type
@@ -53,8 +53,8 @@ class DummyFTI(object):
             return '@@defaultView'
         return default
 
+@implementer(IDynamicType)
 class DummyNotBrowserDefault(Explicit):
-    implements(IDynamicType)
 
     def __init__(self, portal_type='testtype', viewAction=''):
         self.portal_type = portal_type

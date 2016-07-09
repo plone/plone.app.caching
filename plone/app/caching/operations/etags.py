@@ -1,7 +1,7 @@
 import random
 import time
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 
 from zope.component import adapts
@@ -18,11 +18,10 @@ from plone.app.caching.operations.utils import getLastModifiedAnnotation
 
 from Products.CMFCore.utils import getToolByName
 
+@implementer(IETagValue)
 class UserID(object):
     """The ``userid`` etag component, returning the current user's id
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):
@@ -41,12 +40,11 @@ class UserID(object):
 
         return member.getId()
 
+@implementer(IETagValue)
 class Roles(object):
     """The ``roles`` etag component, returning the current user's roles,
     separated by semicolons
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):
@@ -68,12 +66,11 @@ class Roles(object):
 
         return ';'.join(sorted(member.getRolesInContext(context)))
 
+@implementer(IETagValue)
 class Language(object):
     """The ``language`` etag component, returning the value of the
     HTTP_ACCEPT_LANGUAGE request key.
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):
@@ -83,12 +80,11 @@ class Language(object):
     def __call__(self):
         return self.request.get('HTTP_ACCEPT_LANGUAGE', '')
 
+@implementer(IETagValue)
 class UserLanguage(object):
     """The ``userLanguage`` etag component, returning the user's preferred
     language
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):
@@ -103,12 +99,11 @@ class UserLanguage(object):
 
         return portal_state.language()
 
+@implementer(IETagValue)
 class LastModified(object):
     """The ``lastModified`` etag component, returning the last modification
     timestamp
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):
@@ -121,12 +116,11 @@ class LastModified(object):
             return None
         return str(time.mktime(lastModified.utctimetuple()))
 
+@implementer(IETagValue)
 class CatalogCounter(object):
     """The ``catalogCounter`` etag component, returning a counter which is
     incremented each time the catalog is updated.
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):
@@ -141,12 +135,11 @@ class CatalogCounter(object):
 
         return str(tools.catalog().getCounter())
 
+@implementer(IETagValue)
 class ObjectLocked(object):
     """The ``locked`` etag component, returning 1 or 0 depending on whether
     the object is locked.
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):
@@ -160,11 +153,10 @@ class ObjectLocked(object):
             return None
         return str(int(context_state.is_locked()))
 
+@implementer(IETagValue)
 class Skin(object):
     """The ``skin`` etag component, returning the current skin name.
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):
@@ -184,13 +176,12 @@ class Skin(object):
 
         return portal_skins.getDefaultSkin()
 
+@implementer(IETagValue)
 class ResourceRegistries(object):
     """The ``resourceRegistries`` etag component, returning the most recent
     last modified timestamp from all three Resource Registries.  This is
     useful for avoiding requests for expired resources from cached pages.
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):
@@ -216,14 +207,13 @@ class ResourceRegistries(object):
         mtimes.sort()
         return str(mtimes[-1])
 
+@implementer(IETagValue)
 class AnonymousOrRandom(object):
     """The ``anonymousOrRandom`` etag component. This is normally added
     implicitly by the ``anonOnly`` setting. It will return None for anonymous
     users, but a random number for logged-in ones. The idea is to force a
     re-fetch of a page every time for logged-in users.
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):
@@ -239,12 +229,11 @@ class AnonymousOrRandom(object):
             return None
         return "%s%d" % (time.time(), random.randint(0, 1000))
 
+@implementer(IETagValue)
 class CopyCookie(object):
     """The ``copy`` etag component, returning 1 or 0 depending on whether
     the '__cp' cookie is set.
     """
-
-    implements(IETagValue)
     adapts(Interface, Interface)
 
     def __init__(self, published, request):

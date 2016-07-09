@@ -1,4 +1,4 @@
-from zope.interface import implements
+from zope.interface import implementer
 from zope.component import queryUtility
 
 from plone.registry.interfaces import IRegistry
@@ -11,6 +11,7 @@ from Acquisition import aq_base
 
 from plone.app.caching.utils import getObjectDefaultView
 
+@implementer(IRulesetLookup)
 class ContentItemLookup(object):
     """General lookup for browser views and page templates.
 
@@ -46,8 +47,6 @@ class ContentItemLookup(object):
     Note that this lookup is *not* invoked for a view which happens to use a
     page template to render itself.
     """
-
-    implements(IRulesetLookup)
 
     # This adapter is registered twice in configure.zcml, ala:
     # adapts(IPageTemplate, Interface)

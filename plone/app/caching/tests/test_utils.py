@@ -10,7 +10,7 @@ from plone.registry.interfaces import IRegistry
 from plone.testing.zca import UNIT_TESTING
 from datetime import datetime
 from zope.component import provideUtility, provideAdapter, getUtility
-from zope.interface import implements
+from zope.interface import implementer
 
 import pytz
 import unittest2 as unittest
@@ -28,8 +28,8 @@ def stable_now():
     return now
 
 
+@implementer(IBrowserDefault, IDynamicType)
 class DummyContent(Explicit):
-    implements(IBrowserDefault, IDynamicType)
 
     def __init__(self, portal_type='testtype', defaultView='defaultView'):
         self.portal_type = portal_type
@@ -59,8 +59,8 @@ class DummyFTI(object):
             return '@@defaultView'
         return default
 
+@implementer(IDynamicType)
 class DummyNotBrowserDefault(Explicit):
-    implements(IDynamicType)
 
     def __init__(self, portal_type='testtype', viewAction=''):
         self.portal_type = portal_type
