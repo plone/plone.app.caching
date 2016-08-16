@@ -4,14 +4,6 @@ Changelog
 1.2.11 (unreleased)
 -------------------
 
-Incompatibilities:
-
-- *add item here*
-
-New:
-
-- *add item here*
-
 Fixes:
 
 - Use zope.interface decorator.
