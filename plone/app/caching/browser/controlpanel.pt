@@ -91,7 +91,7 @@
                 <form
                     name="settings"
                     method="post"
-                    class="enableFormTabbing enableUnloadProtection pat-autotoc"
+                    class="enableFormTabbing pat-formunloadalert pat-autotoc"
                     data-pat-autotoc="levels: legend; section: fieldset; className: autotabs"
                     tal:attributes="action request/URL"
                     tal:define="errors view/errors">
