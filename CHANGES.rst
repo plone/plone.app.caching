@@ -14,7 +14,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Enable unload protection by using pattern class ``pat-formunloadalert`` instead ``enableUnloadProtection``.
+  [thet]
 
 
 1.2.11 (2016-08-17)

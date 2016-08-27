@@ -59,7 +59,7 @@
                 </p>
 
                 <form name="profiles" tal:attributes="action request/URL" method="post"
-                    class="enableUnloadProtection"
+                    class="pat-formunloadalert"
                     tal:define="errors view/errors">
 
                     <div class="field">

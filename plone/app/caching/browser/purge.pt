@@ -71,7 +71,7 @@
                 </div>
 
                 <form name="purge" tal:attributes="action string:${request/URL}" method="post"
-                    class="enableUnloadProtection"
+                    class="pat-formunloadalert"
                     tal:define="errors view/errors">
 
                     <div tal:define="error errors/urls | nothing"

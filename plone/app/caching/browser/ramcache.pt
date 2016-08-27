@@ -58,7 +58,7 @@
                 </p>
 
                 <form name="purge" tal:attributes="action string:${request/URL}" method="post"
-                    class="enableUnloadProtection"
+                    class="pat-formunloadalert"
                     tal:define="errors view/errors">
 
                   <table tal:define="stats view/ramCache/getStatistics"
