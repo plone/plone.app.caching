@@ -249,7 +249,7 @@ are being applied to published resources. There are two ways to see
 this: via debug response headers and via debug logging.
 
 Several debug response headers are added automatically by plone.app.caching
-and plone.cahing. These headers include:
+and plone.caching. These headers include:
 
 * ``X-Cache-Rule: <matching rule id>``
 
