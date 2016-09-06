@@ -136,7 +136,6 @@ class TestOperations(unittest.TestCase):
         import transaction
         transaction.commit()
         browser = Browser(self.app)
-        browser.handleErrors = False
 
         # Check that we can open all without errors and without cache headers
         browser.open(self.portal.absolute_url())

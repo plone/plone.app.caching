@@ -10,7 +10,8 @@ Breaking changes:
 
 New features:
 
-- *add item here*
+- Use plone.namedfile for test image
+  [didrix]
 
 Bug fixes:
 
