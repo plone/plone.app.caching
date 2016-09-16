@@ -4,15 +4,6 @@ Changelog
 1.2.12 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- Use plone.namedfile for test image
-  [didrix]
-
 Bug fixes:
 
 - Enable unload protection by using pattern class ``pat-formunloadalert`` instead ``enableUnloadProtection``.
@@ -23,6 +14,9 @@ Bug fixes:
 -------------------
 
 Fixes:
+
+- Use plone.namedfile for test image.
+  [didrix]
 
 - Use zope.interface decorator.
   [gforcada]
