@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from dateutil.tz import tzlocal
 from persistent.TimeStamp import TimeStamp
 from plone.app.caching import lastmodified

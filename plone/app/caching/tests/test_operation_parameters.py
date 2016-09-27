@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID

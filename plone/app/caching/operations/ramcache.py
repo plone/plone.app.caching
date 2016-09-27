@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import IRAMCached
 from plone.app.caching.operations.utils import storeResponseInRAMCache
 from plone.transformchain.interfaces import ITransform

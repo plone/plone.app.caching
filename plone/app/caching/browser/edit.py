@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import _
 from plone.memoize.instance import memoize
 from plone.registry import FieldRef

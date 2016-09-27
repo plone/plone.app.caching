@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Acquisition import Explicit
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.lookup import ContentItemLookup

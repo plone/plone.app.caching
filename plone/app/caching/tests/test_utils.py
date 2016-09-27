@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Acquisition import Explicit
 from datetime import datetime
 from plone.app.caching.interfaces import IPloneCacheSettings

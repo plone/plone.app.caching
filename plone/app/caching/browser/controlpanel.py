@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.app.caching.browser.edit import EditForm
 from plone.app.caching.interfaces import _
 from plone.app.caching.interfaces import ICacheProfiles

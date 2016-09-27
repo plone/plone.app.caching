@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import _
 from plone.app.caching.operations.utils import cachedResponse
 from plone.app.caching.operations.utils import cacheInRAM

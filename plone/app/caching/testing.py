@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from hashlib import sha1 as sha
 from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
 from plone.app.testing import applyProfile

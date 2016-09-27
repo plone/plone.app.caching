@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from AccessControl.PermissionRole import rolesForPermissionOn
 from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.interfaces import IPloneCacheSettings

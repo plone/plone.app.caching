@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Acquisition import aq_parent
 from plone.app.caching.utils import getObjectDefaultView
 from plone.app.caching.utils import isPurged

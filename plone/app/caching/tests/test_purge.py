@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from Acquisition import Explicit
 from plone.app.caching.interfaces import IPloneCacheSettings

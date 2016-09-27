@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.testing import getToken
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING

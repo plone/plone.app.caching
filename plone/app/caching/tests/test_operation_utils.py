@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from OFS.SimpleItem import SimpleItem
 from plone.memoize.interfaces import ICacheChooser
 from plone.testing.zca import UNIT_TESTING
