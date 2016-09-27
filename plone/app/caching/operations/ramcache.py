@@ -2,7 +2,7 @@
 from plone.app.caching.interfaces import IRAMCached
 from plone.app.caching.operations.utils import storeResponseInRAMCache
 from plone.transformchain.interfaces import ITransform
-from zope.component import adapts
+from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -11,6 +11,7 @@ GLOBAL_KEY = 'plone.app.caching.operations.ramcache'
 
 
 @implementer(ITransform)
+@adapter(Interface, Interface)
 class Store(object):
     """Transform chain element which actually saves the page in RAM.
 
@@ -18,7 +19,6 @@ class Store(object):
     the ``cacheInRAM()`` helper method. Thus, the transform is only used if
     the caching operation requested it.
     """
-    adapts(Interface, Interface)
 
     order = 90000
 

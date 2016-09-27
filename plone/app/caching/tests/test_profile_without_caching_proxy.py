@@ -21,11 +21,9 @@ from zope.globalrequest import setRequest
 import datetime
 import dateutil.parser
 import dateutil.tz
-import OFS.Image
 import os
 import pkg_resources
 import unittest2 as unittest
-import urllib
 
 
 TEST_FILE = pkg_resources.resource_filename(

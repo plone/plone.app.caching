@@ -11,7 +11,6 @@ from Products.CMFCore.utils import getToolByName
 from z3c.caching.interfaces import IPurgePaths
 from z3c.caching.purge import Purge
 from zope.component import adapter
-from zope.component import adapts
 from zope.component import getAdapters
 from zope.event import notify
 from zope.globalrequest import getRequest
@@ -23,13 +22,16 @@ from zope.lifecycleevent.interfaces import IObjectMovedEvent
 try:
     from plone.app.blob.interfaces import IBlobField
     from Products.Archetypes.interfaces import IBaseObject
-    from Products.Archetypes.interfaces import IFileField, IImageField, ITextField
+    from Products.Archetypes.interfaces import IFileField
+    from Products.Archetypes.interfaces import IImageField
+    from Products.Archetypes.interfaces import ITextField
     HAVE_AT = True
 except ImportError:
     HAVE_AT = False
 
 
 @implementer(IPurgePaths)
+@adapter(IDynamicType)
 class ContentPurgePaths(object):
     """Paths to purge for content items
 
@@ -44,7 +46,6 @@ class ContentPurgePaths(object):
     * ${parent_path}
     * ${parent_path}/
     """
-    adapts(IDynamicType)
 
     def __init__(self, context):
         self.context = context
@@ -60,25 +61,28 @@ class ContentPurgePaths(object):
                 paths.append(path)
 
         parent = aq_parent(self.context)
-        if parent is not None:
-            parentDefaultView = getObjectDefaultView(parent)
-            if parentDefaultView == self.context.getId():
-                parentPrefix = '/' + parent.virtual_url_path()
-                paths.append(parentPrefix)
-                if parentPrefix == '/':
-                    # special handling for site root since parentPrefix
-                    # does not make sense in that case.
-                    # Additionally, empty site roots were not getting
-                    # purge paths /VirtualHostBase/http/site.com:80/site1/VirtualHostRoot/_vh_site1/
-                    # was getting generated but not
-                    # /VirtualHostBase/http/site.com:80/site1/VirtualHostRoot/_vh_site1
-                    # which would translate to http://site.come/ getting invalidated
-                    # but not http://site.come
-                    paths.append('')
-                    paths.append('/view')
-                else:
-                    paths.append(parentPrefix + '/')
-                    paths.append(parentPrefix + '/view')
+        if parent is None:
+            return paths
+
+        parentDefaultView = getObjectDefaultView(parent)
+        if parentDefaultView == self.context.getId():
+            parentPrefix = '/' + parent.virtual_url_path()
+            paths.append(parentPrefix)
+            if parentPrefix == '/':
+                # special handling for site root since parentPrefix
+                # does not make sense in that case.
+                # Additionally, empty site roots were not getting
+                # purge paths
+                # /VirtualHostBase/http/site.com:80/site1/VirtualHostRoot/_vh_site1/
+                # was getting generated but not
+                # /VirtualHostBase/http/site.com:80/site1/VirtualHostRoot/_vh_site1
+                # which would translate to http://site.come/ getting
+                # invalidated but not http://site.come
+                paths.append('')
+                paths.append('/view')
+            else:
+                paths.append(parentPrefix + '/')
+                paths.append(parentPrefix + '/view')
 
         return paths
 
@@ -87,12 +91,12 @@ class ContentPurgePaths(object):
 
 
 @implementer(IPurgePaths)
+@adapter(IDiscussionResponse)
 class DiscussionItemPurgePaths(object):
     """Paths to purge for Discussion Item.
 
     Looks up paths for the ultimate parent.
     """
-    adapts(IDiscussionResponse)
 
     def __init__(self, context):
         self.context = context
@@ -149,13 +153,14 @@ class DiscussionItemPurgePaths(object):
 
         return thread[0]
 
+
 if HAVE_AT:
 
     @implementer(IPurgePaths)
+    @adapter(IBaseObject)
     class ObjectFieldPurgePaths(object):
         """Paths to purge for Archetypes object fields
         """
-        adapts(IBaseObject)
 
         def __init__(self, context):
             self.context = context
@@ -165,15 +170,16 @@ if HAVE_AT:
             schema = self.context.Schema()
 
             def fieldFilter(field):
-                return ((IBlobField.providedBy(field) or
-                         IFileField.providedBy(field) or
-                         IImageField.providedBy(field))
-                        and not ITextField.providedBy(field))
-
+                return (
+                    (
+                        IBlobField.providedBy(field) or
+                        IFileField.providedBy(field) or
+                        IImageField.providedBy(field)
+                    ) and
+                    not ITextField.providedBy(field)
+                )
             seenDownloads = False
-
             for field in schema.filterFields(fieldFilter):
-
                 if not seenDownloads:
                     yield prefix + '/download'
                     yield prefix + '/at_download'

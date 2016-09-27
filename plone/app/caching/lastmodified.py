@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from Acquisition import aq_base
-from Acquisition import aq_inner
-from Acquisition import aq_parent
 from datetime import datetime
 from dateutil.tz import tzlocal
 from OFS.Image import File
@@ -15,7 +13,6 @@ from Products.ResourceRegistries.interfaces import IResourceRegistry
 from z3c.caching.interfaces import ILastModified
 from zope.browserresource.interfaces import IResource
 from zope.component import adapter
-from zope.component import adapts
 from zope.interface import implementer
 from zope.interface import Interface
 from zope.pagetemplate.interfaces import IPageTemplate
@@ -68,17 +65,17 @@ class PersistentLastModified(object):
         return None
 
 
+@adapter(File)
 class OFSFileLastModified(PersistentLastModified):
     """ILastModified adapter for OFS.Image.File
     """
-    adapts(File)
 
 
 @implementer(ILastModified)
+@adapter(ImageScale)
 class ImageScaleLastModified(object):
     """ILastModified adapter for Products.Archetypes.Field.Image
     """
-    adapts(ImageScale)
 
     def __init__(self, context):
         self.context = context
@@ -91,10 +88,10 @@ class ImageScaleLastModified(object):
 
 
 @implementer(ILastModified)
+@adapter(FSObject)
 class FSObjectLastModified(object):
     """ILastModified adapter for FSFile and FSImage
     """
-    adapts(FSObject)
 
     def __init__(self, context):
         self.context = context
@@ -109,11 +106,11 @@ class FSObjectLastModified(object):
 
 
 @implementer(ILastModified)
+@adapter(ICatalogableDublinCore)
 class CatalogableDublinCoreLastModified(object):
     """ILastModified adapter for ICatalogableDublinCore, which includes
     most CMF, Archetypes and Dexterity content
     """
-    adapts(ICatalogableDublinCore)
 
     def __init__(self, context):
         self.context = context
@@ -126,10 +123,10 @@ class CatalogableDublinCoreLastModified(object):
 
 
 @implementer(ILastModified)
+@adapter(IDCTimes)
 class DCTimesLastModified(object):
     """ILastModified adapter for zope.dublincore IDCTimes
     """
-    adapts(IDCTimes)
 
     def __init__(self, context):
         self.context = context
@@ -139,10 +136,10 @@ class DCTimesLastModified(object):
 
 
 @implementer(ILastModified)
+@adapter(IResource)
 class ResourceLastModified(object):
     """ILastModified for Zope 3 style browser resources
     """
-    adapts(IResource)
 
     def __init__(self, context):
         self.context = context
@@ -151,24 +148,25 @@ class ResourceLastModified(object):
         lmt = getattr(self.context.context, 'lmt', None)
         if lmt is not None:
             return datetime.fromtimestamp(lmt, tzlocal())
-        return None
 
 
 @implementer(ILastModified)
+@adapter(ICookedFile)
 class CookedFileLastModified(object):
     """ILastModified for Resource Registry `cooked` files
     """
-    adapts(ICookedFile)
 
     def __init__(self, context):
         self.context = context
 
     def __call__(self):
         registry = getContext(self.context, IResourceRegistry)
-        if registry is not None:
-            if registry.getDebugMode() or not registry.isCacheable(self.context.__name__):
-                return None
-            mtime = getattr(registry.aq_base, '_p_mtime', None)
-            if mtime is not None and mtime > 0:
-                return datetime.fromtimestamp(mtime, tzlocal())
-        return None
+        if (
+            registry is None or
+            registry.getDebugMode() or
+            not registry.isCacheable(self.context.__name__)
+        ):
+            return None
+        mtime = getattr(registry.aq_base, '_p_mtime', None)
+        if mtime is not None and mtime > 0:
+            return datetime.fromtimestamp(mtime, tzlocal())

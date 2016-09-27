@@ -2,18 +2,13 @@
 from Acquisition import Explicit
 from datetime import datetime
 from dateutil.tz import tzlocal
-from plone.app.caching.interfaces import IPloneCacheSettings
-from plone.registry import Registry
 from plone.registry.fieldfactory import persistentFieldAdapter
-from plone.registry.interfaces import IRegistry
 from plone.testing.zca import UNIT_TESTING
 from Products.CMFCore.interfaces import IContentish
 from StringIO import StringIO
 from z3c.caching.interfaces import ILastModified
-from zope.component import adapts
-from zope.component import getUtility
+from zope.component import adapter
 from zope.component import provideAdapter
-from zope.component import provideUtility
 from zope.interface import implementer
 from zope.interface import Interface
 from ZPublisher.HTTPRequest import HTTPRequest
@@ -47,8 +42,8 @@ class TestETags(unittest.TestCase):
         from plone.app.caching.operations.etags import UserID
 
         @implementer(Interface)
+        @adapter(DummyContext, Interface)
         class DummyPortalState(object):
-            adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
                 pass
@@ -76,8 +71,8 @@ class TestETags(unittest.TestCase):
                 return 'bob'
 
         @implementer(Interface)
+        @adapter(DummyContext, Interface)
         class DummyPortalState(object):
-            adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
                 pass
@@ -102,8 +97,8 @@ class TestETags(unittest.TestCase):
         from plone.app.caching.operations.etags import Roles
 
         @implementer(Interface)
+        @adapter(DummyContext, Interface)
         class DummyPortalState(object):
-            adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
                 pass
@@ -134,8 +129,8 @@ class TestETags(unittest.TestCase):
                 return ['Member', 'Manager']
 
         @implementer(Interface)
+        @adapter(DummyContext, Interface)
         class DummyPortalState(object):
-            adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
                 pass
@@ -191,8 +186,8 @@ class TestETags(unittest.TestCase):
         from plone.app.caching.operations.etags import UserLanguage
 
         @implementer(Interface)
+        @adapter(DummyContext, Interface)
         class DummyPortalState(object):
-            adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
                 pass
@@ -229,8 +224,8 @@ class TestETags(unittest.TestCase):
         from plone.app.caching.operations.etags import LastModified
 
         @implementer(ILastModified)
+        @adapter(DummyPublished)
         class DummyLastModified(object):
-            adapts(DummyPublished)
 
             def __init__(self, context):
                 self.context = context
@@ -256,8 +251,8 @@ class TestETags(unittest.TestCase):
         utcStamp = time.mktime(mod.utctimetuple())
 
         @implementer(ILastModified)
+        @adapter(DummyPublished)
         class DummyLastModified(object):
-            adapts(DummyPublished)
 
             def __init__(self, context):
                 self.context = context
@@ -286,8 +281,8 @@ class TestETags(unittest.TestCase):
                 return 10
 
         @implementer(Interface)
+        @adapter(DummyContext, Interface)
         class DummyTools(object):
-            adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
                 pass
@@ -312,8 +307,8 @@ class TestETags(unittest.TestCase):
         from plone.app.caching.operations.etags import ObjectLocked
 
         @implementer(Interface)
+        @adapter(DummyContext, Interface)
         class DummyContextState(object):
-            adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
                 pass
@@ -336,8 +331,8 @@ class TestETags(unittest.TestCase):
         from plone.app.caching.operations.etags import ObjectLocked
 
         @implementer(Interface)
+        @adapter(DummyContext, Interface)
         class DummyContextState(object):
-            adapts(DummyContext, Interface)
 
             def __init__(self, context, request):
                 pass

@@ -8,7 +8,7 @@ from z3c.caching.interfaces import ILastModified
 from zope.annotation.attribute import AttributeAnnotations
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
-from zope.component import adapts
+from zope.component import adapter
 from zope.component import provideAdapter
 from zope.component import provideUtility
 from zope.interface import alsoProvides
@@ -80,7 +80,9 @@ class ResponseModificationHelpersTest(unittest.TestCase):
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         response.setHeader(
-            'Last-Modified', wsgiref.handlers.format_date_time(time.mktime(now.timetuple())))
+            'Last-Modified',
+            wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
+        )
 
         doNotCache(published, request, response)
 
@@ -278,8 +280,15 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         nowFormatted = wsgiref.handlers.format_date_time(
             time.mktime(now.timetuple()))
 
-        cacheInBrowserAndProxy(published, request, response,
-                               maxage=60, etag=etag, lastModified=now, vary=vary)
+        cacheInBrowserAndProxy(
+            published,
+            request,
+            response,
+            maxage=60,
+            etag=etag,
+            lastModified=now,
+            vary=vary
+        )
 
         self.assertEqual(200, response.getStatus())
         self.assertEqual('max-age=60, proxy-revalidate, public',
@@ -302,7 +311,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
 
     def test_cacheInRAM_no_etag(self):
         from plone.app.caching.operations.utils import cacheInRAM
-        from plone.app.caching.operations.utils import PAGE_CACHE_ANNOTATION_KEY
+        from plone.app.caching.operations.utils import PAGE_CACHE_ANNOTATION_KEY  # noqa
 
         from plone.app.caching.interfaces import IRAMCached
 
@@ -324,7 +333,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
 
     def test_cacheInRAM_etag(self):
         from plone.app.caching.operations.utils import cacheInRAM
-        from plone.app.caching.operations.utils import PAGE_CACHE_ANNOTATION_KEY
+        from plone.app.caching.operations.utils import PAGE_CACHE_ANNOTATION_KEY  # noqa
 
         from plone.app.caching.interfaces import IRAMCached
 
@@ -602,8 +611,8 @@ class CacheCheckHelpersTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ[
-            'HTTP_IF_MODIFIED_SINCE'] = 'Thu, 24 Nov 2011 03:04:05 GMT; Thu, 24 Nov 2011 03:04:05'
+        request.environ['HTTP_IF_MODIFIED_SINCE'] = \
+            'Thu, 24 Nov 2011 03:04:05 GMT; Thu, 24 Nov 2011 03:04:05'
 
         lastModified = datetime.datetime(
             2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
@@ -943,8 +952,8 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.operations.utils import getLastModified
 
         @implementer(ILastModified)
+        @adapter(DummyPublished)
         class DummyLastModified(object):
-            adapts(DummyPublished)
 
             def __init__(self, context):
                 self.context = context
@@ -961,8 +970,8 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.operations.utils import getLastModified
 
         @implementer(ILastModified)
+        @adapter(DummyPublished)
         class DummyLastModified(object):
-            adapts(DummyPublished)
 
             def __init__(self, context):
                 self.context = context
@@ -973,27 +982,33 @@ class MiscHelpersTest(unittest.TestCase):
         provideAdapter(DummyLastModified)
 
         published = DummyPublished()
-        self.assertEqual(datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzlocal()),
-                         getLastModified(published))
+        self.assertEqual(
+            datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzlocal()),
+            getLastModified(published)
+        )
 
     def test_getLastModified_timezone(self):
         from plone.app.caching.operations.utils import getLastModified
 
         @implementer(ILastModified)
+        @adapter(DummyPublished)
         class DummyLastModified(object):
-            adapts(DummyPublished)
 
             def __init__(self, context):
                 self.context = context
 
             def __call__(self):
-                return datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+                return datetime.datetime(
+                    2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc()
+                )
 
         provideAdapter(DummyLastModified)
 
         published = DummyPublished()
-        self.assertEqual(datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc()),
-                         getLastModified(published))
+        self.assertEqual(
+            datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc()),
+            getLastModified(published)
+        )
 
     # getExpiration()
 
@@ -1061,8 +1076,8 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.interfaces import IETagValue
 
         @implementer(IETagValue)
+        @adapter(DummyPublished, HTTPRequest)
         class FooETag(object):
-            adapts(DummyPublished, HTTPRequest)
 
             def __init__(self, published, request):
                 self.published = published
@@ -1074,8 +1089,8 @@ class MiscHelpersTest(unittest.TestCase):
         provideAdapter(FooETag, name=u"foo")
 
         @implementer(IETagValue)
+        @adapter(DummyPublished, HTTPRequest)
         class BarETag(object):
-            adapts(DummyPublished, HTTPRequest)
 
             def __init__(self, published, request):
                 self.published = published
@@ -1099,8 +1114,8 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.interfaces import IETagValue
 
         @implementer(IETagValue)
+        @adapter(DummyPublished, HTTPRequest)
         class FooETag(object):
-            adapts(DummyPublished, HTTPRequest)
 
             def __init__(self, published, request):
                 self.published = published
@@ -1112,8 +1127,8 @@ class MiscHelpersTest(unittest.TestCase):
         provideAdapter(FooETag, name=u"foo")
 
         @implementer(IETagValue)
+        @adapter(DummyPublished, HTTPRequest)
         class BarETag(object):
-            adapts(DummyPublished, HTTPRequest)
 
             def __init__(self, published, request):
                 self.published = published
@@ -1129,8 +1144,15 @@ class MiscHelpersTest(unittest.TestCase):
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
-        self.assertEqual('|foo|bar|baz;qux', getETag(published, request,
-                                                     keys=('foo', 'bar',), extraTokens=('baz,qux',)))
+        self.assertEqual(
+            '|foo|bar|baz;qux',
+            getETag(
+                published,
+                request,
+                keys=('foo', 'bar',),
+                extraTokens=('baz,qux',)
+            )
+        )
 
     # parseETags()
 
@@ -1500,8 +1522,9 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
 
-        cache[
-            '||a|b||http://example.com/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
+        cache['||a|b||http://example.com/foo/bar?'] = (
+            200, {'x-foo': 'bar'}, u'Body'
+        )
 
         cached = normalize_response_cache(
             fetchFromRAMCache(request, etag="|a|b"))

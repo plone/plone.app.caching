@@ -47,8 +47,8 @@ class ContentItemLookup(object):
     """
 
     # This adapter is registered twice in configure.zcml, ala:
-    # adapts(IPageTemplate, Interface)
-    # adapts(IBrowserView, Interface)
+    # @adapter(IPageTemplate, Interface)
+    # @adapter(IBrowserView, Interface)
 
     def __init__(self, published, request):
         self.published = published
@@ -81,31 +81,34 @@ class ContentItemLookup(object):
 
         # 4. Find the parent of the published object
         parent = getattr(self.published, '__parent__', None)
-        if parent is not None:
+        if parent is None:
+            return None
 
-            # 4.1. If the parent is a content object:
-            parentPortalType = getattr(aq_base(parent), 'portal_type', None)
-            if parentPortalType is not None:
+        # 4.1. If the parent is a content object:
+        parentPortalType = getattr(aq_base(parent), 'portal_type', None)
+        if parentPortalType is None:
+            return None
 
-                # 4.1.1. Get the default view of the parent content object
-                defaultView = getObjectDefaultView(parent)
+        # 4.1.1. Get the default view of the parent content object
+        defaultView = getObjectDefaultView(parent)
 
-                # 4.1.2. If the name of the published object is the same as the
-                # default view of the parent:
-                if defaultView == name:
+        # 4.1.2. If the name of the published object is the same as the
+        # default view of the parent:
+        if defaultView != name:
+            return None
 
-                    # 4.1.2.1. Look up the parent type in the content type
-                    # mapping
-                    if ploneCacheSettings.contentTypeRulesetMapping is not None:
-                        ruleset = ploneCacheSettings.contentTypeRulesetMapping.get(
-                            parentPortalType, None)
-                        if ruleset is not None:
-                            return ruleset
+        # 4.1.2.1. Look up the parent type in the content type
+        # mapping
+        if ploneCacheSettings.contentTypeRulesetMapping is not None:
+            ruleset = ploneCacheSettings.contentTypeRulesetMapping.get(
+                parentPortalType,
+                None
+            )
+            if ruleset is not None:
+                return ruleset
 
-                    # 4.1.2.2. Look up a ruleset on the parent object and
-                    # return
-                    ruleset = lookup(parent)
-                    if ruleset is not None:
-                        return ruleset
-
-        return None
+        # 4.1.2.2. Look up a ruleset on the parent object and
+        # return
+        ruleset = lookup(parent)
+        if ruleset is not None:
+            return ruleset

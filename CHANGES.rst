@@ -14,7 +14,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Code-Style: isort, utf8-headers, zca-decorators, manual cleanup.
+  [jensens]
 
 
 1.2.12 (2016-09-16)

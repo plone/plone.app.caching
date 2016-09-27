@@ -19,7 +19,6 @@ from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
 from z3c.caching.interfaces import IPurgeEvent
 from z3c.caching.interfaces import IPurgePaths
 from zope.component import adapter
-from zope.component import adapts
 from zope.component import getUtility
 from zope.component import provideAdapter
 from zope.component import provideHandler
@@ -181,17 +180,26 @@ class TestContentPurgePaths(unittest.TestCase):
         context = FauxContent('foo').__of__(FauxContent('bar'))
         purger = ContentPurgePaths(context)
 
-        self.assertEqual(['/bar/foo/', '/bar/foo/view', '/bar/foo/default-view'],
-                         list(purger.getRelativePaths()))
+        self.assertEqual(
+            ['/bar/foo/', '/bar/foo/view', '/bar/foo/default-view'],
+            list(purger.getRelativePaths())
+        )
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_parent_default_view(self):
         context = FauxContent('default-view').__of__(FauxContent('bar'))
         purger = ContentPurgePaths(context)
-
-        self.assertEqual(['/bar/default-view/', '/bar/default-view/view',
-                          '/bar/default-view/default-view', '/bar', '/bar/', '/bar/view'],
-                         list(purger.getRelativePaths()))
+        self.assertEqual(
+            [
+                '/bar/default-view/',
+                '/bar/default-view/view',
+                '/bar/default-view/default-view',
+                '/bar',
+                '/bar/',
+                '/bar/view'
+            ],
+            list(purger.getRelativePaths())
+        )
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
 
@@ -202,8 +210,8 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
     def setUp(self):
 
         @implementer(IPurgePaths)
+        @adapter(FauxContent)
         class FauxContentPurgePaths(object):
-            adapts(FauxContent)
 
             def __init__(self, context):
                 self.context = context
@@ -325,12 +333,24 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
         context = ATMultipleFields('foo').__of__(root)
         purger = ObjectFieldPurgePaths(context)
 
-        self.assertEqual(['/foo/download', '/foo/at_download',
-                          '/foo/at_download/file1', '/foo/file1',
-                          '/foo/at_download/image1', '/foo/image1', '/foo/image1_thumb',
-                          '/foo/at_download/image2', '/foo/image2', '/foo/image2_mini',
-                          '/foo/image2_normal', '/foo/at_download/blob1', '/foo/blob1'],
-                         list(purger.getRelativePaths()))
+        self.assertEqual(
+            [
+                '/foo/download',
+                '/foo/at_download',
+                '/foo/at_download/file1',
+                '/foo/file1',
+                '/foo/at_download/image1',
+                '/foo/image1',
+                '/foo/image1_thumb',
+                '/foo/at_download/image2',
+                '/foo/image2',
+                '/foo/image2_mini',
+                '/foo/image2_normal',
+                '/foo/at_download/blob1',
+                '/foo/blob1'
+            ],
+            list(purger.getRelativePaths())
+        )
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_file_image_text_fields(self):
@@ -349,10 +369,20 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
         context = ATMultipleFields('foo').__of__(root)
         purger = ObjectFieldPurgePaths(context)
 
-        self.assertEqual(['/foo/download', '/foo/at_download',
-                          '/foo/at_download/file1', '/foo/file1',
-                          '/foo/at_download/image1', '/foo/image1', '/foo/image1_thumb',
-                          '/foo/at_download/image2', '/foo/image2', '/foo/image2_mini',
-                          '/foo/image2_normal'],
-                         list(purger.getRelativePaths()))
+        self.assertEqual(
+            [
+                '/foo/download',
+                '/foo/at_download',
+                '/foo/at_download/file1',
+                '/foo/file1',
+                '/foo/at_download/image1',
+                '/foo/image1',
+                '/foo/image1_thumb',
+                '/foo/at_download/image2',
+                '/foo/image2',
+                '/foo/image2_mini',
+                '/foo/image2_normal'
+            ],
+            list(purger.getRelativePaths())
+        )
         self.assertEqual([], list(purger.getAbsolutePaths()))

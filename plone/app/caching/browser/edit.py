@@ -59,7 +59,15 @@ class EditForm(form.Form):
     # registration
     __name__ = 'cache-operation-edit'
 
-    def __init__(self, context, request, operationName, operation, rulesetName=None, ruleset=None):
+    def __init__(
+        self,
+        context,
+        request,
+        operationName,
+        operation,
+        rulesetName=None,
+        ruleset=None
+    ):
         self.context = context
         self.request = request
         self.operationName = operationName
@@ -228,7 +236,7 @@ class EditForm(form.Form):
 
     # Buttons/actions
 
-    @button.buttonAndHandler(_(u"Save"), name="save")
+    @button.buttonAndHandler(_(u'Save'), name='save')
     def save(self, action):
         data, errors = self.extractData()
         if errors:
@@ -236,19 +244,29 @@ class EditForm(form.Form):
             return
         self.applyChanges(data)
         IStatusMessage(self.request).addStatusMessage(
-            _(u"Changes saved."), "info")
+            _(u'Changes saved.'), 'info')
         self.request.response.redirect(
-            "%s/@@caching-controlpanel#detailed-settings" % self.context.absolute_url())
+            '{0}/@@caching-controlpanel#detailed-settings'.format(
+                self.context.absolute_url()
+            )
+        )
+        return ''
 
-    @button.buttonAndHandler(_(u"Cancel"), name="cancel")
+    @button.buttonAndHandler(_(u'Cancel'), name='cancel')
     def cancel(self, action):
         IStatusMessage(self.request).addStatusMessage(
             _(u"Edit cancelled."), type="info")
         self.request.response.redirect(
-            "%s/@@caching-controlpanel#detailed-settings" % self.context.absolute_url())
+            '{0}/@@caching-controlpanel#detailed-settings'.format(
+                self.context.absolute_url()
+            )
+        )
         return ''
 
-    @button.buttonAndHandler(_(u"Delete settings (use defaults)"), name="clear")
+    @button.buttonAndHandler(
+        _(u'Delete settings (use defaults)'),
+        name='clear'
+    )
     def clear(self, action):
         for key in self.getContent().keys():
             assert key.startswith("%s.%s." % (
@@ -260,5 +278,8 @@ class EditForm(form.Form):
         IStatusMessage(self.request).addStatusMessage(
             _(u"Ruleset-specific settings removed."), type="info")
         self.request.response.redirect(
-            "%s/@@caching-controlpanel#detailed-settings" % self.context.absolute_url())
+            '{0}/@@caching-controlpanel#detailed-settings'.format(
+                self.context.absolute_url()
+            )
+        )
         return ''

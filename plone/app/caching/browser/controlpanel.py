@@ -109,7 +109,10 @@ class ControlPanel(BaseView):
             return self  # traverse again to get operation name
 
         # Step 2 - get operation name
-        if (self.editGlobal or self.editRuleset) and not self.editOperationName:
+        if (
+            (self.editGlobal or self.editRuleset) and
+            not self.editOperationName
+        ):
             self.editOperationName = name
 
             if self.editGlobal:
@@ -119,14 +122,23 @@ class ControlPanel(BaseView):
                 if operation is None:
                     raise NotFound(self, operation)
 
-                return EditForm(self.context, self.request, self.editOperationName, operation)
+                return EditForm(
+                    self.context,
+                    self.request,
+                    self.editOperationName,
+                    operation
+                )
             elif self.editRuleset:
                 return self  # traverse again to get ruleset name
             else:
                 raise NotFound(self, name)
 
         # Step 3 - if this is ruleset traversal, get the ruleset name
-        if self.editRuleset and self.editOperationName and not self.editRulesetName:
+        if (
+            self.editRuleset and
+            self.editOperationName and
+            not self.editRulesetName
+        ):
             self.editRulesetName = name
 
             operation = queryUtility(
@@ -195,7 +207,6 @@ class ControlPanel(BaseView):
             operationMapping[ruleset] = operation
 
         for ruleset, contentTypes in contentTypesMap.items():
-
             if not ruleset:
                 continue
 
@@ -203,9 +214,7 @@ class ControlPanel(BaseView):
                 ruleset = ruleset.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
-
             for contentType in contentTypes:
-
                 if not contentType:
                     continue
 
@@ -213,16 +222,25 @@ class ControlPanel(BaseView):
                     contentType = contentType.encode('utf-8')
 
                 if contentType in contentTypeRulesetMapping:
-                    self.errors.setdefault('contenttypes', {})[ruleset] = \
-                        _(u"Content type ${contentType} is already mapped to the rule ${ruleset}.",
-                            mapping={
-                                'contentType': self.contentTypesLookup.get(contentType, {}).get('title', contentType),  # noqa
-                                'ruleset': contentTypeRulesetMapping[contentType]})
+                    self.errors.setdefault(
+                        'contenttypes', {}
+                    )[ruleset] = _(
+                        u'Content type ${contentType} is already mapped to '
+                        u'the rule ${ruleset}.',
+                        mapping={
+                            'contentType': self.contentTypesLookup.get(
+                                contentType, {}
+                            ).get(
+                                'title',
+                                contentType
+                            ),
+                            'ruleset': contentTypeRulesetMapping[contentType]
+                        }
+                    )
                 else:
                     contentTypeRulesetMapping[contentType] = ruleset
 
         for ruleset, templates in templatesMap.items():
-
             if not ruleset:
                 continue
 
@@ -230,11 +248,8 @@ class ControlPanel(BaseView):
                 ruleset = ruleset.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
-
             for template in templates:
-
                 template = template.strip()
-
                 if not template:
                     continue
 
@@ -242,16 +257,20 @@ class ControlPanel(BaseView):
                     template = template.encode('utf-8')
 
                 if template in templateRulesetMapping:
-                    self.errors.setdefault('templates', {})[ruleset] = \
-                        _(u"Template ${template} is already mapped to the rule ${ruleset}.",
-                            mapping={
-                                'template': template,
-                                'ruleset': templateRulesetMapping[template]})
+                    self.errors.setdefault(
+                        'templates', {}
+                    )[ruleset] = _(
+                        u'Template ${template} is already mapped to the rule '
+                        u'${ruleset}.',
+                        mapping={
+                            'template': template,
+                            'ruleset': templateRulesetMapping[template]
+                        }
+                    )
                 else:
                     templateRulesetMapping[template] = ruleset
 
         # Validate purging settings
-
         for cachingProxy in cachingProxies:
             if not _isuri(cachingProxy):
                 self.errors['cachingProxies'] = _(u"Invalid URL: ${url}", mapping={'url': cachingProxy})  # noqa
@@ -259,10 +278,11 @@ class ControlPanel(BaseView):
         for domain in domains:
             if not _isuri(domain):
                 self.errors['domain'] = _(
-                    u"Invalid URL: ${url}", mapping={'url': domain})
+                    u'Invalid URL: ${url}',
+                    mapping={'url': domain}
+                )
 
         # RAM cache settings
-
         try:
             ramCacheMaxEntries = int(ramCacheMaxEntries)
         except (ValueError, TypeError,):
@@ -270,8 +290,8 @@ class ControlPanel(BaseView):
         else:
             if ramCacheMaxEntries < 0:
                 self.errors['ramCacheMaxEntries'] = _(
-                    u"A positive number is required.")
-
+                    u"A positive number is required."
+                )
         try:
             ramCacheMaxAge = int(ramCacheMaxAge)
         except (ValueError, TypeError,):
@@ -279,17 +299,20 @@ class ControlPanel(BaseView):
         else:
             if ramCacheMaxAge < 0:
                 self.errors['ramCacheMaxAge'] = _(
-                    u"A positive number is required.")
+                    u'A positive number is required.'
+                )
 
         try:
             ramCacheCleanupInterval = int(ramCacheCleanupInterval)
         except (ValueError, TypeError,):
             self.errors['ramCacheCleanupInterval'] = _(
-                u"An integer is required.")
+                u'An integer is required.'
+            )
         else:
             if ramCacheMaxAge < 0:
                 self.errors['ramCacheCleanupInterval'] = _(
-                    u"A positive number is required.")
+                    u'A positive number is required.'
+                )
 
         # Check for errors
         if self.errors:
@@ -302,7 +325,7 @@ class ControlPanel(BaseView):
         self.settings.operationMapping = operationMapping
 
         self.ploneSettings.templateRulesetMapping = templateRulesetMapping
-        self.ploneSettings.contentTypeRulesetMapping = contentTypeRulesetMapping
+        self.ploneSettings.contentTypeRulesetMapping = contentTypeRulesetMapping  # noqa
         self.ploneSettings.purgedContentTypes = purgedContentTypes
 
         self.purgingSettings.enabled = purgingEnabled
@@ -310,11 +333,16 @@ class ControlPanel(BaseView):
         self.purgingSettings.virtualHosting = virtualHosting
         self.purgingSettings.domains = domains
 
-        self.ramCache.update(ramCacheMaxEntries,
-                             ramCacheMaxAge, ramCacheCleanupInterval)
+        self.ramCache.update(
+            ramCacheMaxEntries,
+            ramCacheMaxAge,
+            ramCacheCleanupInterval
+        )
 
         IStatusMessage(self.request).addStatusMessage(
-            _(u"Changes saved."), "info")
+            _(u'Changes saved.'),
+            'info'
+        )
 
     # Rule types - used as the index column
     @property
@@ -343,15 +371,23 @@ class ControlPanel(BaseView):
     @property
     def templateMapping(self):
         return dict(
-            [(k, v.replace('.', '-'),)
-             for k, v in (self.ploneSettings.templateRulesetMapping or {}).items()]
+            [
+                (k, v.replace('.', '-'),)
+                for k, v in (
+                    self.ploneSettings.templateRulesetMapping or {}
+                ).items()
+            ]
         )
 
     @property
     def contentTypeMapping(self):
         return dict(
-            [(k, v.replace('.', '-'),)
-             for k, v in (self.ploneSettings.contentTypeRulesetMapping or {}).items()]
+            [
+                (k, v.replace('.', '-'),)
+                for k, v in (
+                    self.ploneSettings.contentTypeRulesetMapping or {}
+                ).items()
+            ]
         )
 
     # Type lookups (for accessing settings)
@@ -498,8 +534,13 @@ class Import(BaseView):
     @memoize
     def profiles(self):
         portal_setup = getToolByName(self.context, 'portal_setup')
-        return [profile for profile in portal_setup.listProfileInfo(ICacheProfiles)
-                if profile.get('type', BASE) == EXTENSION and profile.get('for') is not None]
+        return [
+            profile for profile in portal_setup.listProfileInfo(ICacheProfiles)
+            if (
+                profile.get('type', BASE) == EXTENSION and
+                profile.get('for') is not None
+            )
+        ]
 
 
 class Purge(BaseView):
@@ -508,7 +549,6 @@ class Purge(BaseView):
 
     def update(self):
         self.purgeLog = []
-
         if super(Purge, self).update():
             if 'form.button.Purge' in self.request.form:
                 self.processPurge()
@@ -526,7 +566,6 @@ class Purge(BaseView):
             return
 
         purger = getUtility(IPurger)
-
         serverURL = self.request['SERVER_URL']
 
         def purge(url):

@@ -48,7 +48,16 @@ etagNoQuote = re.compile('(\s*(W\/)?([^,]*)\s*,?)')
 #
 
 
-def setCacheHeaders(published, request, response, maxage=None, smaxage=None, etag=None, lastModified=None, vary=None):
+def setCacheHeaders(
+    published,
+    request,
+    response,
+    maxage=None,
+    smaxage=None,
+    etag=None,
+    lastModified=None,
+    vary=None
+):
     """General purpose dispatcher to set various cache headers
 
     ``maxage`` is the cache timeout value in seconds
@@ -59,16 +68,36 @@ def setCacheHeaders(published, request, response, maxage=None, smaxage=None, eta
     """
 
     if maxage:
-        cacheInBrowserAndProxy(published, request, response, maxage, smaxage=smaxage,
-                               etag=etag, lastModified=lastModified, vary=vary)
+        cacheInBrowserAndProxy(
+            published,
+            request,
+            response,
+            maxage,
+            smaxage=smaxage,
+            etag=etag,
+            lastModified=lastModified,
+            vary=vary
+        )
 
     elif smaxage:
-        cacheInProxy(published, request, response, smaxage,
-                     etag=etag, lastModified=lastModified, vary=vary)
+        cacheInProxy(
+            published,
+            request,
+            response,
+            smaxage,
+            etag=etag,
+            lastModified=lastModified,
+            vary=vary
+        )
 
     elif etag or lastModified:
-        cacheInBrowser(published, request, response,
-                       etag=etag, lastModified=lastModified)
+        cacheInBrowser(
+            published,
+            request,
+            response,
+            etag=etag,
+            lastModified=lastModified
+        )
 
     else:
         doNotCache(published, request, response)
@@ -114,7 +143,15 @@ def cacheInBrowser(published, request, response, etag=None, lastModified=None):
     response.setHeader('Cache-Control', 'max-age=0, must-revalidate, private')
 
 
-def cacheInProxy(published, request, response, smaxage, etag=None, lastModified=None, vary=None):
+def cacheInProxy(
+    published,
+    request,
+    response,
+    smaxage,
+    etag=None,
+    lastModified=None,
+    vary=None
+):
     """Set headers to cache the response in a caching proxy.
 
     ``smaxage`` is the timeout value in seconds.
@@ -124,7 +161,10 @@ def cacheInProxy(published, request, response, smaxage, etag=None, lastModified=
     """
 
     if lastModified is not None:
-        response.setHeader('Last-Modified', formatDateTime(lastModified))
+        response.setHeader(
+            'Last-Modified',
+            formatDateTime(lastModified)
+        )
     elif response.getHeader('Last-Modified'):
         del response.headers['last-modified']
 
@@ -139,7 +179,16 @@ def cacheInProxy(published, request, response, smaxage, etag=None, lastModified=
         'Cache-Control', 'max-age=0, s-maxage=%d, must-revalidate' % smaxage)
 
 
-def cacheInBrowserAndProxy(published, request, response, maxage, smaxage=None, etag=None, lastModified=None, vary=None):
+def cacheInBrowserAndProxy(
+    published,
+    request,
+    response,
+    maxage,
+    smaxage=None,
+    etag=None,
+    lastModified=None,
+    vary=None
+):
     """Set headers to cache the response in the browser and caching proxy if
     applicable.
 
@@ -166,13 +215,23 @@ def cacheInBrowserAndProxy(published, request, response, maxage, smaxage=None, e
     if smaxage is not None:
         maxage = '%s, s-maxage=%s' % (maxage, smaxage)
 
-    # Substituting proxy-validate in place of must=revalidate here because of Safari bug
+    # Substituting proxy-validate in place of must=revalidate here because of
+    # Safari bug
     # https://bugs.webkit.org/show_bug.cgi?id=13128
     response.setHeader(
-        'Cache-Control', 'max-age=%s, proxy-revalidate, public' % maxage)
+        'Cache-Control',
+        'max-age=%s, proxy-revalidate, public' % maxage
+    )
 
 
-def cacheInRAM(published, request, response, etag=None, lastModified=None, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
+def cacheInRAM(
+    published,
+    request,
+    response,
+    etag=None,
+    lastModified=None,
+    annotationsKey=PAGE_CACHE_ANNOTATION_KEY
+):
     """Set a flag indicating that the response for the given request
     should be cached in RAM.
 
@@ -201,7 +260,15 @@ def cacheInRAM(published, request, response, etag=None, lastModified=None, annot
     alsoProvides(request, IRAMCached)
 
 
-def cachedResponse(published, request, response, status, headers, body, gzip=False):
+def cachedResponse(
+    published,
+    request,
+    response,
+    status,
+    headers,
+    body,
+    gzip=False
+):
     """Returned a cached page. Modifies the response (status and headers)
     and returns the cached body.
 
@@ -287,11 +354,7 @@ def cacheStop(request, rulename):
 
     ploneSettings = registry.forInterface(IPloneCacheSettings)
     variables = ploneSettings.cacheStopRequestVariables
-
-    for variable in variables:
-        if request.has_key(variable):
-            return True
-    return False
+    return set(variables) & set(request.keys())
 
 
 def isModified(request, etag=None, lastModified=None):
@@ -338,7 +401,7 @@ def isModified(request, etag=None, lastModified=None):
     latest headers. I interpret this as the spec rule that the
     etags do NOT match, and therefor we must not return a 304.
     """
-    if ifNoneMatch and etag == None:
+    if ifNoneMatch and etag is None:
         return True
 
     # Check the modification date
@@ -355,16 +418,16 @@ def isModified(request, etag=None, lastModified=None):
         # has content been modified since the if-modified-since time?
         try:
             # browser only knows the date to one second resolution
-            if (lastModified - ifModifiedSince) > datetime.timedelta(seconds=1):
+            delta_sec = datetime.timedelta(seconds=1)
+            if (lastModified - ifModifiedSince) > delta_sec:
                 return True
         except TypeError:
             logger.exception("Could not compare dates")
 
         # If we expected an ETag and the client didn't give us one, consider
         # that an error. This may be more conservative than the spec requires.
-        if etag is not None:
-            if not etagMatched:
-                return True
+        if etag is not None and not etagMatched:
+            return True
 
     # XXX Do we really want the default here to be false?
     return False
@@ -403,9 +466,9 @@ def getContext(published, marker=(IContentish, ISiteRoot,)):
         return False
 
     while (
-        published is not None
-        and not checkType(published)
-        and hasattr(published, '__parent__',)
+        published is not None and
+        not checkType(published) and
+        hasattr(published, '__parent__',)
     ):
         published = published.__parent__
 
@@ -608,13 +671,13 @@ def parseETags(text, allowWeak=True, _result=None):
         m = etagQuote.match(text)
         if m:
             # Match quoted etag (spec-observing client)
-            l = len(m.group(1))
+            length = len(m.group(1))
             value = (m.group(2) or '') + (m.group(3) or '')
         else:
             # Match non-quoted etag (lazy client)
             m = etagNoQuote.match(text)
             if m:
-                l = len(m.group(1))
+                length = len(m.group(1))
                 value = (m.group(2) or '') + (m.group(3) or '')
             else:
                 return result
@@ -622,14 +685,13 @@ def parseETags(text, allowWeak=True, _result=None):
         parseETagLock.release()
 
     if value:
-
         if value.startswith('W/'):
             if allowWeak:
                 result.append(value[2:])
         else:
             result.append(value)
 
-    return parseETags(text[l:], allowWeak=allowWeak, _result=result)
+    return parseETags(text[length:], allowWeak=allowWeak, _result=result)
 
 #
 # RAM cache management
@@ -679,7 +741,13 @@ def getRAMCacheKey(request, etag=None, lastModified=None):
     return resourceKey
 
 
-def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
+def storeResponseInRAMCache(
+    request,
+    response,
+    result,
+    globalKey=PAGE_CACHE_KEY,
+    annotationsKey=PAGE_CACHE_ANNOTATION_KEY
+):
     """Store the given response in the RAM cache.
 
     ``result`` should be the response body as a string.
@@ -706,9 +774,9 @@ def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY,
 
     """
     Resource registries have no body. If we put them in the cache the content
-    type headers will indicate length and the body will be '', causing the browser
-    to just spin. Furthermore, I doubt we ever want to cache an empty result:
-    it's an indication that something went wrong somewhere.
+    type headers will indicate length and the body will be '', causing the
+    browser to just spin. Furthermore, I doubt we ever want to cache an empty
+    result: it's an indication that something went wrong somewhere.
 
     This does mean that any resources will not be cached in ram. There is
     potentially another fix but I doubt long term it's ever the right thing to
@@ -724,7 +792,13 @@ def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY,
     cache[key] = (status, headers, result, gzipFlag)
 
 
-def fetchFromRAMCache(request, etag=None, lastModified=None, globalKey=PAGE_CACHE_KEY, default=None):
+def fetchFromRAMCache(
+    request,
+    etag=None,
+    lastModified=None,
+    globalKey=PAGE_CACHE_KEY,
+    default=None
+):
     """Return a page cached in RAM, or None if it cannot be found.
 
     The return value is a tuple as stored by ``storeResponseInRAMCache()``.

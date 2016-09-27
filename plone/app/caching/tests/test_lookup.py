@@ -10,7 +10,6 @@ from Products.CMFCore.interfaces import IDynamicType
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
 from Products.Five.browser import BrowserView
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
-from z3c.caching.registry import RulesetRegistry
 from zope.component import getUtility
 from zope.component import provideAdapter
 from zope.component import provideUtility

@@ -6,23 +6,13 @@ from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import PloneSandboxLayer
 from plone.cachepurging.interfaces import IPurger
+from plone.protect.authenticator import _getKeyring
 from zope.component import getUtility
 from zope.component import provideUtility
 from zope.configuration import xmlconfig
 from zope.interface import implementer
 
 import hmac
-
-
-try:
-    from plone.protect.authenticator import _getKeyring
-except ImportError:
-    # so we can run tests on plone 4.3
-    from plone.keyring.interfaces import IKeyManager
-
-    def _getKeyring(username):
-        manager = getUtility(IKeyManager)
-        return manager['_system']
 
 
 @implementer(IPurger)
@@ -76,9 +66,13 @@ class PloneAppCaching(PloneSandboxLayer):
 
 PLONE_APP_CACHING_FIXTURE = PloneAppCaching()
 PLONE_APP_CACHING_INTEGRATION_TESTING = IntegrationTesting(
-    bases=(PLONE_APP_CACHING_FIXTURE,), name="PloneAppCaching:Integration")
+    bases=(PLONE_APP_CACHING_FIXTURE,),
+    name='PloneAppCaching:Integration'
+)
 PLONE_APP_CACHING_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(PLONE_APP_CACHING_FIXTURE,), name="PloneAppCaching:Functional")
+    bases=(PLONE_APP_CACHING_FIXTURE,),
+    name='PloneAppCaching:Functional'
+)
 
 
 def getToken(username):
