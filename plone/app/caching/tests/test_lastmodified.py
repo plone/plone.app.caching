@@ -1,19 +1,16 @@
-import unittest2 as unittest
+from dateutil.tz import tzlocal
+from persistent.TimeStamp import TimeStamp
+from plone.app.caching import lastmodified
 from plone.testing.zca import UNIT_TESTING
+from z3c.caching.interfaces import ILastModified
+from zope.component import provideAdapter
 
-import os
-import time
 import datetime
 import DateTime
+import os
+import time
+import unittest2 as unittest
 
-from dateutil.tz import tzlocal
-
-from persistent.TimeStamp import TimeStamp
-
-from zope.component import provideAdapter
-from z3c.caching.interfaces import ILastModified
-
-from plone.app.caching import lastmodified
 
 class FauxDataManager(object):
 

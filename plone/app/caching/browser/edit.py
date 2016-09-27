@@ -1,21 +1,18 @@
-from zope.component import getUtility
-from zope.interface import alsoProvides
-
-from zope.schema.interfaces import IField
-
-from z3c.form.interfaces import IFormLayer
-from z3c.form import form, button, field
-
-from plone.memoize.instance import memoize
-
-from plone.registry.interfaces import IRegistry
-from plone.registry import Record
-from plone.registry import FieldRef
-
 from plone.app.caching.interfaces import _
-
+from plone.memoize.instance import memoize
+from plone.registry import FieldRef
+from plone.registry import Record
+from plone.registry.interfaces import IRegistry
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.statusmessages.interfaces import IStatusMessage
+from z3c.form import button
+from z3c.form import field
+from z3c.form import form
+from z3c.form.interfaces import IFormLayer
+from zope.component import getUtility
+from zope.interface import alsoProvides
+from zope.schema.interfaces import IField
+
 
 class EditForm(form.Form):
     """General edit form for operations.

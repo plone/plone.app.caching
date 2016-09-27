@@ -1,15 +1,12 @@
-from zope.interface import implementer
-from zope.component import queryUtility
-
-from plone.registry.interfaces import IRegistry
-
-from z3c.caching.registry import lookup
-from plone.caching.interfaces import IRulesetLookup
-from plone.app.caching.interfaces import IPloneCacheSettings
-
 from Acquisition import aq_base
-
+from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.utils import getObjectDefaultView
+from plone.caching.interfaces import IRulesetLookup
+from plone.registry.interfaces import IRegistry
+from z3c.caching.registry import lookup
+from zope.component import queryUtility
+from zope.interface import implementer
+
 
 @implementer(IRulesetLookup)
 class ContentItemLookup(object):

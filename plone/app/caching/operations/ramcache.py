@@ -1,12 +1,10 @@
+from plone.app.caching.interfaces import IRAMCached
+from plone.app.caching.operations.utils import storeResponseInRAMCache
+from plone.transformchain.interfaces import ITransform
+from zope.component import adapts
 from zope.interface import implementer
 from zope.interface import Interface
 
-from zope.component import adapts
-from plone.transformchain.interfaces import ITransform
-
-from plone.app.caching.interfaces import IRAMCached
-
-from plone.app.caching.operations.utils import storeResponseInRAMCache
 
 GLOBAL_KEY = 'plone.app.caching.operations.ramcache'
 

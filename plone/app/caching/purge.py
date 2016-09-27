@@ -1,27 +1,23 @@
-from zope.interface import implementer
-from zope.component import adapts, adapter, getAdapters
+from Acquisition import aq_parent
+from plone.app.caching.utils import getObjectDefaultView
+from plone.app.caching.utils import isPurged
+from plone.cachepurging.interfaces import IPurgePathRewriter
+from plone.memoize.instance import memoize
+from Products.CMFCore.interfaces import IContentish
+from Products.CMFCore.interfaces import IDiscussionResponse
+from Products.CMFCore.interfaces import IDynamicType
+from Products.CMFCore.utils import getToolByName
+from z3c.caching.interfaces import IPurgePaths
+from z3c.caching.purge import Purge
+from zope.component import adapter
+from zope.component import adapts
+from zope.component import getAdapters
 from zope.event import notify
 from zope.globalrequest import getRequest
-
+from zope.interface import implementer
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.lifecycleevent.interfaces import IObjectMovedEvent
 
-from z3c.caching.purge import Purge
-from z3c.caching.interfaces import IPurgePaths
-
-from plone.cachepurging.interfaces import IPurgePathRewriter
-
-from Products.CMFCore.interfaces import IDiscussionResponse
-from Products.CMFCore.interfaces import IContentish
-from Products.CMFCore.interfaces import IDynamicType
-from Products.CMFCore.utils import getToolByName
-
-from plone.app.caching.utils import isPurged
-from plone.app.caching.utils import getObjectDefaultView
-
-from plone.memoize.instance import memoize
-
-from Acquisition import aq_parent
 
 try:
     from plone.app.blob.interfaces import IBlobField

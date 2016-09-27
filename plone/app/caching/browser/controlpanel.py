@@ -1,43 +1,34 @@
-import re
-import datetime
-
-from zope.interface import implementer
-from zope.component import getUtility
-from zope.component import getUtilitiesFor
-from zope.component import queryUtility
-
-from zope.publisher.interfaces import IPublishTraverse
-from zope.publisher.interfaces import NotFound
-
-from zope.ramcache.interfaces.ram import IRAMCache
-
-from plone.memoize.instance import memoize
-
-from plone.registry.interfaces import IRegistry
-
-from z3c.caching.interfaces import IRulesetType
-from z3c.caching.registry import enumerateTypes
-
-from plone.protect import CheckAuthenticator
-
-from plone.caching.interfaces import ICacheSettings
-from plone.caching.interfaces import ICachingOperationType
-
-from plone.cachepurging.interfaces import IPurger
+from plone.app.caching.browser.edit import EditForm
+from plone.app.caching.interfaces import _
+from plone.app.caching.interfaces import ICacheProfiles
+from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.cachepurging.interfaces import ICachePurgingSettings
-
-from plone.cachepurging.utils import isCachePurgingEnabled
+from plone.cachepurging.interfaces import IPurger
 from plone.cachepurging.utils import getPathsToPurge
 from plone.cachepurging.utils import getURLsToPurge
-
-from plone.app.caching.interfaces import IPloneCacheSettings
-from plone.app.caching.interfaces import ICacheProfiles
-from plone.app.caching.interfaces import _
-from plone.app.caching.browser.edit import EditForm
-
-from Products.GenericSetup.interfaces import BASE, EXTENSION
+from plone.cachepurging.utils import isCachePurgingEnabled
+from plone.caching.interfaces import ICacheSettings
+from plone.caching.interfaces import ICachingOperationType
+from plone.memoize.instance import memoize
+from plone.protect import CheckAuthenticator
+from plone.registry.interfaces import IRegistry
 from Products.CMFCore.utils import getToolByName
+from Products.GenericSetup.interfaces import BASE
+from Products.GenericSetup.interfaces import EXTENSION
 from Products.statusmessages.interfaces import IStatusMessage
+from z3c.caching.interfaces import IRulesetType
+from z3c.caching.registry import enumerateTypes
+from zope.component import getUtilitiesFor
+from zope.component import getUtility
+from zope.component import queryUtility
+from zope.interface import implementer
+from zope.publisher.interfaces import IPublishTraverse
+from zope.publisher.interfaces import NotFound
+from zope.ramcache.interfaces.ram import IRAMCache
+
+import datetime
+import re
+
 
 # Borrowed from zope.schema to avoid an import of a private name
 _isuri = re.compile(

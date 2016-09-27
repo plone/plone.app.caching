@@ -1,29 +1,24 @@
-import unittest2 as unittest
-
-from plone.testing.z2 import Browser
-
-from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
+from plone.app.caching.interfaces import IPloneCacheSettings
+from plone.app.caching.testing import getToken
+from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 from plone.app.testing import applyProfile
 from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import TEST_USER_PASSWORD
 from plone.app.textfield.value import RichTextValue
-
-import pkg_resources
-
-import OFS.Image
-
-from zope.component import getUtility
-
-from zope.globalrequest import setRequest
-
-from plone.namedfile.file import NamedImage
-from plone.registry.interfaces import IRegistry
-from plone.caching.interfaces import ICacheSettings
 from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.cachepurging.interfaces import IPurger
-from plone.app.caching.interfaces import IPloneCacheSettings
+from plone.caching.interfaces import ICacheSettings
+from plone.namedfile.file import NamedImage
+from plone.registry.interfaces import IRegistry
+from plone.testing.z2 import Browser
+from zope.component import getUtility
+from zope.globalrequest import setRequest
 
-from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
-from plone.app.caching.testing import getToken
+import OFS.Image
+import pkg_resources
+import unittest2 as unittest
 
 
 TEST_IMAGE = pkg_resources.resource_filename(

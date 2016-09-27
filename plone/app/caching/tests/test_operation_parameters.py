@@ -1,21 +1,18 @@
-import unittest2 as unittest
-
-import transaction;
-
-from plone.testing.z2 import Browser
-
-from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
+from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import TEST_USER_PASSWORD
 from plone.app.textfield.value import RichTextValue
-
+from plone.caching.interfaces import ICacheSettings
+from plone.registry.interfaces import IRegistry
+from plone.testing.z2 import Browser
 from zope.component import getUtility
-
 from zope.globalrequest import setRequest
 
-from plone.registry.interfaces import IRegistry
-from plone.caching.interfaces import ICacheSettings
+import transaction
+import unittest2 as unittest
 
-from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 
 class TestOperationParameters(unittest.TestCase):
     """This test aims to test the effect of changing various caching operation

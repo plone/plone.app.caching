@@ -1,48 +1,39 @@
-import unittest2 as unittest
-from plone.testing.zca import UNIT_TESTING
-
-from zope.interface import implementer
-
-from zope.component import getUtility
-from zope.component import adapter
-from zope.component import adapts
-from zope.component import provideHandler
-from zope.component import provideUtility
-from zope.component import provideAdapter
-
-from zope.component.event import objectEventNotify
-
-from zope.event import notify
-
-from zope.lifecycleevent import ObjectModifiedEvent
-from zope.lifecycleevent import ObjectAddedEvent
-from zope.lifecycleevent import ObjectRemovedEvent
-from zope.lifecycleevent import ObjectMovedEvent
-
-from zope.globalrequest import setRequest
-
-from plone.registry.interfaces import IRegistry
-from plone.registry.fieldfactory import persistentFieldAdapter
-from plone.registry import Registry
-
-from z3c.caching.interfaces import IPurgeEvent
-from z3c.caching.interfaces import IPurgePaths
-
+from Acquisition import aq_base
+from Acquisition import Explicit
 from plone.app.caching.interfaces import IPloneCacheSettings
-
-from Acquisition import Explicit, aq_base
-from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
-from Products.CMFCore.interfaces import IContentish
-from Products.CMFCore.interfaces import IDiscussionResponse
-from Products.Archetypes import atapi
-from Products.Archetypes.Schema.factory import instanceSchemaFactory
-
-from plone.app.caching.purge import purgeOnModified
-from plone.app.caching.purge import purgeOnMovedOrRemoved
-
 from plone.app.caching.purge import ContentPurgePaths
 from plone.app.caching.purge import DiscussionItemPurgePaths
 from plone.app.caching.purge import ObjectFieldPurgePaths
+from plone.app.caching.purge import purgeOnModified
+from plone.app.caching.purge import purgeOnMovedOrRemoved
+from plone.registry import Registry
+from plone.registry.fieldfactory import persistentFieldAdapter
+from plone.registry.interfaces import IRegistry
+from plone.testing.zca import UNIT_TESTING
+from Products.Archetypes import atapi
+from Products.Archetypes.Schema.factory import instanceSchemaFactory
+from Products.CMFCore.interfaces import IContentish
+from Products.CMFCore.interfaces import IDiscussionResponse
+from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
+from z3c.caching.interfaces import IPurgeEvent
+from z3c.caching.interfaces import IPurgePaths
+from zope.component import adapter
+from zope.component import adapts
+from zope.component import getUtility
+from zope.component import provideAdapter
+from zope.component import provideHandler
+from zope.component import provideUtility
+from zope.component.event import objectEventNotify
+from zope.event import notify
+from zope.globalrequest import setRequest
+from zope.interface import implementer
+from zope.lifecycleevent import ObjectAddedEvent
+from zope.lifecycleevent import ObjectModifiedEvent
+from zope.lifecycleevent import ObjectMovedEvent
+from zope.lifecycleevent import ObjectRemovedEvent
+
+import unittest2 as unittest
+
 
 class Handler(object):
 

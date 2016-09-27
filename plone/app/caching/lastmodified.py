@@ -1,12 +1,24 @@
+from Acquisition import aq_base
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from datetime import datetime
 from dateutil.tz import tzlocal
-
-from zope.interface import implementer, implementer, Interface
-from zope.component import adapter, adapts
-
-from zope.browserresource.interfaces import IResource
-from zope.pagetemplate.interfaces import IPageTemplate
+from OFS.Image import File
+from plone.app.caching.operations.utils import getContext
+from Products.Archetypes.Field import Image as ImageScale
+from Products.CMFCore.FSObject import FSObject
+from Products.CMFCore.FSPageTemplate import FSPageTemplate
+from Products.CMFCore.interfaces import ICatalogableDublinCore
+from Products.ResourceRegistries.interfaces import ICookedFile
+from Products.ResourceRegistries.interfaces import IResourceRegistry
 from z3c.caching.interfaces import ILastModified
+from zope.browserresource.interfaces import IResource
+from zope.component import adapter
+from zope.component import adapts
+from zope.interface import implementer
+from zope.interface import Interface
+from zope.pagetemplate.interfaces import IPageTemplate
+
 
 try:
     from zope.dublincore.interfaces import IDCTimes
@@ -14,19 +26,8 @@ except ImportError:
     class IDCTimes(Interface):
         pass
 
-from Acquisition import aq_base
-from Acquisition import aq_parent
-from Acquisition import aq_inner
 
-from OFS.Image import File
-from Products.Archetypes.Field import Image as ImageScale
-from Products.CMFCore.interfaces import ICatalogableDublinCore
-from Products.CMFCore.FSObject import FSObject
-from Products.CMFCore.FSPageTemplate import FSPageTemplate
 
-from plone.app.caching.operations.utils import getContext
-from Products.ResourceRegistries.interfaces import ICookedFile
-from Products.ResourceRegistries.interfaces import IResourceRegistry
 
 
 @implementer(ILastModified)

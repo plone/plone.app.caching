@@ -1,26 +1,23 @@
-import unittest2 as unittest
+from Acquisition import Explicit
+from plone.app.caching.interfaces import IPloneCacheSettings
+from plone.app.caching.lookup import ContentItemLookup
 from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
-
-from z3c.caching.registry import RulesetRegistry
-import z3c.caching.registry
-
-from zope.component import provideUtility, provideAdapter, getUtility
-from zope.interface import implementer
-
-from plone.registry.interfaces import IRegistry
-
 from plone.registry import Registry
 from plone.registry.fieldfactory import persistentFieldAdapter
-
-from plone.app.caching.interfaces import IPloneCacheSettings
-
-from plone.app.caching.lookup import ContentItemLookup
-
-from Acquisition import Explicit
-from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import IDynamicType
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
 from Products.Five.browser import BrowserView
+from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+from z3c.caching.registry import RulesetRegistry
+from zope.component import getUtility
+from zope.component import provideAdapter
+from zope.component import provideUtility
+from zope.interface import implementer
+
+import unittest2 as unittest
+import z3c.caching.registry
+
 
 @implementer(IBrowserDefault, IDynamicType)
 class DummyContent(Explicit):

@@ -1,6 +1,5 @@
 from Acquisition import Explicit
-from Products.CMFCore.interfaces import IDynamicType
-from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
+from datetime import datetime
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.utils import getObjectDefaultView
 from plone.app.caching.utils import isPurged
@@ -8,8 +7,11 @@ from plone.registry import Registry
 from plone.registry.fieldfactory import persistentFieldAdapter
 from plone.registry.interfaces import IRegistry
 from plone.testing.zca import UNIT_TESTING
-from datetime import datetime
-from zope.component import provideUtility, provideAdapter, getUtility
+from Products.CMFCore.interfaces import IDynamicType
+from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
+from zope.component import getUtility
+from zope.component import provideAdapter
+from zope.component import provideUtility
 from zope.interface import implementer
 
 import pytz

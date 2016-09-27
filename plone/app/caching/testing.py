@@ -1,17 +1,17 @@
+from hashlib import sha1 as sha
 from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
-from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import IntegrationTesting
-from plone.app.testing import FunctionalTesting
 from plone.app.testing import applyProfile
-
-from zope.interface import implementer
-
+from plone.app.testing import FunctionalTesting
+from plone.app.testing import IntegrationTesting
+from plone.app.testing import PloneSandboxLayer
+from plone.cachepurging.interfaces import IPurger
 from zope.component import getUtility
 from zope.component import provideUtility
-
 from zope.configuration import xmlconfig
+from zope.interface import implementer
 
-from plone.cachepurging.interfaces import IPurger
+import hmac
+
 
 try:
     from plone.protect.authenticator import _getKeyring
@@ -22,8 +22,6 @@ except ImportError:
         manager = getUtility(IKeyManager)
         return manager['_system']
 
-import hmac
-from hashlib import sha1 as sha
 
 
 @implementer(IPurger)

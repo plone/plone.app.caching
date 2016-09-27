@@ -1,40 +1,34 @@
-import pkg_resources
-
-import unittest2 as unittest
-
-from plone.testing.z2 import Browser
-
-from plone.app.caching.tests.test_utils import stable_now
-from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
-from plone.app.testing import SITE_OWNER_NAME, SITE_OWNER_PASSWORD
-from plone.app.testing import setRoles
-from plone.app.testing import applyProfile
-
 from cStringIO import StringIO
+from plone.app.caching.interfaces import IPloneCacheSettings
+from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+from plone.app.caching.tests.test_utils import stable_now
+from plone.app.testing import applyProfile
+from plone.app.testing import setRoles
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import TEST_USER_PASSWORD
+from plone.app.textfield.value import RichTextValue
+from plone.cachepurging.interfaces import ICachePurgingSettings
+from plone.cachepurging.interfaces import IPurger
+from plone.caching.interfaces import ICacheSettings
+from plone.registry.interfaces import IRegistry
+from plone.testing.z2 import Browser
+from Products.CMFCore.FSFile import FSFile
+from Products.CMFCore.utils import getToolByName
+from zope.component import getUtility
+from zope.globalrequest import setRequest
 
 import datetime
 import dateutil.parser
 import dateutil.tz
-
+import OFS.Image
 import os
+import pkg_resources
+import unittest2 as unittest
 import urllib
 
-import OFS.Image
-from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.FSFile import FSFile
-
-from zope.component import getUtility
-
-from zope.globalrequest import setRequest
-
-from plone.app.textfield.value import RichTextValue
-from plone.registry.interfaces import IRegistry
-from plone.caching.interfaces import ICacheSettings
-from plone.cachepurging.interfaces import ICachePurgingSettings
-from plone.cachepurging.interfaces import IPurger
-from plone.app.caching.interfaces import IPloneCacheSettings
-
-from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 
 TEST_FILE = pkg_resources.resource_filename('plone.app.caching.tests', 'test.gif')
 

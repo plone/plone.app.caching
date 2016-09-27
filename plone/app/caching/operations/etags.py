@@ -1,22 +1,18 @@
-import random
-import time
-
-from zope.interface import implementer
-from zope.interface import Interface
-
+from plone.app.caching.interfaces import IETagValue
+from plone.app.caching.interfaces import IPloneCacheSettings
+from plone.app.caching.operations.utils import getContext
+from plone.app.caching.operations.utils import getLastModifiedAnnotation
+from plone.registry.interfaces import IRegistry
+from Products.CMFCore.utils import getToolByName
 from zope.component import adapts
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
+from zope.interface import implementer
+from zope.interface import Interface
 
-from plone.registry.interfaces import IRegistry
+import random
+import time
 
-from plone.app.caching.interfaces import IETagValue
-from plone.app.caching.interfaces import IPloneCacheSettings
-
-from plone.app.caching.operations.utils import getContext
-from plone.app.caching.operations.utils import getLastModifiedAnnotation
-
-from Products.CMFCore.utils import getToolByName
 
 @implementer(IETagValue)
 class UserID(object):

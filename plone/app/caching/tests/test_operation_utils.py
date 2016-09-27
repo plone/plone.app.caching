@@ -1,36 +1,29 @@
-import unittest2 as unittest
-from plone.testing.zca import UNIT_TESTING
-
-import time
-import datetime
-import dateutil.parser
-import dateutil.tz
-import wsgiref.handlers
-from StringIO import StringIO
-
-from zope.interface import implementer
-from zope.interface import Interface
-from zope.interface import classImplements
-from zope.interface import alsoProvides
-
-from zope.component import provideAdapter
-from zope.component import provideUtility
-from zope.component import adapts
-
+from OFS.SimpleItem import SimpleItem
 from plone.memoize.interfaces import ICacheChooser
-
+from plone.testing.zca import UNIT_TESTING
+from Products.CMFCore.interfaces import IContentish
+from StringIO import StringIO
 from z3c.caching.interfaces import ILastModified
-
+from zope.annotation.attribute import AttributeAnnotations
 from zope.annotation.interfaces import IAnnotations
 from zope.annotation.interfaces import IAttributeAnnotatable
-from zope.annotation.attribute import AttributeAnnotations
-
+from zope.component import adapts
+from zope.component import provideAdapter
+from zope.component import provideUtility
+from zope.interface import alsoProvides
+from zope.interface import classImplements
+from zope.interface import implementer
+from zope.interface import Interface
 from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPResponse import HTTPResponse
 
-from OFS.SimpleItem import SimpleItem
+import datetime
+import dateutil.parser
+import dateutil.tz
+import time
+import unittest2 as unittest
+import wsgiref.handlers
 
-from Products.CMFCore.interfaces import IContentish
 
 class DummyPublished(object):
 

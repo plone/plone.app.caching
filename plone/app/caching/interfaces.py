@@ -1,7 +1,8 @@
+from zope import schema
+from zope.interface import Interface
+
 import zope.i18nmessageid
 
-from zope.interface import Interface
-from zope import schema
 
 _ = zope.i18nmessageid.MessageFactory('plone.app.caching')
 

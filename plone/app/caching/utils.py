@@ -1,11 +1,10 @@
-from zope.component import queryUtility
-
-from plone.registry.interfaces import IRegistry
-from plone.app.caching.interfaces import IPloneCacheSettings
-
 from Acquisition import aq_base
+from plone.app.caching.interfaces import IPloneCacheSettings
+from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import IDynamicType
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
+from zope.component import queryUtility
+
 
 def isPurged(object):
     """Determine if object is of a content type that should be purged.

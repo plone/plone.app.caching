@@ -1,30 +1,27 @@
-import re
-import time
-import datetime
-import logging
-import dateutil.parser
-import dateutil.tz
-import wsgiref.handlers
-
-from thread import allocate_lock
-
-from zope.interface import alsoProvides
-from zope.component import queryMultiAdapter
-from zope.component import queryUtility
-from zope.component import getUtility
-
-from zope.annotation.interfaces import IAnnotations
-from z3c.caching.interfaces import ILastModified
-from plone.registry.interfaces import IRegistry
-from plone.memoize.interfaces import ICacheChooser
-
-from plone.app.caching.interfaces import IRAMCached
+from AccessControl.PermissionRole import rolesForPermissionOn
 from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.interfaces import IPloneCacheSettings
-
-from AccessControl.PermissionRole import rolesForPermissionOn
+from plone.app.caching.interfaces import IRAMCached
+from plone.memoize.interfaces import ICacheChooser
+from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import ISiteRoot
+from thread import allocate_lock
+from z3c.caching.interfaces import ILastModified
+from zope.annotation.interfaces import IAnnotations
+from zope.component import getUtility
+from zope.component import queryMultiAdapter
+from zope.component import queryUtility
+from zope.interface import alsoProvides
+
+import datetime
+import dateutil.parser
+import dateutil.tz
+import logging
+import re
+import time
+import wsgiref.handlers
+
 
 PAGE_CACHE_KEY = 'plone.app.caching.operations.ramcache'
 PAGE_CACHE_ANNOTATION_KEY = 'plone.app.caching.operations.ramcache.key'
