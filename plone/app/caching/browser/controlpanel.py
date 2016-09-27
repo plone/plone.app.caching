@@ -56,7 +56,8 @@ class BaseView(object):
         self.registry = getUtility(IRegistry)
         self.settings = self.registry.forInterface(ICacheSettings)
         self.ploneSettings = self.registry.forInterface(IPloneCacheSettings)
-        self.purgingSettings = self.registry.forInterface(ICachePurgingSettings)
+        self.purgingSettings = self.registry.forInterface(
+            ICachePurgingSettings)
         self.ramCache = queryUtility(IRAMCache)
 
         if self.request.method == 'POST':
@@ -113,7 +114,8 @@ class ControlPanel(BaseView):
 
             if self.editGlobal:
 
-                operation = queryUtility(ICachingOperationType, name=self.editOperationName)
+                operation = queryUtility(
+                    ICachingOperationType, name=self.editOperationName)
                 if operation is None:
                     raise NotFound(self, operation)
 
@@ -127,7 +129,8 @@ class ControlPanel(BaseView):
         if self.editRuleset and self.editOperationName and not self.editRulesetName:
             self.editRulesetName = name
 
-            operation = queryUtility(ICachingOperationType, name=self.editOperationName)
+            operation = queryUtility(
+                ICachingOperationType, name=self.editOperationName)
             if operation is None:
                 raise NotFound(self, self.operationName)
 
@@ -255,7 +258,8 @@ class ControlPanel(BaseView):
 
         for domain in domains:
             if not _isuri(domain):
-                self.errors['domain'] = _(u"Invalid URL: ${url}", mapping={'url': domain})
+                self.errors['domain'] = _(
+                    u"Invalid URL: ${url}", mapping={'url': domain})
 
         # RAM cache settings
 
@@ -265,7 +269,8 @@ class ControlPanel(BaseView):
             self.errors['ramCacheMaxEntries'] = _(u"An integer is required.")
         else:
             if ramCacheMaxEntries < 0:
-                self.errors['ramCacheMaxEntries'] = _(u"A positive number is required.")
+                self.errors['ramCacheMaxEntries'] = _(
+                    u"A positive number is required.")
 
         try:
             ramCacheMaxAge = int(ramCacheMaxAge)
@@ -273,19 +278,23 @@ class ControlPanel(BaseView):
             self.errors['ramCacheMaxAge'] = _(u"An integer is required.")
         else:
             if ramCacheMaxAge < 0:
-                self.errors['ramCacheMaxAge'] = _(u"A positive number is required.")
+                self.errors['ramCacheMaxAge'] = _(
+                    u"A positive number is required.")
 
         try:
             ramCacheCleanupInterval = int(ramCacheCleanupInterval)
         except (ValueError, TypeError,):
-            self.errors['ramCacheCleanupInterval'] = _(u"An integer is required.")
+            self.errors['ramCacheCleanupInterval'] = _(
+                u"An integer is required.")
         else:
             if ramCacheMaxAge < 0:
-                self.errors['ramCacheCleanupInterval'] = _(u"A positive number is required.")
+                self.errors['ramCacheCleanupInterval'] = _(
+                    u"A positive number is required.")
 
         # Check for errors
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"There were errors."), "error")
             return
 
         # Save settings
@@ -301,9 +310,11 @@ class ControlPanel(BaseView):
         self.purgingSettings.virtualHosting = virtualHosting
         self.purgingSettings.domains = domains
 
-        self.ramCache.update(ramCacheMaxEntries, ramCacheMaxAge, ramCacheCleanupInterval)
+        self.ramCache.update(ramCacheMaxEntries,
+                             ramCacheMaxAge, ramCacheCleanupInterval)
 
-        IStatusMessage(self.request).addStatusMessage(_(u"Changes saved."), "info")
+        IStatusMessage(self.request).addStatusMessage(
+            _(u"Changes saved."), "info")
 
     # Rule types - used as the index column
     @property
@@ -368,7 +379,8 @@ class ControlPanel(BaseView):
         types = {}
         portal_types = getToolByName(self.context, 'portal_types')
         for fti in portal_types.objectValues():
-            types[fti.id] = dict(title=fti.title or fti.id, description=fti.description)
+            types[fti.id] = dict(title=fti.title or fti.id,
+                                 description=fti.description)
         return types
 
     # Sorted lists (e.g. for drop-downs)
@@ -377,7 +389,8 @@ class ControlPanel(BaseView):
     @memoize
     def operationTypes(self):
         operations = [v for k, v in self.operationTypesLookup.items()]
-        operations.sort(lambda x, y: (cmp(x['sort'], y['sort']) or cmp(x['title'], y['title'])))
+        operations.sort(lambda x, y: (
+            cmp(x['sort'], y['sort']) or cmp(x['title'], y['title'])))
         return operations
 
     @property
@@ -463,7 +476,8 @@ class Import(BaseView):
             self.errors['profile'] = _(u"You must select a profile to import.")
 
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"There were errors."), "error")
             return
 
         portal_setup = getToolByName(self.context, 'portal_setup')
@@ -477,7 +491,8 @@ class Import(BaseView):
         # Import the new profile
         portal_setup.runAllImportStepsFromProfile("profile-%s" % profile)
 
-        IStatusMessage(self.request).addStatusMessage(_(u"Import complete."), "info")
+        IStatusMessage(self.request).addStatusMessage(
+            _(u"Import complete."), "info")
 
     @property
     @memoize
@@ -490,6 +505,7 @@ class Import(BaseView):
 class Purge(BaseView):
     """The purge control panel
     """
+
     def update(self):
         self.purgeLog = []
 
@@ -505,7 +521,8 @@ class Purge(BaseView):
             self.errors['urls'] = _(u"No URLs or paths entered.")
 
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"There were errors."), "error")
             return
 
         purger = getUtility(IPurger)
@@ -581,11 +598,14 @@ class RAMCache(BaseView):
     def processPurge(self):
 
         if self.ramCache is None:
-            IStatusMessage(self.request).addStatusMessage(_(u"RAM cache not installed."), "error")
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"RAM cache not installed."), "error")
 
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"There were errors."), "error")
             return
 
         self.ramCache.invalidateAll()
-        IStatusMessage(self.request).addStatusMessage(_(u"Cache purged."), "info")
+        IStatusMessage(self.request).addStatusMessage(
+            _(u"Cache purged."), "info")

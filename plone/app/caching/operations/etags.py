@@ -27,7 +27,8 @@ class UserID(object):
 
     def __call__(self):
         context = getContext(self.published)
-        portal_state = queryMultiAdapter((context, self.request), name=u'plone_portal_state')
+        portal_state = queryMultiAdapter(
+            (context, self.request), name=u'plone_portal_state')
         if portal_state is None:
             return None
 
@@ -36,6 +37,7 @@ class UserID(object):
             return None
 
         return member.getId()
+
 
 @implementer(IETagValue)
 class Roles(object):
@@ -50,7 +52,8 @@ class Roles(object):
 
     def __call__(self):
         context = getContext(self.published)
-        portal_state = queryMultiAdapter((context, self.request), name=u'plone_portal_state')
+        portal_state = queryMultiAdapter(
+            (context, self.request), name=u'plone_portal_state')
         if portal_state is None:
             return None
 
@@ -62,6 +65,7 @@ class Roles(object):
             return None
 
         return ';'.join(sorted(member.getRolesInContext(context)))
+
 
 @implementer(IETagValue)
 class Language(object):
@@ -77,6 +81,7 @@ class Language(object):
     def __call__(self):
         return self.request.get('HTTP_ACCEPT_LANGUAGE', '')
 
+
 @implementer(IETagValue)
 class UserLanguage(object):
     """The ``userLanguage`` etag component, returning the user's preferred
@@ -90,11 +95,13 @@ class UserLanguage(object):
 
     def __call__(self):
         context = getContext(self.published)
-        portal_state = queryMultiAdapter((context, self.request), name=u'plone_portal_state')
+        portal_state = queryMultiAdapter(
+            (context, self.request), name=u'plone_portal_state')
         if portal_state is None:
             return None
 
         return portal_state.language()
+
 
 @implementer(IETagValue)
 class LastModified(object):
@@ -112,6 +119,7 @@ class LastModified(object):
         if lastModified is None:
             return None
         return str(time.mktime(lastModified.utctimetuple()))
+
 
 @implementer(IETagValue)
 class CatalogCounter(object):
@@ -132,6 +140,7 @@ class CatalogCounter(object):
 
         return str(tools.catalog().getCounter())
 
+
 @implementer(IETagValue)
 class ObjectLocked(object):
     """The ``locked`` etag component, returning 1 or 0 depending on whether
@@ -145,10 +154,12 @@ class ObjectLocked(object):
 
     def __call__(self):
         context = getContext(self.published)
-        context_state = queryMultiAdapter((context, self.request), name=u'plone_context_state')
+        context_state = queryMultiAdapter(
+            (context, self.request), name=u'plone_context_state')
         if context_state is None:
             return None
         return str(int(context_state.is_locked()))
+
 
 @implementer(IETagValue)
 class Skin(object):
@@ -172,6 +183,7 @@ class Skin(object):
             return self.request[requestVariable]
 
         return portal_skins.getDefaultSkin()
+
 
 @implementer(IETagValue)
 class ResourceRegistries(object):
@@ -204,6 +216,7 @@ class ResourceRegistries(object):
         mtimes.sort()
         return str(mtimes[-1])
 
+
 @implementer(IETagValue)
 class AnonymousOrRandom(object):
     """The ``anonymousOrRandom`` etag component. This is normally added
@@ -219,12 +232,14 @@ class AnonymousOrRandom(object):
 
     def __call__(self):
         context = getContext(self.published)
-        portal_state = queryMultiAdapter((context, self.request), name=u'plone_portal_state')
+        portal_state = queryMultiAdapter(
+            (context, self.request), name=u'plone_portal_state')
         if portal_state is None:
             return None
         if portal_state.anonymous():
             return None
         return "%s%d" % (time.time(), random.randint(0, 1000))
+
 
 @implementer(IETagValue)
 class CopyCookie(object):

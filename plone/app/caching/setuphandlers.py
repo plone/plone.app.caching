@@ -11,6 +11,7 @@ def enableExplicitMode():
     if registry is not None:
         registry.explicit = True
 
+
 def importVarious(context):
 
     if not context.readDataFile('plone.app.caching.txt'):

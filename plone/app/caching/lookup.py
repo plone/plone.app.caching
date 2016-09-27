@@ -65,7 +65,8 @@ class ContentItemLookup(object):
         if registry is None:
             return None
 
-        ploneCacheSettings = registry.forInterface(IPloneCacheSettings, check=False)
+        ploneCacheSettings = registry.forInterface(
+            IPloneCacheSettings, check=False)
 
         # 2. Get the name of the published object
         name = getattr(self.published, '__name__', None)
@@ -89,16 +90,20 @@ class ContentItemLookup(object):
                 # 4.1.1. Get the default view of the parent content object
                 defaultView = getObjectDefaultView(parent)
 
-                # 4.1.2. If the name of the published object is the same as the default view of the parent:
+                # 4.1.2. If the name of the published object is the same as the
+                # default view of the parent:
                 if defaultView == name:
 
-                    # 4.1.2.1. Look up the parent type in the content type mapping
+                    # 4.1.2.1. Look up the parent type in the content type
+                    # mapping
                     if ploneCacheSettings.contentTypeRulesetMapping is not None:
-                        ruleset = ploneCacheSettings.contentTypeRulesetMapping.get(parentPortalType, None)
+                        ruleset = ploneCacheSettings.contentTypeRulesetMapping.get(
+                            parentPortalType, None)
                         if ruleset is not None:
                             return ruleset
 
-                    # 4.1.2.2. Look up a ruleset on the parent object and return
+                    # 4.1.2.2. Look up a ruleset on the parent object and
+                    # return
                     ruleset = lookup(parent)
                     if ruleset is not None:
                         return ruleset

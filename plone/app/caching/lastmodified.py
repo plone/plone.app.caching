@@ -28,9 +28,6 @@ except ImportError:
         pass
 
 
-
-
-
 @implementer(ILastModified)
 @adapter(IPageTemplate)
 def PageTemplateDelegateLastModified(template):
@@ -40,6 +37,7 @@ def PageTemplateDelegateLastModified(template):
     """
     return ILastModified(template.__parent__, None)
 
+
 @implementer(ILastModified)
 @adapter(FSPageTemplate)
 def FSPageTemplateDelegateLastModified(template):
@@ -48,6 +46,7 @@ def FSPageTemplateDelegateLastModified(template):
     adapter would otherwise take precedence.
     """
     return PageTemplateDelegateLastModified(template)
+
 
 @implementer(ILastModified)
 class PersistentLastModified(object):
@@ -68,10 +67,12 @@ class PersistentLastModified(object):
             return datetime.fromtimestamp(mtime, tzlocal())
         return None
 
+
 class OFSFileLastModified(PersistentLastModified):
     """ILastModified adapter for OFS.Image.File
     """
     adapts(File)
+
 
 @implementer(ILastModified)
 class ImageScaleLastModified(object):
@@ -87,6 +88,7 @@ class ImageScaleLastModified(object):
         if parent is not None:
             return ILastModified(parent)()
         return None
+
 
 @implementer(ILastModified)
 class FSObjectLastModified(object):
@@ -105,6 +107,7 @@ class FSObjectLastModified(object):
         mtime = self.context._file_mod_time
         return datetime.fromtimestamp(mtime, tzlocal())
 
+
 @implementer(ILastModified)
 class CatalogableDublinCoreLastModified(object):
     """ILastModified adapter for ICatalogableDublinCore, which includes
@@ -121,6 +124,7 @@ class CatalogableDublinCoreLastModified(object):
             return None
         return modified.asdatetime()
 
+
 @implementer(ILastModified)
 class DCTimesLastModified(object):
     """ILastModified adapter for zope.dublincore IDCTimes
@@ -132,6 +136,7 @@ class DCTimesLastModified(object):
 
     def __call__(self):
         return self.context.modified
+
 
 @implementer(ILastModified)
 class ResourceLastModified(object):
@@ -147,6 +152,7 @@ class ResourceLastModified(object):
         if lmt is not None:
             return datetime.fromtimestamp(lmt, tzlocal())
         return None
+
 
 @implementer(ILastModified)
 class CookedFileLastModified(object):

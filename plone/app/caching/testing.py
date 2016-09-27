@@ -19,10 +19,10 @@ try:
 except ImportError:
     # so we can run tests on plone 4.3
     from plone.keyring.interfaces import IKeyManager
+
     def _getKeyring(username):
         manager = getUtility(IKeyManager)
         return manager['_system']
-
 
 
 @implementer(IPurger)
@@ -56,7 +56,8 @@ class PloneAppCaching(PloneSandboxLayer):
 
         # Load ZCML
         import plone.app.caching
-        xmlconfig.file('configure.zcml', plone.app.caching, context=configurationContext)
+        xmlconfig.file('configure.zcml', plone.app.caching,
+                       context=configurationContext)
 
         # Install fake purger
         self.oldPurger = getUtility(IPurger)
@@ -65,7 +66,8 @@ class PloneAppCaching(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'plone.app.caching:default')
 
-        portal['portal_workflow'].setDefaultChain('simple_publication_workflow')
+        portal['portal_workflow'].setDefaultChain(
+            'simple_publication_workflow')
 
     def tearDownZope(self, app):
         # Store old purger

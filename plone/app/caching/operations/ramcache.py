@@ -29,20 +29,20 @@ class Store(object):
     def transformUnicode(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
             storeResponseInRAMCache(self.request, self.request.response,
-                    result.encode(encoding))
+                                    result.encode(encoding))
         return None
 
     def transformBytes(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
             storeResponseInRAMCache(self.request, self.request.response,
-                    result)
+                                    result)
         return None
 
     def transformIterable(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
             result = ''.join(result)
             storeResponseInRAMCache(self.request, self.request.response,
-                result)
+                                    result)
             # as we have iterated the iterable, we must return a new one
             return iter(result)
         return None

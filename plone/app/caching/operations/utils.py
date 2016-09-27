@@ -47,6 +47,7 @@ etagNoQuote = re.compile('(\s*(W\/)?([^,]*)\s*,?)')
 # as any additional keyword parameters required.
 #
 
+
 def setCacheHeaders(published, request, response, maxage=None, smaxage=None, etag=None, lastModified=None, vary=None):
     """General purpose dispatcher to set various cache headers
 
@@ -59,18 +60,19 @@ def setCacheHeaders(published, request, response, maxage=None, smaxage=None, eta
 
     if maxage:
         cacheInBrowserAndProxy(published, request, response, maxage, smaxage=smaxage,
-            etag=etag, lastModified=lastModified, vary=vary)
+                               etag=etag, lastModified=lastModified, vary=vary)
 
     elif smaxage:
         cacheInProxy(published, request, response, smaxage,
-            etag=etag, lastModified=lastModified, vary=vary)
+                     etag=etag, lastModified=lastModified, vary=vary)
 
     elif etag or lastModified:
         cacheInBrowser(published, request, response,
-            etag=etag, lastModified=lastModified)
+                       etag=etag, lastModified=lastModified)
 
     else:
         doNotCache(published, request, response)
+
 
 def doNotCache(published, request, response):
     """Set response headers to ensure that the response is not cached by
@@ -87,6 +89,7 @@ def doNotCache(published, request, response):
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, must-revalidate, private')
 
+
 def cacheInBrowser(published, request, response, etag=None, lastModified=None):
     """Set response headers to indicate that browsers should cache the
     response but expire immediately and revalidate the cache on every
@@ -100,7 +103,7 @@ def cacheInBrowser(published, request, response, etag=None, lastModified=None):
     """
 
     if etag is not None:
-        response.setHeader('ETag', '"%s"' %etag, literal=1)
+        response.setHeader('ETag', '"%s"' % etag, literal=1)
 
     if lastModified is not None:
         response.setHeader('Last-Modified', formatDateTime(lastModified))
@@ -109,6 +112,7 @@ def cacheInBrowser(published, request, response, etag=None, lastModified=None):
 
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader('Cache-Control', 'max-age=0, must-revalidate, private')
+
 
 def cacheInProxy(published, request, response, smaxage, etag=None, lastModified=None, vary=None):
     """Set headers to cache the response in a caching proxy.
@@ -125,13 +129,15 @@ def cacheInProxy(published, request, response, smaxage, etag=None, lastModified=
         del response.headers['last-modified']
 
     if etag is not None:
-        response.setHeader('ETag', '"%s"' %etag, literal=1)
+        response.setHeader('ETag', '"%s"' % etag, literal=1)
 
     if vary is not None:
         response.setHeader('Vary', vary)
 
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
-    response.setHeader('Cache-Control', 'max-age=0, s-maxage=%d, must-revalidate' % smaxage)
+    response.setHeader(
+        'Cache-Control', 'max-age=0, s-maxage=%d, must-revalidate' % smaxage)
+
 
 def cacheInBrowserAndProxy(published, request, response, maxage, smaxage=None, etag=None, lastModified=None, vary=None):
     """Set headers to cache the response in the browser and caching proxy if
@@ -150,7 +156,7 @@ def cacheInBrowserAndProxy(published, request, response, maxage, smaxage=None, e
         del response.headers['last-modified']
 
     if etag is not None:
-        response.setHeader('ETag', '"%s"' %etag, literal=1)
+        response.setHeader('ETag', '"%s"' % etag, literal=1)
 
     if vary is not None:
         response.setHeader('Vary', vary)
@@ -158,11 +164,13 @@ def cacheInBrowserAndProxy(published, request, response, maxage, smaxage=None, e
     response.setHeader('Expires', formatDateTime(getExpiration(maxage)))
 
     if smaxage is not None:
-        maxage = '%s, s-maxage=%s' %(maxage, smaxage)
+        maxage = '%s, s-maxage=%s' % (maxage, smaxage)
 
     # Substituting proxy-validate in place of must=revalidate here because of Safari bug
     # https://bugs.webkit.org/show_bug.cgi?id=13128
-    response.setHeader('Cache-Control', 'max-age=%s, proxy-revalidate, public' % maxage)
+    response.setHeader(
+        'Cache-Control', 'max-age=%s, proxy-revalidate, public' % maxage)
+
 
 def cacheInRAM(published, request, response, etag=None, lastModified=None, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
     """Set a flag indicating that the response for the given request
@@ -192,6 +200,7 @@ def cacheInRAM(published, request, response, etag=None, lastModified=None, annot
     annotations[annotationsKey] = key
     alsoProvides(request, IRAMCached)
 
+
 def cachedResponse(published, request, response, status, headers, body, gzip=False):
     """Returned a cached page. Modifies the response (status and headers)
     and returns the cached body.
@@ -218,6 +227,7 @@ def cachedResponse(published, request, response, status, headers, body, gzip=Fal
         response.enableHTTPCompression(request)
 
     return body
+
 
 def notModified(published, request, response, etag=None, lastModified=None):
     """Return a ``304 NOT MODIFIED`` response. Modifies the response (status)
@@ -283,6 +293,7 @@ def cacheStop(request, rulename):
             return True
     return False
 
+
 def isModified(request, etag=None, lastModified=None):
     """Return True or False depending on whether the published resource has
     been modified.
@@ -327,7 +338,7 @@ def isModified(request, etag=None, lastModified=None):
     latest headers. I interpret this as the spec rule that the
     etags do NOT match, and therefor we must not return a 304.
     """
-    if ifNoneMatch and etag==None:
+    if ifNoneMatch and etag == None:
         return True
 
     # Check the modification date
@@ -372,6 +383,7 @@ def visibleToRole(published, role, permission='View'):
 # Basic helper functions
 #
 
+
 def getContext(published, marker=(IContentish, ISiteRoot,)):
     """Given a published object, attempt to look up a context
 
@@ -402,6 +414,7 @@ def getContext(published, marker=(IContentish, ISiteRoot,)):
 
     return published
 
+
 def formatDateTime(dt):
     """Format a Python datetime object as an RFC1123 date.
 
@@ -414,6 +427,7 @@ def formatDateTime(dt):
         dt = dt.astimezone(dateutil.tz.tzlocal())
 
     return wsgiref.handlers.format_date_time(time.mktime(dt.timetuple()))
+
 
 def parseDateTime(str):
     """Return a Python datetime object from an an RFC1123 date.
@@ -437,6 +451,7 @@ def parseDateTime(str):
 
     return dt
 
+
 def getLastModifiedAnnotation(published, request, lastModified=True):
     """Try to get the last modified date from a request annotation if available,
     otherwise try to get it from published object
@@ -457,6 +472,7 @@ def getLastModifiedAnnotation(published, request, lastModified=True):
         annotations[LASTMODIFIED_ANNOTATION_KEY] = dt
 
     return dt
+
 
 def getLastModified(published, lastModified=True):
     """Get a last modified date or None.
@@ -483,6 +499,7 @@ def getLastModified(published, lastModified=True):
 
     return dt
 
+
 def getExpiration(maxage):
     """Get an expiration date as a datetime in the local timezone.
 
@@ -495,6 +512,7 @@ def getExpiration(maxage):
         return now + datetime.timedelta(seconds=maxage)
     else:
         return now - datetime.timedelta(days=3650)
+
 
 def getETagAnnotation(published, request, keys=(), extraTokens=()):
     """Try to get the ETag from a request annotation if available,
@@ -517,6 +535,7 @@ def getETagAnnotation(published, request, keys=(), extraTokens=()):
 
     return etag
 
+
 def getETag(published, request, keys=(), extraTokens=()):
     """Calculate an ETag.
 
@@ -536,9 +555,11 @@ def getETag(published, request, keys=(), extraTokens=()):
     tokens = []
     noTokens = True
     for key in keys:
-        component = queryMultiAdapter((published, request), IETagValue, name=key)
+        component = queryMultiAdapter(
+            (published, request), IETagValue, name=key)
         if component is None:
-            logger.warning("Could not find value adapter for ETag component %s", key)
+            logger.warning(
+                "Could not find value adapter for ETag component %s", key)
             tokens.append('')
         else:
             value = component()
@@ -560,6 +581,7 @@ def getETag(published, request, keys=(), extraTokens=()):
     etag = etag.replace('"', "'")  # double quotes are bad in etags
 
     return etag
+
 
 def parseETags(text, allowWeak=True, _result=None):
     """Parse a header value into a list of etags. Handles fishy quoting and
@@ -586,13 +608,13 @@ def parseETags(text, allowWeak=True, _result=None):
         m = etagQuote.match(text)
         if m:
             # Match quoted etag (spec-observing client)
-            l     = len(m.group(1))
+            l = len(m.group(1))
             value = (m.group(2) or '') + (m.group(3) or '')
         else:
             # Match non-quoted etag (lazy client)
             m = etagNoQuote.match(text)
             if m:
-                l     = len(m.group(1))
+                l = len(m.group(1))
                 value = (m.group(2) or '') + (m.group(3) or '')
             else:
                 return result
@@ -613,6 +635,7 @@ def parseETags(text, allowWeak=True, _result=None):
 # RAM cache management
 #
 
+
 def getRAMCache(globalKey=PAGE_CACHE_KEY):
     """Get a RAM cache instance for the given key. The return value is ``None``
     if no RAM cache can be found, or a mapping object supporting at least
@@ -628,6 +651,7 @@ def getRAMCache(globalKey=PAGE_CACHE_KEY):
         return None
 
     return chooser(globalKey)
+
 
 def getRAMCacheKey(request, etag=None, lastModified=None):
     """Calculate the cache key for pages cached in RAM.
@@ -647,12 +671,13 @@ def getRAMCacheKey(request, etag=None, lastModified=None):
         request.get('SERVER_URL', ''),
         request.get('PATH_INFO', ''),
         request.get('QUERY_STRING', ''),
-        )
+    )
     if etag:
         resourceKey = '|' + etag + '||' + resourceKey
     if lastModified:
         resourceKey = '|' + str(lastModified) + '||' + resourceKey
     return resourceKey
+
 
 def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY, annotationsKey=PAGE_CACHE_ANNOTATION_KEY):
     """Store the given response in the RAM cache.
@@ -697,6 +722,7 @@ def storeResponseInRAMCache(request, response, result, globalKey=PAGE_CACHE_KEY,
     gzipFlag = response.enableHTTPCompression(query=True)
 
     cache[key] = (status, headers, result, gzipFlag)
+
 
 def fetchFromRAMCache(request, etag=None, lastModified=None, globalKey=PAGE_CACHE_KEY, default=None):
     """Return a page cached in RAM, or None if it cannot be found.

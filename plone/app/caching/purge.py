@@ -28,6 +28,7 @@ try:
 except ImportError:
     HAVE_AT = False
 
+
 @implementer(IPurgePaths)
 class ContentPurgePaths(object):
     """Paths to purge for content items
@@ -84,6 +85,7 @@ class ContentPurgePaths(object):
     def getAbsolutePaths(self):
         return []
 
+
 @implementer(IPurgePaths)
 class DiscussionItemPurgePaths(object):
     """Paths to purge for Discussion Item.
@@ -113,7 +115,8 @@ class DiscussionItemPurgePaths(object):
                     if rewriter is None:
                         yield relativePath
                     else:
-                        rewrittenPaths = rewriter(relativePath) or []  # None -> []
+                        rewrittenPaths = rewriter(
+                            relativePath) or []  # None -> []
                         for rewrittenPath in rewrittenPaths:
                             yield rewrittenPath
 
@@ -163,8 +166,8 @@ if HAVE_AT:
 
             def fieldFilter(field):
                 return ((IBlobField.providedBy(field) or
-                        IFileField.providedBy(field) or
-                        IImageField.providedBy(field))
+                         IFileField.providedBy(field) or
+                         IImageField.providedBy(field))
                         and not ITextField.providedBy(field))
 
             seenDownloads = False
@@ -191,10 +194,12 @@ if HAVE_AT:
 # Event redispatch for content items - we check the list of content items
 # instead of the marker interface
 
+
 @adapter(IContentish, IObjectModifiedEvent)
 def purgeOnModified(object, event):
     if isPurged(object):
         notify(Purge(object))
+
 
 @adapter(IContentish, IObjectMovedEvent)
 def purgeOnMovedOrRemoved(object, event):

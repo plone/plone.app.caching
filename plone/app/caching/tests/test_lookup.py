@@ -30,16 +30,18 @@ class DummyContent(Explicit):
     def defaultView(self):
         return self._defaultView
 
+
 class DummyNotContent(Explicit):
     pass
+
 
 class DummyFTI(object):
 
     def __init__(self, portal_type, viewAction=''):
         self.id = portal_type
         self._actions = {
-                'object/view': {'url': viewAction},
-            }
+            'object/view': {'url': viewAction},
+        }
 
     def getActionInfo(self, name):
         return self._actions[name]
@@ -51,6 +53,7 @@ class DummyFTI(object):
             return '@@defaultView'
         return default
 
+
 @implementer(IDynamicType)
 class DummyNotBrowserDefault(Explicit):
 
@@ -61,18 +64,23 @@ class DummyNotBrowserDefault(Explicit):
     def getTypeInfo(self):
         return DummyFTI(self.portal_type, self._viewAction)
 
+
 class DummyResponse(dict):
 
     def addHeader(self, name, value):
         self.setdefault(name, []).append(value)
 
+
 class DummyRequest(dict):
+
     def __init__(self, published, response):
         self['PUBLISHED'] = published
         self.response = response
 
+
 class DummyView(BrowserView):
     __name__ = 'defaultView'
+
 
 class TestContentItemLookup(unittest.TestCase):
 
@@ -218,7 +226,8 @@ class TestContentItemLookup(unittest.TestCase):
         ploneSettings.templateRulesetMapping = {}
         ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
 
-        published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/view'))
+        published = ZopePageTemplate('defaultView').__of__(
+            DummyNotBrowserDefault('testtype', 'string:${object_url}/view'))
         request = DummyRequest(published, DummyResponse())
         self.assertEqual('rule1', ContentItemLookup(published, request)())
 
@@ -231,7 +240,8 @@ class TestContentItemLookup(unittest.TestCase):
         ploneSettings.templateRulesetMapping = {}
         ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
 
-        published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/'))
+        published = ZopePageTemplate('defaultView').__of__(
+            DummyNotBrowserDefault('testtype', 'string:${object_url}/'))
         request = DummyRequest(published, DummyResponse())
         self.assertEqual('rule1', ContentItemLookup(published, request)())
 
@@ -244,7 +254,8 @@ class TestContentItemLookup(unittest.TestCase):
         ploneSettings.templateRulesetMapping = {}
         ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
 
-        published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView'))
+        published = ZopePageTemplate('defaultView').__of__(
+            DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView'))
         request = DummyRequest(published, DummyResponse())
 
         self.assertEqual('rule1', ContentItemLookup(published, request)())

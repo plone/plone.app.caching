@@ -27,6 +27,7 @@ def isPurged(object):
 
     return (portal_type in settings.purgedContentTypes)
 
+
 def stripLeadingCharacters(name):
     """Strip off leading / and/or @@
     """
@@ -37,6 +38,7 @@ def stripLeadingCharacters(name):
         name = name[2:]
 
     return name
+
 
 def getObjectDefaultView(context):
     """Get the id of an object's default view
@@ -59,7 +61,7 @@ def getObjectDefaultView(context):
     fti = context.getTypeInfo()
     try:
         # XXX: This isn't quite right since it assumes the action starts
-        #with ${object_url}
+        # with ${object_url}
         action = fti.getActionInfo('object/view')['url'].split('/')[-1]
     except ValueError:
         # If the action doesn't exist, stop
@@ -67,9 +69,9 @@ def getObjectDefaultView(context):
 
     # Try resolving method aliases because we need a real template_id here
     if action:
-        action = fti.queryMethodID(action, default = action, context = context)
+        action = fti.queryMethodID(action, default=action, context=context)
     else:
-        action = fti.queryMethodID('(Default)', default = action,
-                                   context = context)
+        action = fti.queryMethodID('(Default)', default=action,
+                                   context=context)
 
     return stripLeadingCharacters(action)

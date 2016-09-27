@@ -27,10 +27,12 @@ import unittest2 as unittest
 class DummyContext(Explicit):
     pass
 
+
 class DummyPublished(object):
 
     def __init__(self, parent=None):
         self.__parent__ = parent
+
 
 class TestETags(unittest.TestCase):
 
@@ -94,7 +96,6 @@ class TestETags(unittest.TestCase):
 
         self.assertEqual('bob', etag())
 
-
     # Roles
 
     def test_Roles_anonymous(self):
@@ -155,7 +156,6 @@ class TestETags(unittest.TestCase):
         etag = Roles(published, request)
 
         self.assertEqual('Manager;Member', etag())
-
 
     # Language
 
@@ -306,7 +306,6 @@ class TestETags(unittest.TestCase):
 
         self.assertEqual('10', etag())
 
-
     # ObjectLocked
 
     def test_ObjectLocked_true(self):
@@ -356,7 +355,6 @@ class TestETags(unittest.TestCase):
         etag = ObjectLocked(published, request)
 
         self.assertEqual('0', etag())
-
 
     # Skin
 

@@ -45,8 +45,10 @@ class Handler(object):
     def handler(self, event):
         self.invocations.append(event)
 
+
 class FauxRequest(dict):
     pass
+
 
 @implementer(IContentish)
 class FauxNonContent(Explicit):
@@ -68,6 +70,7 @@ class FauxNonContent(Explicit):
     def getPhysicalPath(self):
         return ('', )
 
+
 @implementer(IBrowserDefault)
 class FauxContent(FauxNonContent):
 
@@ -76,9 +79,11 @@ class FauxContent(FauxNonContent):
     def defaultView(self):
         return 'default-view'
 
+
 @implementer(IDiscussionResponse)
 class FauxDiscussable(Explicit):
     pass
+
 
 class TestPurgeRedispatch(unittest.TestCase):
 
@@ -151,6 +156,7 @@ class TestPurgeRedispatch(unittest.TestCase):
         self.assertEqual(1, len(self.handler.invocations))
         self.assertEqual(context, self.handler.invocations[0].object)
 
+
 class TestContentPurgePaths(unittest.TestCase):
 
     layer = UNIT_TESTING
@@ -187,6 +193,7 @@ class TestContentPurgePaths(unittest.TestCase):
                           '/bar/default-view/default-view', '/bar', '/bar/', '/bar/view'],
                          list(purger.getRelativePaths()))
         self.assertEqual([], list(purger.getAbsolutePaths()))
+
 
 class TestDiscussionItemPurgePaths(unittest.TestCase):
 
@@ -281,6 +288,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         self.assertEqual(['/app/foo'], list(purge.getRelativePaths()))
         self.assertEqual(['/purgeme'], list(purge.getAbsolutePaths()))
 
+
 class TestObjectFieldPurgePaths(unittest.TestCase):
 
     maxDiff = None
@@ -308,7 +316,8 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                 atapi.StringField('foo'),
                 atapi.FileField('file1'),
                 atapi.ImageField('image1'),
-                atapi.ImageField('image2', sizes={'mini': (50, 50), 'normal': (100, 100)}),
+                atapi.ImageField('image2', sizes={
+                                 'mini': (50, 50), 'normal': (100, 100)}),
                 BlobField('blob1'),
             ))
 
@@ -331,7 +340,8 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                 atapi.StringField('foo'),
                 atapi.FileField('file1'),
                 atapi.ImageField('image1'),
-                atapi.ImageField('image2', sizes={'mini': (50, 50), 'normal': (100, 100)}),
+                atapi.ImageField('image2', sizes={
+                                 'mini': (50, 50), 'normal': (100, 100)}),
                 atapi.TextField('text'),
             ))
 

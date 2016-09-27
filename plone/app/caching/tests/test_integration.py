@@ -197,7 +197,8 @@ class TestOperations(unittest.TestCase):
 
         browser.open(editURL)
 
-        browser.getControl(name='form.widgets.IDublinCore.title').value = u"Title 1"
+        browser.getControl(
+            name='form.widgets.IDublinCore.title').value = u"Title 1"
         browser.getControl('Save').click()
 
         self.assertEqual([], self.purger._sync)
@@ -212,7 +213,8 @@ class TestOperations(unittest.TestCase):
         transaction.commit()
 
         browser.open(editURL)
-        browser.getControl(name='form.widgets.IDublinCore.title').value = u"Title 2"
+        browser.getControl(
+            name='form.widgets.IDublinCore.title').value = u"Title 2"
         browser.getControl('Save').click()
 
         self.assertEqual([], self.purger._sync)
@@ -227,7 +229,8 @@ class TestOperations(unittest.TestCase):
         transaction.commit()
 
         browser.open(editURL)
-        browser.getControl(name='form.widgets.IDublinCore.title').value = u"Title 3"
+        browser.getControl(
+            name='form.widgets.IDublinCore.title').value = u"Title 3"
         browser.getControl('Save').click()
 
         self.assertEqual([], self.purger._sync)
@@ -242,7 +245,8 @@ class TestOperations(unittest.TestCase):
         transaction.commit()
 
         browser.open(editURL)
-        browser.getControl(name='form.widgets.IDublinCore.title').value = u"Title 4"
+        browser.getControl(
+            name='form.widgets.IDublinCore.title').value = u"Title 4"
         browser.getControl('Save').click()
 
         self.assertEqual([], self.purger._sync)

@@ -33,6 +33,7 @@ try:
 except ImportError:
     HAVE_RESOURCE_REGISTRIES = False
 
+
 @implementer(ICachingOperation)
 @provider(ICachingOperationType)
 class BaseCaching(object):
@@ -67,7 +68,8 @@ class BaseCaching(object):
                     u"to use one of the other simpler operations (Strong caching, "
                     u"Moderate caching, Weak caching, or No caching).")
     prefix = 'plone.app.caching.baseCaching'
-    options = ('maxage','smaxage','etags','lastModified','ramCache', 'vary', 'anonOnly')
+    options = ('maxage', 'smaxage', 'etags', 'lastModified',
+               'ramCache', 'vary', 'anonOnly')
 
     # Default option values
     maxage = smaxage = etags = vary = None
@@ -80,9 +82,9 @@ class BaseCaching(object):
     def interceptResponse(self, rulename, response, class_=None):
         options = lookupOptions(class_ or self.__class__, rulename)
 
-        etags        = options.get('etags') or self.etags
-        anonOnly     = options.get('anonOnly', self.anonOnly)
-        ramCache     = options.get('ramCache', self.ramCache)
+        etags = options.get('etags') or self.etags
+        anonOnly = options.get('anonOnly', self.anonOnly)
+        ramCache = options.get('ramCache', self.ramCache)
         lastModified = options.get('lastModified', self.lastModified)
 
         # Add the ``anonymousOrRandom`` etag if we are anonymous only
@@ -93,7 +95,8 @@ class BaseCaching(object):
                 etags = tuple(etags) + ('anonymousOrRandom',)
 
         etag = getETagAnnotation(self.published, self.request, keys=etags)
-        lastModified = getLastModifiedAnnotation(self.published, self.request, lastModified=lastModified)
+        lastModified = getLastModifiedAnnotation(
+            self.published, self.request, lastModified=lastModified)
 
         # Check for cache stop request variables
         if cacheStop(self.request, rulename):
@@ -106,10 +109,12 @@ class BaseCaching(object):
         # Check if this is in the ram cache
         if ramCache:
             context = getContext(self.published)
-            portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
+            portal_state = getMultiAdapter(
+                (context, self.request), name=u'plone_portal_state')
 
             if portal_state.anonymous():
-                cached = fetchFromRAMCache(self.request, etag=etag, lastModified=lastModified)
+                cached = fetchFromRAMCache(
+                    self.request, etag=etag, lastModified=lastModified)
                 if cached is not None:
                     return cachedResponse(self.published, self.request, response, *cached)
 
@@ -118,13 +123,13 @@ class BaseCaching(object):
     def modifyResponse(self, rulename, response, class_=None):
         options = lookupOptions(class_ or self.__class__, rulename)
 
-        maxage   = options.get('maxage', self.maxage)
-        smaxage  = options.get('smaxage', self.smaxage)
-        etags    = options.get('etags') or self.etags
+        maxage = options.get('maxage', self.maxage)
+        smaxage = options.get('smaxage', self.smaxage)
+        etags = options.get('etags') or self.etags
 
         anonOnly = options.get('anonOnly', self.anonOnly)
         ramCache = options.get('ramCache', self.ramCache)
-        vary     = options.get('vary', self.vary)
+        vary = options.get('vary', self.vary)
 
         # Add the ``anonymousOrRandom`` etag if we are anonymous only
         if anonOnly:
@@ -134,7 +139,8 @@ class BaseCaching(object):
                 etags = tuple(etags) + ('anonymousOrRandom',)
 
         etag = getETagAnnotation(self.published, self.request, etags)
-        lastModified = getLastModifiedAnnotation(self.published, self.request, options['lastModified'])
+        lastModified = getLastModifiedAnnotation(
+            self.published, self.request, options['lastModified'])
 
         # Check for cache stop request variables
         if cacheStop(self.request, rulename):
@@ -154,7 +160,8 @@ class BaseCaching(object):
             if etags is not None:
                 if 'userid' in etags or 'anonymousOrRandom' in etags or 'roles' in etags:
                     context = getContext(self.published)
-                    portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
+                    portal_state = getMultiAdapter(
+                        (context, self.request), name=u'plone_portal_state')
                     public = portal_state.anonymous()
             public = public and visibleToRole(self.published, role='Anonymous')
 
@@ -163,10 +170,11 @@ class BaseCaching(object):
             maxage = smaxage = 0
 
         setCacheHeaders(self.published, self.request, response, maxage=maxage, smaxage=smaxage,
-            etag=etag, lastModified=lastModified, vary=vary)
+                        etag=etag, lastModified=lastModified, vary=vary)
 
         if ramCache and public:
-            cacheInRAM(self.published, self.request, response, etag=etag, lastModified=lastModified)
+            cacheInRAM(self.published, self.request, response,
+                       etag=etag, lastModified=lastModified)
 
 
 @provider(ICachingOperationType)
@@ -187,12 +195,13 @@ class WeakCaching(BaseCaching):
     sort = 3
 
     # Configurable options
-    options = ('etags','lastModified','ramCache','vary', 'anonOnly')
+    options = ('etags', 'lastModified', 'ramCache', 'vary', 'anonOnly')
 
     # Default option values
     maxage = 0
     smaxage = etags = vary = None
     lastModified = ramCache = anonOnly = False
+
 
 @provider(ICachingOperationType)
 class ModerateCaching(BaseCaching):
@@ -211,13 +220,15 @@ class ModerateCaching(BaseCaching):
     sort = 2
 
     # Configurable options
-    options = ('smaxage','etags','lastModified','ramCache','vary', 'anonOnly')
+    options = ('smaxage', 'etags', 'lastModified',
+               'ramCache', 'vary', 'anonOnly')
 
     # Default option values
     maxage = 0
     smaxage = 86400
     etags = vary = None
     lastModified = ramCache = anonOnly = False
+
 
 @provider(ICachingOperationType)
 class StrongCaching(BaseCaching):
@@ -234,7 +245,8 @@ class StrongCaching(BaseCaching):
     sort = 1
 
     # Configurable options
-    options = ('maxage','smaxage','etags','lastModified','ramCache','vary', 'anonOnly')
+    options = ('maxage', 'smaxage', 'etags', 'lastModified',
+               'ramCache', 'vary', 'anonOnly')
 
     # Default option values
     maxage = 86400
@@ -261,7 +273,9 @@ if HAVE_RESOURCE_REGISTRIES:
                     doNotCache(self.published, self.request, response)
                     return
 
-            super(ResourceRegistriesCaching, self).modifyResponse(rulename, response, class_=StrongCaching)
+            super(ResourceRegistriesCaching, self).modifyResponse(
+                rulename, response, class_=StrongCaching)
+
 
 @implementer(ICachingOperation)
 @provider(ICachingOperationType)

@@ -66,7 +66,8 @@ class TestOperationDefault(unittest.TestCase):
         self.assertFalse('Etag' in browser.headers)
 
         # now set up etags and make sure that a header is added
-        self.registry['plone.app.caching.weakCaching.etags'] = ('lastModified',)
+        self.registry['plone.app.caching.weakCaching.etags'] = (
+            'lastModified',)
         import transaction
         transaction.commit()
         browser.open("%s/dummy-content/edit?_authenticator=%s" % (

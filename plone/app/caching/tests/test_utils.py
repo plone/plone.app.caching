@@ -41,16 +41,18 @@ class DummyContent(Explicit):
     def defaultView(self):
         return self._defaultView
 
+
 class DummyNotContent(Explicit):
     pass
+
 
 class DummyFTI(object):
 
     def __init__(self, portal_type, viewAction=''):
         self.id = portal_type
         self._actions = {
-                'object/view': {'url': viewAction},
-            }
+            'object/view': {'url': viewAction},
+        }
 
     def getActionInfo(self, name):
         return self._actions[name]
@@ -62,6 +64,7 @@ class DummyFTI(object):
             return '@@defaultView'
         return default
 
+
 @implementer(IDynamicType)
 class DummyNotBrowserDefault(Explicit):
 
@@ -71,6 +74,7 @@ class DummyNotBrowserDefault(Explicit):
 
     def getTypeInfo(self):
         return DummyFTI(self.portal_type, self._viewAction)
+
 
 class TestIsPurged(unittest.TestCase):
 
@@ -121,6 +125,7 @@ class TestIsPurged(unittest.TestCase):
         content = DummyContent()
         self.assertEqual(True, isPurged(content))
 
+
 class TestGetObjectDefaultPath(unittest.TestCase):
 
     layer = UNIT_TESTING
@@ -138,7 +143,8 @@ class TestGetObjectDefaultPath(unittest.TestCase):
         self.assertEqual('defaultView', getObjectDefaultView(context))
 
     def test_not_IBrowserDefault_methodid(self):
-        context = DummyNotBrowserDefault('testtype', 'string:${object_url}/view')
+        context = DummyNotBrowserDefault(
+            'testtype', 'string:${object_url}/view')
         self.assertEqual('defaultView', getObjectDefaultView(context))
 
     def test_not_IBrowserDefault_default_method(self):
@@ -146,5 +152,6 @@ class TestGetObjectDefaultPath(unittest.TestCase):
         self.assertEqual('defaultView', getObjectDefaultView(context))
 
     def test_not_IBrowserDefault_actiononly(self):
-        context = DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView')
+        context = DummyNotBrowserDefault(
+            'testtype', 'string:${object_url}/defaultView')
         self.assertEqual('defaultView', getObjectDefaultView(context))
