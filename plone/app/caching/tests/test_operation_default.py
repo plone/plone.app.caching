@@ -1,19 +1,17 @@
-import unittest2 as unittest
-
-from plone.testing.z2 import Browser
-
-from plone.app.testing import TEST_USER_ID, TEST_USER_NAME, TEST_USER_PASSWORD
+# -*- coding: utf-8 -*-
+from plone.app.caching.testing import getToken
+from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 from plone.app.testing import setRoles
-
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_NAME
+from plone.app.testing import TEST_USER_PASSWORD
+from plone.caching.interfaces import ICacheSettings
+from plone.registry.interfaces import IRegistry
+from plone.testing.z2 import Browser
 from zope.component import getUtility
-
 from zope.globalrequest import setRequest
 
-from plone.registry.interfaces import IRegistry
-from plone.caching.interfaces import ICacheSettings
-
-from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
-from plone.app.caching.testing import getToken
+import unittest2 as unittest
 
 
 class TestOperationDefault(unittest.TestCase):
@@ -68,7 +66,8 @@ class TestOperationDefault(unittest.TestCase):
         self.assertFalse('Etag' in browser.headers)
 
         # now set up etags and make sure that a header is added
-        self.registry['plone.app.caching.weakCaching.etags'] = ('lastModified',)
+        self.registry['plone.app.caching.weakCaching.etags'] = (
+            'lastModified',)
         import transaction
         transaction.commit()
         browser.open("%s/dummy-content/edit?_authenticator=%s" % (

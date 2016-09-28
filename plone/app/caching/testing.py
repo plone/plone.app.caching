@@ -1,29 +1,18 @@
+# -*- coding: utf-8 -*-
+from hashlib import sha1 as sha
 from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
-from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import IntegrationTesting
-from plone.app.testing import FunctionalTesting
 from plone.app.testing import applyProfile
-
-from zope.interface import implementer
-
+from plone.app.testing import FunctionalTesting
+from plone.app.testing import IntegrationTesting
+from plone.app.testing import PloneSandboxLayer
+from plone.cachepurging.interfaces import IPurger
+from plone.protect.authenticator import _getKeyring
 from zope.component import getUtility
 from zope.component import provideUtility
-
 from zope.configuration import xmlconfig
-
-from plone.cachepurging.interfaces import IPurger
-
-try:
-    from plone.protect.authenticator import _getKeyring
-except ImportError:
-    # so we can run tests on plone 4.3
-    from plone.keyring.interfaces import IKeyManager
-    def _getKeyring(username):
-        manager = getUtility(IKeyManager)
-        return manager['_system']
+from zope.interface import implementer
 
 import hmac
-from hashlib import sha1 as sha
 
 
 @implementer(IPurger)
@@ -57,7 +46,8 @@ class PloneAppCaching(PloneSandboxLayer):
 
         # Load ZCML
         import plone.app.caching
-        xmlconfig.file('configure.zcml', plone.app.caching, context=configurationContext)
+        xmlconfig.file('configure.zcml', plone.app.caching,
+                       context=configurationContext)
 
         # Install fake purger
         self.oldPurger = getUtility(IPurger)
@@ -66,7 +56,8 @@ class PloneAppCaching(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'plone.app.caching:default')
 
-        portal['portal_workflow'].setDefaultChain('simple_publication_workflow')
+        portal['portal_workflow'].setDefaultChain(
+            'simple_publication_workflow')
 
     def tearDownZope(self, app):
         # Store old purger
@@ -75,9 +66,13 @@ class PloneAppCaching(PloneSandboxLayer):
 
 PLONE_APP_CACHING_FIXTURE = PloneAppCaching()
 PLONE_APP_CACHING_INTEGRATION_TESTING = IntegrationTesting(
-    bases=(PLONE_APP_CACHING_FIXTURE,), name="PloneAppCaching:Integration")
+    bases=(PLONE_APP_CACHING_FIXTURE,),
+    name='PloneAppCaching:Integration'
+)
 PLONE_APP_CACHING_FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(PLONE_APP_CACHING_FIXTURE,), name="PloneAppCaching:Functional")
+    bases=(PLONE_APP_CACHING_FIXTURE,),
+    name='PloneAppCaching:Functional'
+)
 
 
 def getToken(username):

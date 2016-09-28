@@ -1,43 +1,35 @@
-import re
-import datetime
-
-from zope.interface import implementer
-from zope.component import getUtility
-from zope.component import getUtilitiesFor
-from zope.component import queryUtility
-
-from zope.publisher.interfaces import IPublishTraverse
-from zope.publisher.interfaces import NotFound
-
-from zope.ramcache.interfaces.ram import IRAMCache
-
-from plone.memoize.instance import memoize
-
-from plone.registry.interfaces import IRegistry
-
-from z3c.caching.interfaces import IRulesetType
-from z3c.caching.registry import enumerateTypes
-
-from plone.protect import CheckAuthenticator
-
-from plone.caching.interfaces import ICacheSettings
-from plone.caching.interfaces import ICachingOperationType
-
-from plone.cachepurging.interfaces import IPurger
+# -*- coding: utf-8 -*-
+from plone.app.caching.browser.edit import EditForm
+from plone.app.caching.interfaces import _
+from plone.app.caching.interfaces import ICacheProfiles
+from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.cachepurging.interfaces import ICachePurgingSettings
-
-from plone.cachepurging.utils import isCachePurgingEnabled
+from plone.cachepurging.interfaces import IPurger
 from plone.cachepurging.utils import getPathsToPurge
 from plone.cachepurging.utils import getURLsToPurge
-
-from plone.app.caching.interfaces import IPloneCacheSettings
-from plone.app.caching.interfaces import ICacheProfiles
-from plone.app.caching.interfaces import _
-from plone.app.caching.browser.edit import EditForm
-
-from Products.GenericSetup.interfaces import BASE, EXTENSION
+from plone.cachepurging.utils import isCachePurgingEnabled
+from plone.caching.interfaces import ICacheSettings
+from plone.caching.interfaces import ICachingOperationType
+from plone.memoize.instance import memoize
+from plone.protect import CheckAuthenticator
+from plone.registry.interfaces import IRegistry
 from Products.CMFCore.utils import getToolByName
+from Products.GenericSetup.interfaces import BASE
+from Products.GenericSetup.interfaces import EXTENSION
 from Products.statusmessages.interfaces import IStatusMessage
+from z3c.caching.interfaces import IRulesetType
+from z3c.caching.registry import enumerateTypes
+from zope.component import getUtilitiesFor
+from zope.component import getUtility
+from zope.component import queryUtility
+from zope.interface import implementer
+from zope.publisher.interfaces import IPublishTraverse
+from zope.publisher.interfaces import NotFound
+from zope.ramcache.interfaces.ram import IRAMCache
+
+import datetime
+import re
+
 
 # Borrowed from zope.schema to avoid an import of a private name
 _isuri = re.compile(
@@ -64,7 +56,8 @@ class BaseView(object):
         self.registry = getUtility(IRegistry)
         self.settings = self.registry.forInterface(ICacheSettings)
         self.ploneSettings = self.registry.forInterface(IPloneCacheSettings)
-        self.purgingSettings = self.registry.forInterface(ICachePurgingSettings)
+        self.purgingSettings = self.registry.forInterface(
+            ICachePurgingSettings)
         self.ramCache = queryUtility(IRAMCache)
 
         if self.request.method == 'POST':
@@ -116,26 +109,40 @@ class ControlPanel(BaseView):
             return self  # traverse again to get operation name
 
         # Step 2 - get operation name
-        if (self.editGlobal or self.editRuleset) and not self.editOperationName:
+        if (
+            (self.editGlobal or self.editRuleset) and
+            not self.editOperationName
+        ):
             self.editOperationName = name
 
             if self.editGlobal:
 
-                operation = queryUtility(ICachingOperationType, name=self.editOperationName)
+                operation = queryUtility(
+                    ICachingOperationType, name=self.editOperationName)
                 if operation is None:
                     raise NotFound(self, operation)
 
-                return EditForm(self.context, self.request, self.editOperationName, operation)
+                return EditForm(
+                    self.context,
+                    self.request,
+                    self.editOperationName,
+                    operation
+                )
             elif self.editRuleset:
                 return self  # traverse again to get ruleset name
             else:
                 raise NotFound(self, name)
 
         # Step 3 - if this is ruleset traversal, get the ruleset name
-        if self.editRuleset and self.editOperationName and not self.editRulesetName:
+        if (
+            self.editRuleset and
+            self.editOperationName and
+            not self.editRulesetName
+        ):
             self.editRulesetName = name
 
-            operation = queryUtility(ICachingOperationType, name=self.editOperationName)
+            operation = queryUtility(
+                ICachingOperationType, name=self.editOperationName)
             if operation is None:
                 raise NotFound(self, self.operationName)
 
@@ -200,7 +207,6 @@ class ControlPanel(BaseView):
             operationMapping[ruleset] = operation
 
         for ruleset, contentTypes in contentTypesMap.items():
-
             if not ruleset:
                 continue
 
@@ -208,9 +214,7 @@ class ControlPanel(BaseView):
                 ruleset = ruleset.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
-
             for contentType in contentTypes:
-
                 if not contentType:
                     continue
 
@@ -218,16 +222,25 @@ class ControlPanel(BaseView):
                     contentType = contentType.encode('utf-8')
 
                 if contentType in contentTypeRulesetMapping:
-                    self.errors.setdefault('contenttypes', {})[ruleset] = \
-                        _(u"Content type ${contentType} is already mapped to the rule ${ruleset}.",
-                            mapping={
-                                'contentType': self.contentTypesLookup.get(contentType, {}).get('title', contentType),  # noqa
-                                'ruleset': contentTypeRulesetMapping[contentType]})
+                    self.errors.setdefault(
+                        'contenttypes', {}
+                    )[ruleset] = _(
+                        u'Content type ${contentType} is already mapped to '
+                        u'the rule ${ruleset}.',
+                        mapping={
+                            'contentType': self.contentTypesLookup.get(
+                                contentType, {}
+                            ).get(
+                                'title',
+                                contentType
+                            ),
+                            'ruleset': contentTypeRulesetMapping[contentType]
+                        }
+                    )
                 else:
                     contentTypeRulesetMapping[contentType] = ruleset
 
         for ruleset, templates in templatesMap.items():
-
             if not ruleset:
                 continue
 
@@ -235,11 +248,8 @@ class ControlPanel(BaseView):
                 ruleset = ruleset.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
-
             for template in templates:
-
                 template = template.strip()
-
                 if not template:
                     continue
 
@@ -247,53 +257,67 @@ class ControlPanel(BaseView):
                     template = template.encode('utf-8')
 
                 if template in templateRulesetMapping:
-                    self.errors.setdefault('templates', {})[ruleset] = \
-                        _(u"Template ${template} is already mapped to the rule ${ruleset}.",
-                            mapping={
-                                'template': template,
-                                'ruleset': templateRulesetMapping[template]})
+                    self.errors.setdefault(
+                        'templates', {}
+                    )[ruleset] = _(
+                        u'Template ${template} is already mapped to the rule '
+                        u'${ruleset}.',
+                        mapping={
+                            'template': template,
+                            'ruleset': templateRulesetMapping[template]
+                        }
+                    )
                 else:
                     templateRulesetMapping[template] = ruleset
 
         # Validate purging settings
-
         for cachingProxy in cachingProxies:
             if not _isuri(cachingProxy):
                 self.errors['cachingProxies'] = _(u"Invalid URL: ${url}", mapping={'url': cachingProxy})  # noqa
 
         for domain in domains:
             if not _isuri(domain):
-                self.errors['domain'] = _(u"Invalid URL: ${url}", mapping={'url': domain})
+                self.errors['domain'] = _(
+                    u'Invalid URL: ${url}',
+                    mapping={'url': domain}
+                )
 
         # RAM cache settings
-
         try:
             ramCacheMaxEntries = int(ramCacheMaxEntries)
         except (ValueError, TypeError,):
             self.errors['ramCacheMaxEntries'] = _(u"An integer is required.")
         else:
             if ramCacheMaxEntries < 0:
-                self.errors['ramCacheMaxEntries'] = _(u"A positive number is required.")
-
+                self.errors['ramCacheMaxEntries'] = _(
+                    u"A positive number is required."
+                )
         try:
             ramCacheMaxAge = int(ramCacheMaxAge)
         except (ValueError, TypeError,):
             self.errors['ramCacheMaxAge'] = _(u"An integer is required.")
         else:
             if ramCacheMaxAge < 0:
-                self.errors['ramCacheMaxAge'] = _(u"A positive number is required.")
+                self.errors['ramCacheMaxAge'] = _(
+                    u'A positive number is required.'
+                )
 
         try:
             ramCacheCleanupInterval = int(ramCacheCleanupInterval)
         except (ValueError, TypeError,):
-            self.errors['ramCacheCleanupInterval'] = _(u"An integer is required.")
+            self.errors['ramCacheCleanupInterval'] = _(
+                u'An integer is required.'
+            )
         else:
             if ramCacheMaxAge < 0:
-                self.errors['ramCacheCleanupInterval'] = _(u"A positive number is required.")
+                self.errors['ramCacheCleanupInterval'] = _(
+                    u'A positive number is required.'
+                )
 
         # Check for errors
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"There were errors."), "error")
             return
 
         # Save settings
@@ -301,7 +325,7 @@ class ControlPanel(BaseView):
         self.settings.operationMapping = operationMapping
 
         self.ploneSettings.templateRulesetMapping = templateRulesetMapping
-        self.ploneSettings.contentTypeRulesetMapping = contentTypeRulesetMapping
+        self.ploneSettings.contentTypeRulesetMapping = contentTypeRulesetMapping  # noqa
         self.ploneSettings.purgedContentTypes = purgedContentTypes
 
         self.purgingSettings.enabled = purgingEnabled
@@ -309,9 +333,16 @@ class ControlPanel(BaseView):
         self.purgingSettings.virtualHosting = virtualHosting
         self.purgingSettings.domains = domains
 
-        self.ramCache.update(ramCacheMaxEntries, ramCacheMaxAge, ramCacheCleanupInterval)
+        self.ramCache.update(
+            ramCacheMaxEntries,
+            ramCacheMaxAge,
+            ramCacheCleanupInterval
+        )
 
-        IStatusMessage(self.request).addStatusMessage(_(u"Changes saved."), "info")
+        IStatusMessage(self.request).addStatusMessage(
+            _(u'Changes saved.'),
+            'info'
+        )
 
     # Rule types - used as the index column
     @property
@@ -340,15 +371,23 @@ class ControlPanel(BaseView):
     @property
     def templateMapping(self):
         return dict(
-            [(k, v.replace('.', '-'),)
-             for k, v in (self.ploneSettings.templateRulesetMapping or {}).items()]
+            [
+                (k, v.replace('.', '-'),)
+                for k, v in (
+                    self.ploneSettings.templateRulesetMapping or {}
+                ).items()
+            ]
         )
 
     @property
     def contentTypeMapping(self):
         return dict(
-            [(k, v.replace('.', '-'),)
-             for k, v in (self.ploneSettings.contentTypeRulesetMapping or {}).items()]
+            [
+                (k, v.replace('.', '-'),)
+                for k, v in (
+                    self.ploneSettings.contentTypeRulesetMapping or {}
+                ).items()
+            ]
         )
 
     # Type lookups (for accessing settings)
@@ -376,7 +415,8 @@ class ControlPanel(BaseView):
         types = {}
         portal_types = getToolByName(self.context, 'portal_types')
         for fti in portal_types.objectValues():
-            types[fti.id] = dict(title=fti.title or fti.id, description=fti.description)
+            types[fti.id] = dict(title=fti.title or fti.id,
+                                 description=fti.description)
         return types
 
     # Sorted lists (e.g. for drop-downs)
@@ -385,7 +425,8 @@ class ControlPanel(BaseView):
     @memoize
     def operationTypes(self):
         operations = [v for k, v in self.operationTypesLookup.items()]
-        operations.sort(lambda x, y: (cmp(x['sort'], y['sort']) or cmp(x['title'], y['title'])))
+        operations.sort(lambda x, y: (
+            cmp(x['sort'], y['sort']) or cmp(x['title'], y['title'])))
         return operations
 
     @property
@@ -471,7 +512,8 @@ class Import(BaseView):
             self.errors['profile'] = _(u"You must select a profile to import.")
 
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"There were errors."), "error")
             return
 
         portal_setup = getToolByName(self.context, 'portal_setup')
@@ -485,22 +527,28 @@ class Import(BaseView):
         # Import the new profile
         portal_setup.runAllImportStepsFromProfile("profile-%s" % profile)
 
-        IStatusMessage(self.request).addStatusMessage(_(u"Import complete."), "info")
+        IStatusMessage(self.request).addStatusMessage(
+            _(u"Import complete."), "info")
 
     @property
     @memoize
     def profiles(self):
         portal_setup = getToolByName(self.context, 'portal_setup')
-        return [profile for profile in portal_setup.listProfileInfo(ICacheProfiles)
-                if profile.get('type', BASE) == EXTENSION and profile.get('for') is not None]
+        return [
+            profile for profile in portal_setup.listProfileInfo(ICacheProfiles)
+            if (
+                profile.get('type', BASE) == EXTENSION and
+                profile.get('for') is not None
+            )
+        ]
 
 
 class Purge(BaseView):
     """The purge control panel
     """
+
     def update(self):
         self.purgeLog = []
-
         if super(Purge, self).update():
             if 'form.button.Purge' in self.request.form:
                 self.processPurge()
@@ -513,11 +561,11 @@ class Purge(BaseView):
             self.errors['urls'] = _(u"No URLs or paths entered.")
 
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"There were errors."), "error")
             return
 
         purger = getUtility(IPurger)
-
         serverURL = self.request['SERVER_URL']
 
         def purge(url):
@@ -589,11 +637,14 @@ class RAMCache(BaseView):
     def processPurge(self):
 
         if self.ramCache is None:
-            IStatusMessage(self.request).addStatusMessage(_(u"RAM cache not installed."), "error")
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"RAM cache not installed."), "error")
 
         if self.errors:
-            IStatusMessage(self.request).addStatusMessage(_(u"There were errors."), "error")
+            IStatusMessage(self.request).addStatusMessage(
+                _(u"There were errors."), "error")
             return
 
         self.ramCache.invalidateAll()
-        IStatusMessage(self.request).addStatusMessage(_(u"Cache purged."), "info")
+        IStatusMessage(self.request).addStatusMessage(
+            _(u"Cache purged."), "info")

@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+from zope import schema
+from zope.interface import Interface
+
 import zope.i18nmessageid
 
-from zope.interface import Interface
-from zope import schema
 
 _ = zope.i18nmessageid.MessageFactory('plone.app.caching')
+
 
 class ICacheProfiles(Interface):
     """Marker interface for extension profiles that contain cache settings.
@@ -25,6 +28,7 @@ class ICacheProfiles(Interface):
     available for installation in the cache settings control panel.
     """
 
+
 class IPloneCacheSettings(Interface):
     """Settings stored in the registry.
 
@@ -34,32 +38,35 @@ class IPloneCacheSettings(Interface):
     """
 
     templateRulesetMapping = schema.Dict(
-            title=_(u"Page template/ruleset mapping"),
-            description=_(u"Maps skin layer page template names to ruleset names"),
-            key_type=schema.ASCIILine(title=_(u"Page template name")),
-            value_type=schema.DottedName(title=_(u"Ruleset name")),
-        )
+        title=_(u"Page template/ruleset mapping"),
+        description=_(u"Maps skin layer page template names to ruleset names"),
+        key_type=schema.ASCIILine(title=_(u"Page template name")),
+        value_type=schema.DottedName(title=_(u"Ruleset name")),
+    )
 
     contentTypeRulesetMapping = schema.Dict(
-            title=_(u"Content type/ruleset mapping"),
-            description=_(u"Maps content type names to ruleset names"),
-            key_type=schema.ASCIILine(title=_(u"Content type name")),
-            value_type=schema.DottedName(title=_(u"Ruleset name")),
-        )
+        title=_(u"Content type/ruleset mapping"),
+        description=_(u"Maps content type names to ruleset names"),
+        key_type=schema.ASCIILine(title=_(u"Content type name")),
+        value_type=schema.DottedName(title=_(u"Ruleset name")),
+    )
 
     purgedContentTypes = schema.Tuple(
-            title=_(u"Content types to purge"),
-            description=_(u"List content types which should be purged when modified"),
-            value_type=schema.ASCIILine(title=_(u"Content type name")),
-            default=('File', 'Image', 'News Item', ),
-        )
+        title=_(u"Content types to purge"),
+        description=_(
+            u"List content types which should be purged when modified"),
+        value_type=schema.ASCIILine(title=_(u"Content type name")),
+        default=('File', 'Image', 'News Item', ),
+    )
 
     cacheStopRequestVariables = schema.Tuple(
-            title=_(u"Request variables that prevent caching"),
-            description=_(u"Variables in the request that prevent caching if present"),
-            value_type=schema.ASCIILine(title=_(u"Request variables")),
-            default=('statusmessages', 'SearchableText',),
-        )
+        title=_(u"Request variables that prevent caching"),
+        description=_(
+            u"Variables in the request that prevent caching if present"),
+        value_type=schema.ASCIILine(title=_(u"Request variables")),
+        default=('statusmessages', 'SearchableText',),
+    )
+
 
 class IETagValue(Interface):
     """ETag component builder
@@ -73,6 +80,7 @@ class IETagValue(Interface):
     def __call__():
         """Return the ETag component, as a string.
         """
+
 
 class IRAMCached(Interface):
     """Marker interface applied to the request if it should be RAM cached.

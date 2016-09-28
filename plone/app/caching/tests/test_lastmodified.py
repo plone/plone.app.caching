@@ -1,19 +1,17 @@
-import unittest2 as unittest
+# -*- coding: utf-8 -*-
+from dateutil.tz import tzlocal
+from persistent.TimeStamp import TimeStamp
+from plone.app.caching import lastmodified
 from plone.testing.zca import UNIT_TESTING
+from z3c.caching.interfaces import ILastModified
+from zope.component import provideAdapter
 
-import os
-import time
 import datetime
 import DateTime
+import os
+import time
+import unittest2 as unittest
 
-from dateutil.tz import tzlocal
-
-from persistent.TimeStamp import TimeStamp
-
-from zope.component import provideAdapter
-from z3c.caching.interfaces import ILastModified
-
-from plone.app.caching import lastmodified
 
 class FauxDataManager(object):
 
@@ -25,6 +23,7 @@ class FauxDataManager(object):
 
     def register(self, object):
         pass
+
 
 class TestLastModified(unittest.TestCase):
 
@@ -54,8 +53,7 @@ class TestLastModified(unittest.TestCase):
         zpt = ZopePageTemplate('zpt').__of__(d)
         self.assertEqual(None, ILastModified(zpt)())
 
-
-        timestamp = 987654321.0 # time stamp (in UTC)
+        timestamp = 987654321.0  # time stamp (in UTC)
         # equivalent in local time, which is what the last-modified adapter
         # should return
         mod = datetime.datetime.fromtimestamp(timestamp, tzlocal())
@@ -78,8 +76,7 @@ class TestLastModified(unittest.TestCase):
         zpt = FSPageTemplate('zpt', __file__).__of__(d)
         self.assertEqual(None, ILastModified(zpt)())
 
-
-        timestamp = 987654321.0 # time stamp (in UTC)
+        timestamp = 987654321.0  # time stamp (in UTC)
         # equivalent in local time, which is what the last-modified adapter
         # should return
         mod = datetime.datetime.fromtimestamp(timestamp, tzlocal())
@@ -93,8 +90,8 @@ class TestLastModified(unittest.TestCase):
         dummy = File('dummy', 'Dummy', 'data')
         self.assertEqual(None, ILastModified(dummy)())
 
-        timestamp = 987654321.0 # time stamp (in UTC)
-        ts = TimeStamp(*time.gmtime(timestamp)[:6]) # corresponding TimeStamp
+        timestamp = 987654321.0  # time stamp (in UTC)
+        ts = TimeStamp(*time.gmtime(timestamp)[:6])  # corresponding TimeStamp
 
         # equivalent in local time, which is what the last-modified adapter
         # should return
@@ -110,8 +107,8 @@ class TestLastModified(unittest.TestCase):
         dummy = Image('dummy', 'Dummy', 'data')
         self.assertEqual(None, ILastModified(dummy)())
 
-        timestamp = 987654321.0 # time stamp (in UTC)
-        ts = TimeStamp(*time.gmtime(timestamp)[:6]) # corresponding TimeStamp
+        timestamp = 987654321.0  # time stamp (in UTC)
+        ts = TimeStamp(*time.gmtime(timestamp)[:6])  # corresponding TimeStamp
 
         # equivalent in local time, which is what the last-modified adapter
         # should return
@@ -129,19 +126,22 @@ class TestLastModified(unittest.TestCase):
         modtime = float(os.path.getmtime(__file__))
         mod = datetime.datetime.fromtimestamp(modtime, tzlocal())
 
-        format = "%y%m%d%H%M%s" # see note in test_FSObjectLastModified_FSImage
-        self.assertEqual(mod.strftime(format), ILastModified(dummy)().strftime(format))
+        format = "%y%m%d%H%M%s"  # see note in test_FSObjectLastModified_FSImage
+        self.assertEqual(mod.strftime(format),
+                         ILastModified(dummy)().strftime(format))
 
     def test_FSObjectLastModified_FSImage(self):
         from Products.CMFCore.FSImage import FSImage
 
-        dummy = FSImage('dummy', __file__) # not really an image, but anyway
+        dummy = FSImage('dummy', __file__)  # not really an image, but anyway
         modtime = float(os.path.getmtime(__file__))
         mod = datetime.datetime.fromtimestamp(modtime, tzlocal())
         # different filesystems seem to handle datetime differently. some use microseconds
-        # and others don't so to make jenkins happy lets omit the microseconds factor
+        # and others don't so to make jenkins happy lets omit the microseconds
+        # factor
         format = "%y%m%d%H%M%s"
-        self.assertEqual(mod.strftime(format), ILastModified(dummy)().strftime(format))
+        self.assertEqual(mod.strftime(format),
+                         ILastModified(dummy)().strftime(format))
 
     def test_CatalogableDublinCoreLastModified(self):
         from Products.CMFCore.interfaces import ICatalogableDublinCore
@@ -153,7 +153,8 @@ class TestLastModified(unittest.TestCase):
             _mod = None
 
             def modified(self):
-                if self._mod is not None: return DateTime.DateTime(self._mod)
+                if self._mod is not None:
+                    return DateTime.DateTime(self._mod)
                 return None
 
         d = Dummy()

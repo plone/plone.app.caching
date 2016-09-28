@@ -1,26 +1,23 @@
-import unittest2 as unittest
+# -*- coding: utf-8 -*-
+from Acquisition import Explicit
+from plone.app.caching.interfaces import IPloneCacheSettings
+from plone.app.caching.lookup import ContentItemLookup
 from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
-
-from z3c.caching.registry import RulesetRegistry
-import z3c.caching.registry
-
-from zope.component import provideUtility, provideAdapter, getUtility
-from zope.interface import implementer
-
-from plone.registry.interfaces import IRegistry
-
 from plone.registry import Registry
 from plone.registry.fieldfactory import persistentFieldAdapter
-
-from plone.app.caching.interfaces import IPloneCacheSettings
-
-from plone.app.caching.lookup import ContentItemLookup
-
-from Acquisition import Explicit
-from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import IDynamicType
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
 from Products.Five.browser import BrowserView
+from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+from zope.component import getUtility
+from zope.component import provideAdapter
+from zope.component import provideUtility
+from zope.interface import implementer
+
+import unittest2 as unittest
+import z3c.caching.registry
+
 
 @implementer(IBrowserDefault, IDynamicType)
 class DummyContent(Explicit):
@@ -32,16 +29,18 @@ class DummyContent(Explicit):
     def defaultView(self):
         return self._defaultView
 
+
 class DummyNotContent(Explicit):
     pass
+
 
 class DummyFTI(object):
 
     def __init__(self, portal_type, viewAction=''):
         self.id = portal_type
         self._actions = {
-                'object/view': {'url': viewAction},
-            }
+            'object/view': {'url': viewAction},
+        }
 
     def getActionInfo(self, name):
         return self._actions[name]
@@ -53,6 +52,7 @@ class DummyFTI(object):
             return '@@defaultView'
         return default
 
+
 @implementer(IDynamicType)
 class DummyNotBrowserDefault(Explicit):
 
@@ -63,18 +63,23 @@ class DummyNotBrowserDefault(Explicit):
     def getTypeInfo(self):
         return DummyFTI(self.portal_type, self._viewAction)
 
+
 class DummyResponse(dict):
 
     def addHeader(self, name, value):
         self.setdefault(name, []).append(value)
 
+
 class DummyRequest(dict):
+
     def __init__(self, published, response):
         self['PUBLISHED'] = published
         self.response = response
 
+
 class DummyView(BrowserView):
     __name__ = 'defaultView'
+
 
 class TestContentItemLookup(unittest.TestCase):
 
@@ -220,7 +225,8 @@ class TestContentItemLookup(unittest.TestCase):
         ploneSettings.templateRulesetMapping = {}
         ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
 
-        published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/view'))
+        published = ZopePageTemplate('defaultView').__of__(
+            DummyNotBrowserDefault('testtype', 'string:${object_url}/view'))
         request = DummyRequest(published, DummyResponse())
         self.assertEqual('rule1', ContentItemLookup(published, request)())
 
@@ -233,7 +239,8 @@ class TestContentItemLookup(unittest.TestCase):
         ploneSettings.templateRulesetMapping = {}
         ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
 
-        published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/'))
+        published = ZopePageTemplate('defaultView').__of__(
+            DummyNotBrowserDefault('testtype', 'string:${object_url}/'))
         request = DummyRequest(published, DummyResponse())
         self.assertEqual('rule1', ContentItemLookup(published, request)())
 
@@ -246,7 +253,8 @@ class TestContentItemLookup(unittest.TestCase):
         ploneSettings.templateRulesetMapping = {}
         ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
 
-        published = ZopePageTemplate('defaultView').__of__(DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView'))
+        published = ZopePageTemplate('defaultView').__of__(
+            DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView'))
         request = DummyRequest(published, DummyResponse())
 
         self.assertEqual('rule1', ContentItemLookup(published, request)())

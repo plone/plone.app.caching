@@ -1,48 +1,39 @@
-import unittest2 as unittest
-from plone.testing.zca import UNIT_TESTING
-
-from zope.interface import implementer
-
-from zope.component import getUtility
-from zope.component import adapter
-from zope.component import adapts
-from zope.component import provideHandler
-from zope.component import provideUtility
-from zope.component import provideAdapter
-
-from zope.component.event import objectEventNotify
-
-from zope.event import notify
-
-from zope.lifecycleevent import ObjectModifiedEvent
-from zope.lifecycleevent import ObjectAddedEvent
-from zope.lifecycleevent import ObjectRemovedEvent
-from zope.lifecycleevent import ObjectMovedEvent
-
-from zope.globalrequest import setRequest
-
-from plone.registry.interfaces import IRegistry
-from plone.registry.fieldfactory import persistentFieldAdapter
-from plone.registry import Registry
-
-from z3c.caching.interfaces import IPurgeEvent
-from z3c.caching.interfaces import IPurgePaths
-
+# -*- coding: utf-8 -*-
+from Acquisition import aq_base
+from Acquisition import Explicit
 from plone.app.caching.interfaces import IPloneCacheSettings
-
-from Acquisition import Explicit, aq_base
-from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
-from Products.CMFCore.interfaces import IContentish
-from Products.CMFCore.interfaces import IDiscussionResponse
-from Products.Archetypes import atapi
-from Products.Archetypes.Schema.factory import instanceSchemaFactory
-
-from plone.app.caching.purge import purgeOnModified
-from plone.app.caching.purge import purgeOnMovedOrRemoved
-
 from plone.app.caching.purge import ContentPurgePaths
 from plone.app.caching.purge import DiscussionItemPurgePaths
 from plone.app.caching.purge import ObjectFieldPurgePaths
+from plone.app.caching.purge import purgeOnModified
+from plone.app.caching.purge import purgeOnMovedOrRemoved
+from plone.registry import Registry
+from plone.registry.fieldfactory import persistentFieldAdapter
+from plone.registry.interfaces import IRegistry
+from plone.testing.zca import UNIT_TESTING
+from Products.Archetypes import atapi
+from Products.Archetypes.Schema.factory import instanceSchemaFactory
+from Products.CMFCore.interfaces import IContentish
+from Products.CMFCore.interfaces import IDiscussionResponse
+from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
+from z3c.caching.interfaces import IPurgeEvent
+from z3c.caching.interfaces import IPurgePaths
+from zope.component import adapter
+from zope.component import getUtility
+from zope.component import provideAdapter
+from zope.component import provideHandler
+from zope.component import provideUtility
+from zope.component.event import objectEventNotify
+from zope.event import notify
+from zope.globalrequest import setRequest
+from zope.interface import implementer
+from zope.lifecycleevent import ObjectAddedEvent
+from zope.lifecycleevent import ObjectModifiedEvent
+from zope.lifecycleevent import ObjectMovedEvent
+from zope.lifecycleevent import ObjectRemovedEvent
+
+import unittest2 as unittest
+
 
 class Handler(object):
 
@@ -53,8 +44,10 @@ class Handler(object):
     def handler(self, event):
         self.invocations.append(event)
 
+
 class FauxRequest(dict):
     pass
+
 
 @implementer(IContentish)
 class FauxNonContent(Explicit):
@@ -76,6 +69,7 @@ class FauxNonContent(Explicit):
     def getPhysicalPath(self):
         return ('', )
 
+
 @implementer(IBrowserDefault)
 class FauxContent(FauxNonContent):
 
@@ -84,9 +78,11 @@ class FauxContent(FauxNonContent):
     def defaultView(self):
         return 'default-view'
 
+
 @implementer(IDiscussionResponse)
 class FauxDiscussable(Explicit):
     pass
+
 
 class TestPurgeRedispatch(unittest.TestCase):
 
@@ -159,6 +155,7 @@ class TestPurgeRedispatch(unittest.TestCase):
         self.assertEqual(1, len(self.handler.invocations))
         self.assertEqual(context, self.handler.invocations[0].object)
 
+
 class TestContentPurgePaths(unittest.TestCase):
 
     layer = UNIT_TESTING
@@ -183,18 +180,28 @@ class TestContentPurgePaths(unittest.TestCase):
         context = FauxContent('foo').__of__(FauxContent('bar'))
         purger = ContentPurgePaths(context)
 
-        self.assertEqual(['/bar/foo/', '/bar/foo/view', '/bar/foo/default-view'],
-                         list(purger.getRelativePaths()))
+        self.assertEqual(
+            ['/bar/foo/', '/bar/foo/view', '/bar/foo/default-view'],
+            list(purger.getRelativePaths())
+        )
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_parent_default_view(self):
         context = FauxContent('default-view').__of__(FauxContent('bar'))
         purger = ContentPurgePaths(context)
-
-        self.assertEqual(['/bar/default-view/', '/bar/default-view/view',
-                          '/bar/default-view/default-view', '/bar', '/bar/', '/bar/view'],
-                         list(purger.getRelativePaths()))
+        self.assertEqual(
+            [
+                '/bar/default-view/',
+                '/bar/default-view/view',
+                '/bar/default-view/default-view',
+                '/bar',
+                '/bar/',
+                '/bar/view'
+            ],
+            list(purger.getRelativePaths())
+        )
         self.assertEqual([], list(purger.getAbsolutePaths()))
+
 
 class TestDiscussionItemPurgePaths(unittest.TestCase):
 
@@ -203,8 +210,8 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
     def setUp(self):
 
         @implementer(IPurgePaths)
+        @adapter(FauxContent)
         class FauxContentPurgePaths(object):
-            adapts(FauxContent)
 
             def __init__(self, context):
                 self.context = context
@@ -289,6 +296,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         self.assertEqual(['/app/foo'], list(purge.getRelativePaths()))
         self.assertEqual(['/purgeme'], list(purge.getAbsolutePaths()))
 
+
 class TestObjectFieldPurgePaths(unittest.TestCase):
 
     maxDiff = None
@@ -316,7 +324,8 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                 atapi.StringField('foo'),
                 atapi.FileField('file1'),
                 atapi.ImageField('image1'),
-                atapi.ImageField('image2', sizes={'mini': (50, 50), 'normal': (100, 100)}),
+                atapi.ImageField('image2', sizes={
+                                 'mini': (50, 50), 'normal': (100, 100)}),
                 BlobField('blob1'),
             ))
 
@@ -324,12 +333,24 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
         context = ATMultipleFields('foo').__of__(root)
         purger = ObjectFieldPurgePaths(context)
 
-        self.assertEqual(['/foo/download', '/foo/at_download',
-                          '/foo/at_download/file1', '/foo/file1',
-                          '/foo/at_download/image1', '/foo/image1', '/foo/image1_thumb',
-                          '/foo/at_download/image2', '/foo/image2', '/foo/image2_mini',
-                          '/foo/image2_normal', '/foo/at_download/blob1', '/foo/blob1'],
-                         list(purger.getRelativePaths()))
+        self.assertEqual(
+            [
+                '/foo/download',
+                '/foo/at_download',
+                '/foo/at_download/file1',
+                '/foo/file1',
+                '/foo/at_download/image1',
+                '/foo/image1',
+                '/foo/image1_thumb',
+                '/foo/at_download/image2',
+                '/foo/image2',
+                '/foo/image2_mini',
+                '/foo/image2_normal',
+                '/foo/at_download/blob1',
+                '/foo/blob1'
+            ],
+            list(purger.getRelativePaths())
+        )
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_file_image_text_fields(self):
@@ -339,7 +360,8 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                 atapi.StringField('foo'),
                 atapi.FileField('file1'),
                 atapi.ImageField('image1'),
-                atapi.ImageField('image2', sizes={'mini': (50, 50), 'normal': (100, 100)}),
+                atapi.ImageField('image2', sizes={
+                                 'mini': (50, 50), 'normal': (100, 100)}),
                 atapi.TextField('text'),
             ))
 
@@ -347,10 +369,20 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
         context = ATMultipleFields('foo').__of__(root)
         purger = ObjectFieldPurgePaths(context)
 
-        self.assertEqual(['/foo/download', '/foo/at_download',
-                          '/foo/at_download/file1', '/foo/file1',
-                          '/foo/at_download/image1', '/foo/image1', '/foo/image1_thumb',
-                          '/foo/at_download/image2', '/foo/image2', '/foo/image2_mini',
-                          '/foo/image2_normal'],
-                         list(purger.getRelativePaths()))
+        self.assertEqual(
+            [
+                '/foo/download',
+                '/foo/at_download',
+                '/foo/at_download/file1',
+                '/foo/file1',
+                '/foo/at_download/image1',
+                '/foo/image1',
+                '/foo/image1_thumb',
+                '/foo/at_download/image2',
+                '/foo/image2',
+                '/foo/image2_mini',
+                '/foo/image2_normal'
+            ],
+            list(purger.getRelativePaths())
+        )
         self.assertEqual([], list(purger.getAbsolutePaths()))

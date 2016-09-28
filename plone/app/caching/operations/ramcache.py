@@ -1,17 +1,17 @@
+# -*- coding: utf-8 -*-
+from plone.app.caching.interfaces import IRAMCached
+from plone.app.caching.operations.utils import storeResponseInRAMCache
+from plone.transformchain.interfaces import ITransform
+from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
 
-from zope.component import adapts
-from plone.transformchain.interfaces import ITransform
-
-from plone.app.caching.interfaces import IRAMCached
-
-from plone.app.caching.operations.utils import storeResponseInRAMCache
 
 GLOBAL_KEY = 'plone.app.caching.operations.ramcache'
 
 
 @implementer(ITransform)
+@adapter(Interface, Interface)
 class Store(object):
     """Transform chain element which actually saves the page in RAM.
 
@@ -19,7 +19,6 @@ class Store(object):
     the ``cacheInRAM()`` helper method. Thus, the transform is only used if
     the caching operation requested it.
     """
-    adapts(Interface, Interface)
 
     order = 90000
 
@@ -30,20 +29,20 @@ class Store(object):
     def transformUnicode(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
             storeResponseInRAMCache(self.request, self.request.response,
-                    result.encode(encoding))
+                                    result.encode(encoding))
         return None
 
     def transformBytes(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
             storeResponseInRAMCache(self.request, self.request.response,
-                    result)
+                                    result)
         return None
 
     def transformIterable(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
             result = ''.join(result)
             storeResponseInRAMCache(self.request, self.request.response,
-                result)
+                                    result)
             # as we have iterated the iterable, we must return a new one
             return iter(result)
         return None
