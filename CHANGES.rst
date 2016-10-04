@@ -4,14 +4,6 @@ Changelog
 1.2.13 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
 Bug fixes:
 
 - Code-Style: isort, utf8-headers, zca-decorators, manual cleanup.
