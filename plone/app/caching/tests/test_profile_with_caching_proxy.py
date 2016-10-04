@@ -430,6 +430,7 @@ class TestProfileWithCaching(unittest.TestCase):
         # Request an image scale with Manager role
         now = stable_now()
         browser = Browser(self.app)
+        browser.handleErrors = False
         browser.addHeader('Authorization', 'Basic %s:%s' %
                           (SITE_OWNER_NAME, SITE_OWNER_PASSWORD,))
         browser.open(self.portal['f1'][
