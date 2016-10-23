@@ -57,23 +57,28 @@ class TestOperationDefault(unittest.TestCase):
 
         # log in and create a content type
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' % (
-            TEST_USER_NAME, TEST_USER_PASSWORD,))
-        browser.open("%s/++add++Document" % self.portal['f1'].absolute_url())
+        browser.addHeader(
+            'Authorization',
+            'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
+        )
+        browser.open('{0}/++add++Document'.format(
+            self.portal['f1'].absolute_url())
+        )
         browser.getControl(
-            name='form.widgets.IDublinCore.title').value = "dummy content"
+            name='form.widgets.IDublinCore.title').value = 'dummy content'
         browser.getControl('Save').click()
         self.assertFalse('Etag' in browser.headers)
 
         # now set up etags and make sure that a header is added
         self.registry['plone.app.caching.weakCaching.etags'] = (
-            'lastModified',)
+            'lastModified',
+        )
         import transaction
         transaction.commit()
-        browser.open("%s/dummy-content/edit?_authenticator=%s" % (
+        browser.open('{0}/dummy-content/edit?_authenticator={1}'.format(
             self.portal['f1'].absolute_url(),
             getToken(TEST_USER_NAME)))
         browser.getControl(
-            name='form.widgets.IDublinCore.title').value = "dummy content"
+            name='form.widgets.IDublinCore.title').value = 'dummy content'
         browser.getControl('Save').click()
         self.assertTrue('Etag' in browser.headers)

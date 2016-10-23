@@ -33,8 +33,8 @@ import re
 
 # Borrowed from zope.schema to avoid an import of a private name
 _isuri = re.compile(
-    r"[a-zA-z0-9+.-]+:"   # scheme
-    r"\S*$"               # non space (should be pickier)
+    r'[a-zA-z0-9+.-]+:'   # scheme
+    r'\S*$'               # non space (should be pickier)
 ).match
 
 
@@ -162,7 +162,10 @@ class ControlPanel(BaseView):
                 self.processSave()
             elif 'form.button.Cancel' in self.request.form:
                 self.request.response.redirect(
-                    "%s/@@overview-controlpanel" % self.context.absolute_url())
+                    '{0}/@@overview-controlpanel'.format(
+                        self.context.absolute_url()
+                    )
+                )
 
     def processSave(self):
 
@@ -273,7 +276,7 @@ class ControlPanel(BaseView):
         # Validate purging settings
         for cachingProxy in cachingProxies:
             if not _isuri(cachingProxy):
-                self.errors['cachingProxies'] = _(u"Invalid URL: ${url}", mapping={'url': cachingProxy})  # noqa
+                self.errors['cachingProxies'] = _(u'Invalid URL: ${url}', mapping={'url': cachingProxy})  # noqa
 
         for domain in domains:
             if not _isuri(domain):
@@ -286,16 +289,16 @@ class ControlPanel(BaseView):
         try:
             ramCacheMaxEntries = int(ramCacheMaxEntries)
         except (ValueError, TypeError,):
-            self.errors['ramCacheMaxEntries'] = _(u"An integer is required.")
+            self.errors['ramCacheMaxEntries'] = _(u'An integer is required.')
         else:
             if ramCacheMaxEntries < 0:
                 self.errors['ramCacheMaxEntries'] = _(
-                    u"A positive number is required."
+                    u'A positive number is required.'
                 )
         try:
             ramCacheMaxAge = int(ramCacheMaxAge)
         except (ValueError, TypeError,):
-            self.errors['ramCacheMaxAge'] = _(u"An integer is required.")
+            self.errors['ramCacheMaxAge'] = _(u'An integer is required.')
         else:
             if ramCacheMaxAge < 0:
                 self.errors['ramCacheMaxAge'] = _(
@@ -317,7 +320,7 @@ class ControlPanel(BaseView):
         # Check for errors
         if self.errors:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"There were errors."), "error")
+                _(u'There were errors.'), 'error')
             return
 
         # Save settings
@@ -476,7 +479,7 @@ class ControlPanel(BaseView):
             return False
 
         for option in options:
-            if '%s.%s' % (prefix, option,) in self.registry:
+            if '{0}.{1}'.format(prefix, option,) in self.registry:
                 return True
 
         return False
@@ -489,7 +492,7 @@ class ControlPanel(BaseView):
             return False
 
         for option in options:
-            if '%s.%s.%s' % (prefix, ruleset, option,) in self.registry:
+            if '{0}.{1}.{2}'.format(prefix, ruleset, option,) in self.registry:
                 return True
 
         return False
@@ -509,26 +512,28 @@ class Import(BaseView):
         snapshot = self.request.form.get('snapshot', True)
 
         if not profile:
-            self.errors['profile'] = _(u"You must select a profile to import.")
+            self.errors['profile'] = _(u'You must select a profile to import.')
 
         if self.errors:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"There were errors."), "error")
+                _(u'There were errors.'), 'error')
             return
 
         portal_setup = getToolByName(self.context, 'portal_setup')
 
         # Create a snapshot
         if snapshot:
-            snapshotId = "plone.app.caching.beforeimport.%s" % (
+            snapshotId = 'plone.app.caching.beforeimport.{0}'.format(
                 datetime.datetime.now().isoformat().replace(':', '.'))
             portal_setup.createSnapshot(snapshotId)
 
         # Import the new profile
-        portal_setup.runAllImportStepsFromProfile("profile-%s" % profile)
+        portal_setup.runAllImportStepsFromProfile(
+            'profile-{0}'.format(profile)
+        )
 
         IStatusMessage(self.request).addStatusMessage(
-            _(u"Import complete."), "info")
+            _(u'Import complete.'), 'info')
 
     @property
     @memoize
@@ -558,11 +563,11 @@ class Purge(BaseView):
         sync = self.request.form.get('synchronous', True)
 
         if not urls:
-            self.errors['urls'] = _(u"No URLs or paths entered.")
+            self.errors['urls'] = _(u'No URLs or paths entered.')
 
         if self.errors:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"There were errors."), "error")
+                _(u'There were errors.'), 'error')
             return
 
         purger = getUtility(IPurger)
@@ -574,11 +579,11 @@ class Purge(BaseView):
 
                 log = url
                 if xcache:
-                    log += " (X-Cache header: " + xcache + ")"
+                    log += ' (X-Cache header: ' + xcache + ')'
                 if xerror:
-                    log += " -- " + xerror
+                    log += ' -- ' + xerror
                 if not str(status).startswith('2'):
-                    log += " -- WARNING status " + str(status)
+                    log += ' -- WARNING status ' + str(status)
                 self.purgeLog.append(log)
             else:
                 purger.purgeAsync(url)
@@ -638,13 +643,13 @@ class RAMCache(BaseView):
 
         if self.ramCache is None:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"RAM cache not installed."), "error")
+                _(u'RAM cache not installed.'), 'error')
 
         if self.errors:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"There were errors."), "error")
+                _(u'There were errors.'), 'error')
             return
 
         self.ramCache.invalidateAll()
         IStatusMessage(self.request).addStatusMessage(
-            _(u"Cache purged."), "info")
+            _(u'Cache purged.'), 'info')

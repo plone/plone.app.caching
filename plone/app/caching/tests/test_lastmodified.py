@@ -126,7 +126,8 @@ class TestLastModified(unittest.TestCase):
         modtime = float(os.path.getmtime(__file__))
         mod = datetime.datetime.fromtimestamp(modtime, tzlocal())
 
-        format = "%y%m%d%H%M%s"  # see note in test_FSObjectLastModified_FSImage
+        # see note in test_FSObjectLastModified_FSImage
+        format = '%y%m%d%H%M%s'
         self.assertEqual(mod.strftime(format),
                          ILastModified(dummy)().strftime(format))
 
@@ -136,10 +137,10 @@ class TestLastModified(unittest.TestCase):
         dummy = FSImage('dummy', __file__)  # not really an image, but anyway
         modtime = float(os.path.getmtime(__file__))
         mod = datetime.datetime.fromtimestamp(modtime, tzlocal())
-        # different filesystems seem to handle datetime differently. some use microseconds
-        # and others don't so to make jenkins happy lets omit the microseconds
-        # factor
-        format = "%y%m%d%H%M%s"
+        # different filesystems seem to handle datetime differently.
+        # Some use microseconds and others don't so to make jenkins happy,
+        # lets omit the microseconds factor
+        format = '%y%m%d%H%M%s'
         self.assertEqual(mod.strftime(format),
                          ILastModified(dummy)().strftime(format))
 

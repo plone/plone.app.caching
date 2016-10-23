@@ -222,7 +222,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
             def getAbsolutePaths(self):
                 return ['/purgeme']
 
-        provideAdapter(FauxContentPurgePaths, name="testpurge")
+        provideAdapter(FauxContentPurgePaths, name='testpurge')
 
     def test_no_tool(self):
         root = FauxContent('')

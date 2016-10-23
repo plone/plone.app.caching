@@ -125,7 +125,10 @@ class TestOperations(unittest.TestCase):
 
         # OFS image (custom folder)
         OFS.Image.manage_addImage(
-            self.portal['portal_skins']['custom'], 'test.gif', open(TEST_IMAGE, 'rb'))
+            self.portal['portal_skins']['custom'],
+            'test.gif',
+            open(TEST_IMAGE, 'rb')
+        )
 
         setRoles(self.portal, TEST_USER_ID, ('Member',))
 
@@ -182,9 +185,10 @@ class TestOperations(unittest.TestCase):
         self.cachePurgingSettings.cachingProxies = ()
         self.ploneCacheSettings.purgedContentTypes = ()
 
-        editURL = '%s/edit?_authenticator=%s' % (
+        editURL = '{0}/edit?_authenticator={1}'.format(
             self.portal['d1'].absolute_url(),
-            getToken(TEST_USER_NAME))
+            getToken(TEST_USER_NAME)
+        )
 
         import transaction
         transaction.commit()
@@ -193,7 +197,8 @@ class TestOperations(unittest.TestCase):
         browser.handleErrors = False
         browser.addHeader(
             'Authorization',
-            'Basic %s:%s' % (TEST_USER_NAME, TEST_USER_PASSWORD,))
+            'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
+        )
 
         browser.open(editURL)
 

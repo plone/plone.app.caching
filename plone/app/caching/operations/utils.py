@@ -132,7 +132,7 @@ def cacheInBrowser(published, request, response, etag=None, lastModified=None):
     """
 
     if etag is not None:
-        response.setHeader('ETag', '"%s"' % etag, literal=1)
+        response.setHeader('ETag', '"{0}"'.format(etag), literal=1)
 
     if lastModified is not None:
         response.setHeader('Last-Modified', formatDateTime(lastModified))
@@ -169,14 +169,16 @@ def cacheInProxy(
         del response.headers['last-modified']
 
     if etag is not None:
-        response.setHeader('ETag', '"%s"' % etag, literal=1)
+        response.setHeader('ETag', '"{0}"'.format(etag), literal=1)
 
     if vary is not None:
         response.setHeader('Vary', vary)
 
     response.setHeader('Expires', formatDateTime(getExpiration(0)))
     response.setHeader(
-        'Cache-Control', 'max-age=0, s-maxage=%d, must-revalidate' % smaxage)
+        'Cache-Control',
+        'max-age=0, s-maxage={0}, must-revalidate'.format(smaxage),
+    )
 
 
 def cacheInBrowserAndProxy(
@@ -205,7 +207,7 @@ def cacheInBrowserAndProxy(
         del response.headers['last-modified']
 
     if etag is not None:
-        response.setHeader('ETag', '"%s"' % etag, literal=1)
+        response.setHeader('ETag', '"{0}"'.format(etag), literal=1)
 
     if vary is not None:
         response.setHeader('Vary', vary)
@@ -213,14 +215,14 @@ def cacheInBrowserAndProxy(
     response.setHeader('Expires', formatDateTime(getExpiration(maxage)))
 
     if smaxage is not None:
-        maxage = '%s, s-maxage=%s' % (maxage, smaxage)
+        maxage = '{0}, s-maxage={1}'.format(maxage, smaxage)
 
     # Substituting proxy-validate in place of must=revalidate here because of
     # Safari bug
     # https://bugs.webkit.org/show_bug.cgi?id=13128
     response.setHeader(
         'Cache-Control',
-        'max-age=%s, proxy-revalidate, public' % maxage
+        'max-age={0}, proxy-revalidate, public'.format(maxage)
     )
 
 
@@ -328,7 +330,7 @@ def notModified(published, request, response, etag=None, lastModified=None):
         del response.headers['cache-control']
 
     response.setStatus(304)
-    return u""
+    return u''
 
 
 #
@@ -422,7 +424,7 @@ def isModified(request, etag=None, lastModified=None):
             if (lastModified - ifModifiedSince) > delta_sec:
                 return True
         except TypeError:
-            logger.exception("Could not compare dates")
+            logger.exception('Could not compare dates')
 
         # If we expected an ETag and the client didn't give us one, consider
         # that an error. This may be more conservative than the spec requires.
@@ -468,7 +470,7 @@ def getContext(published, marker=(IContentish, ISiteRoot,)):
     while (
         published is not None and
         not checkType(published) and
-        hasattr(published, '__parent__',)
+        getattr(published, '__parent__')
     ):
         published = published.__parent__
 
@@ -622,7 +624,7 @@ def getETag(published, request, keys=(), extraTokens=()):
             (published, request), IETagValue, name=key)
         if component is None:
             logger.warning(
-                "Could not find value adapter for ETag component %s", key)
+                'Could not find value adapter for ETag component %s', key)
             tokens.append('')
         else:
             value = component()
@@ -729,7 +731,7 @@ def getRAMCacheKey(request, etag=None, lastModified=None):
     is needed to ensure the key changes when the resource view changes.
     """
 
-    resourceKey = "%s%s?%s" % (
+    resourceKey = '{0}{1}?{2}'.format(
         request.get('SERVER_URL', ''),
         request.get('PATH_INFO', ''),
         request.get('QUERY_STRING', ''),

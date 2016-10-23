@@ -95,11 +95,14 @@ class EditForm(form.Form):
 
         for option in self.operation.options:
             newField = None
-            fieldName = "%s.%s" % (prefix, option)
+            fieldName = '{0}.{1}'.format(prefix, option)
 
             if self.rulesetName:
-                rulesetFieldName = "%s.%s.%s" % (
-                    prefix, self.rulesetName, option)
+                rulesetFieldName = '{0}.{1}.{2}'.format(
+                    prefix,
+                    self.rulesetName,
+                    option,
+                )
 
                 if rulesetFieldName in self.registry.records:
                     newField = self.cloneField(self.registry.records[
@@ -149,14 +152,14 @@ class EditForm(form.Form):
         options = self.operation.options
 
         for option in options:
-            recordName = "%s.%s" % (prefix, option,)
+            recordName = '{0}.{1}'.format(prefix, option,)
 
             # If a ruleset-specific record does not exist, we can fall back on
             # a global record, since the per-ruleset records will be created
             # as necessary in applyChanges()
 
             if self.rulesetName:
-                rulesetRecordName = "%s.%s.%s" % (
+                rulesetRecordName = '{0}{1}{2}'.format(
                     prefix, self.rulesetName, option,)
 
                 if rulesetRecordName in self.registry.records:
@@ -255,7 +258,7 @@ class EditForm(form.Form):
     @button.buttonAndHandler(_(u'Cancel'), name='cancel')
     def cancel(self, action):
         IStatusMessage(self.request).addStatusMessage(
-            _(u"Edit cancelled."), type="info")
+            _(u"Edit cancelled."), type='info')
         self.request.response.redirect(
             '{0}/@@caching-controlpanel#detailed-settings'.format(
                 self.context.absolute_url()
@@ -269,14 +272,17 @@ class EditForm(form.Form):
     )
     def clear(self, action):
         for key in self.getContent().keys():
-            assert key.startswith("%s.%s." % (
-                self.operation.prefix, self.rulesetName,))
+            key_suffix = '{0}.{1}.'.format(
+                self.operation.prefix,
+                self.rulesetName,
+            )
+            assert key.startswith(key_suffix)
 
             if key in self.registry.records:
                 del self.registry.records[key]
 
         IStatusMessage(self.request).addStatusMessage(
-            _(u"Ruleset-specific settings removed."), type="info")
+            _(u"Ruleset-specific settings removed."), type='info')
         self.request.response.redirect(
             '{0}/@@caching-controlpanel#detailed-settings'.format(
                 self.context.absolute_url()

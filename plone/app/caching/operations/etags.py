@@ -235,7 +235,7 @@ class AnonymousOrRandom(object):
             return None
         if portal_state.anonymous():
             return None
-        return "%s%d" % (time.time(), random.randint(0, 1000))
+        return '{0}{1}'.format(time.time(), random.randint(0, 1000))
 
 
 @implementer(IETagValue)

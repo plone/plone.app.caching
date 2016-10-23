@@ -99,7 +99,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.portal['f1'].invokeFactory('Document', 'd1')
         self.portal['f1']['d1'].title = u"Document one"
         self.portal['f1']['d1'].description = u"Document one description"
-        testText = "Testing... body one"
+        testText = 'Testing... body one'
         self.portal['f1']['d1'].text = RichTextValue(
             testText,
             'text/plain',
@@ -127,8 +127,10 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Request the quthenticated folder
         now = stable_now()
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' %
-                          (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader(
+            'Authorization',
+            'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
+        )
         browser.open(self.portal['f1'].absolute_url())
         self.assertEqual('plone.content.folderView',
                          browser.headers['X-Cache-Rule'])
@@ -137,8 +139,11 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertEqual('"|test_user_1_|%d|en|%s|0|0' % (
-            catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
+        tag = '"|test_user_1_|{0}|en|{1}|0|0'.format(
+            catalog.getCounter(),
+            default_skin,
+        )
+        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -152,14 +157,19 @@ class TestProfileWithoutCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertEqual('"|test_user_1_|%d|en|%s|0|1' % (
-            catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
+        tag = '"|test_user_1_|{0}|en|{1}|0|1'.format(
+            catalog.getCounter(),
+            default_skin,
+        )
+        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
 
         # Request the authenticated page
         now = stable_now()
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' %
-                          (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader(
+            'Authorization',
+            'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
+        )
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertTrue(testText in browser.contents)
         self.assertEqual('plone.content.itemView',
@@ -169,15 +179,20 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertEqual('"|test_user_1_|%d|en|%s|0' % (
-            catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
+        tag = '"|test_user_1_|{0}|en|{1}|0'.format(
+            catalog.getCounter(),
+            default_skin,
+        )
+        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request the authenticated page again -- to test RAM cache.
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' %
-                          (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader(
+            'Authorization',
+            'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
+        )
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEqual('plone.content.itemView',
                          browser.headers['X-Cache-Rule'])
@@ -191,8 +206,10 @@ class TestProfileWithoutCaching(unittest.TestCase):
         etag = browser.headers['ETag']
         browser = Browser(self.app)
         browser.raiseHttpErrors = False  # we really do want to see the 304
-        browser.addHeader('Authorization', 'Basic %s:%s' %
-                          (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader(
+            'Authorization',
+            'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
+        )
         browser.addHeader('If-None-Match', etag)
         browser.open(self.portal['f1']['d1'].absolute_url())
         # This should be a 304 response
@@ -210,8 +227,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|%s|0|0' % (
-            catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
+        tag = '"||{0}|en|{1}|0|0'.format(catalog.getCounter(), default_skin)
+        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -227,8 +244,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|%s|0' % (
-            catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
+        tag = '"||{0}|en|{1}|0'.format(catalog.getCounter(), default_skin)
+        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -247,8 +264,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertTrue(testText in browser.contents)
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|%s|0' % (
-            catalog.getCounter(), default_skin), _normalize_etag(browser.headers['ETag']))
+        tag = '"||{0}|en|{1}|0'.format(catalog.getCounter(), default_skin)
+        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
         self.assertTrue(now > dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -267,7 +284,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('', browser.contents)
 
         # Edit the page to update the etag
-        testText2 = "Testing... body two"
+        testText2 = 'Testing... body two'
         self.portal['f1']['d1'].text = RichTextValue(
             testText2,
             'text/plain',
@@ -315,8 +332,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|%s"' % (catalog.getCounter(),
-                                           default_skin), browser.headers['ETag'])
+        tag = '"||{0}|en|{1}"'.format(catalog.getCounter(), default_skin)
+        self.assertEqual(tag, browser.headers['ETag'])
         self.assertTrue(now > dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -334,8 +351,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(rssText, browser.contents)
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertEqual('"||%d|en|%s"' % (catalog.getCounter(),
-                                           default_skin), browser.headers['ETag'])
+        tag = '"||{0}|en|{1}"'.format(catalog.getCounter(), default_skin)
+        self.assertEqual(tag, browser.headers['ETag'])
         self.assertTrue(now > dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -355,8 +372,12 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Request the authenticated rss feed
         now = stable_now()
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' %
-                          (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader(
+            'Authorization', 'Basic {0}:{1}'.format(
+                TEST_USER_NAME,
+                TEST_USER_PASSWORD,
+            )
+        )
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEqual('plone.content.feed', browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.weakCaching',
@@ -364,15 +385,19 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertEqual('"|test_user_1_|%d|en|%s"' % (
+        self.assertEqual('"|test_user_1_|{0}|en|{1}"'.format(
             catalog.getCounter(), default_skin), browser.headers['ETag'])
         self.assertTrue(now > dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request the authenticated rss feed again -- to test RAM cache
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' %
-                          (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader(
+            'Authorization', 'Basic {0}:{1}'.format(
+                TEST_USER_NAME,
+                TEST_USER_PASSWORD,
+            )
+        )
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEqual('plone.content.feed', browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.weakCaching',
@@ -413,8 +438,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
         # remove this when the next line works
-        self.assertFalse(None == browser.headers.get('Last-Modified'))
-        #self.assertEqual('---lastmodified---', browser.headers['Last-Modified'])
+        self.assertIsNotNone(browser.headers.get('Last-Modified'))
         self.assertTrue(now > dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -443,8 +467,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
         # remove this when the next line works
-        self.assertFalse(None == browser.headers.get('Last-Modified'))
-        #self.assertEqual('---lastmodified---', browser.headers['Last-Modified'])
+        self.assertIsNotNone(browser.headers.get('Last-Modified'))
         self.assertTrue(now > dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -464,8 +487,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('max-age=86400, proxy-revalidate, public',
                          browser.headers['Cache-Control'])
         # remove this when the next line works
-        self.assertFalse(None == browser.headers.get('Last-Modified'))
-        #self.assertEqual('---lastmodified---', browser.headers['Last-Modified'])
+        self.assertIsNotNone(browser.headers.get('Last-Modified'))
         timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
         self.assertTrue(timedelta > datetime.timedelta(seconds=86390))
 
@@ -488,7 +510,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # large OFS.Image.Image, large non-blog ATImages/ATFiles, and
         # large Resource Registry cooked files, which all use the same
         # method to initiate a streamed response.
-        s = "a" * (1 << 16) * 3
+        s = 'a' * (1 << 16) * 3
         self.portal.manage_addFile('bigfile', file=StringIO(
             s), content_type='application/octet-stream')
 
@@ -504,8 +526,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('max-age=86400, proxy-revalidate, public',
                          browser.headers['Cache-Control'])
         # remove this when the next line works
-        self.assertFalse(None == browser.headers.get('Last-Modified'))
-        #self.assertEqual('---lastmodified---', browser.headers['Last-Modified'])
+        self.assertIsNotNone(browser.headers.get('Last-Modified'))
         timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
         self.assertTrue(timedelta > datetime.timedelta(seconds=86390))
 
