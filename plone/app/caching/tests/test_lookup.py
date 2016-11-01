@@ -254,7 +254,11 @@ class TestContentItemLookup(unittest.TestCase):
         ploneSettings.contentTypeRulesetMapping = {'testtype': 'rule1'}
 
         published = ZopePageTemplate('defaultView').__of__(
-            DummyNotBrowserDefault('testtype', 'string:${object_url}/defaultView'))
+            DummyNotBrowserDefault(
+                'testtype',
+                'string:${object_url}/defaultView'
+            )
+        )
         request = DummyRequest(published, DummyResponse())
 
         self.assertEqual('rule1', ContentItemLookup(published, request)())

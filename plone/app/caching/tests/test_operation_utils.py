@@ -126,7 +126,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         published = DummyPublished()
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        etag = "|foo|bar|"
+        etag = '|foo|bar|'
 
         cacheInBrowser(published, request, response, etag=etag)
 
@@ -171,7 +171,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         published = DummyPublished()
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        etag = "|foo|bar|"
+        etag = '|foo|bar|'
 
         nowFormatted = wsgiref.handlers.format_date_time(
             time.mktime(now.timetuple()))
@@ -298,13 +298,15 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual('Accept-Language', response.getHeader('Vary'))
 
         timedelta = dateutil.parser.parse(response.getHeader('Expires')) - now
+        delta = datetime.timedelta(seconds=58)
         self.assertFalse(
-            timedelta < datetime.timedelta(seconds=58),
-            "%s is not < %s" % (timedelta, datetime.timedelta(seconds=58))
+            timedelta < delta,
+            '{0} is not < {1}'.format(timedelta, delta)
         )
+        delta = datetime.timedelta(seconds=61)
         self.assertFalse(
-            timedelta > datetime.timedelta(seconds=61),
-            "%s is not > %s" % (timedelta, datetime.timedelta(seconds=61))
+            timedelta > delta,
+            '{0} is not > {1}'.format(timedelta, delta)
         )
 
     # cacheInRAM()
@@ -327,7 +329,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInRAM(published, request, response)
 
         annotations = IAnnotations(request)
-        self.assertEqual("http://example.com/foo?",
+        self.assertEqual('http://example.com/foo?',
                          annotations[PAGE_CACHE_ANNOTATION_KEY])
         self.assertTrue(IRAMCached.providedBy(request))
 
@@ -350,7 +352,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInRAM(published, request, response, etag=etag)
 
         annotations = IAnnotations(request)
-        self.assertEqual("||foo|bar|||http://example.com/foo?",
+        self.assertEqual('||foo|bar|||http://example.com/foo?',
                          annotations[PAGE_CACHE_ANNOTATION_KEY])
         self.assertTrue(IRAMCached.providedBy(request))
 
@@ -370,11 +372,11 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         assert not IRAMCached.providedBy(response)
 
         cacheInRAM(published, request, response,
-                   etag=etag, annotationsKey="alt.key")
+                   etag=etag, annotationsKey='alt.key')
 
         annotations = IAnnotations(request)
-        self.assertEqual("||foo|bar|||http://example.com/foo?",
-                         annotations["alt.key"])
+        self.assertEqual('||foo|bar|||http://example.com/foo?',
+                         annotations['alt.key'])
         self.assertTrue(IRAMCached.providedBy(request))
 
 
@@ -514,7 +516,7 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         response.setStatus(200)
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        etag = "|foo|bar|"
+        etag = '|foo|bar|'
 
         body = notModified(published, request, response,
                            etag=etag, lastModified=now)
@@ -924,7 +926,7 @@ class MiscHelpersTest(unittest.TestCase):
     def test_parseDateTime_invalid(self):
         from plone.app.caching.operations.utils import parseDateTime
 
-        self.assertEqual(None, parseDateTime("foo"))
+        self.assertEqual(None, parseDateTime('foo'))
 
     def test_parseDateTime_rfc1123(self):
         from plone.app.caching.operations.utils import parseDateTime
@@ -1306,7 +1308,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['QUERY_STRING'] = 'x=1&y=2'
 
         self.assertEqual('||foo|bar||http://example.com/foo/bar?x=1&y=2',
-                         getRAMCacheKey(request, etag="|foo|bar"))
+                         getRAMCacheKey(request, etag='|foo|bar'))
 
     # storeResponseInRAMCache()
 
@@ -1527,7 +1529,7 @@ class RAMCacheTest(unittest.TestCase):
         )
 
         cached = normalize_response_cache(
-            fetchFromRAMCache(request, etag="|a|b"))
+            fetchFromRAMCache(request, etag='|a|b'))
         self.assertEqual((200, {'x-foo': 'bar'}, u'Body'), cached)
 
     def test_fetchFromRAMCache_custom_key(self):

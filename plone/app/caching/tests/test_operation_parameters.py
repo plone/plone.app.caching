@@ -48,7 +48,7 @@ class TestOperationParameters(unittest.TestCase):
         self.portal['f1'].invokeFactory('Document', 'd1')
         self.portal['f1']['d1'].title = u"Document one"
         self.portal['f1']['d1'].description = u"Document one description"
-        testText = "Testing... body one"
+        testText = 'Testing... body one'
         self.portal['f1']['d1'].text = RichTextValue(
             testText,
             'text/plain',
@@ -104,8 +104,10 @@ class TestOperationParameters(unittest.TestCase):
 
         # View the page as logged-in
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' %
-                          (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader(
+            'Authorization',
+            'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
+        )
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEqual('plone.content.itemView',
                          browser.headers['X-Cache-Rule'])
@@ -140,8 +142,10 @@ class TestOperationParameters(unittest.TestCase):
 
         # View the page as logged-in
         browser = Browser(self.app)
-        browser.addHeader('Authorization', 'Basic %s:%s' %
-                          (TEST_USER_NAME, TEST_USER_PASSWORD,))
+        browser.addHeader(
+            'Authorization',
+            'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
+        )
         browser.open(self.portal['f1']['d1'].absolute_url())
         self.assertEqual('plone.content.itemView',
                          browser.headers['X-Cache-Rule'])

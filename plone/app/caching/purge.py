@@ -187,12 +187,12 @@ if HAVE_AT:
 
                 yield prefix + '/at_download/' + field.getName()
 
-                fieldURL = "%s/%s" % (prefix, field.getName(),)
+                fieldURL = '{0}/{1}'.format(prefix, field.getName(),)
                 yield fieldURL
 
                 if IImageField.providedBy(field):
                     for size in field.getAvailableSizes(self.context).keys():
-                        yield "%s_%s" % (fieldURL, size,)
+                        yield '{0}_{1}'.format(fieldURL, size,)
 
         def getAbsolutePaths(self):
             return []

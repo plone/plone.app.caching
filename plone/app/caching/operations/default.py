@@ -165,7 +165,7 @@ class BaseCaching(object):
         if cacheStop(self.request, rulename):
             # only stop with etags if configured
             if etags:
-                etag = "%s%d" % (time.time(), random.randint(0, 1000))
+                etag = '{0}{1}'.format(time.time(), random.randint(0, 1000))
                 return setCacheHeaders(
                     self.published,
                     self.request,
