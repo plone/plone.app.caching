@@ -14,7 +14,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Fixed tests when using ZODB 4.
+  [davisagli]
 
 
 1.2.14 (2016-11-18)

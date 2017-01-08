@@ -98,7 +98,7 @@ class TestLastModified(unittest.TestCase):
         mod = datetime.datetime.fromtimestamp(timestamp, tzlocal())
 
         dummy._p_jar = FauxDataManager()
-        dummy._p_serial = repr(ts)
+        dummy._p_serial = ts.raw()
         self.assertEqual(mod, ILastModified(dummy)())
 
     def test_OFSFileLastModified_Image(self):
@@ -115,7 +115,7 @@ class TestLastModified(unittest.TestCase):
         mod = datetime.datetime.fromtimestamp(timestamp, tzlocal())
 
         dummy._p_jar = FauxDataManager()
-        dummy._p_serial = repr(ts)
+        dummy._p_serial = ts.raw()
         self.assertEqual(mod, ILastModified(dummy)())
 
     def test_FSObjectLastModified_FSFile(self):
