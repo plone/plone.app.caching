@@ -15,7 +15,7 @@ from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPResponse import HTTPResponse
 
 import time
-import unittest2 as unittest
+import unittest
 
 
 @implementer(IContentish)
@@ -60,7 +60,7 @@ class TestETags(unittest.TestCase):
 
         etag = UserID(published, request)
 
-        self.assertEqual(None, etag())
+        self.assertIsNone(etag())
 
     def test_UserID_member(self):
         from plone.app.caching.operations.etags import UserID
@@ -218,7 +218,7 @@ class TestETags(unittest.TestCase):
 
         etag = LastModified(published, request)
 
-        self.assertEqual(None, etag())
+        self.assertIsNone(etag())
 
     def test_LastModified_None(self):
         from plone.app.caching.operations.etags import LastModified
@@ -242,7 +242,7 @@ class TestETags(unittest.TestCase):
 
         etag = LastModified(published, request)
 
-        self.assertEqual(None, etag())
+        self.assertIsNone(etag())
 
     def test_LastModified(self):
         from plone.app.caching.operations.etags import LastModified

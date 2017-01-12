@@ -22,7 +22,7 @@ import datetime
 import dateutil.parser
 import dateutil.tz
 import time
-import unittest2 as unittest
+import unittest
 import wsgiref.handlers
 
 
@@ -65,10 +65,10 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual(200, response.getStatus())
         self.assertEqual('max-age=0, must-revalidate, private',
                          response.getHeader('Cache-Control'))
-        self.assertEqual(None, response.getHeader('Last-Modified'))
+        self.assertIsNone(response.getHeader('Last-Modified'))
 
         expires = dateutil.parser.parse(response.getHeader('Expires'))
-        self.assertTrue(now > expires)
+        self.assertGreater(now, expires)
 
     def test_doNotCache_deletes_last_modified(self):
         from plone.app.caching.operations.utils import doNotCache
@@ -89,10 +89,10 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual(200, response.getStatus())
         self.assertEqual('max-age=0, must-revalidate, private',
                          response.getHeader('Cache-Control'))
-        self.assertEqual(None, response.getHeader('Last-Modified'))
+        self.assertIsNone(response.getHeader('Last-Modified'))
 
         expires = dateutil.parser.parse(response.getHeader('Expires'))
-        self.assertTrue(now > expires)
+        self.assertGreater(now, expires)
 
     # cacheInBrowser()
 
@@ -111,11 +111,11 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual(200, response.getStatus())
         self.assertEqual('max-age=0, must-revalidate, private',
                          response.getHeader('Cache-Control'))
-        self.assertEqual(None, response.getHeader('Last-Modified'))
-        self.assertEqual(None, response.getHeader('ETag', literal=1))
+        self.assertIsNone(response.getHeader('Last-Modified'))
+        self.assertIsNone(response.getHeader('ETag', literal=1))
 
         expires = dateutil.parser.parse(response.getHeader('Expires'))
-        self.assertTrue(now > expires)
+        self.assertGreater(now, expires)
 
     def test_cacheInBrowser_etag(self):
         from plone.app.caching.operations.utils import cacheInBrowser
@@ -133,11 +133,11 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual(200, response.getStatus())
         self.assertEqual('max-age=0, must-revalidate, private',
                          response.getHeader('Cache-Control'))
-        self.assertEqual(None, response.getHeader('Last-Modified'))
+        self.assertIsNone(response.getHeader('Last-Modified'))
         self.assertEqual('"|foo|bar|"', response.getHeader('ETag', literal=1))
 
         expires = dateutil.parser.parse(response.getHeader('Expires'))
-        self.assertTrue(now > expires)
+        self.assertGreater(now, expires)
 
     def test_cacheInBrowser_lastModified(self):
         from plone.app.caching.operations.utils import cacheInBrowser
@@ -157,10 +157,10 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual('max-age=0, must-revalidate, private',
                          response.getHeader('Cache-Control'))
         self.assertEqual(nowFormatted, response.getHeader('Last-Modified'))
-        self.assertEqual(None, response.getHeader('ETag', literal=1))
+        self.assertIsNone(response.getHeader('ETag', literal=1))
 
         expires = dateutil.parser.parse(response.getHeader('Expires'))
-        self.assertTrue(now > expires)
+        self.assertGreater(now, expires)
 
     def test_cacheInBrowser_lastModified_and_etag(self):
         from plone.app.caching.operations.utils import cacheInBrowser
@@ -186,7 +186,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual('"|foo|bar|"', response.getHeader('ETag', literal=1))
 
         expires = dateutil.parser.parse(response.getHeader('Expires'))
-        self.assertTrue(now > expires)
+        self.assertGreater(now, expires)
 
     # cacheInProxy()
 
@@ -205,12 +205,12 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual(200, response.getStatus())
         self.assertEqual('max-age=0, s-maxage=60, must-revalidate',
                          response.getHeader('Cache-Control'))
-        self.assertEqual(None, response.getHeader('Last-Modified'))
-        self.assertEqual(None, response.getHeader('ETag', literal=1))
-        self.assertEqual(None, response.getHeader('Vary'))
+        self.assertIsNone(response.getHeader('Last-Modified'))
+        self.assertIsNone(response.getHeader('ETag', literal=1))
+        self.assertIsNone(response.getHeader('Vary'))
 
         expires = dateutil.parser.parse(response.getHeader('Expires'))
-        self.assertTrue(now > expires)
+        self.assertGreater(now, expires)
 
     def test_cacheInProxy_full(self):
         from plone.app.caching.operations.utils import cacheInProxy
@@ -238,7 +238,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual('Accept-Language', response.getHeader('Vary'))
 
         expires = dateutil.parser.parse(response.getHeader('Expires'))
-        self.assertTrue(now > expires)
+        self.assertGreater(now, expires)
 
     # cacheInBrowserAndProxy()
 
@@ -257,13 +257,13 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertEqual(200, response.getStatus())
         self.assertEqual('max-age=60, proxy-revalidate, public',
                          response.getHeader('Cache-Control'))
-        self.assertEqual(None, response.getHeader('Last-Modified'))
-        self.assertEqual(None, response.getHeader('ETag', literal=1))
-        self.assertEqual(None, response.getHeader('Vary'))
+        self.assertIsNone(response.getHeader('Last-Modified'))
+        self.assertIsNone(response.getHeader('ETag', literal=1))
+        self.assertIsNone(response.getHeader('Vary'))
 
         timedelta = dateutil.parser.parse(response.getHeader('Expires')) - now
-        self.assertFalse(timedelta < datetime.timedelta(seconds=59))
-        self.assertFalse(timedelta > datetime.timedelta(seconds=60))
+        self.assertGreaterEqual(timedelta, datetime.timedelta(seconds=59))
+        self.assertLessEqual(timedelta, datetime.timedelta(seconds=60))
 
     def test_cacheInBrowserAndProxy_full(self):
         from plone.app.caching.operations.utils import cacheInBrowserAndProxy
@@ -523,9 +523,9 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
 
         self.assertEqual(u"", body)
         self.assertEqual(etag, response.getHeader('ETag', literal=1))
-        self.assertEqual(None, response.getHeader('Last-Modified'))
-        self.assertEqual(None, response.getHeader('Expires'))
-        self.assertEqual(None, response.getHeader('Cache-Control'))
+        self.assertIsNone(response.getHeader('Last-Modified'))
+        self.assertIsNone(response.getHeader('Expires'))
+        self.assertIsNone(response.getHeader('Cache-Control'))
         self.assertEqual(304, response.getStatus())
 
 
@@ -546,7 +546,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        self.assertEqual(True, isModified(request))
+        self.assertTrue(isModified(request))
 
     def test_isModified_no_headers_with_keys(self):
         from plone.app.caching.operations.utils import isModified
@@ -559,7 +559,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
         lastModified = datetime.datetime(
             2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertEqual(True, isModified(
+        self.assertTrue(isModified(
             request, etag=etag, lastModified=lastModified))
 
     def test_isModified_ims_invalid_date(self):
@@ -574,7 +574,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
         lastModified = datetime.datetime(
             2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertEqual(True, isModified(request, lastModified=lastModified))
+        self.assertTrue(isModified(request, lastModified=lastModified))
 
     def test_isModified_ims_modified(self):
         from plone.app.caching.operations.utils import isModified
@@ -589,7 +589,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
         lastModified = datetime.datetime(
             2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertEqual(True, isModified(request, lastModified=lastModified))
+        self.assertTrue(isModified(request, lastModified=lastModified))
 
     def test_isModified_ims_not_modified(self):
         from plone.app.caching.operations.utils import isModified
@@ -604,7 +604,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
         lastModified = datetime.datetime(
             2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertEqual(False, isModified(request, lastModified=lastModified))
+        self.assertFalse(isModified(request, lastModified=lastModified))
 
     def test_isModified_ims_not_modified_two_dates(self):
         from plone.app.caching.operations.utils import isModified
@@ -619,7 +619,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
         lastModified = datetime.datetime(
             2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertEqual(False, isModified(request, lastModified=lastModified))
+        self.assertFalse(isModified(request, lastModified=lastModified))
 
     def test_isModified_ims_not_modified_etag_no_inm_header(self):
         from plone.app.caching.operations.utils import isModified
@@ -635,7 +635,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
         lastModified = datetime.datetime(
             2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertEqual(True, isModified(
+        self.assertTrue(isModified(
             request, etag=etag, lastModified=lastModified))
 
     def test_isModified_inm_no_tags(self):
@@ -647,7 +647,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = '|foo'
 
-        self.assertEqual(True, isModified(request, etag=etag))
+        self.assertTrue(isModified(request, etag=etag))
 
     def test_isModified_inm_one_tag_no_match(self):
         from plone.app.caching.operations.utils import isModified
@@ -660,7 +660,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = '|foo'
 
-        self.assertEqual(True, isModified(request, etag=etag))
+        self.assertTrue(isModified(request, etag=etag))
 
     def test_isModified_inm_multiple_tags_no_match(self):
         from plone.app.caching.operations.utils import isModified
@@ -673,7 +673,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = '|foo'
 
-        self.assertEqual(True, isModified(request, etag=etag))
+        self.assertTrue(isModified(request, etag=etag))
 
     def test_isModified_inm_invalid_tag(self):
         from plone.app.caching.operations.utils import isModified
@@ -686,7 +686,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = '|foo'
 
-        self.assertEqual(True, isModified(request, etag=etag))
+        self.assertTrue(isModified(request, etag=etag))
 
     def test_isModified_inm_star(self):
         from plone.app.caching.operations.utils import isModified
@@ -699,7 +699,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = '|foo'
 
-        self.assertEqual(False, isModified(request, etag=etag))
+        self.assertFalse(isModified(request, etag=etag))
 
     def test_isModified_inm_match_single(self):
         from plone.app.caching.operations.utils import isModified
@@ -712,7 +712,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = '|foo'
 
-        self.assertEqual(False, isModified(request, etag=etag))
+        self.assertFalse(isModified(request, etag=etag))
 
     def test_isModified_inm_match_update(self):
         """
@@ -736,7 +736,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = None
 
-        self.assertEqual(True, isModified(request, etag=etag,
+        self.assertTrue(isModified(request, etag=etag,
                                           lastModified='doesnt_really_matter'))
 
     def test_isModified_inm_match_multiple(self):
@@ -750,7 +750,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = '|foo'
 
-        self.assertEqual(False, isModified(request, etag=etag))
+        self.assertFalse(isModified(request, etag=etag))
 
     def test_isModified_inm_match_weak(self):
         from plone.app.caching.operations.utils import isModified
@@ -763,7 +763,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = '|foo'
 
-        self.assertEqual(False, isModified(request, etag=etag))
+        self.assertFalse(isModified(request, etag=etag))
 
     def test_isModified_inm_match_ignores_ims_if_no_last_modified_date(self):
         from plone.app.caching.operations.utils import isModified
@@ -778,7 +778,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = '|foo'
 
-        self.assertEqual(False, isModified(request, etag=etag))
+        self.assertFalse(isModified(request, etag=etag))
 
     def test_isModified_inm_match_modified(self):
         from plone.app.caching.operations.utils import isModified
@@ -795,7 +795,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
         lastModified = datetime.datetime(
             2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertEqual(True, isModified(
+        self.assertTrue(isModified(
             request, etag=etag, lastModified=lastModified))
 
     def test_isModified_inm_match_not_modified(self):
@@ -813,7 +813,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
         lastModified = datetime.datetime(
             2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertEqual(False, isModified(
+        self.assertFalse(isModified(
             request, etag=etag, lastModified=lastModified))
 
     # visibleToRole()
@@ -821,7 +821,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
     def test_visibleToRole_not_real(self):
         from plone.app.caching.operations.utils import visibleToRole
         published = DummyPublished()
-        self.assertEqual(False, visibleToRole(published, role='Anonymous'))
+        self.assertFalse(visibleToRole(published, role='Anonymous'))
 
     def test_visibleToRole_permission(self):
         from plone.app.caching.operations.utils import visibleToRole
@@ -829,10 +829,10 @@ class CacheCheckHelpersTest(unittest.TestCase):
         s = SimpleItem()
 
         s.manage_permission('View', ('Member', 'Manager',))
-        self.assertEqual(False, visibleToRole(s, role='Anonymous'))
+        self.assertFalse(visibleToRole(s, role='Anonymous'))
 
         s.manage_permission('View', ('Member', 'Manager', 'Anonymous',))
-        self.assertEqual(True, visibleToRole(s, role='Anonymous'))
+        self.assertTrue(visibleToRole(s, role='Anonymous'))
 
 
 class MiscHelpersTest(unittest.TestCase):
@@ -898,7 +898,7 @@ class MiscHelpersTest(unittest.TestCase):
 
         # Who knows what your local timezone is :-)
         self.assertTrue(inGMT.endswith(' GMT'))
-        self.assertTrue('Nov 2010' in inGMT)
+        self.assertIn('Nov 2010', inGMT)
 
         # We lose microseconds. Big whoop.
         p = dateutil.parser.parse(inGMT).astimezone(dateutil.tz.tzlocal())
@@ -914,7 +914,7 @@ class MiscHelpersTest(unittest.TestCase):
 
         # Who knows what your local timezone is :-)
         self.assertTrue(inGMT.endswith(' GMT'))
-        self.assertTrue('Nov 2010' in inGMT)
+        self.assertIn('Nov 2010', inGMT)
 
         # Can't compare offset aware and naive
         p = dateutil.parser.parse(inGMT).astimezone(dateutil.tz.tzlocal())
@@ -926,7 +926,7 @@ class MiscHelpersTest(unittest.TestCase):
     def test_parseDateTime_invalid(self):
         from plone.app.caching.operations.utils import parseDateTime
 
-        self.assertEqual(None, parseDateTime('foo'))
+        self.assertIsNone(parseDateTime('foo'))
 
     def test_parseDateTime_rfc1123(self):
         from plone.app.caching.operations.utils import parseDateTime
@@ -948,7 +948,7 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.operations.utils import getLastModified
 
         published = DummyPublished()
-        self.assertEqual(None, getLastModified(published))
+        self.assertIsNone(getLastModified(published))
 
     def test_getLastModified_none(self):
         from plone.app.caching.operations.utils import getLastModified
@@ -966,7 +966,7 @@ class MiscHelpersTest(unittest.TestCase):
         provideAdapter(DummyLastModified)
 
         published = DummyPublished()
-        self.assertEqual(None, getLastModified(published))
+        self.assertIsNone(getLastModified(published))
 
     def test_getLastModified_missing_timezone(self):
         from plone.app.caching.operations.utils import getLastModified
@@ -1047,7 +1047,7 @@ class MiscHelpersTest(unittest.TestCase):
         difference = val - now
 
         # give the test two seconds' leeway
-        self.assertTrue(difference >= datetime.timedelta(seconds=58))
+        self.assertGreaterEqual(difference, datetime.timedelta(seconds=58))
 
     # getETag()
 
@@ -1070,8 +1070,7 @@ class MiscHelpersTest(unittest.TestCase):
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
-        self.assertEqual(None, getETag(
-            published, request, keys=('foo', 'bar',)))
+        self.assertIsNone(getETag(published, request, keys=('foo', 'bar',)))
 
     def test_getETag_adapter_returns_none(self):
         from plone.app.caching.operations.utils import getETag
@@ -1235,7 +1234,7 @@ class RAMCacheTest(unittest.TestCase):
 
     def test_getRAMCache_no_chooser(self):
         from plone.app.caching.operations.utils import getRAMCache
-        self.assertEqual(None, getRAMCache())
+        self.assertIsNone(getRAMCache())
 
     def test_getRAMCache_custom_global_key(self):
         from plone.app.caching.operations.utils import getRAMCache
@@ -1469,7 +1468,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['PATH_INFO'] = '/foo/bar'
         request.environ['QUERY_STRING'] = ''
 
-        self.assertEqual(None, fetchFromRAMCache(request))
+        self.assertIsNone(fetchFromRAMCache(request))
 
     def test_fetchFromRAMCache_minimal(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1590,7 +1589,7 @@ class RAMCacheTest(unittest.TestCase):
 
         cached = normalize_response_cache(
             fetchFromRAMCache(request, etag='|foo'))
-        self.assertEqual(None, cached)
+        self.assertIsNone(cached)
 
     def test_fetchFromRAMCache_miss_custom_default(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1621,4 +1620,4 @@ class RAMCacheTest(unittest.TestCase):
         marker = object()
         cached = normalize_response_cache(
             fetchFromRAMCache(request, etag='|foo', default=marker))
-        self.assertTrue(cached is marker)
+        self.assertIs(cached, marker)

@@ -10,7 +10,7 @@ import datetime
 import DateTime
 import os
 import time
-import unittest2 as unittest
+import unittest
 
 
 class FauxDataManager(object):
@@ -51,7 +51,7 @@ class TestLastModified(unittest.TestCase):
 
         from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
         zpt = ZopePageTemplate('zpt').__of__(d)
-        self.assertEqual(None, ILastModified(zpt)())
+        self.assertIsNone(ILastModified(zpt)())
 
         timestamp = 987654321.0  # time stamp (in UTC)
         # equivalent in local time, which is what the last-modified adapter
@@ -74,7 +74,7 @@ class TestLastModified(unittest.TestCase):
 
         from Products.CMFCore.FSPageTemplate import FSPageTemplate
         zpt = FSPageTemplate('zpt', __file__).__of__(d)
-        self.assertEqual(None, ILastModified(zpt)())
+        self.assertIsNone(ILastModified(zpt)())
 
         timestamp = 987654321.0  # time stamp (in UTC)
         # equivalent in local time, which is what the last-modified adapter
@@ -88,7 +88,7 @@ class TestLastModified(unittest.TestCase):
         from OFS.Image import File
 
         dummy = File('dummy', 'Dummy', 'data')
-        self.assertEqual(None, ILastModified(dummy)())
+        self.assertIsNone(ILastModified(dummy)())
 
         timestamp = 987654321.0  # time stamp (in UTC)
         ts = TimeStamp(*time.gmtime(timestamp)[:6])  # corresponding TimeStamp
@@ -105,7 +105,7 @@ class TestLastModified(unittest.TestCase):
         from OFS.Image import Image
 
         dummy = Image('dummy', 'Dummy', 'data')
-        self.assertEqual(None, ILastModified(dummy)())
+        self.assertIsNone(ILastModified(dummy)())
 
         timestamp = 987654321.0  # time stamp (in UTC)
         ts = TimeStamp(*time.gmtime(timestamp)[:6])  # corresponding TimeStamp
@@ -160,7 +160,7 @@ class TestLastModified(unittest.TestCase):
 
         d = Dummy()
 
-        self.assertEqual(None, ILastModified(d)())
+        self.assertIsNone(ILastModified(d)())
 
         d._mod = datetime.datetime(2001, 4, 19, 12, 25, 21, 120000)
         self.assertEqual(d._mod, ILastModified(d)())
@@ -183,7 +183,7 @@ class TestLastModified(unittest.TestCase):
 
         d = Dummy()
 
-        self.assertEqual(None, ILastModified(d)())
+        self.assertIsNone(ILastModified(d)())
 
         d._mod = datetime.datetime(2001, 4, 19, 12, 25, 21, 120000)
         self.assertEqual(d._mod, ILastModified(d)())
