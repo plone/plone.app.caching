@@ -32,7 +32,7 @@ from zope.lifecycleevent import ObjectModifiedEvent
 from zope.lifecycleevent import ObjectMovedEvent
 from zope.lifecycleevent import ObjectRemovedEvent
 
-import unittest2 as unittest
+import unittest
 
 
 class Handler(object):

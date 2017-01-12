@@ -15,7 +15,7 @@ from zope.component import provideAdapter
 from zope.component import provideUtility
 from zope.interface import implementer
 
-import unittest2 as unittest
+import unittest
 import z3c.caching.registry
 
 
@@ -92,7 +92,7 @@ class TestContentItemLookup(unittest.TestCase):
         published = ZopePageTemplate('someView')
         request = DummyRequest(published, DummyResponse())
 
-        self.assertEqual(None, ContentItemLookup(published, request)())
+        self.assertIsNone(ContentItemLookup(published, request)())
 
     def test_no_mappings(self):
         provideUtility(Registry(), IRegistry)
@@ -101,7 +101,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('someView')
         request = DummyRequest(published, DummyResponse())
-        self.assertEqual(None, ContentItemLookup(published, request)())
+        self.assertIsNone(ContentItemLookup(published, request)())
 
     def test_template_lookup(self):
         provideUtility(Registry(), IRegistry)
@@ -201,7 +201,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('someView').__of__(DummyContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEqual(None, ContentItemLookup(published, request)())
+        self.assertIsNone(ContentItemLookup(published, request)())
 
     def test_parent_not_content(self):
         provideUtility(Registry(), IRegistry)
@@ -214,7 +214,7 @@ class TestContentItemLookup(unittest.TestCase):
 
         published = ZopePageTemplate('defaultView').__of__(DummyNotContent())
         request = DummyRequest(published, DummyResponse())
-        self.assertEqual(None, ContentItemLookup(published, request)())
+        self.assertIsNone(ContentItemLookup(published, request)())
 
     def test_parent_not_IBrowserDefault_methodid(self):
         provideUtility(Registry(), IRegistry)

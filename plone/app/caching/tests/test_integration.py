@@ -19,7 +19,7 @@ from zope.globalrequest import setRequest
 
 import OFS.Image
 import pkg_resources
-import unittest2 as unittest
+import unittest
 
 
 TEST_IMAGE = pkg_resources.resource_filename(
@@ -138,25 +138,25 @@ class TestOperations(unittest.TestCase):
 
         # Check that we can open all without errors and without cache headers
         browser.open(self.portal.absolute_url())
-        self.assertFalse('Cache-Control' in browser.headers)
+        self.assertNotIn('Cache-Control', browser.headers)
 
         browser.open(self.portal['f1'].absolute_url())
-        self.assertTrue('Folder one description' in browser.contents)
-        self.assertFalse('Cache-Control' in browser.headers)
+        self.assertIn('Folder one description', browser.contents)
+        self.assertNotIn('Cache-Control', browser.headers)
 
         browser.open(self.portal['f1']['d1'].absolute_url())
-        self.assertTrue('Document one description' in browser.contents)
-        self.assertFalse('Cache-Control' in browser.headers)
+        self.assertIn('Document one description', browser.contents)
+        self.assertNotIn('Cache-Control', browser.headers)
 
         browser.open(self.portal['f1']['i1'].absolute_url())
-        self.assertFalse('Cache-Control' in browser.headers)
+        self.assertNotIn('Cache-Control', browser.headers)
 
         browser.open(self.portal['f1']['f1'].absolute_url())
-        self.assertFalse('Cache-Control' in browser.headers)
+        self.assertNotIn('Cache-Control', browser.headers)
 
         browser.open(
             self.portal.absolute_url() + '/portal_skins/custom/test.gif')
-        self.assertFalse('Cache-Control' in browser.headers)
+        self.assertNotIn('Cache-Control', browser.headers)
 
         browser.open(
             self.portal.absolute_url() + '/++resource++plone.app.caching.gif')

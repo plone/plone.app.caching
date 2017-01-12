@@ -11,7 +11,7 @@ from plone.testing.z2 import Browser
 from zope.component import getUtility
 from zope.globalrequest import setRequest
 
-import unittest2 as unittest
+import unittest
 
 
 class TestOperationDefault(unittest.TestCase):
@@ -67,7 +67,7 @@ class TestOperationDefault(unittest.TestCase):
         browser.getControl(
             name='form.widgets.IDublinCore.title').value = 'dummy content'
         browser.getControl('Save').click()
-        self.assertFalse('Etag' in browser.headers)
+        self.assertNotIn('Etag', browser.headers)
 
         # now set up etags and make sure that a header is added
         self.registry['plone.app.caching.weakCaching.etags'] = (
@@ -81,4 +81,4 @@ class TestOperationDefault(unittest.TestCase):
         browser.getControl(
             name='form.widgets.IDublinCore.title').value = 'dummy content'
         browser.getControl('Save').click()
-        self.assertTrue('Etag' in browser.headers)
+        self.assertIn('Etag', browser.headers)
