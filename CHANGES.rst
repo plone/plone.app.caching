@@ -4,14 +4,6 @@ Changelog
 1.2.15 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
 Bug fixes:
 
 - Fixed tests when using ZODB 4.
@@ -25,6 +17,7 @@ Bug fixes:
 
 - Update code to follow Plone styleguide.
   [gforcada]
+
 
 1.2.13 (2016-10-05)
 -------------------
