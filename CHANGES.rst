@@ -6,6 +6,9 @@ Changelog
 
 Bug fixes:
 
+- Remove dependency on unittest2; fix tests assertions.
+  [hvelarde]
+
 - Fixed tests when using ZODB 4.
   [davisagli]
 

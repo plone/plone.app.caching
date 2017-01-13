@@ -16,7 +16,7 @@ from zope.component import provideUtility
 from zope.interface import implementer
 
 import pytz
-import unittest2 as unittest
+import unittest
 
 
 TEST_TIMEZONE = 'Europe/Vienna'
@@ -85,12 +85,12 @@ class TestIsPurged(unittest.TestCase):
 
     def test_no_registry(self):
         content = DummyContent()
-        self.assertEqual(False, isPurged(content))
+        self.assertFalse(isPurged(content))
 
     def test_no_settings(self):
         provideUtility(Registry(), IRegistry)
         content = DummyContent()
-        self.assertEqual(False, isPurged(content))
+        self.assertFalse(isPurged(content))
 
     def test_no_portal_type(self):
         provideUtility(Registry(), IRegistry)
@@ -101,7 +101,7 @@ class TestIsPurged(unittest.TestCase):
         ploneSettings.purgedContentTypes = ('testtype',)
 
         content = DummyNotContent()
-        self.assertEqual(False, isPurged(content))
+        self.assertFalse(isPurged(content))
 
     def test_not_listed(self):
         provideUtility(Registry(), IRegistry)
@@ -112,7 +112,7 @@ class TestIsPurged(unittest.TestCase):
         ploneSettings.purgedContentTypes = ('File', 'Image',)
 
         content = DummyContent()
-        self.assertEqual(False, isPurged(content))
+        self.assertFalse(isPurged(content))
 
     def test_listed(self):
         provideUtility(Registry(), IRegistry)
@@ -123,7 +123,7 @@ class TestIsPurged(unittest.TestCase):
         ploneSettings.purgedContentTypes = ('File', 'Image', 'testtype',)
 
         content = DummyContent()
-        self.assertEqual(True, isPurged(content))
+        self.assertTrue(isPurged(content))
 
 
 class TestGetObjectDefaultPath(unittest.TestCase):
@@ -132,7 +132,7 @@ class TestGetObjectDefaultPath(unittest.TestCase):
 
     def test_not_content(self):
         context = DummyNotContent()
-        self.assertEqual(None, getObjectDefaultView(context))
+        self.assertIsNone(getObjectDefaultView(context))
 
     def test_browserdefault(self):
         context = DummyContent()

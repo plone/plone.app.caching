@@ -26,7 +26,7 @@ import dateutil.parser
 import dateutil.tz
 import os
 import pkg_resources
-import unittest2 as unittest
+import unittest
 
 
 TEST_FILE = pkg_resources.resource_filename(
@@ -149,7 +149,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['Cache-Control'])
         self.assertEqual('"|test_user_1_|%d|en|%s|0|0' % (catalog.getCounter(
         ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Set the copy/cut cookie and then request the folder view again
@@ -173,7 +173,7 @@ class TestProfileWithCaching(unittest.TestCase):
             'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
         )
         browser.open(self.portal['f1']['d1'].absolute_url())
-        self.assertTrue(testText in browser.contents)
+        self.assertIn(testText, browser.contents)
         self.assertEqual('plone.content.itemView',
                          browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.weakCaching',
@@ -183,7 +183,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['Cache-Control'])
         self.assertEqual('"|test_user_1_|%d|en|%s|0' % (catalog.getCounter(
         ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request the authenticated page again -- to test RAM cache.
@@ -198,7 +198,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.weakCaching',
                          browser.headers['X-Cache-Operation'])
         # Authenticated should NOT be RAM cached
-        self.assertEqual(None, browser.headers.get('X-RAMCache'))
+        self.assertIsNone(browser.headers.get('X-RAMCache'))
 
         # Request the authenticated page again -- with an INM header to test
         # 304
@@ -228,7 +228,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['Cache-Control'])
         self.assertEqual('"||%d|en|%s|0|0' % (catalog.getCounter(
         ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request the anonymous page
@@ -239,13 +239,13 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.weakCaching',
                          browser.headers['X-Cache-Operation'])
-        self.assertTrue(testText in browser.contents)
+        self.assertIn(testText, browser.contents)
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
         self.assertEqual('"||%d|en|%s|0' % (catalog.getCounter(
         ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request the anonymous page again -- to test RAM cache.
@@ -260,12 +260,12 @@ class TestProfileWithCaching(unittest.TestCase):
         # This should come from RAM cache
         self.assertEqual('plone.app.caching.operations.ramcache',
                          browser.headers['X-RAMCache'])
-        self.assertTrue(testText in browser.contents)
+        self.assertIn(testText, browser.contents)
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
         self.assertEqual('"||%d|en|%s|0' % (catalog.getCounter(
         ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request the anonymous page again -- with an INM header to test 304.
@@ -305,7 +305,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.weakCaching',
                          browser.headers['X-Cache-Operation'])
         # The etag has changed so we should get a fresh page.
-        self.assertEqual(None, browser.headers.get('X-RAMCache'))
+        self.assertIsNone(browser.headers.get('X-RAMCache'))
         self.assertEqual('200 Ok', browser.headers['Status'])
 
     def test_content_feeds(self):
@@ -337,7 +337,7 @@ class TestProfileWithCaching(unittest.TestCase):
             skins_tool.default_skin,
         )
         self.assertEqual(tag, browser.headers['ETag'])
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request the rss feed again -- to test RAM cache
@@ -359,7 +359,7 @@ class TestProfileWithCaching(unittest.TestCase):
             skins_tool.default_skin,
         )
         self.assertEqual(tag, browser.headers['ETag'])
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request the rss feed again -- with an INM header to test 304.
@@ -394,7 +394,7 @@ class TestProfileWithCaching(unittest.TestCase):
             skins_tool.default_skin,
         )
         self.assertEqual(tag, browser.headers['ETag'])
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request the authenticated rss feed again -- to test RAM cache
@@ -408,7 +408,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual('plone.app.caching.moderateCaching',
                          browser.headers['X-Cache-Operation'])
         # Authenticated should NOT be RAM cached
-        self.assertEqual(None, browser.headers.get('X-RAMCache'))
+        self.assertIsNone(browser.headers.get('X-RAMCache'))
 
     def test_content_files(self):
 
@@ -446,7 +446,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['Cache-Control'])
         # remove this when the next line works
         self.assertIsNotNone(browser.headers.get('Last-Modified'))
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request an image scale with Manager role
@@ -468,7 +468,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['Cache-Control'])
         # remove this when the next line works
         self.assertIsNotNone(browser.headers.get('Last-Modified'))
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Publish the folder
@@ -489,7 +489,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['Cache-Control'])
         # remove this when the next line works
         self.assertIsNotNone(browser.headers.get('Last-Modified'))
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
         # Request the image again -- with an IMS header to test 304
@@ -518,7 +518,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['Cache-Control'])
         # remove this when the next line works
         self.assertIsNotNone(browser.headers.get('Last-Modified'))
-        self.assertTrue(now > dateutil.parser.parse(
+        self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
     def test_resources(self):
@@ -541,7 +541,7 @@ class TestProfileWithCaching(unittest.TestCase):
         # remove this when the next line works
         self.assertIsNotNone(browser.headers.get('Last-Modified'))
         timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
-        self.assertTrue(timedelta > datetime.timedelta(seconds=86390))
+        self.assertGreater(timedelta, datetime.timedelta(seconds=86390))
 
         # Request the skin image again -- with an IMS header to test 304
         lastmodified = browser.headers['Last-Modified']
@@ -580,7 +580,7 @@ class TestProfileWithCaching(unittest.TestCase):
         # remove this when the next line works
         self.assertIsNotNone(browser.headers.get('Last-Modified'))
         timedelta = dateutil.parser.parse(browser.headers['Expires']) - now
-        self.assertTrue(timedelta > datetime.timedelta(seconds=86390))
+        self.assertGreater(timedelta, datetime.timedelta(seconds=86390))
 
     def test_stable_resources(self):
         # This is a clone of the same test for 'without-caching-proxy'

@@ -12,7 +12,7 @@ from zope.component import getUtility
 from zope.globalrequest import setRequest
 
 import transaction
-import unittest2 as unittest
+import unittest
 
 
 class TestOperationParameters(unittest.TestCase):
@@ -74,7 +74,7 @@ class TestOperationParameters(unittest.TestCase):
                          browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.weakCaching',
                          browser.headers['X-Cache-Operation'])
-        self.assertTrue(testText in browser.contents)
+        self.assertIn(testText, browser.contents)
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
 
@@ -96,11 +96,11 @@ class TestOperationParameters(unittest.TestCase):
                          browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.moderateCaching',
                          browser.headers['X-Cache-Operation'])
-        self.assertTrue(testText in browser.contents)
+        self.assertIn(testText, browser.contents)
         self.assertEqual('max-age=0, s-maxage=60, must-revalidate',
                          browser.headers['Cache-Control'])
         self.assertEqual('X-Anonymous', browser.headers['Vary'])
-        self.assertFalse('Etag' in browser.headers)
+        self.assertNotIn('Etag', browser.headers)
 
         # View the page as logged-in
         browser = Browser(self.app)
@@ -113,10 +113,10 @@ class TestOperationParameters(unittest.TestCase):
                          browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.moderateCaching',
                          browser.headers['X-Cache-Operation'])
-        self.assertTrue(testText in browser.contents)
+        self.assertIn(testText, browser.contents)
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertTrue('Etag' in browser.headers)
+        self.assertIn('Etag', browser.headers)
 
         # Set pages to have strong caching so that we can see the difference
         # between logged in and anonymous
@@ -134,11 +134,11 @@ class TestOperationParameters(unittest.TestCase):
                          browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.strongCaching',
                          browser.headers['X-Cache-Operation'])
-        self.assertTrue(testText in browser.contents)
+        self.assertIn(testText, browser.contents)
         self.assertEqual('max-age=86400, proxy-revalidate, public',
                          browser.headers['Cache-Control'])
         self.assertEqual('X-Anonymous', browser.headers['Vary'])
-        self.assertFalse('Etag' in browser.headers)
+        self.assertNotIn('Etag', browser.headers)
 
         # View the page as logged-in
         browser = Browser(self.app)
@@ -151,10 +151,10 @@ class TestOperationParameters(unittest.TestCase):
                          browser.headers['X-Cache-Rule'])
         self.assertEqual('plone.app.caching.strongCaching',
                          browser.headers['X-Cache-Operation'])
-        self.assertTrue(testText in browser.contents)
+        self.assertIn(testText, browser.contents)
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        self.assertTrue('Etag' in browser.headers)
+        self.assertIn('Etag', browser.headers)
 
         # Check an edge case that has had a problem in the past:
         # setting strongCaching maxage to zero.
