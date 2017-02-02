@@ -306,7 +306,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # The etag has changed so we should get a fresh page.
         self.assertIsNone(browser.headers.get('X-RAMCache'))
-        self.assertEqual('200 Ok', browser.headers['Status'])
+        self.assertEqual('200 OK', browser.headers['Status'].upper())
 
     def test_content_feeds(self):
 
