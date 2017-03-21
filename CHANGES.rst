@@ -14,7 +14,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Fix: Do not break Plone if there is no Archetypes available.
+  [jensens]
 
 
 1.2.15 (2017-01-12)
