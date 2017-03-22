@@ -4,7 +4,6 @@ from datetime import datetime
 from dateutil.tz import tzlocal
 from OFS.Image import File
 from plone.app.caching.operations.utils import getContext
-from Products.Archetypes.Field import Image as ImageScale
 from Products.CMFCore.FSObject import FSObject
 from Products.CMFCore.FSPageTemplate import FSPageTemplate
 from Products.CMFCore.interfaces import ICatalogableDublinCore
@@ -22,6 +21,12 @@ try:
     from zope.dublincore.interfaces import IDCTimes
 except ImportError:
     class IDCTimes(Interface):
+        pass
+
+try:
+    from Products.Archetypes.Field import Image as ImageScale
+except ImportError:
+    class ImageScale(object):
         pass
 
 
