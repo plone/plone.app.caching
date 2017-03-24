@@ -4,14 +4,6 @@ Changelog
 1.2.16 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
 Bug fixes:
 
 - Fix: Do not break Plone if there is no Archetypes available.
