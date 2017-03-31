@@ -4,7 +4,20 @@ Changelog
 1.1.12 (unreleased)
 ~~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+Breaking changes:
+
+- *add item here*
+
+New features:
+
+- *add item here*
+
+Bug fixes:
+
+- Fixed title and description of max age in strong caching rule for resources.
+  They wrongly were the same as for shared max age.
+  Fixes `issue 1989 <https://github.com/plone/Products.CMFPlone/issues/1989>`_.
+  [maurits]
 
 
 1.1.11 (2016-03-29)
