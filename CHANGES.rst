@@ -14,7 +14,10 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Fixed title and description of max age in strong caching rule for resources.
+  They wrongly were the same as for shared max age.
+  Fixes `issue 1989 <https://github.com/plone/Products.CMFPlone/issues/1989>`_.
+  [maurits]
 
 
 1.2.16 (2017-03-23)

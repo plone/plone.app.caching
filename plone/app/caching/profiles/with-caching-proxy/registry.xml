@@ -82,7 +82,7 @@
 
   <!-- plone.resource-->
   <record name="plone.app.caching.strongCaching.plone.resource.maxage">
-      <field ref="plone.app.caching.strongCaching.smaxage" />
+      <field ref="plone.app.caching.strongCaching.maxage" />
       <value>86400</value>
   </record>
   <record name="plone.app.caching.strongCaching.plone.resource.lastModified">
