@@ -159,7 +159,7 @@ class EditForm(form.Form):
             # as necessary in applyChanges()
 
             if self.rulesetName:
-                rulesetRecordName = '{0}{1}{2}'.format(
+                rulesetRecordName = '{0}.{1}.{2}'.format(
                     prefix, self.rulesetName, option,)
 
                 if rulesetRecordName in self.registry.records:
