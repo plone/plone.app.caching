@@ -4,14 +4,6 @@ Changelog
 1.1.12 (unreleased)
 ~~~~~~~~~~~~~~~~~~~
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
 Bug fixes:
 
 - Fixed title and description of max age in strong caching rule for resources.
