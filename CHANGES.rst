@@ -14,7 +14,9 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Fixed blank edit forms of the per ruleset parameters.
+  `Issue 1993 <https://github.com/plone/Products.CMFPlone/issues/1993>`_.
+  [maurits]
 
 
 1.2.17 (2017-04-02)
