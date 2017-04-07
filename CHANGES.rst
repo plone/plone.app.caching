@@ -4,14 +4,6 @@ Changelog
 1.2.18 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
 Bug fixes:
 
 - Fixed blank edit forms of the per ruleset parameters.
