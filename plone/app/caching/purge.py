@@ -293,7 +293,7 @@ def purgeOnMovedOrRemoved(object, event):
     # Don't purge when added
     if IObjectAddedEvent.providedBy(event):
         return
-    if isPurged(object):
+    if isPurged(object) and 'portal_factory' not in request.URL:
         notify(Purge(object))
     parent = object.getParentNode()
     if parent:
