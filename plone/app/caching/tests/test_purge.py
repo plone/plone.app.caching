@@ -30,6 +30,7 @@ from zope.component import provideHandler
 from zope.component import provideUtility
 from zope.component.event import objectEventNotify
 from zope.event import notify
+from zope.globalrequest import getRequest
 from zope.globalrequest import setRequest
 from zope.interface import implementer
 from zope.lifecycleevent import ObjectAddedEvent
@@ -65,7 +66,9 @@ class Handler(object):
 
 
 class FauxRequest(dict):
-    pass
+    REQUEST_METHOD = 'POST'
+    URL = 'http://nohost/test'
+    form = ('form.submitted',)
 
 
 @implementer(IContentish)
@@ -87,6 +90,9 @@ class FauxNonContent(Explicit):
 
     def getPhysicalPath(self):
         return ('', )
+
+    def getParentNode(self):
+        return FauxNonContent('folder')
 
 
 @implementer(IBrowserDefault)
@@ -153,7 +159,7 @@ class TestPurgeRedispatch(unittest.TestCase):
         notify(ObjectMovedEvent(context, FauxContent(), 'old',
                                 context.__parent__, 'new'))
 
-        self.assertEqual(1, len(self.handler.invocations))
+        self.assertEqual(2, len(self.handler.invocations))
         self.assertEqual(context, self.handler.invocations[0].object)
 
     def test_renamed(self):
@@ -163,15 +169,17 @@ class TestPurgeRedispatch(unittest.TestCase):
                                 context.__parent__, 'old',
                                 context.__parent__, 'new'))
 
-        self.assertEqual(1, len(self.handler.invocations))
+        self.assertEqual(2, len(self.handler.invocations))
         self.assertEqual(context, self.handler.invocations[0].object)
 
     def test_removed(self):
         context = FauxContent('new').__of__(FauxContent())
+        request = getRequest()
+        request.URL = 'http://nohost/delete_confirmation'
 
         notify(ObjectRemovedEvent(context, context.__parent__, 'new'))
 
-        self.assertEqual(1, len(self.handler.invocations))
+        self.assertEqual(2, len(self.handler.invocations))
         self.assertEqual(context, self.handler.invocations[0].object)
 
 
