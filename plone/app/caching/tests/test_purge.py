@@ -7,6 +7,13 @@ from plone.app.caching.purge import DiscussionItemPurgePaths
 from plone.app.caching.purge import ObjectFieldPurgePaths
 from plone.app.caching.purge import purgeOnModified
 from plone.app.caching.purge import purgeOnMovedOrRemoved
+from plone.app.caching.purge import ScalesPurgePaths
+from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_ROLES
+from plone.namedfile.file import NamedFile
+from plone.namedfile.file import NamedImage
 from plone.registry import Registry
 from plone.registry.fieldfactory import persistentFieldAdapter
 from plone.registry.interfaces import IRegistry
@@ -33,6 +40,14 @@ from zope.lifecycleevent import ObjectMovedEvent
 from zope.lifecycleevent import ObjectRemovedEvent
 
 import unittest
+
+
+def getData(filename):
+    from os.path import dirname, join
+    from plone.app.caching import tests
+    filename = join(dirname(tests.__file__), filename)
+    data = open(filename).read()
+    return data
 
 
 class Handler(object):
@@ -386,3 +401,52 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
             list(purger.getRelativePaths())
         )
         self.assertEqual([], list(purger.getAbsolutePaths()))
+
+
+class TestScalesPurgePaths(unittest.TestCase):
+
+    layer = PLONE_APP_CACHING_FUNCTIONAL_TESTING
+
+    def setUp(self):
+
+        self.portal = self.layer['portal']
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.portal.invokeFactory('Folder', 'media')
+        self.folder = self.portal.media
+        self.folder.invokeFactory(
+            'Image',
+            'image',
+            title='Test Image')
+        self.image_type = self.folder['image']
+        self.image_type.image = NamedImage(
+            getData('data/plone-app-caching.jpg'),
+            'image/jpg',
+            u'plone-app-caching.jpg')
+        self.folder.invokeFactory(
+            'File',
+            'file',
+            title=u'Töst File')
+        self.file = self.folder['file']
+        self.file.file = NamedFile(
+            getData('data/testfile.csv'),
+            'text/csv',
+            u'data/töstfile.csv')
+
+        setRoles(self.portal, TEST_USER_ID, TEST_USER_ROLES)
+
+    def test_scale_purge_paths(self):
+        prefix = '/'.join(self.image_type.getPhysicalPath())
+        purge = ScalesPurgePaths(self.image_type)
+        paths = purge.getRelativePaths()
+        scales = purge.getScales()
+        scalepaths = [prefix + '/@@images/image/' + str(i) for i in scales]
+        [self.assertIn(j, paths) for j in scalepaths]
+
+    def test_scale_purge_paths_unicode(self):
+        purge = ScalesPurgePaths(self.file)
+        self.assertEqual(
+            list(purge.getRelativePaths()),
+            ['/plone/media/file/view/++widget++form.widgets.file/@@download/' +
+             'data/t\xc3\xb6stfile.csv',
+             '/plone/media/file/@@download/file/data/t\xc3\xb6stfile.csv']
+        )
