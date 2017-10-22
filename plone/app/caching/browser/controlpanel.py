@@ -29,6 +29,7 @@ from zope.ramcache.interfaces.ram import IRAMCache
 
 import datetime
 import re
+import six
 
 
 # Borrowed from zope.schema to avoid an import of a private name
@@ -200,10 +201,10 @@ class ControlPanel(BaseView):
             if not ruleset or not operation:
                 continue
 
-            if isinstance(ruleset, unicode):  # should be ASCII
+            if isinstance(ruleset, six.text_type):  # should be ASCII
                 ruleset = ruleset.encode('utf-8')
 
-            if isinstance(operation, unicode):  # should be ASCII
+            if isinstance(operation, six.text_type):  # should be ASCII
                 operation = operation.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
@@ -213,7 +214,7 @@ class ControlPanel(BaseView):
             if not ruleset:
                 continue
 
-            if isinstance(ruleset, unicode):  # should be ASCII
+            if isinstance(ruleset, six.text_type):  # should be ASCII
                 ruleset = ruleset.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
@@ -221,7 +222,7 @@ class ControlPanel(BaseView):
                 if not contentType:
                     continue
 
-                if isinstance(contentType, unicode):  # should be ASCII
+                if isinstance(contentType, six.text_type):  # should be ASCII
                     contentType = contentType.encode('utf-8')
 
                 if contentType in contentTypeRulesetMapping:
@@ -247,7 +248,7 @@ class ControlPanel(BaseView):
             if not ruleset:
                 continue
 
-            if isinstance(ruleset, unicode):  # should be ASCII
+            if isinstance(ruleset, six.text_type):  # should be ASCII
                 ruleset = ruleset.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
@@ -256,7 +257,7 @@ class ControlPanel(BaseView):
                 if not template:
                     continue
 
-                if isinstance(template, unicode):  # should be ASCII
+                if isinstance(template, six.text_type):  # should be ASCII
                     template = template.encode('utf-8')
 
                 if template in templateRulesetMapping:
