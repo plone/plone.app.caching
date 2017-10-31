@@ -162,7 +162,10 @@
     <adapter factory=".purge.ContentPurgePaths" name="plone.content" />
 
     <!-- Discussion items -->
-    <adapter factory=".purge.DiscussionItemPurgePaths" name="plone.content" />
+    <adapter factory=".purge.DiscussionItemPurgePaths" name="plone.discussion" />
+
+    <!-- Image scales & file download paths -->
+    <adapter factory=".purge.ScalesPurgePaths" name="plone.files" />
 
     <!-- Archetypes object fields -->
     <configure zcml:condition="installed plone.app.blob">

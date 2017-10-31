@@ -10,7 +10,7 @@ Breaking changes:
 
 New features:
 
-- *add item here*
+- Purging all image scale paths and file paths in custom dexterity content types. [karalics]
 
 Bug fixes:
 
