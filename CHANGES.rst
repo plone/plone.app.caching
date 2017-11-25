@@ -4,17 +4,9 @@ Changelog
 1.2.19 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
 New features:
 
 - Purging all image scale paths and file paths in custom dexterity content types. [karalics]
-
-Bug fixes:
-
-- *add item here*
 
 
 1.2.18 (2017-04-08)
