@@ -3,7 +3,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-version = '1.2.19.dev0'
+version = '1.2.19'
 
 setup(
     name='plone.app.caching',
