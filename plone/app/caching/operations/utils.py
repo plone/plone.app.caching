@@ -426,7 +426,7 @@ def parseDateTime(str):
 
     try:
         dt = dateutil.parser.parse(str)
-    except ValueError:
+    except (ValueError, OverflowError):
         return None
 
     if not dt:

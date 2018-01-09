@@ -878,6 +878,11 @@ class MiscHelpersTest(unittest.TestCase):
 
         self.assertEqual(None, parseDateTime("foo"))
 
+    def test_parseDateTime_overflow(self):
+        from plone.app.caching.operations.utils import parseDateTime
+
+        self.assertEqual(None, parseDateTime('10000000000'))
+
     def test_parseDateTime_rfc1123(self):
         from plone.app.caching.operations.utils import parseDateTime
 

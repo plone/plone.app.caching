@@ -14,7 +14,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Fix parseDateTime to handle OverflowError.
+  [davisagli]
 
 
 1.1.12 (2017-04-05)
