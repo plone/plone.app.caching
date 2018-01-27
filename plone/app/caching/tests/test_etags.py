@@ -5,7 +5,7 @@ from dateutil.tz import tzlocal
 from plone.registry.fieldfactory import persistentFieldAdapter
 from plone.testing.zca import UNIT_TESTING
 from Products.CMFCore.interfaces import IContentish
-from StringIO import StringIO
+from six import StringIO
 from z3c.caching.interfaces import ILastModified
 from zope.component import adapter
 from zope.component import provideAdapter

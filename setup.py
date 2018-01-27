@@ -33,6 +33,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
+        'six',
         'python-dateutil',
         'plone.caching',
         'plone.cachepurging',

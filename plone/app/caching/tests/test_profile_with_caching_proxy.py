@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from cStringIO import StringIO
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 from plone.app.caching.tests.test_utils import stable_now
@@ -18,6 +17,7 @@ from plone.registry.interfaces import IRegistry
 from plone.testing.z2 import Browser
 from Products.CMFCore.FSFile import FSFile
 from Products.CMFCore.utils import getToolByName
+from six.moves import cStringIO as StringIO
 from zope.component import getUtility
 from zope.globalrequest import setRequest
 
