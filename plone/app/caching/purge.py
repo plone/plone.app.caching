@@ -26,7 +26,6 @@ from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.lifecycleevent.interfaces import IObjectMovedEvent
 from zope.schema import getFieldsInOrder
 
-
 import six
 
 

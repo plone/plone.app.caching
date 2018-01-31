@@ -66,7 +66,7 @@ class EditForm(form.Form):
         operationName,
         operation,
         rulesetName=None,
-        ruleset=None
+        ruleset=None,
     ):
         self.context = context
         self.request = request
@@ -226,11 +226,11 @@ class EditForm(form.Form):
     @property
     def title(self):
         if self.rulesetName:
-            return _(u"Edit ${operation} options for Ruleset: ${ruleset}",
+            return _(u'Edit ${operation} options for Ruleset: ${ruleset}',
                      mapping={'operation': self.operation.title,
                               'ruleset': self.ruleset.title})
         else:
-            return _(u"Edit ${operation} options",
+            return _(u'Edit ${operation} options',
                      mapping={'operation': self.operation.title})
 
     @property
@@ -250,19 +250,19 @@ class EditForm(form.Form):
             _(u'Changes saved.'), 'info')
         self.request.response.redirect(
             '{0}/@@caching-controlpanel#detailed-settings'.format(
-                self.context.absolute_url()
-            )
+                self.context.absolute_url(),
+            ),
         )
         return ''
 
     @button.buttonAndHandler(_(u'Cancel'), name='cancel')
     def cancel(self, action):
         IStatusMessage(self.request).addStatusMessage(
-            _(u"Edit cancelled."), type='info')
+            _(u'Edit cancelled.'), type='info')
         self.request.response.redirect(
             '{0}/@@caching-controlpanel#detailed-settings'.format(
-                self.context.absolute_url()
-            )
+                self.context.absolute_url(),
+            ),
         )
         return ''
 
@@ -282,10 +282,10 @@ class EditForm(form.Form):
                 del self.registry.records[key]
 
         IStatusMessage(self.request).addStatusMessage(
-            _(u"Ruleset-specific settings removed."), type='info')
+            _(u'Ruleset-specific settings removed.'), type='info')
         self.request.response.redirect(
             '{0}/@@caching-controlpanel#detailed-settings'.format(
-                self.context.absolute_url()
-            )
+                self.context.absolute_url(),
+            ),
         )
         return ''

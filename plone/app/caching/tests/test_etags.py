@@ -51,7 +51,7 @@ class TestETags(unittest.TestCase):
             def member(self):
                 return None
 
-        provideAdapter(DummyPortalState, name=u"plone_portal_state")
+        provideAdapter(DummyPortalState, name=u'plone_portal_state')
 
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
         response = HTTPResponse()
@@ -80,7 +80,7 @@ class TestETags(unittest.TestCase):
             def member(self):
                 return DummyMember()
 
-        provideAdapter(DummyPortalState, name=u"plone_portal_state")
+        provideAdapter(DummyPortalState, name=u'plone_portal_state')
 
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
         response = HTTPResponse()
@@ -109,7 +109,7 @@ class TestETags(unittest.TestCase):
             def member(self):
                 return None
 
-        provideAdapter(DummyPortalState, name=u"plone_portal_state")
+        provideAdapter(DummyPortalState, name=u'plone_portal_state')
 
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
         response = HTTPResponse()
@@ -141,7 +141,7 @@ class TestETags(unittest.TestCase):
             def member(self):
                 return DummyMember()
 
-        provideAdapter(DummyPortalState, name=u"plone_portal_state")
+        provideAdapter(DummyPortalState, name=u'plone_portal_state')
 
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
         response = HTTPResponse()
@@ -195,7 +195,7 @@ class TestETags(unittest.TestCase):
             def language(self):
                 return 'en'
 
-        provideAdapter(DummyPortalState, name=u"plone_portal_state")
+        provideAdapter(DummyPortalState, name=u'plone_portal_state')
 
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
         response = HTTPResponse()
@@ -290,7 +290,7 @@ class TestETags(unittest.TestCase):
             def catalog(self):
                 return DummyCatalog()
 
-        provideAdapter(DummyTools, name=u"plone_tools")
+        provideAdapter(DummyTools, name=u'plone_tools')
 
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
         response = HTTPResponse()
@@ -316,7 +316,7 @@ class TestETags(unittest.TestCase):
             def is_locked(self):
                 return True
 
-        provideAdapter(DummyContextState, name=u"plone_context_state")
+        provideAdapter(DummyContextState, name=u'plone_context_state')
 
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
         response = HTTPResponse()
@@ -340,7 +340,7 @@ class TestETags(unittest.TestCase):
             def is_locked(self):
                 return False
 
-        provideAdapter(DummyContextState, name=u"plone_context_state")
+        provideAdapter(DummyContextState, name=u'plone_context_state')
 
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
         response = HTTPResponse()

@@ -102,7 +102,7 @@ class ContentItemLookup(object):
         if ploneCacheSettings.contentTypeRulesetMapping is not None:
             ruleset = ploneCacheSettings.contentTypeRulesetMapping.get(
                 parentPortalType,
-                None
+                None,
             )
             if ruleset is not None:
                 return ruleset
