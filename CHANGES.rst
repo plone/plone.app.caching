@@ -10,12 +10,12 @@ Breaking changes:
 
 New features:
 
-- *add item here*
+- Prepare for Python 2 / 3 compatibility
+  [b4oshany, davilima6]
 
 Bug fixes:
 
-- Imports are Python3 compatible.
-  [b4oshany]
+- *add item here*
 
 
 1.2.19 (2017-11-24)
