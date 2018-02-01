@@ -67,11 +67,11 @@ class PloneAppCaching(PloneSandboxLayer):
 PLONE_APP_CACHING_FIXTURE = PloneAppCaching()
 PLONE_APP_CACHING_INTEGRATION_TESTING = IntegrationTesting(
     bases=(PLONE_APP_CACHING_FIXTURE,),
-    name='PloneAppCaching:Integration'
+    name='PloneAppCaching:Integration',
 )
 PLONE_APP_CACHING_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(PLONE_APP_CACHING_FIXTURE,),
-    name='PloneAppCaching:Functional'
+    name='PloneAppCaching:Functional',
 )
 
 

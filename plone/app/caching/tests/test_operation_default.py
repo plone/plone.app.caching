@@ -43,8 +43,8 @@ class TestOperationDefault(unittest.TestCase):
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
         self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].title = u"Folder one"
-        self.portal['f1'].description = u"Folder one description"
+        self.portal['f1'].title = u'Folder one'
+        self.portal['f1'].description = u'Folder one description'
         self.portal['f1'].reindexObject()
 
         self.cacheSettings.operationMapping = {
@@ -62,8 +62,7 @@ class TestOperationDefault(unittest.TestCase):
             'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
         )
         browser.open('{0}/++add++Document'.format(
-            self.portal['f1'].absolute_url())
-        )
+            self.portal['f1'].absolute_url()),)
         browser.getControl(
             name='form.widgets.IDublinCore.title').value = 'dummy content'
         browser.getControl('Save').click()

@@ -81,7 +81,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         response.setHeader(
             'Last-Modified',
-            wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
+            wsgiref.handlers.format_date_time(time.mktime(now.timetuple())),
         )
 
         doNotCache(published, request, response)
@@ -287,7 +287,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
             maxage=60,
             etag=etag,
             lastModified=now,
-            vary=vary
+            vary=vary,
         )
 
         self.assertEqual(200, response.getStatus())
@@ -301,12 +301,12 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         delta = datetime.timedelta(seconds=58)
         self.assertFalse(
             timedelta < delta,
-            '{0} is not < {1}'.format(timedelta, delta)
+            '{0} is not < {1}'.format(timedelta, delta),
         )
         delta = datetime.timedelta(seconds=61)
         self.assertFalse(
             timedelta > delta,
-            '{0} is not > {1}'.format(timedelta, delta)
+            '{0} is not > {1}'.format(timedelta, delta),
         )
 
     # cacheInRAM()
@@ -409,9 +409,9 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         response.setStatus(200)
 
         body = cachedResponse(published, request,
-                              response, 404, headers, u"body")
+                              response, 404, headers, u'body')
 
-        self.assertEqual(u"body", body)
+        self.assertEqual(u'body', body)
         self.assertEqual(404, response.getStatus())
         self.assertEqual('foo', response.getHeader('X-Cache-Rule'))
         self.assertEqual('bar', response.getHeader('X-Foo'))
@@ -442,9 +442,9 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         assert response.enableHTTPCompression(query=True)
 
         body = cachedResponse(published, request, response,
-                              404, headers, u"body", 0)
+                              404, headers, u'body', 0)
 
-        self.assertEqual(u"body", body)
+        self.assertEqual(u'body', body)
         self.assertEqual(404, response.getStatus())
         self.assertEqual('foo', response.getHeader('X-Cache-Rule'))
         self.assertEqual('bar', response.getHeader('X-Foo'))
@@ -477,9 +477,9 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         assert not response.enableHTTPCompression(query=True)
 
         body = cachedResponse(published, request, response,
-                              404, headers, u"body", 1)
+                              404, headers, u'body', 1)
 
-        self.assertEqual(u"body", body)
+        self.assertEqual(u'body', body)
         self.assertEqual(404, response.getStatus())
         self.assertEqual('foo', response.getHeader('X-Cache-Rule'))
         self.assertEqual('bar', response.getHeader('X-Foo'))
@@ -502,7 +502,7 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
 
         body = notModified(published, request, response)
 
-        self.assertEqual(u"", body)
+        self.assertEqual('', body)
         self.assertEqual(304, response.getStatus())
 
     def test_notModified_full(self):
@@ -521,7 +521,7 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         body = notModified(published, request, response,
                            etag=etag, lastModified=now)
 
-        self.assertEqual(u"", body)
+        self.assertEqual(u'', body)
         self.assertEqual(etag, response.getHeader('ETag', literal=1))
         self.assertIsNone(response.getHeader('Last-Modified'))
         self.assertIsNone(response.getHeader('Expires'))
@@ -736,8 +736,11 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
         etag = None
 
-        self.assertTrue(isModified(request, etag=etag,
-                                          lastModified='doesnt_really_matter'))
+        self.assertTrue(isModified(
+            request,
+            etag=etag,
+            lastModified='doesnt_really_matter'),
+        )
 
     def test_isModified_inm_match_multiple(self):
         from plone.app.caching.operations.utils import isModified
@@ -986,7 +989,7 @@ class MiscHelpersTest(unittest.TestCase):
         published = DummyPublished()
         self.assertEqual(
             datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzlocal()),
-            getLastModified(published)
+            getLastModified(published),
         )
 
     def test_getLastModified_timezone(self):
@@ -1001,7 +1004,7 @@ class MiscHelpersTest(unittest.TestCase):
 
             def __call__(self):
                 return datetime.datetime(
-                    2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc()
+                    2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc(),
                 )
 
         provideAdapter(DummyLastModified)
@@ -1009,7 +1012,7 @@ class MiscHelpersTest(unittest.TestCase):
         published = DummyPublished()
         self.assertEqual(
             datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc()),
-            getLastModified(published)
+            getLastModified(published),
         )
 
     # getExpiration()
@@ -1087,7 +1090,7 @@ class MiscHelpersTest(unittest.TestCase):
             def __call__(self):
                 return 'foo'
 
-        provideAdapter(FooETag, name=u"foo")
+        provideAdapter(FooETag, name=u'foo')
 
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
@@ -1100,7 +1103,7 @@ class MiscHelpersTest(unittest.TestCase):
             def __call__(self):
                 return None
 
-        provideAdapter(BarETag, name=u"bar")
+        provideAdapter(BarETag, name=u'bar')
 
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
         response = HTTPResponse()
@@ -1125,7 +1128,7 @@ class MiscHelpersTest(unittest.TestCase):
             def __call__(self):
                 return 'foo'
 
-        provideAdapter(FooETag, name=u"foo")
+        provideAdapter(FooETag, name=u'foo')
 
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
@@ -1138,7 +1141,7 @@ class MiscHelpersTest(unittest.TestCase):
             def __call__(self):
                 return 'bar'
 
-        provideAdapter(BarETag, name=u"bar")
+        provideAdapter(BarETag, name=u'bar')
 
         environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
         response = HTTPResponse()
@@ -1151,8 +1154,8 @@ class MiscHelpersTest(unittest.TestCase):
                 published,
                 request,
                 keys=('foo', 'bar',),
-                extraTokens=('baz,qux',)
-            )
+                extraTokens=('baz,qux',),
+            ),
         )
 
     # parseETags()
@@ -1332,7 +1335,7 @@ class RAMCacheTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u"Body"
+        result = u'Body'
         response.setHeader('X-Foo', 'bar')
 
         storeResponseInRAMCache(request, response, result)
@@ -1346,7 +1349,7 @@ class RAMCacheTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u"Body"
+        result = u'Body'
         response.setHeader('X-Foo', 'bar')
 
         IAnnotations(request)[
@@ -1375,7 +1378,7 @@ class RAMCacheTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u"Body"
+        result = u'Body'
         response.setHeader('X-Foo', 'bar')
 
         IAnnotations(request)[
@@ -1411,7 +1414,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['HTTP_ACCEPT_ENCODING'] = 'gzip; deflate'
         response.enableHTTPCompression(request)
 
-        result = u"Body"
+        result = u'Body'
         response.setHeader('X-Foo', 'bar')
 
         IAnnotations(request)[
@@ -1444,7 +1447,7 @@ class RAMCacheTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u"Body"
+        result = u'Body'
         response.setHeader('X-Foo', 'bar')
 
         IAnnotations(request)['annkey'] = 'foo'
@@ -1524,7 +1527,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ['QUERY_STRING'] = ''
 
         cache['||a|b||http://example.com/foo/bar?'] = (
-            200, {'x-foo': 'bar'}, u'Body'
+            200, {'x-foo': 'bar'}, u'Body',
         )
 
         cached = normalize_response_cache(

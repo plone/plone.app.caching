@@ -256,8 +256,8 @@ class TestContentItemLookup(unittest.TestCase):
         published = ZopePageTemplate('defaultView').__of__(
             DummyNotBrowserDefault(
                 'testtype',
-                'string:${object_url}/defaultView'
-            )
+                'string:${object_url}/defaultView',
+            ),
         )
         request = DummyRequest(published, DummyResponse())
 

@@ -37,7 +37,7 @@ def test_image():
     filename = os.path.join(os.path.dirname(__file__), u'test.gif')
     return NamedBlobImage(
         data=open(filename, 'r').read(),
-        filename=filename
+        filename=filename,
     )
 
 
@@ -91,19 +91,19 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
         self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].title = u"Folder one"
-        self.portal['f1'].description = u"Folder one description"
+        self.portal['f1'].title = u'Folder one'
+        self.portal['f1'].description = u'Folder one description'
         self.portal['f1'].reindexObject()
 
         # Add page content
         self.portal['f1'].invokeFactory('Document', 'd1')
-        self.portal['f1']['d1'].title = u"Document one"
-        self.portal['f1']['d1'].description = u"Document one description"
+        self.portal['f1']['d1'].title = u'Document one'
+        self.portal['f1']['d1'].description = u'Document one description'
         testText = 'Testing... body one'
         self.portal['f1']['d1'].text = RichTextValue(
             testText,
             'text/plain',
-            'text/html'
+            'text/html',
         )
         self.portal['f1']['d1'].reindexObject()
 
@@ -288,7 +288,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.portal['f1']['d1'].text = RichTextValue(
             testText2,
             'text/plain',
-            'text/html'
+            'text/html',
         )
         self.portal['f1']['d1'].reindexObject()
 
@@ -376,7 +376,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
             'Authorization', 'Basic {0}:{1}'.format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
-            )
+            ),
         )
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEqual('plone.content.feed', browser.headers['X-Cache-Rule'])
@@ -396,7 +396,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
             'Authorization', 'Basic {0}:{1}'.format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
-            )
+            ),
         )
         browser.open(self.portal.absolute_url() + '/RSS')
         self.assertEqual('plone.content.feed', browser.headers['X-Cache-Rule'])
@@ -410,14 +410,14 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
         self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].title = u"Folder one"
-        self.portal['f1'].description = u"Folder one description"
+        self.portal['f1'].title = u'Folder one'
+        self.portal['f1'].description = u'Folder one description'
         self.portal['f1'].reindexObject()
 
         # Add content image
         self.portal['f1'].invokeFactory('Image', 'i1')
-        self.portal['f1']['i1'].title = u"Image one"
-        self.portal['f1']['i1'].description = u"Image one description"
+        self.portal['f1']['i1'].title = u'Image one'
+        self.portal['f1']['i1'].description = u'Image one description'
         self.portal['f1']['i1'].image = test_image()
         self.portal['f1']['i1'].reindexObject()
 

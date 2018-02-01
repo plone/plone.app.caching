@@ -117,7 +117,7 @@ class BaseCaching(object):
                 self.request,
                 response,
                 etag=etag,
-                lastModified=lastModified
+                lastModified=lastModified,
             )
 
         # Check if this is in the ram cache
@@ -170,7 +170,7 @@ class BaseCaching(object):
                     self.published,
                     self.request,
                     response,
-                    etag=etag
+                    etag=etag,
                 )
             # XXX: should there be an else here? Last modified works without
             #      extra headers.
@@ -192,7 +192,7 @@ class BaseCaching(object):
                     context = getContext(self.published)
                     portal_state = getMultiAdapter(
                         (context, self.request),
-                        name=u'plone_portal_state'
+                        name=u'plone_portal_state',
                     )
                     public = portal_state.anonymous()
             public = public and visibleToRole(self.published, role='Anonymous')
@@ -209,7 +209,7 @@ class BaseCaching(object):
             smaxage=smaxage,
             etag=etag,
             lastModified=lastModified,
-            vary=vary
+            vary=vary,
         )
 
         if ramCache and public:
@@ -310,7 +310,7 @@ if HAVE_RESOURCE_REGISTRIES:
         def interceptResponse(self, rulename, response):
             return super(
                 ResourceRegistriesCaching,
-                self
+                self,
             ).interceptResponse(rulename, response, class_=StrongCaching)
 
         def modifyResponse(self, rulename, response):
@@ -336,9 +336,9 @@ class NoCaching(object):
     out of all caches.
     """
 
-    title = _(u"No caching")
-    description = _(u"Use this operation to keep the response "
-                    u"out of all caches.")
+    title = _(u'No caching')
+    description = _(u'Use this operation to keep the response '
+                    u'out of all caches.')
     prefix = 'plone.app.caching.noCaching'
     sort = 4
     options = ()

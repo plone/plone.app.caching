@@ -197,7 +197,7 @@ class TestContentPurgePaths(unittest.TestCase):
 
         self.assertEqual(
             ['/bar/foo/', '/bar/foo/view', '/bar/foo/default-view'],
-            list(purger.getRelativePaths())
+            list(purger.getRelativePaths()),
         )
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
@@ -211,9 +211,9 @@ class TestContentPurgePaths(unittest.TestCase):
                 '/bar/default-view/default-view',
                 '/bar',
                 '/bar/',
-                '/bar/view'
+                '/bar/view',
             ],
-            list(purger.getRelativePaths())
+            list(purger.getRelativePaths()),
         )
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
@@ -362,9 +362,9 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                 '/foo/image2_mini',
                 '/foo/image2_normal',
                 '/foo/at_download/blob1',
-                '/foo/blob1'
+                '/foo/blob1',
             ],
-            list(purger.getRelativePaths())
+            list(purger.getRelativePaths()),
         )
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
@@ -396,9 +396,9 @@ class TestObjectFieldPurgePaths(unittest.TestCase):
                 '/foo/at_download/image2',
                 '/foo/image2',
                 '/foo/image2_mini',
-                '/foo/image2_normal'
+                '/foo/image2_normal',
             ],
-            list(purger.getRelativePaths())
+            list(purger.getRelativePaths()),
         )
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
@@ -448,5 +448,5 @@ class TestScalesPurgePaths(unittest.TestCase):
             list(purge.getRelativePaths()),
             ['/plone/media/file/view/++widget++form.widgets.file/@@download/' +
              'data/t\xc3\xb6stfile.csv',
-             '/plone/media/file/@@download/file/data/t\xc3\xb6stfile.csv']
+             '/plone/media/file/@@download/file/data/t\xc3\xb6stfile.csv'],
         )

@@ -56,7 +56,7 @@ def setCacheHeaders(
     smaxage=None,
     etag=None,
     lastModified=None,
-    vary=None
+    vary=None,
 ):
     """General purpose dispatcher to set various cache headers
 
@@ -76,7 +76,7 @@ def setCacheHeaders(
             smaxage=smaxage,
             etag=etag,
             lastModified=lastModified,
-            vary=vary
+            vary=vary,
         )
 
     elif smaxage:
@@ -87,7 +87,7 @@ def setCacheHeaders(
             smaxage,
             etag=etag,
             lastModified=lastModified,
-            vary=vary
+            vary=vary,
         )
 
     elif etag or lastModified:
@@ -96,7 +96,7 @@ def setCacheHeaders(
             request,
             response,
             etag=etag,
-            lastModified=lastModified
+            lastModified=lastModified,
         )
 
     else:
@@ -150,7 +150,7 @@ def cacheInProxy(
     smaxage,
     etag=None,
     lastModified=None,
-    vary=None
+    vary=None,
 ):
     """Set headers to cache the response in a caching proxy.
 
@@ -163,7 +163,7 @@ def cacheInProxy(
     if lastModified is not None:
         response.setHeader(
             'Last-Modified',
-            formatDateTime(lastModified)
+            formatDateTime(lastModified),
         )
     elif response.getHeader('Last-Modified'):
         del response.headers['last-modified']
@@ -189,7 +189,7 @@ def cacheInBrowserAndProxy(
     smaxage=None,
     etag=None,
     lastModified=None,
-    vary=None
+    vary=None,
 ):
     """Set headers to cache the response in the browser and caching proxy if
     applicable.
@@ -222,7 +222,7 @@ def cacheInBrowserAndProxy(
     # https://bugs.webkit.org/show_bug.cgi?id=13128
     response.setHeader(
         'Cache-Control',
-        'max-age={0}, proxy-revalidate, public'.format(maxage)
+        'max-age={0}, proxy-revalidate, public'.format(maxage),
     )
 
 
@@ -232,7 +232,7 @@ def cacheInRAM(
     response,
     etag=None,
     lastModified=None,
-    annotationsKey=PAGE_CACHE_ANNOTATION_KEY
+    annotationsKey=PAGE_CACHE_ANNOTATION_KEY,
 ):
     """Set a flag indicating that the response for the given request
     should be cached in RAM.
@@ -269,7 +269,7 @@ def cachedResponse(
     status,
     headers,
     body,
-    gzip=False
+    gzip=False,
 ):
     """Returned a cached page. Modifies the response (status and headers)
     and returns the cached body.
@@ -748,7 +748,7 @@ def storeResponseInRAMCache(
     response,
     result,
     globalKey=PAGE_CACHE_KEY,
-    annotationsKey=PAGE_CACHE_ANNOTATION_KEY
+    annotationsKey=PAGE_CACHE_ANNOTATION_KEY,
 ):
     """Store the given response in the RAM cache.
 
@@ -799,7 +799,7 @@ def fetchFromRAMCache(
     etag=None,
     lastModified=None,
     globalKey=PAGE_CACHE_KEY,
-    default=None
+    default=None,
 ):
     """Return a page cached in RAM, or None if it cannot be found.
 

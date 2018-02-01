@@ -38,33 +38,33 @@ class IPloneCacheSettings(Interface):
     """
 
     templateRulesetMapping = schema.Dict(
-        title=_(u"Page template/ruleset mapping"),
-        description=_(u"Maps skin layer page template names to ruleset names"),
-        key_type=schema.ASCIILine(title=_(u"Page template name")),
-        value_type=schema.DottedName(title=_(u"Ruleset name")),
+        title=_(u'Page template/ruleset mapping'),
+        description=_(u'Maps skin layer page template names to ruleset names'),
+        key_type=schema.ASCIILine(title=_(u'Page template name')),
+        value_type=schema.DottedName(title=_(u'Ruleset name')),
     )
 
     contentTypeRulesetMapping = schema.Dict(
-        title=_(u"Content type/ruleset mapping"),
-        description=_(u"Maps content type names to ruleset names"),
-        key_type=schema.ASCIILine(title=_(u"Content type name")),
-        value_type=schema.DottedName(title=_(u"Ruleset name")),
+        title=_(u'Content type/ruleset mapping'),
+        description=_(u'Maps content type names to ruleset names'),
+        key_type=schema.ASCIILine(title=_(u'Content type name')),
+        value_type=schema.DottedName(title=_(u'Ruleset name')),
     )
 
     purgedContentTypes = schema.Tuple(
-        title=_(u"Content types to purge"),
+        title=_(u'Content types to purge'),
         description=_(
-            u"List content types which should be purged when modified"),
-        value_type=schema.ASCIILine(title=_(u"Content type name")),
+            u'List content types which should be purged when modified'),
+        value_type=schema.ASCIILine(title=_(u'Content type name')),
         default=('File', 'Image', 'News Item', ),
     )
 
     cacheStopRequestVariables = schema.Tuple(
-        title=_(u"Request variables that prevent caching"),
+        title=_(u'Request variables that prevent caching'),
         description=_(
-            u"Variables in the request that prevent caching if present"),
-        value_type=schema.ASCIILine(title=_(u"Request variables")),
-        default=('statusmessages', 'SearchableText',),
+            u'Variables in the request that prevent caching if present'),
+        value_type=schema.ASCIILine(title=_(u'Request variables')),
+        default=('statusmessages', 'SearchableText', ),
     )
 
 

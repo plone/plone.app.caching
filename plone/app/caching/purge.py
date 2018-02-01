@@ -26,6 +26,8 @@ from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.lifecycleevent.interfaces import IObjectMovedEvent
 from zope.schema import getFieldsInOrder
 
+import six
+
 
 try:
     from plone.app.blob.interfaces import IBlobField
@@ -212,7 +214,7 @@ class ScalesPurgePaths(object):
                     yield '{0}/@@download/{1}'.format(prefix, field)
             else:
                 filename = value.filename
-                if isinstance(filename, unicode):
+                if isinstance(filename, six.text_type):
                     filename = filename.encode('utf-8')
                 yield '{0}/view/{1}.{2}/@@download/{3}'.format(
                     prefix, '++widget++form.widgets', field, filename)

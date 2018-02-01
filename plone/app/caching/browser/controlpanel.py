@@ -127,7 +127,7 @@ class ControlPanel(BaseView):
                     self.context,
                     self.request,
                     self.editOperationName,
-                    operation
+                    operation,
                 )
             elif self.editRuleset:
                 return self  # traverse again to get ruleset name
@@ -164,8 +164,8 @@ class ControlPanel(BaseView):
             elif 'form.button.Cancel' in self.request.form:
                 self.request.response.redirect(
                     '{0}/@@overview-controlpanel'.format(
-                        self.context.absolute_url()
-                    )
+                        self.context.absolute_url(),
+                    ),
                 )
 
     def processSave(self):
@@ -227,19 +227,19 @@ class ControlPanel(BaseView):
 
                 if contentType in contentTypeRulesetMapping:
                     self.errors.setdefault(
-                        'contenttypes', {}
+                        'contenttypes', {},
                     )[ruleset] = _(
                         u'Content type ${contentType} is already mapped to '
                         u'the rule ${ruleset}.',
                         mapping={
                             'contentType': self.contentTypesLookup.get(
-                                contentType, {}
+                                contentType, {},
                             ).get(
                                 'title',
-                                contentType
+                                contentType,
                             ),
-                            'ruleset': contentTypeRulesetMapping[contentType]
-                        }
+                            'ruleset': contentTypeRulesetMapping[contentType],
+                        },
                     )
                 else:
                     contentTypeRulesetMapping[contentType] = ruleset
@@ -262,14 +262,14 @@ class ControlPanel(BaseView):
 
                 if template in templateRulesetMapping:
                     self.errors.setdefault(
-                        'templates', {}
+                        'templates', {},
                     )[ruleset] = _(
                         u'Template ${template} is already mapped to the rule '
                         u'${ruleset}.',
                         mapping={
                             'template': template,
-                            'ruleset': templateRulesetMapping[template]
-                        }
+                            'ruleset': templateRulesetMapping[template],
+                        },
                     )
                 else:
                     templateRulesetMapping[template] = ruleset
@@ -283,7 +283,7 @@ class ControlPanel(BaseView):
             if not _isuri(domain):
                 self.errors['domain'] = _(
                     u'Invalid URL: ${url}',
-                    mapping={'url': domain}
+                    mapping={'url': domain},
                 )
 
         # RAM cache settings
@@ -294,7 +294,7 @@ class ControlPanel(BaseView):
         else:
             if ramCacheMaxEntries < 0:
                 self.errors['ramCacheMaxEntries'] = _(
-                    u'A positive number is required.'
+                    u'A positive number is required.',
                 )
         try:
             ramCacheMaxAge = int(ramCacheMaxAge)
@@ -303,19 +303,19 @@ class ControlPanel(BaseView):
         else:
             if ramCacheMaxAge < 0:
                 self.errors['ramCacheMaxAge'] = _(
-                    u'A positive number is required.'
+                    u'A positive number is required.',
                 )
 
         try:
             ramCacheCleanupInterval = int(ramCacheCleanupInterval)
         except (ValueError, TypeError,):
             self.errors['ramCacheCleanupInterval'] = _(
-                u'An integer is required.'
+                u'An integer is required.',
             )
         else:
             if ramCacheMaxAge < 0:
                 self.errors['ramCacheCleanupInterval'] = _(
-                    u'A positive number is required.'
+                    u'A positive number is required.',
                 )
 
         # Check for errors
@@ -340,12 +340,12 @@ class ControlPanel(BaseView):
         self.ramCache.update(
             ramCacheMaxEntries,
             ramCacheMaxAge,
-            ramCacheCleanupInterval
+            ramCacheCleanupInterval,
         )
 
         IStatusMessage(self.request).addStatusMessage(
             _(u'Changes saved.'),
-            'info'
+            'info',
         )
 
     # Rule types - used as the index column
@@ -357,7 +357,7 @@ class ControlPanel(BaseView):
             types.append(dict(name=type_.name,
                               title=type_.title or type_.name,
                               description=type_.description,
-                              safeName=type_.name.replace('.', '-')))
+                              safeName=type_.name.replace('.', '-'), ))
         types.sort(lambda x, y: cmp(x['title'], y['title']))
         return types
 
@@ -369,7 +369,7 @@ class ControlPanel(BaseView):
     def operationMapping(self):
         return dict(
             [(k.replace('.', '-'), v,)
-             for k, v in (self.settings.operationMapping or {}).items()]
+             for k, v in (self.settings.operationMapping or {}).items()],
         )
 
     @property
@@ -380,7 +380,7 @@ class ControlPanel(BaseView):
                 for k, v in (
                     self.ploneSettings.templateRulesetMapping or {}
                 ).items()
-            ]
+            ],
         )
 
     @property
@@ -391,7 +391,7 @@ class ControlPanel(BaseView):
                 for k, v in (
                     self.ploneSettings.contentTypeRulesetMapping or {}
                 ).items()
-            ]
+            ],
         )
 
     # Type lookups (for accessing settings)
@@ -420,7 +420,7 @@ class ControlPanel(BaseView):
         portal_types = getToolByName(self.context, 'portal_types')
         for fti in portal_types.objectValues():
             types[fti.id] = dict(title=fti.title or fti.id,
-                                 description=fti.description)
+                                 description=fti.description, )
         return types
 
     # Sorted lists (e.g. for drop-downs)
@@ -440,7 +440,7 @@ class ControlPanel(BaseView):
             dict(
                 name=name,
                 title=info['title'],
-                description=info['description']
+                description=info['description'],
             ) for name, info in self.contentTypesLookup.items()
         ]
         types.sort(lambda x, y: cmp(x['title'], y['title']))
@@ -493,7 +493,7 @@ class ControlPanel(BaseView):
             return False
 
         for option in options:
-            if '{0}.{1}.{2}'.format(prefix, ruleset, option,) in self.registry:
+            if '{0}.{1}.{2}'.format(prefix, ruleset, option) in self.registry:
                 return True
 
         return False
@@ -530,11 +530,11 @@ class Import(BaseView):
 
         # Import the new profile
         portal_setup.runAllImportStepsFromProfile(
-            'profile-{0}'.format(profile)
+            'profile-{0}'.format(profile),
         )
 
         IStatusMessage(self.request).addStatusMessage(
-            _(u'Import complete.'), 'info')
+            _(u'Import complete.'), 'info'),
 
     @property
     @memoize

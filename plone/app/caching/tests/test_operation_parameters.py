@@ -40,19 +40,19 @@ class TestOperationParameters(unittest.TestCase):
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
         self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].title = u"Folder one"
-        self.portal['f1'].description = u"Folder one description"
+        self.portal['f1'].title = u'Folder one'
+        self.portal['f1'].description = u'Folder one description'
         self.portal['f1'].reindexObject()
 
         # Add page content
         self.portal['f1'].invokeFactory('Document', 'd1')
-        self.portal['f1']['d1'].title = u"Document one"
-        self.portal['f1']['d1'].description = u"Document one description"
+        self.portal['f1']['d1'].title = u'Document one'
+        self.portal['f1']['d1'].description = u'Document one description'
         testText = 'Testing... body one'
         self.portal['f1']['d1'].text = RichTextValue(
             testText,
             'text/plain',
-            'text/html'
+            'text/html',
         )
         self.portal['f1']['d1'].reindexObject()
 
