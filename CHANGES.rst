@@ -4,18 +4,10 @@ Changelog
 1.2.20 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
 New features:
 
 - Prepare for Python 2 / 3 compatibility
   [b4oshany, davilima6]
-
-Bug fixes:
-
-- *add item here*
 
 
 1.2.19 (2017-11-24)
