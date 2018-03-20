@@ -10,7 +10,8 @@ Breaking changes:
 
 New features:
 
-- *add item here*
+- Use plone as i18n domain
+  [erral]
 
 Bug fixes:
 

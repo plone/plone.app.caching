@@ -4,7 +4,7 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     lang="en"
     metal:use-macro="context/prefs_main_template/macros/master"
-    i18n:domain="plone.app.caching">
+    i18n:domain="plone">
 
 <body>
 
@@ -207,7 +207,7 @@
                                                     title    contentType/description;
                                                     selected python:'selected' if contentType['name'] in selected else None;"
                                     tal:content="contentType/title"
-                                    i18n:domain="plone" i18n:attributes="title" i18n:translate=""/>
+                                    i18n:attributes="title" i18n:translate=""/>
                             </select>
 
                         </div>
@@ -506,7 +506,7 @@
                                                                         title    contentType/description;
                                                                         selected python:'selected' if contentType['name'] in selected else None;"
                                                         tal:content="contentType/title"
-                                                        i18n:domain="plone" i18n:attributes="title" i18n:translate="" />
+                                                        i18n:attributes="title" i18n:translate="" />
                                                 </select>
                                             </div>
                                         </td>
