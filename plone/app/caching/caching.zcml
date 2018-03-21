@@ -3,7 +3,7 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:cache="http://namespaces.zope.org/cache"
     xmlns:zcml="http://namespaces.zope.org/zcml"
-    i18n_domain="plone.app.caching">
+    i18n_domain="plone">
 
     <!-- Out-of-the-box cache profiles
          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
