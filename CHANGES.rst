@@ -10,6 +10,9 @@ Breaking changes:
 
 New features:
 
+- Use plone as i18n domain in ZCML files too
+  [erral]
+
 - Use plone as i18n domain
   [erral]
 
