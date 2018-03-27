@@ -18,7 +18,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Fix backslash escapes in i18nstring (poedit complains).
+  [jensens]
 
 
 1.2.20 (2018-02-05)

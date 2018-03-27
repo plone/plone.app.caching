@@ -257,8 +257,8 @@ class ModerateCaching(BaseCaching):
         u'and cache in proxy (default: 24 hrs). '
         u'Use a purgable caching reverse proxy for best results. '
         u'Caution: If proxy cannot be purged, or cannot be configured '
-        u'to remove the \s-maxage\ token from the response, then stale '
-        u'responses might be seen until the cached entry expires. ')
+        u'to remove the \'s-maxage\' token from the response, then stale '
+        u'responses might be seen until the cached entry expires.')
     prefix = 'plone.app.caching.moderateCaching'
     sort = 2
 
