@@ -4,10 +4,6 @@ Changelog
 1.2.21 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
 New features:
 
 - Use plone as i18n domain in ZCML files too
