@@ -4,7 +4,7 @@ from Acquisition import Explicit
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.purge import ContentPurgePaths
 from plone.app.caching.purge import DiscussionItemPurgePaths
-from plone.app.caching.purge import ObjectFieldPurgePaths
+from plone.app.caching.purge import HAVE_AT
 from plone.app.caching.purge import purgeOnModified
 from plone.app.caching.purge import purgeOnMovedOrRemoved
 from plone.app.caching.purge import ScalesPurgePaths
@@ -18,8 +18,6 @@ from plone.registry import Registry
 from plone.registry.fieldfactory import persistentFieldAdapter
 from plone.registry.interfaces import IRegistry
 from plone.testing.zca import UNIT_TESTING
-from Products.Archetypes import atapi
-from Products.Archetypes.Schema.factory import instanceSchemaFactory
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import IDiscussionResponse
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
@@ -41,12 +39,17 @@ from zope.lifecycleevent import ObjectRemovedEvent
 
 import unittest
 
+if HAVE_AT:
+    from plone.app.caching.purge import ObjectFieldPurgePaths
+    from Products.Archetypes import atapi
+    from Products.Archetypes.Schema.factory import instanceSchemaFactory
+
 
 def getData(filename):
     from os.path import dirname, join
     from plone.app.caching import tests
     filename = join(dirname(tests.__file__), filename)
-    data = open(filename).read()
+    data = open(filename, 'rb').read()
     return data
 
 
@@ -312,6 +315,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         self.assertEqual(['/purgeme'], list(purge.getAbsolutePaths()))
 
 
+@unittest.skipUnless(HAVE_AT, 'Only run with AT')
 class TestObjectFieldPurgePaths(unittest.TestCase):
 
     maxDiff = None

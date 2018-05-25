@@ -87,7 +87,7 @@ class TestLastModified(unittest.TestCase):
     def test_OFSFileLastModified_File(self):
         from OFS.Image import File
 
-        dummy = File('dummy', 'Dummy', 'data')
+        dummy = File('dummy', 'Dummy', b'data')
         self.assertIsNone(ILastModified(dummy)())
 
         timestamp = 987654321.0  # time stamp (in UTC)
@@ -104,7 +104,7 @@ class TestLastModified(unittest.TestCase):
     def test_OFSFileLastModified_Image(self):
         from OFS.Image import Image
 
-        dummy = Image('dummy', 'Dummy', 'data')
+        dummy = Image('dummy', 'Dummy', b'data')
         self.assertIsNone(ILastModified(dummy)())
 
         timestamp = 987654321.0  # time stamp (in UTC)

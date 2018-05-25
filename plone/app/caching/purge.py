@@ -214,7 +214,7 @@ class ScalesPurgePaths(object):
                     yield '{0}/@@download/{1}'.format(prefix, field)
             else:
                 filename = value.filename
-                if isinstance(filename, six.text_type):
+                if six.PY2 and isinstance(filename, six.text_type):
                     filename = filename.encode('utf-8')
                 yield '{0}/view/{1}.{2}/@@download/{3}'.format(
                     prefix, '++widget++form.widgets', field, filename)

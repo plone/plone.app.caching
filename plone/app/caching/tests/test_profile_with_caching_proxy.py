@@ -39,7 +39,7 @@ def test_image():
         'plone.app.caching.tests', 'test.gif')
     filename = os.path.join(os.path.dirname(__file__), u'test.gif')
     return NamedBlobImage(
-        data=open(filename, 'r').read(),
+        data=open(filename, 'rb').read(),
         filename=filename,
     )
 

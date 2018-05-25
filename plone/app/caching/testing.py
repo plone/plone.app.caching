@@ -77,5 +77,5 @@ PLONE_APP_CACHING_FUNCTIONAL_TESTING = FunctionalTesting(
 
 def getToken(username):
     ring = _getKeyring(username)
-    secret = ring.random()
-    return hmac.new(secret, username, sha).hexdigest()
+    secret = ring.random().encode('utf8')
+    return hmac.new(secret, username.encode('utf8'), sha).hexdigest()
