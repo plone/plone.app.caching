@@ -14,7 +14,6 @@ from plone.registry.interfaces import IRegistry
 from plone.testing.z2 import Browser
 from Products.CMFCore.FSFile import FSFile
 from Products.CMFCore.utils import getToolByName
-from six.moves import cStringIO as StringIO
 from zope.component import getUtility
 from zope.globalrequest import setRequest
 
@@ -23,6 +22,7 @@ import dateutil.parser
 import dateutil.tz
 import os
 import pkg_resources
+import six
 import unittest
 
 
@@ -214,7 +214,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         browser.open(self.portal['f1']['d1'].absolute_url())
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
+        self.assertEqual(b'', browser.contents)
 
         # Request the anonymous folder
         now = stable_now()
@@ -281,7 +281,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
+        self.assertEqual(b'', browser.contents)
 
         # Edit the page to update the etag
         testText2 = 'Testing... body two'
@@ -367,7 +367,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
+        self.assertEqual(b'', browser.contents)
 
         # Request the authenticated rss feed
         now = stable_now()
@@ -453,7 +453,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
+        self.assertEqual(b'', browser.contents)
 
         # Request an image scale
         now = stable_now()
@@ -502,7 +502,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
+        self.assertEqual(b'', browser.contents)
 
         # Request a large datafile (over 64K) to test files that use
         # the "response.write()" function to initiate a streamed response.
@@ -510,9 +510,11 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # large OFS.Image.Image, large non-blog ATImages/ATFiles, and
         # large Resource Registry cooked files, which all use the same
         # method to initiate a streamed response.
-        s = 'a' * (1 << 16) * 3
-        self.portal.manage_addFile('bigfile', file=StringIO(
-            s), content_type='application/octet-stream')
+        s = b'a' * (1 << 16) * 3
+        self.portal.manage_addFile(
+            'bigfile',
+            file=six.BytesIO(s),
+            content_type='application/octet-stream')
 
         import transaction
         transaction.commit()
