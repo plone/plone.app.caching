@@ -784,7 +784,7 @@ def storeResponseInRAMCache(
     potentially another fix but I doubt long term it's ever the right thing to
     do.
     """
-    if result == '':
+    if not result:
         return
 
     status = response.getStatus()
