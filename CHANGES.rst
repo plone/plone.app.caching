@@ -11,7 +11,7 @@ Breaking changes:
 New features:
 
 - Python 3 support
-  [pbauer, MatthewWilkes]
+  [pbauer, MatthewWilkes, ale-rt]
 
 Bug fixes:
 
