@@ -4,7 +4,7 @@ from Acquisition import Explicit
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.purge import ContentPurgePaths
 from plone.app.caching.purge import DiscussionItemPurgePaths
-from plone.app.caching.purge import ObjectFieldPurgePaths
+from plone.app.caching.purge import HAVE_AT
 from plone.app.caching.purge import purgeOnModified
 from plone.app.caching.purge import purgeOnMovedOrRemoved
 from plone.app.caching.purge import ScalesPurgePaths
@@ -18,8 +18,6 @@ from plone.registry import Registry
 from plone.registry.fieldfactory import persistentFieldAdapter
 from plone.registry.interfaces import IRegistry
 from plone.testing.zca import UNIT_TESTING
-from Products.Archetypes import atapi
-from Products.Archetypes.Schema.factory import instanceSchemaFactory
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import IDiscussionResponse
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
@@ -39,14 +37,20 @@ from zope.lifecycleevent import ObjectModifiedEvent
 from zope.lifecycleevent import ObjectMovedEvent
 from zope.lifecycleevent import ObjectRemovedEvent
 
+import six
 import unittest
+
+if HAVE_AT:
+    from plone.app.caching.purge import ObjectFieldPurgePaths
+    from Products.Archetypes import atapi
+    from Products.Archetypes.Schema.factory import instanceSchemaFactory
 
 
 def getData(filename):
     from os.path import dirname, join
     from plone.app.caching import tests
     filename = join(dirname(tests.__file__), filename)
-    data = open(filename).read()
+    data = open(filename, 'rb').read()
     return data
 
 
@@ -312,6 +316,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         self.assertEqual(['/purgeme'], list(purge.getAbsolutePaths()))
 
 
+@unittest.skipUnless(HAVE_AT, 'Only run with AT')
 class TestObjectFieldPurgePaths(unittest.TestCase):
 
     maxDiff = None
@@ -444,9 +449,14 @@ class TestScalesPurgePaths(unittest.TestCase):
 
     def test_scale_purge_paths_unicode(self):
         purge = ScalesPurgePaths(self.file)
-        self.assertEqual(
+        expected = [
+            u'/plone/media/file/view/++widget++form.widgets.file/@@download/data/töstfile.csv',  # noqa: E501
+            u'/plone/media/file/@@download/file/data/töstfile.csv',
+        ]
+        if six.PY2:
+            # the getRelativePaths method returns bytes on Python 2
+            expected = [x.encode('utf8') for x in expected]
+        self.assertListEqual(
             list(purge.getRelativePaths()),
-            ['/plone/media/file/view/++widget++form.widgets.file/@@download/' +
-             'data/t\xc3\xb6stfile.csv',
-             '/plone/media/file/@@download/file/data/t\xc3\xb6stfile.csv'],
+            expected,
         )

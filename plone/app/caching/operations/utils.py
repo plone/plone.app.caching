@@ -7,7 +7,7 @@ from plone.memoize.interfaces import ICacheChooser
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import ISiteRoot
-from thread import allocate_lock
+from six.moves._thread import allocate_lock
 from z3c.caching.interfaces import ILastModified
 from zope.annotation.interfaces import IAnnotations
 from zope.component import getUtility
@@ -784,7 +784,7 @@ def storeResponseInRAMCache(
     potentially another fix but I doubt long term it's ever the right thing to
     do.
     """
-    if result == '':
+    if not result:
         return
 
     status = response.getStatus()

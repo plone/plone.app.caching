@@ -28,6 +28,7 @@ from zope.publisher.interfaces import NotFound
 from zope.ramcache.interfaces.ram import IRAMCache
 
 import datetime
+from operator import itemgetter
 import re
 import six
 
@@ -358,7 +359,7 @@ class ControlPanel(BaseView):
                               title=type_.title or type_.name,
                               description=type_.description,
                               safeName=type_.name.replace('.', '-'), ))
-        types.sort(lambda x, y: cmp(x['title'], y['title']))
+        types.sort(key=itemgetter('title'))
         return types
 
     # Safe access to the main mappings, which may be None - we want to treat
@@ -429,8 +430,7 @@ class ControlPanel(BaseView):
     @memoize
     def operationTypes(self):
         operations = [v for k, v in self.operationTypesLookup.items()]
-        operations.sort(lambda x, y: (
-            cmp(x['sort'], y['sort']) or cmp(x['title'], y['title'])))
+        operations.sort(key=lambda operation:(operation['sort'], operation['title']))
         return operations
 
     @property
@@ -443,7 +443,7 @@ class ControlPanel(BaseView):
                 description=info['description'],
             ) for name, info in self.contentTypesLookup.items()
         ]
-        types.sort(lambda x, y: cmp(x['title'], y['title']))
+        types.sort(key=itemgetter('title'))
         return types
 
     # We store template and content type mappings as template -> ruleset and

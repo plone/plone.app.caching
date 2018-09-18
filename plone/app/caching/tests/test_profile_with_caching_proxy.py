@@ -17,7 +17,6 @@ from plone.registry.interfaces import IRegistry
 from plone.testing.z2 import Browser
 from Products.CMFCore.FSFile import FSFile
 from Products.CMFCore.utils import getToolByName
-from six.moves import cStringIO as StringIO
 from zope.component import getUtility
 from zope.globalrequest import setRequest
 
@@ -26,6 +25,7 @@ import dateutil.parser
 import dateutil.tz
 import os
 import pkg_resources
+import six
 import unittest
 
 
@@ -39,7 +39,7 @@ def test_image():
         'plone.app.caching.tests', 'test.gif')
     filename = os.path.join(os.path.dirname(__file__), u'test.gif')
     return NamedBlobImage(
-        data=open(filename, 'r').read(),
+        data=open(filename, 'rb').read(),
         filename=filename,
     )
 
@@ -89,7 +89,7 @@ class TestProfileWithCaching(unittest.TestCase):
     def tearDown(self):
         setRequest(None)
 
-    def test_composite_views(self):
+    def test_composite_viewsxx(self):
         # This is a clone of the same test for 'without-caching-proxy'
         # Can we just call that test from this context?
 
@@ -213,11 +213,12 @@ class TestProfileWithCaching(unittest.TestCase):
         browser.open(self.portal['f1']['d1'].absolute_url())
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
+        self.assertEqual(b'', browser.contents)
 
         # Request the anonymous folder
         now = stable_now()
         browser = Browser(self.app)
+        browser.handleErrors = False
         browser.open(self.portal['f1'].absolute_url())
         self.assertEqual('plone.content.folderView',
                          browser.headers['X-Cache-Rule'])
@@ -280,7 +281,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
+        self.assertEqual(b'', browser.contents)
 
         # Edit the page to update the etag
         testText2 = 'Testing... body two'
@@ -373,7 +374,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
+        self.assertEqual(b'', browser.contents)
 
         # Request the authenticated rss feed
         now = stable_now()
@@ -503,7 +504,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
+        self.assertEqual(b'', browser.contents)
 
         # Request an image scale
         now = stable_now()
@@ -554,7 +555,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual('', browser.contents)
+        self.assertEqual(b'', browser.contents)
 
         # Request a large datafile (over 64K) to test files that use
         # the "response.write()" function to initiate a streamed response.
@@ -562,9 +563,11 @@ class TestProfileWithCaching(unittest.TestCase):
         # large OFS.Image.Image, large non-blog ATImages/ATFiles, and
         # large Resource Registry cooked files, which all use the same
         # method to initiate a streamed response.
-        s = 'a' * (1 << 16) * 3
-        self.portal.manage_addFile('bigfile', file=StringIO(
-            s), content_type='application/octet-stream')
+        s = b'a' * (1 << 16) * 3
+        self.portal.manage_addFile(
+            'bigfile',
+            file=six.BytesIO(s),
+            content_type='application/octet-stream')
 
         import transaction
         transaction.commit()
