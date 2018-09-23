@@ -4,18 +4,10 @@ Changelog
 1.2.22 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
 New features:
 
 - Python 3 support
   [pbauer, MatthewWilkes, ale-rt]
-
-Bug fixes:
-
-- *add item here*
 
 
 1.2.21 (2018-04-03)
