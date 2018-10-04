@@ -7,8 +7,6 @@ from plone.app.caching.operations.utils import getContext
 from Products.CMFCore.FSObject import FSObject
 from Products.CMFCore.FSPageTemplate import FSPageTemplate
 from Products.CMFCore.interfaces import ICatalogableDublinCore
-from Products.ResourceRegistries.interfaces import ICookedFile
-from Products.ResourceRegistries.interfaces import IResourceRegistry
 from z3c.caching.interfaces import ILastModified
 from zope.browserresource.interfaces import IResource
 from zope.component import adapter
@@ -16,6 +14,13 @@ from zope.interface import implementer
 from zope.interface import Interface
 from zope.pagetemplate.interfaces import IPageTemplate
 
+
+try:
+    from Products.ResourceRegistries.interfaces import ICookedFile
+    from Products.ResourceRegistries.interfaces import IResourceRegistry
+    HAVE_RESOURCE_REGISTRIES = True
+except ImportError:
+    HAVE_RESOURCE_REGISTRIES = False
 
 try:
     from zope.dublincore.interfaces import IDCTimes
@@ -155,23 +160,25 @@ class ResourceLastModified(object):
             return datetime.fromtimestamp(lmt, tzlocal())
 
 
-@implementer(ILastModified)
-@adapter(ICookedFile)
-class CookedFileLastModified(object):
-    """ILastModified for Resource Registry `cooked` files
-    """
+if HAVE_RESOURCE_REGISTRIES:
 
-    def __init__(self, context):
-        self.context = context
+    @implementer(ILastModified)
+    @adapter(ICookedFile)
+    class CookedFileLastModified(object):
+        """ILastModified for Resource Registry `cooked` files
+        """
 
-    def __call__(self):
-        registry = getContext(self.context, IResourceRegistry)
-        if (
-            registry is None or
-            registry.getDebugMode() or
-            not registry.isCacheable(self.context.__name__)
-        ):
-            return None
-        mtime = getattr(registry.aq_base, '_p_mtime', None)
-        if mtime is not None and mtime > 0:
-            return datetime.fromtimestamp(mtime, tzlocal())
+        def __init__(self, context):
+            self.context = context
+
+        def __call__(self):
+            registry = getContext(self.context, IResourceRegistry)
+            if (
+                registry is None or
+                registry.getDebugMode() or
+                not registry.isCacheable(self.context.__name__)
+            ):
+                return None
+            mtime = getattr(registry.aq_base, '_p_mtime', None)
+            if mtime is not None and mtime > 0:
+                return datetime.fromtimestamp(mtime, tzlocal())
