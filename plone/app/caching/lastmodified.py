@@ -14,7 +14,7 @@ from zope.interface import implementer
 from zope.interface import Interface
 from zope.pagetemplate.interfaces import IPageTemplate
 
-
+# BBB resource registry of old type
 try:
     from Products.ResourceRegistries.interfaces import ICookedFile
     from Products.ResourceRegistries.interfaces import IResourceRegistry
