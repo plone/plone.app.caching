@@ -62,10 +62,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.app = self.layer['app']
         self.portal = self.layer['portal']
 
-        test_css = FSFile('test.css', os.path.join(
-            os.path.dirname(__file__), 'test.css'))
-        self.portal.portal_skins.custom._setOb('test.css', test_css)
-
         setRequest(self.portal.REQUEST)
 
         applyProfile(self.portal, 'plone.app.caching:without-caching-proxy')
@@ -124,7 +120,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         import transaction
         transaction.commit()
 
-        # Request the quthenticated folder
+        # Request the authenticated folder
         now = stable_now()
         browser = Browser(self.app)
         browser.addHeader(
