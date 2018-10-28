@@ -22,12 +22,7 @@ returned to a user, because the cache has not been updated since the item
 was modified. There are three general strategies for dealing with this:
 
 * Since resources are cached in the proxy based on their URL, you can
-  "invalidate" the cached copy by changing an item's URL when it is updated.
-  This is the approach taken by Plone's ResourceRegistries (``portal_css``,
-  ``portal_javascript`` & co): in production mode, the links that are inserted
-  into Plone's content pages for resource managed by ResourceRegistries
-  contain a time-based token, which changes when the ResourceRegistries
-  are updated. This approach has the benefit of also being able to
+  "invalidate" the cached copy by changing an item's URL when it is updated. This approach has the benefit of also being able to
   "invalidate" content stored in a user's browser cache.
 
 * All caching proxies support setting timeouts. This means that content may
@@ -90,8 +85,7 @@ The default purge paths include:
   ``Image`` types.
 
 Files and images created (or customised) in the ZMI are purged automatically
-when modified. Files managed through the ResourceRegistries do not need
-purging, since they have "stable" URLs. To purge Plone content when modified
+when modified. To purge Plone content when modified
 (or removed), you must select the content types in the control panel. By
 default, only the ``File`` and ``Image`` types are purged.
 

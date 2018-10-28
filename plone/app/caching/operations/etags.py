@@ -184,38 +184,6 @@ class Skin(object):
 
 @implementer(IETagValue)
 @adapter(Interface, Interface)
-class ResourceRegistries(object):
-    """The ``resourceRegistries`` etag component, returning the most recent
-    last modified timestamp from all three Resource Registries.  This is
-    useful for avoiding requests for expired resources from cached pages.
-    """
-
-    def __init__(self, published, request):
-        self.published = published
-        self.request = request
-
-    def __call__(self):
-        context = getContext(self.published)
-
-        registries = []
-        registries.append(getToolByName(context, 'portal_css', None))
-        registries.append(getToolByName(context, 'portal_javascripts', None))
-        registries.append(getToolByName(context, 'portal_kss', None))
-
-        mtimes = []
-        now = time.time()
-        for registry in registries:
-            mtime = now
-            if registry is not None:
-                mtime = getattr(registry.aq_base, '_p_mtime', now)
-                mtimes.append(mtime)
-
-        mtimes.sort()
-        return str(mtimes[-1])
-
-
-@implementer(IETagValue)
-@adapter(Interface, Interface)
 class AnonymousOrRandom(object):
     """The ``anonymousOrRandom`` etag component. This is normally added
     implicitly by the ``anonOnly`` setting. It will return None for anonymous

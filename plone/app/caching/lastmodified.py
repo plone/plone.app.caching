@@ -14,13 +14,6 @@ from zope.interface import implementer
 from zope.interface import Interface
 from zope.pagetemplate.interfaces import IPageTemplate
 
-# BBB resource registry of old type
-try:
-    from Products.ResourceRegistries.interfaces import ICookedFile
-    from Products.ResourceRegistries.interfaces import IResourceRegistry
-    HAVE_RESOURCE_REGISTRIES = True
-except ImportError:
-    HAVE_RESOURCE_REGISTRIES = False
 
 try:
     from zope.dublincore.interfaces import IDCTimes
@@ -158,27 +151,3 @@ class ResourceLastModified(object):
         lmt = getattr(self.context.context, 'lmt', None)
         if lmt is not None:
             return datetime.fromtimestamp(lmt, tzlocal())
-
-
-if HAVE_RESOURCE_REGISTRIES:
-
-    @implementer(ILastModified)
-    @adapter(ICookedFile)
-    class CookedFileLastModified(object):
-        """ILastModified for Resource Registry `cooked` files
-        """
-
-        def __init__(self, context):
-            self.context = context
-
-        def __call__(self):
-            registry = getContext(self.context, IResourceRegistry)
-            if (
-                registry is None or
-                registry.getDebugMode() or
-                not registry.isCacheable(self.context.__name__)
-            ):
-                return None
-            mtime = getattr(registry.aq_base, '_p_mtime', None)
-            if mtime is not None and mtime > 0:
-                return datetime.fromtimestamp(mtime, tzlocal())

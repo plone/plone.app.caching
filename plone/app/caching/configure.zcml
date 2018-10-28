@@ -61,7 +61,5 @@
     <adapter factory=".lastmodified.CatalogableDublinCoreLastModified" />
     <adapter factory=".lastmodified.DCTimesLastModified" />
     <adapter factory=".lastmodified.ResourceLastModified" />
-    <adapter zcml:condition="installed some.package"
-             factory=".lastmodified.CookedFileLastModified" />
 
 </configure>

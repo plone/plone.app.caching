@@ -20,7 +20,7 @@ Bug fixes:
 Clean-up
 
 - Legacy code clean-up
-Old type resource registry Products.ResourceRegistries made optional
+Handling of legacy resource registries Products.ResourceRegistries removed
 [ksuess]
 
 
