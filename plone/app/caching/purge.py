@@ -24,6 +24,7 @@ from zope.globalrequest import getRequest
 from zope.interface import implementer
 from zope.lifecycleevent.interfaces import IObjectModifiedEvent
 from zope.lifecycleevent.interfaces import IObjectMovedEvent
+from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from zope.schema import getFieldsInOrder
 
 import six
@@ -279,6 +280,15 @@ def purgeOnModified(object, event):
 
 @adapter(IContentish, IObjectMovedEvent)
 def purgeOnMovedOrRemoved(object, event):
+    request = getRequest()
+    confirmed_delete = (
+        'delete_confirmation' in request.URL
+        and request.REQUEST_METHOD == 'POST'
+        and 'form.submitted' in request.form
+    )
+    if IObjectRemovedEvent.providedBy(event) and not confirmed_delete:
+        # ignore extra delete events
+        return
     # Don't purge when added
     if event.oldName is not None and event.oldParent is not None:
         if isPurged(object):
