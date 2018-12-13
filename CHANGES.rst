@@ -14,7 +14,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Warn after save if caching was disabled while purging is still enabled.
+  [jensens]
 
 
 1.2.22 (2018-09-23)
