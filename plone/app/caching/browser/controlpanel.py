@@ -344,10 +344,11 @@ class ControlPanel(BaseView):
             ramCacheCleanupInterval,
         )
 
-        IStatusMessage(self.request).addStatusMessage(
-            _(u'Purging ist still enabled while caching is disabled!'),
-            'warning',
-        )
+        if not enabled and purgingEnabled:
+            IStatusMessage(self.request).addStatusMessage(
+                _(u'Purging ist still enabled while caching is disabled!'),
+                'warning',
+            )
 
         IStatusMessage(self.request).addStatusMessage(
             _(u'Changes saved.'),
