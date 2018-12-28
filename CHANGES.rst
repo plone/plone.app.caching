@@ -4,14 +4,6 @@ Changelog
 1.2.23 (unreleased)
 -------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
 Bug fixes:
 
 - Warn after save if caching was disabled while purging is still enabled.
