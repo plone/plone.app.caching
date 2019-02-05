@@ -26,13 +26,6 @@
     <utility component=".default.BaseCaching"           name="plone.app.caching.baseCaching" />
     -->
 
-    <!-- Special handling for content in Plone's ResourceRegistries, if installed -->
-    <adapter
-        zcml:condition="installed Products.ResourceRegistries"
-        factory=".default.ResourceRegistriesCaching"
-        name="plone.app.caching.strongCaching"
-        />
-
     <!-- RAM cache storage: a transformation at the very end of the chain -->
     <adapter factory=".ramcache.Store"                  name="plone.app.caching.operations.ramcache" />
 
