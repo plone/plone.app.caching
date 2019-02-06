@@ -3,7 +3,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-version = '1.2.24.dev0'
+version = '2.0.dev0'
 
 setup(
     name='plone.app.caching',
@@ -14,8 +14,6 @@ setup(
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Plone',
-        'Framework :: Plone :: 5.0',
-        'Framework :: Plone :: 5.1',
         'Framework :: Plone :: 5.2',
         'Framework :: Zope2',
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',

@@ -62,10 +62,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.app = self.layer['app']
         self.portal = self.layer['portal']
 
-        test_css = FSFile('test.css', os.path.join(
-            os.path.dirname(__file__), 'test.css'))
-        self.portal.portal_skins.custom._setOb('test.css', test_css)
-
         setRequest(self.portal.REQUEST)
 
         applyProfile(self.portal, 'plone.app.caching:without-caching-proxy')
@@ -124,7 +120,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         import transaction
         transaction.commit()
 
-        # Request the quthenticated folder
+        # Request the authenticated folder
         now = stable_now()
         browser = Browser(self.app)
         browser.addHeader(
@@ -139,7 +135,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        tag = '"|test_user_1_|{0}|en|{1}|0|0'.format(
+        tag = '"|test_user_1_|{0}|en|{1}|0'.format(
             catalog.getCounter(),
             default_skin,
         )
@@ -157,7 +153,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        tag = '"|test_user_1_|{0}|en|{1}|0|1'.format(
+        tag = '"|test_user_1_|{0}|en|{1}|0'.format(
             catalog.getCounter(),
             default_skin,
         )
@@ -179,7 +175,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        tag = '"|test_user_1_|{0}|en|{1}|0'.format(
+        tag = '"|test_user_1_|{0}|en|{1}'.format(
             catalog.getCounter(),
             default_skin,
         )
@@ -227,7 +223,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        tag = '"||{0}|en|{1}|0|0'.format(catalog.getCounter(), default_skin)
+        tag = '"||{0}|en|{1}|0'.format(catalog.getCounter(), default_skin)
         self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
         self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
@@ -244,7 +240,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # This should use cacheInBrowser
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        tag = '"||{0}|en|{1}|0'.format(catalog.getCounter(), default_skin)
+        tag = '"||{0}|en|{1}'.format(catalog.getCounter(), default_skin)
         self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
         self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
@@ -264,7 +260,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertIn(testText, browser.contents)
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
-        tag = '"||{0}|en|{1}|0'.format(catalog.getCounter(), default_skin)
+        tag = '"||{0}|en|{1}'.format(catalog.getCounter(), default_skin)
         self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
         self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))

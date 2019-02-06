@@ -26,14 +26,6 @@ import random
 import time
 
 
-try:
-    from Products.ResourceRegistries.interfaces import ICookedFile
-    from Products.ResourceRegistries.interfaces import IResourceRegistry
-    HAVE_RESOURCE_REGISTRIES = True
-except ImportError:
-    HAVE_RESOURCE_REGISTRIES = False
-
-
 @implementer(ICachingOperation)
 @provider(ICachingOperationType)
 @adapter(Interface, Interface)
@@ -297,35 +289,6 @@ class StrongCaching(BaseCaching):
     maxage = 86400
     smaxage = etags = vary = None
     lastModified = ramCache = anonOnly = False
-
-
-if HAVE_RESOURCE_REGISTRIES:
-
-    @adapter(ICookedFile, IHTTPRequest)
-    class ResourceRegistriesCaching(StrongCaching):
-        """Override for StrongCaching which checks ResourceRegistries
-        cacheability
-        """
-
-        def interceptResponse(self, rulename, response):
-            return super(
-                ResourceRegistriesCaching,
-                self,
-            ).interceptResponse(rulename, response, class_=StrongCaching)
-
-        def modifyResponse(self, rulename, response):
-            registry = getContext(self.published, IResourceRegistry)
-
-            if registry is not None:
-                if (
-                    registry.getDebugMode() or
-                    not registry.isCacheable(self.published.__name__)
-                ):
-                    doNotCache(self.published, self.request, response)
-                    return
-
-            super(ResourceRegistriesCaching, self).modifyResponse(
-                rulename, response, class_=StrongCaching)
 
 
 @implementer(ICachingOperation)

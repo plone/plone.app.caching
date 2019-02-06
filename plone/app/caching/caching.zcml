@@ -100,13 +100,6 @@
     <!-- Zope resources (including those in resource directories) -->
     <cache:ruleset ruleset="plone.resource" for="zope.browserresource.interfaces.IResource" />
 
-    <!-- Resources cooked in ResourceRegistries -->
-    <configure zcml:condition="installed Products.ResourceRegistries">
-
-        <cache:ruleset ruleset="plone.stableResource" for="Products.ResourceRegistries.interfaces.ICookedFile" />
-
-    </configure>
-
     <!-- Standard Plone (non-blob) file and image content objects -->
     <configure zcml:condition="installed Products.ATContentTypes">
 

@@ -17,6 +17,12 @@ Bug fixes:
 - Warn after save if caching was disabled while purging is still enabled.
   [jensens]
 
+Clean-up
+
+- Legacy code clean-up
+Handling of legacy resource registries Products.ResourceRegistries removed
+[ksuess]
+
 
 1.2.22 (2018-09-23)
 -------------------
