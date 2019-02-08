@@ -20,8 +20,8 @@ Bug fixes:
 Clean-up
 
 - Legacy code clean-up
-Handling of legacy resource registries Products.ResourceRegistries removed
-[ksuess]
+  Handling of legacy resource registries Products.ResourceRegistries removed
+  [ksuess]
 
 
 1.2.22 (2018-09-23)
