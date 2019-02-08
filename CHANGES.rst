@@ -8,6 +8,14 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0 (2019-02-08)
+------------------
+
+Breaking changes:
+
+
+- Removed legacy resource registries [ksuess] (#45)
+
 
 1.2.23 (2018-12-28)
 -------------------
