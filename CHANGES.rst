@@ -8,6 +8,18 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.1 (2019-03-03)
+------------------
+
+Bug fixes:
+
+
+- Only fire 1 Purge() when deleting content, instead of 3 [skurfer]
+  Detect and ignore content creation more reliably [skurfer]
+  Also purge the parent object when something changes (since the parent probably displays a list that includes the item being changed)
+  [skurfer] (#37)
+
+
 2.0.0 (2019-02-08)
 ------------------
 
