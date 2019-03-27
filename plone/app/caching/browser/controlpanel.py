@@ -346,7 +346,7 @@ class ControlPanel(BaseView):
 
         if not enabled and purgingEnabled:
             IStatusMessage(self.request).addStatusMessage(
-                _(u'Purging ist still enabled while caching is disabled!'),
+                _(u'Purging is still enabled while caching is disabled!'),
                 'warning',
             )
 
