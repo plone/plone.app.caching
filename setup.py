@@ -55,6 +55,7 @@ setup(
         'Zope2',
         'Acquisition',
         'plone.app.z3cform',
+        'plone.z3cform >= 1.1.0'
         'z3c.form',
         'z3c.zcmlhook',
     ],

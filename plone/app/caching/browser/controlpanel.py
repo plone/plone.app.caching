@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+from Products.CMFCore.utils import getToolByName
+from Products.GenericSetup.interfaces import BASE
+from Products.GenericSetup.interfaces import EXTENSION
+from Products.statusmessages.interfaces import IStatusMessage
+from operator import itemgetter
 from plone.app.caching.browser.edit import EditForm
-from plone.app.caching.interfaces import _
 from plone.app.caching.interfaces import ICacheProfiles
 from plone.app.caching.interfaces import IPloneCacheSettings
+from plone.app.caching.interfaces import _
 from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.cachepurging.interfaces import IPurger
 from plone.cachepurging.utils import getPathsToPurge
@@ -13,10 +18,7 @@ from plone.caching.interfaces import ICachingOperationType
 from plone.memoize.instance import memoize
 from plone.protect import CheckAuthenticator
 from plone.registry.interfaces import IRegistry
-from Products.CMFCore.utils import getToolByName
-from Products.GenericSetup.interfaces import BASE
-from Products.GenericSetup.interfaces import EXTENSION
-from Products.statusmessages.interfaces import IStatusMessage
+from plone.z3cform.z2 import processInputs
 from z3c.caching.interfaces import IRulesetType
 from z3c.caching.registry import enumerateTypes
 from zope.component import getUtilitiesFor
@@ -28,7 +30,6 @@ from zope.publisher.interfaces import NotFound
 from zope.ramcache.interfaces.ram import IRAMCache
 
 import datetime
-from operator import itemgetter
 import re
 import six
 
@@ -161,6 +162,9 @@ class ControlPanel(BaseView):
     def update(self):
         if super(ControlPanel, self).update():
             if 'form.button.Save' in self.request.form:
+                if six.PY3:
+                    # decode the inputs recursively to unicode
+                    processInputs(self.request)
                 self.processSave()
             elif 'form.button.Cancel' in self.request.form:
                 self.request.response.redirect(
@@ -198,15 +202,8 @@ class ControlPanel(BaseView):
         # Process mappings and validate
 
         for ruleset, operation in operations.items():
-
             if not ruleset or not operation:
                 continue
-
-            if isinstance(ruleset, six.text_type):  # should be ASCII
-                ruleset = ruleset.encode('utf-8')
-
-            if isinstance(operation, six.text_type):  # should be ASCII
-                operation = operation.encode('utf-8')
 
             ruleset = ruleset.replace('-', '.')
             operationMapping[ruleset] = operation
@@ -215,16 +212,10 @@ class ControlPanel(BaseView):
             if not ruleset:
                 continue
 
-            if isinstance(ruleset, six.text_type):  # should be ASCII
-                ruleset = ruleset.encode('utf-8')
-
             ruleset = ruleset.replace('-', '.')
             for contentType in contentTypes:
                 if not contentType:
                     continue
-
-                if isinstance(contentType, six.text_type):  # should be ASCII
-                    contentType = contentType.encode('utf-8')
 
                 if contentType in contentTypeRulesetMapping:
                     self.errors.setdefault(
@@ -249,17 +240,11 @@ class ControlPanel(BaseView):
             if not ruleset:
                 continue
 
-            if isinstance(ruleset, six.text_type):  # should be ASCII
-                ruleset = ruleset.encode('utf-8')
-
             ruleset = ruleset.replace('-', '.')
             for template in templates:
                 template = template.strip()
                 if not template:
                     continue
-
-                if isinstance(template, six.text_type):  # should be ASCII
-                    template = template.encode('utf-8')
 
                 if template in templateRulesetMapping:
                     self.errors.setdefault(
