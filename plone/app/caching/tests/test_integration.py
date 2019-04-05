@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import IPloneCacheSettings
-from plone.app.caching.testing import getToken
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
-from plone.app.testing import applyProfile
-from plone.app.testing import setRoles
+from plone.app.caching.testing import getToken
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
+from plone.app.testing import applyProfile
+from plone.app.testing import setRoles
 from plone.app.textfield.value import RichTextValue
 from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.cachepurging.interfaces import IPurger
@@ -77,6 +79,18 @@ class TestOperations(unittest.TestCase):
 
     def tearDown(self):
         setRequest(None)
+
+    def test_controlpanel(self):
+        browser = Browser(self.app)
+        browser.handleErrors = False
+        browser.addHeader(
+            'Authorization',
+            'Basic {0}:{1}'.format(SITE_OWNER_NAME, SITE_OWNER_PASSWORD, ),
+        )
+
+        browser.open("{}/@@caching-controlpanel".format(self.portal.absolute_url()))  # noqa
+        browser.getControl(name='enabled:boolean').value = 'checked'
+        browser.getControl('Save').click()
 
     def test_disabled(self):
         self.cacheSettings.enabled = False
