@@ -8,6 +8,17 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.2 (2019-04-10)
+------------------
+
+Bug fixes:
+
+
+- fix typo "Purging is" and not "Purging ist" [vincentfretin] (#47)
+- Fix controlpanel for Python 3
+  [petschki] (#48)
+
+
 2.0.1 (2019-03-03)
 ------------------
 
