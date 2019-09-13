@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.3 (2019-09-13)
+------------------
+
+Bug fixes:
+
+
+- Fix python3 related encoding error on manual purge page.
+  [agitator] (#51)
+
+
 2.0.2 (2019-04-10)
 ------------------
 
