@@ -562,6 +562,11 @@ class Purge(BaseView):
                 _(u'There were errors.'), 'error')
             return
 
+        if six.PY3:
+            urls = [x.decode('utf8') if isinstance(x, six.binary_type)
+                    else x for x in urls
+                   ]
+
         purger = getUtility(IPurger)
         serverURL = self.request['SERVER_URL']
 
