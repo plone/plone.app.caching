@@ -192,7 +192,7 @@ class ScalesPurgePaths(object):
             assignable = IBehaviorAssignable(self.context, None)
             for behavior in assignable.enumerateBehaviors():
                 if behavior.marker:
-                    new_fields = getFieldsInOrder(behavior.marker)
+                    new_fields = getFieldsInOrder(behavior.interface)
                     if len(new_fields) > 0:
                         fields = fields + new_fields
 
