@@ -9,9 +9,14 @@ from plone.app.caching.purge import purgeOnModified
 from plone.app.caching.purge import purgeOnMovedOrRemoved
 from plone.app.caching.purge import ScalesPurgePaths
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+from plone.app.contenttypes.behaviors.leadimage \
+    import ILeadImageBehavior
+from plone.app.contenttypes.interfaces import IDocument
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_ROLES
+from plone.behavior.interfaces import IBehavior
+from plone.behavior.interfaces import IBehaviorAssignable
 from plone.namedfile.file import NamedFile
 from plone.namedfile.file import NamedImage
 from plone.registry import Registry
@@ -28,6 +33,7 @@ from zope.component import getUtility
 from zope.component import provideAdapter
 from zope.component import provideHandler
 from zope.component import provideUtility
+from zope.component import queryUtility
 from zope.component.event import objectEventNotify
 from zope.event import notify
 from zope.globalrequest import getRequest
@@ -445,11 +451,54 @@ class TestScalesPurgePaths(unittest.TestCase):
             'text/csv',
             u'data/töstfile.csv')
 
+        # Create a page with a lead image.
+        # For the purposes of testing, we will use the Document type and
+        # a custom IBehaviorAssignable adapter to mark the behavior as enabled.
+
+        @implementer(IBehaviorAssignable)
+        @adapter(IDocument)
+        class TestingAssignable(object):
+
+            enabled = [ILeadImageBehavior]
+            name = 'plone.leadimage'
+
+            def __init__(self, context):
+                self.context = context
+
+            def supports(self, behavior_interface):
+                return behavior_interface in self.enabled
+
+            def enumerateBehaviors(self):
+                behavior = queryUtility(IBehavior, name=self.name)
+                if behavior is not None:
+                    yield behavior
+
+        provideAdapter(TestingAssignable)
+
+        self.folder.invokeFactory(
+            'Document',
+            'page',
+            title='Test Page')
+        self.page = self.folder['page']
+
+        leadimage_adapter = ILeadImageBehavior(self.page)
+        leadimage_adapter.image = NamedImage(
+            getData('data/plone-app-caching.jpg'),
+            'image/jpg',
+            u'plone-app-caching.jpg')
+
         setRoles(self.portal, TEST_USER_ID, TEST_USER_ROLES)
 
     def test_scale_purge_paths(self):
         prefix = '/'.join(self.image_type.getPhysicalPath())
         purge = ScalesPurgePaths(self.image_type)
+        paths = purge.getRelativePaths()
+        scales = purge.getScales()
+        scalepaths = [prefix + '/@@images/image/' + str(i) for i in scales]
+        [self.assertIn(j, paths) for j in scalepaths]
+        # lead image scales (example for an image field of a behavior)
+        prefix = '/'.join(self.page.getPhysicalPath())
+        purge = ScalesPurgePaths(self.page)
         paths = purge.getRelativePaths()
         scales = purge.getScales()
         scalepaths = [prefix + '/@@images/image/' + str(i) for i in scales]
