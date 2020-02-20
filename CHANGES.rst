@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.4 (2020-02-20)
+------------------
+
+Bug fixes:
+
+
+- Purging image scales of behavior fields, e.g. lead image
+  [ksuess] (#55)
+
+
 2.0.3 (2019-09-13)
 ------------------
 
