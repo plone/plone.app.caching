@@ -99,10 +99,12 @@ class BaseCaching(object):
             self.published, self.request, lastModified=lastModified)
 
         # Remove Range from request if the If-Range condition is not fulfilled
+        # If-Range check is done here so we could remove the header from request
         if_range = self.request.environ.get('HTTP_IF_RANGE', '').strip('"')
-        if if_range and if_range != lastModified and if_range != etag:
-            if 'HTTP_RANGE' in self.request.environ:
-                del self.request.environ['HTTP_RANGE']
+        if if_range:
+            if if_range != lastModified and if_range != etag:
+                if 'HTTP_RANGE' in self.request.environ:
+                    del self.request.environ['HTTP_RANGE']
             del self.request.environ['HTTP_IF_RANGE']
 
         # Check for cache stop request variables
