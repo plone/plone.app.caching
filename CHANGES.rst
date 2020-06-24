@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.6 (2020-06-24)
+------------------
+
+New features:
+
+
+- Remove Range from request if the If-Range condition is not fulfilled
+  [mamico] (#58)
+
+
 2.0.5 (2020-04-20)
 ------------------
 
