@@ -10,6 +10,7 @@ from plone.app.caching.operations.utils import getETagAnnotation
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
 from plone.app.caching.operations.utils import isModified
 from plone.app.caching.operations.utils import notModified
+from plone.app.caching.operations.utils import parseDateTime
 from plone.app.caching.operations.utils import setCacheHeaders
 from plone.app.caching.operations.utils import visibleToRole
 from plone.caching.interfaces import ICachingOperation
@@ -22,6 +23,7 @@ from zope.interface import Interface
 from zope.interface import provider
 from zope.publisher.interfaces.http import IHTTPRequest
 
+import datetime
 import random
 import time
 
@@ -97,6 +99,21 @@ class BaseCaching(object):
         etag = getETagAnnotation(self.published, self.request, keys=etags)
         lastModified = getLastModifiedAnnotation(
             self.published, self.request, lastModified=lastModified)
+
+        # Remove Range from request if the If-Range condition is not fulfilled
+        if_range = self.request.environ.get('HTTP_IF_RANGE', '').strip('"')
+        if if_range:
+            if 'HTTP_RANGE' in self.request.environ:
+                if_range_dt = parseDateTime(if_range)
+                delta_sec = datetime.timedelta(seconds=1)
+                if if_range_dt and (lastModified - if_range_dt) < delta_sec:
+                    pass
+                elif if_range == etag:
+                    pass
+                else:
+                    del self.request.environ['HTTP_RANGE']
+            # If-Range check is done here so we could remove it from the request
+            del self.request.environ['HTTP_IF_RANGE']
 
         # Check for cache stop request variables
         if cacheStop(self.request, rulename):
