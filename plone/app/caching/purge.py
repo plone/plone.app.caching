@@ -283,7 +283,7 @@ def purgeOnMovedOrRemoved(object, event):
     request = getRequest()
     confirmed_delete = (
         request
-        and request.URL is not None
+        and getattr(request, 'URL', None)
         and 'delete_confirmation' in request.URL
         and request.REQUEST_METHOD == 'POST'
         and 'form.submitted' in request.form
