@@ -8,36 +8,32 @@ Introduction
 ``plone.app.caching`` provides a Plone UI and default rules for managing HTTP response caching in Plone.
 It builds on ``z3c.caching``, ``plone.caching`` and ``plone.cachepurging``.
 
-``plone.app.caching`` requires Plone 4 or later.
+``plone.app.caching`` version 2.x requires Plone 5.2 or later.
+For earlier Plone versions, use a release from branch 1.x.
+
 
 Installation
 ============
 
-Plone >=4.1
------------
+``plone.app.caching`` is shipped as a dependency of the ``Plone`` package.
+Caching is **not enabled by default**.
+When you create a default Plone site, it is available in the Site Setup.
+Under the Advanced header, look for the Caching control panel.
+There you can enable caching.
 
-**From Plone 4.1 onwards, ``plone.app.caching`` is shipped as a dependency of Plone core.**
+When the Caching control panel is not there, there can be various reasons for this:
 
-It is available from the Control Panel, but **not enabled by default**.
-You can enable it from the "add-ons" menu option.
+- If your buildout does not load the ``Plone`` egg, but only ``Products.CMFPlone``, then ``plone.app.caching`` is not included.
+- If the package *is* included, but you add a Plone Site using the advanced form and disable caching, then the control panel is not there.
 
-Plone 4.0
----------
+If you want to install it in an existing Plone Site:
 
-Add ``plone.app.caching`` to the ``eggs`` list in your ``buildout.cfg``, or as a dependency of one of your own packages in ``setup.py``.
-ZCML configuration will be automatically loaded via a ``z3c.autoinclude`` entry point.
-You will also need to install the package in Plone's Add-ons control panel as normal.
+1. Make sure the package is available in the Plone instance, by adding ``plone.app.caching`` or ``Plone`` to the eggs and running buildout.
+2. From the Plone Site Setup go to the ZMI (Zope Management Interface).
+3. Go to ``portal_setup``, and then to the Import tab.
+4. Select the HTTP caching support profile, perhaps easiest by id: ``profile-plone.app.caching:default``.
+5. Click 'Import all steps'.
 
-This package depends on a number of other packages, including ``z3c.form`` and ``plone.app.registry``, that do not ship with Plone 4.0.
-You will probably want to lock down the versions for those packages using a known good set.
-Add this to the the ``extends`` line in your ``buildout.cfg``, *after* the line that includes the Plone KGS::
-
-    extends =
-        ...
-        http://good-py.appspot.com/release/plone.app.caching/1.0a1
-
-Update the version number at the end of the URL as appropriate.
-You can find here an `overview of the versions <http://good-py.appspot.com/release/plone.app.caching>`_
 
 Source Code
 ===========
