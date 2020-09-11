@@ -33,11 +33,9 @@ _marker = object()
 logger = logging.getLogger('plone.app.caching')
 
 parseETagLock = allocate_lock()
-# etagQuote = re.compile('(\s*\"([^\"]*)\"\s*,{0,1})')
-# etagNoQuote = re.compile('(\s*([^,]*)\s*,{0,1})')
 
-etagQuote = re.compile('(\s*(W\/)?\"([^\"]*)\"\s*,?)')
-etagNoQuote = re.compile('(\s*(W\/)?([^,]*)\s*,?)')
+etagQuote = re.compile(r'(\s*(W\/)?"([^"]*)"\s*,?)')
+etagNoQuote = re.compile(r'(\s*(W\/)?([^,]*)\s*,?)')
 
 #
 # Operation helpers, used in the implementations of interceptResponse() and
