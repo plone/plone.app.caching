@@ -74,6 +74,12 @@
         description="A dynamic feed, e.g. using RSS or ATOM"
         />
 
+    <cache:rulesetType
+        name="plone.content.dynamic"
+        title="Dynamic views, like collections, searches, ..."
+        description="A public-facing view for a contents that is collected dynamically from the whole site."
+        />
+
     <!-- Default caching ruleset assignments
          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
@@ -146,6 +152,15 @@
     <configure zcml:condition="installed plone.app.blob">
 
         <cache:ruleset ruleset="plone.content.file" for="plone.app.blob.interfaces.IATBlob" />
+
+    </configure>
+
+    <!-- plone.restapi content -->
+    <configure zcml:condition="installed plone.restapi">
+
+        <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.breadcrumbs.get.BreadcrumbsGet" />
+        <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.content.get.ContentGet" />
+        <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.content.get.ContentGet" />
 
     </configure>
 

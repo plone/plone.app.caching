@@ -1,0 +1,122 @@
+Caching of plone.restapi
+------------------------
+
+Strategy
+~~~~~~~~
+
+Caching for anonymous users for all GET requests.
+
+Remark: Some POST requests, like `@querystring`, should be turned into GET in order to better cache.
+
+We have endpoints following classic `plone.content.itemView` content and do not accept parameters.
+Those can be handled with the default rules, including purge.
+
+There are others delivering dynamic content, like search, impossible to purge.
+Those shall be cached using a shorttime cache (lie some seconds to some minutes.
+
+A rulesetType will be introduced called `plone.content.dynamic`.
+It will is similar to  be configured to cache by default in browser 15sec, in caching-proxy 60 seconds.
+Its goal is primary to reduce the load/peak-load on the server. Also, it reduces the impact of loading the same endpoint more than one time.
+
+
+plone.restapi GET endpoints
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+And its environment and assignments:
+
+- ``@actions``
+
+  - Authenticated
+  - no rule assignment
+
+- ``@addons``
+
+  - Authenticated
+  - no rule assignment
+
+- ``@breadcrumbs``
+
+  - Anonymous
+  - rule plone.content.itemView
+  - purge
+
+- ``@comments``
+
+  - Anonymous
+  - rule plone.content.itemView
+  - purge
+
+- ``@history``
+
+  - Authenticated
+  - no rule assignment
+
+- ``@lock``
+
+  - Authenticated
+  - no rule assignment
+
+- ``@translations``
+
+  - Anonymous
+  - with parameters
+  - rule plone.content.dynamic
+
+- ``@navigation``
+
+  - Anonymous
+  - with parameters
+  - rule plone.content.dynamic
+
+- ``@querysources``
+
+  - Anonymous
+  - with parameters
+  - rule plone.content.dynamic
+
+- ``@querystring``
+
+  - Anonymous
+  - (values on IPloneSiteRoot from registry)
+  - rule plone.content.dynamic
+
+- ``@querystring-search``
+
+  - is in `get.py` BUT configured as POST
+  - Anonymous
+  - with json body
+  - can not be cached
+
+- ``@registry``
+
+  - Authenticated
+  - with subpath
+  - no rule assignment
+
+- ``@roles``
+
+  - Authenticated
+  - no rule assignment
+
+- ``@search``
+
+  - Anonymous
+  - with parameters
+  - rule plone.content.dynamic
+
+- ``@sources``
+
+  - Authenticated
+  - no rule assignment
+
+- ``@tiles``
+
+  - pre-deprecation
+  - Anonymous
+  - with subpath
+  - no rule assignment
+
+- ``@types``
+
+  - Authenticated
+  - no rule assignment
