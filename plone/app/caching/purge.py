@@ -53,22 +53,13 @@ CONTENT_PATHS_POSTFIXES = [
 ]
 if HAS_RESTAPI:
     CONTENT_PATHS_POSTFIXES += [
-        '@breadcrumbs',
-        '@comments',
-        '@history',
-        '@lock',
-        '@translations',  # with parameters
-        '@navigation',  # with parameters
-        '@querysources',  # with parameters
-        '@querystring',
-        '@querystring-search',  # with parameters
-        '@registry',  # with subpath
-        '@roles',
-        '@search',  # with parameters
-        '@sources',  # with subpath
-        '@tiles',  # with subpath
-        '@types',  # with subpath
+        '/@breadcrumbs',
+        '/@comments',
     ]
+
+def _append_paths(paths, prefix=''):
+    for postfix in CONTENT_PATHS_POSTFIXES:
+        paths.append(prefix + postfix)
 
 @implementer(IPurgePaths)
 @adapter(IDynamicType)
@@ -121,10 +112,10 @@ class ContentPurgePaths(object):
                 # which would translate to http://site.come/ getting
                 # invalidated but not http://site.come
                 paths.append('')
-                paths.append('/view')
+                _append_paths(paths)
             else:
                 paths.append(parentPrefix + '/')
-                paths.append(parentPrefix + '/view')
+                _append_paths(paths, prefix=parentPrefix)
 
         return paths
 

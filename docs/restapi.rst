@@ -46,6 +46,12 @@ And its environment and assignments:
   - rule plone.content.itemView
   - purge
 
+- ``/`` (content)
+
+  - Anonymous
+  - expander!
+  - rule plone.content.dynamic
+
 - ``@history``
 
   - Authenticated
@@ -61,6 +67,11 @@ And its environment and assignments:
   - Anonymous
   - with parameters
   - rule plone.content.dynamic
+
+- ``@translations-locator``
+
+  - Authenticated
+  - no rule assignment
 
 - ``@navigation``
 
