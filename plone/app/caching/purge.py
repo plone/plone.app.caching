@@ -28,6 +28,7 @@ from zope.lifecycleevent.interfaces import IObjectMovedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from zope.schema import getFieldsInOrder
 
+import pkg_resources
 import six
 
 
@@ -41,6 +42,33 @@ try:
 except ImportError:
     HAVE_AT = False
 
+try:
+    pkg_resources.get_distribution('plone.restapi')
+    HAS_RESTAPI = True
+except pkg_resources.DistributionNotFound:
+    HAS_RESTAPI = False
+
+CONTENT_PATHS_POSTFIXES = [
+    '/view',
+]
+if HAS_RESTAPI:
+    CONTENT_PATHS_POSTFIXES += [
+        '@breadcrumbs',
+        '@comments',
+        '@history',
+        '@lock',
+        '@translations',  # with parameters
+        '@navigation',  # with parameters
+        '@querysources',  # with parameters
+        '@querystring',
+        '@querystring-search',  # with parameters
+        '@registry',  # with subpath
+        '@roles',
+        '@search',  # with parameters
+        '@sources',  # with subpath
+        '@tiles',  # with subpath
+        '@types',  # with subpath
+    ]
 
 @implementer(IPurgePaths)
 @adapter(IDynamicType)
@@ -52,12 +80,14 @@ class ContentPurgePaths(object):
     * ${object_path}/ (e.g. for folders)
     * ${object_path}/view
     * ${object_path}/${object_default_view}
+    * a bunch of restapi endpoints
 
     If the object is the default view of its parent, also purge:
 
     * ${parent_path}
     * ${parent_path}/
     """
+
 
     def __init__(self, context):
         self.context = context
@@ -130,11 +160,11 @@ class DiscussionItemPurgePaths(object):
                 for relativePath in relativePaths:
                     if rewriter is None:
                         yield relativePath
-                    else:
-                        rewrittenPaths = rewriter(
-                            relativePath) or []  # None -> []
-                        for rewrittenPath in rewrittenPaths:
-                            yield rewrittenPath
+                    continue
+                    rewrittenPaths = rewriter(
+                        relativePath) or []  # None -> []
+                    for rewrittenPath in rewrittenPaths:
+                        yield rewrittenPath
 
     def getAbsolutePaths(self):
         root = self._getRoot()
