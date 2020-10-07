@@ -31,7 +31,6 @@ The three default caching profiles:
 * **With caching proxy (and split-view caching)**
       An example profile for a caching proxy setup with split-view
       caching enabled.  This example requires a special proxy setup.
-      See the proxy examples in the "proxy-configs" directory.
 
 
 Custom caching profiles

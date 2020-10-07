@@ -103,25 +103,8 @@ before he had a new haircut.
 Installing and configuring a caching proxy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``plone.app.caching`` package includes some example buildout
-configurations in the ``proxy-configs`` directory. Two versions are included:
-one demonstrating a Squid-behind-Apache proxy setup and another demonstrating
-a Varnish-behind-Apache proxy setup. Both examples also demonstrate how to
-properly configure split-view caching.
+There are buildout recipes for building and configuring proxy configs: `plone.recipe.squid`_ and `plone.recipe.varnish`_.
 
-These configurations are provided for instructional purposes but with a little
-modification they can also be used in production. To use in a real production
-instance, you will need to adjust the configuration to match your setup. For a
-simple standard setup, you might only need to change the ``hostname`` value in
-the buildout.cfg. Read the README.txt files in each example for more
-instructions.
-
-There are also some alternative buildout recipes for building and configuring
-proxy configs: `plone.recipe.squid`_ and `plone.recipe.varnish`_. The examples
-in this package do not use these recipes in favor of using a more explicit,
-and hopefully more educational, template-based approach. Even if you decide to
-use one of the automated recipes, it will probably be worth your while to
-study the examples included in this package to get a few pointers.
 
 Running Plone behind Apache 2.2 with mod_cache
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
