@@ -119,27 +119,29 @@ class TestOperations(unittest.TestCase):
         self.portal.portal_workflow.doActionFor(self.portal["f1"]["d1"], "publish")
 
         # Content image
-        self.portal["f1"].invokeFactory("Image", "i1")
-        self.portal["f1"]["i1"].title = "Image one"
-        self.portal["f1"]["i1"].description = "Image one description"
-        with open(TEST_IMAGE, "rb") as ti:
-            self.portal["f1"]["i1"].image = NamedImage(ti, "image/gif", "test.gif")
-        self.portal["f1"]["i1"].reindexObject()
+        self.portal['f1'].invokeFactory('Image', 'i1')
+        self.portal['f1']['i1'].title = u'Image one'
+        self.portal['f1']['i1'].description = u'Image one description'
+        with open(TEST_IMAGE, 'rb') as myfile:
+            self.portal['f1']['i1'].image = NamedImage(
+                myfile, 'image/gif', u'test.gif')
+        self.portal['f1']['i1'].reindexObject()
 
         # Content file
-        self.portal["f1"].invokeFactory("File", "f1")
-        self.portal["f1"]["f1"].title = "File one"
-        self.portal["f1"]["f1"].description = "File one description"
-        with open(TEST_FILE, "rb") as tf:
-            self.portal["f1"]["f1"].file = OFS.Image.File("test.gif", "test.gif", tf)
-        self.portal["f1"]["f1"].reindexObject()
+        self.portal['f1'].invokeFactory('File', 'f1')
+        self.portal['f1']['f1'].title = u'File one'
+        self.portal['f1']['f1'].description = u'File one description'
+        with open(TEST_FILE, 'rb') as myfile:
+            self.portal['f1']['f1'].file = OFS.Image.File(
+                'test.gif', 'test.gif', myfile)
+        self.portal['f1']['f1'].reindexObject()
 
         # OFS image (custom folder)
-        with open(TEST_IMAGE, "rb") as ti:
+        with open(TEST_IMAGE, 'rb') as myfile:
             OFS.Image.manage_addImage(
-                self.portal["portal_skins"]["custom"],
-                "test.gif",
-                ti,
+                self.portal['portal_skins']['custom'],
+                'test.gif',
+                myfile,
             )
 
         setRoles(self.portal, TEST_USER_ID, ("Member",))
