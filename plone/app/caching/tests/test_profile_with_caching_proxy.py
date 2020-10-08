@@ -148,32 +148,25 @@ class TestProfileWithCaching(unittest.TestCase):
             "plone.app.caching.weakCaching", browser.headers["X-Cache-Operation"]
         )
         # This should use cacheInBrowser
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        self.assertEqual(
-            '"|test_user_1_|%d|en|%s|0'
-            % (catalog.getCounter(), skins_tool.default_skin),
-            _normalize_etag(browser.headers["ETag"]),
-        )
-        self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        self.assertEqual('"|test_user_1_|%d|en|%s|0|0' % (catalog.getCounter(
+        ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertGreater(now, dateutil.parser.parse(
+            browser.headers['Expires']))
 
         # Set the copy/cut cookie and then request the folder view again
         browser.cookies.create("__cp", "xxx")
         browser.open(self.portal["f1"].absolute_url())
         # The response should be the same as before except for the etag
-        self.assertEqual("plone.content.folderView", browser.headers["X-Cache-Rule"])
-        self.assertEqual(
-            "plone.app.caching.weakCaching", browser.headers["X-Cache-Operation"]
-        )
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        self.assertEqual(
-            '"|test_user_1_|%d|en|%s|0'
-            % (catalog.getCounter(), skins_tool.default_skin),
-            _normalize_etag(browser.headers["ETag"]),
-        )
+        self.assertEqual('plone.content.folderView',
+                         browser.headers['X-Cache-Rule'])
+        self.assertEqual('plone.app.caching.weakCaching',
+                         browser.headers['X-Cache-Operation'])
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        self.assertEqual('"|test_user_1_|%d|en|%s|0|1' % (catalog.getCounter(
+        ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
 
         # Request the authenticated page
         now = stable_now()
@@ -192,14 +185,12 @@ class TestProfileWithCaching(unittest.TestCase):
             "plone.app.caching.weakCaching", browser.headers["X-Cache-Operation"]
         )
         # This should use cacheInBrowser
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        self.assertEqual(
-            '"|test_user_1_|%d|en|%s' % (catalog.getCounter(), skins_tool.default_skin),
-            _normalize_etag(browser.headers["ETag"]),
-        )
-        self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        self.assertEqual('"|test_user_1_|%d|en|%s|0' % (catalog.getCounter(
+        ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertGreater(now, dateutil.parser.parse(
+            browser.headers['Expires']))
 
         # Request the authenticated page again -- to test RAM cache.
         browser = Browser(self.app)
@@ -246,14 +237,12 @@ class TestProfileWithCaching(unittest.TestCase):
             "plone.app.caching.weakCaching", browser.headers["X-Cache-Operation"]
         )
         # This should use cacheInBrowser
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        self.assertEqual(
-            '"||%d|en|%s|0' % (catalog.getCounter(), skins_tool.default_skin),
-            _normalize_etag(browser.headers["ETag"]),
-        )
-        self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        self.assertEqual('"||%d|en|%s|0|0' % (catalog.getCounter(
+        ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertGreater(now, dateutil.parser.parse(
+            browser.headers['Expires']))
 
         # Request the anonymous page
         now = stable_now()
@@ -265,14 +254,12 @@ class TestProfileWithCaching(unittest.TestCase):
         )
         self.assertIn(testText, browser.contents)
         # This should use cacheInBrowser
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        self.assertEqual(
-            '"||%d|en|%s' % (catalog.getCounter(), skins_tool.default_skin),
-            _normalize_etag(browser.headers["ETag"]),
-        )
-        self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        self.assertEqual('"||%d|en|%s|0' % (catalog.getCounter(
+        ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertGreater(now, dateutil.parser.parse(
+            browser.headers['Expires']))
 
         # Request the anonymous page again -- to test RAM cache.
         # Anonymous should be RAM cached
@@ -288,14 +275,12 @@ class TestProfileWithCaching(unittest.TestCase):
             "plone.app.caching.operations.ramcache", browser.headers["X-RAMCache"]
         )
         self.assertIn(testText, browser.contents)
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        self.assertEqual(
-            '"||%d|en|%s' % (catalog.getCounter(), skins_tool.default_skin),
-            _normalize_etag(browser.headers["ETag"]),
-        )
-        self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        self.assertEqual('"||%d|en|%s|0' % (catalog.getCounter(
+        ), skins_tool.default_skin), _normalize_etag(browser.headers['ETag']))
+        self.assertGreater(now, dateutil.parser.parse(
+            browser.headers['Expires']))
 
         # Request the anonymous page again -- with an INM header to test 304.
         etag = browser.headers["ETag"]
