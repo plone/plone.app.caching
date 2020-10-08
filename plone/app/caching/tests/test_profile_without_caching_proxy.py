@@ -3,6 +3,7 @@ from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 from plone.app.caching.tests.test_utils import normalize_etag
 from plone.app.caching.tests.test_utils import stable_now
+from plone.app.caching.tests.test_utils import test_image
 from plone.app.testing import applyProfile
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -20,25 +21,8 @@ from zope.globalrequest import setRequest
 import datetime
 import dateutil.parser
 import dateutil.tz
-import os
-import pkg_resources
 import six
 import unittest
-
-
-TEST_FILE = pkg_resources.resource_filename(
-    'plone.app.caching.tests', 'test.gif')
-
-
-def test_image():
-    from plone.namedfile.file import NamedBlobImage
-    filename = pkg_resources.resource_filename(
-        'plone.app.caching.tests', 'test.gif')
-    filename = os.path.join(os.path.dirname(__file__), u'test.gif')
-    return NamedBlobImage(
-        data=open(filename, 'rb').read(),
-        filename=filename,
-    )
 
 
 class TestProfileWithoutCaching(unittest.TestCase):
