@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+from plone.app.caching.tests.test_utils import normalize_etag
 from plone.app.caching.tests.test_utils import stable_now
 from plone.app.testing import applyProfile
 from plone.app.testing import setRoles
@@ -39,12 +40,6 @@ def test_image():
         data=open(filename, 'rb').read(),
         filename=filename,
     )
-
-
-def _normalize_etag(s):
-    s = s.split('|')
-    s.pop()  # remove time-based component
-    return '|'.join(s)
 
 
 class TestProfileWithoutCaching(unittest.TestCase):
@@ -139,7 +134,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
             catalog.getCounter(),
             default_skin,
         )
-        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
         self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -157,7 +152,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
             catalog.getCounter(),
             default_skin,
         )
-        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
 
         # Request the authenticated page
         now = stable_now()
@@ -179,7 +174,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
             catalog.getCounter(),
             default_skin,
         )
-        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
         self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -224,7 +219,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
         tag = '"||{0}|en|{1}|0|0'.format(catalog.getCounter(), default_skin)
-        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
         self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -241,7 +236,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
         tag = '"||{0}|en|{1}|0'.format(catalog.getCounter(), default_skin)
-        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
         self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 
@@ -261,7 +256,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual('max-age=0, must-revalidate, private',
                          browser.headers['Cache-Control'])
         tag = '"||{0}|en|{1}|0'.format(catalog.getCounter(), default_skin)
-        self.assertEqual(tag, _normalize_etag(browser.headers['ETag']))
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
         self.assertGreater(now, dateutil.parser.parse(
             browser.headers['Expires']))
 

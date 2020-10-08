@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from Acquisition import Explicit
+from datetime import date
 from datetime import datetime
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.utils import getObjectDefaultView
@@ -29,6 +30,18 @@ def stable_now():
     now = datetime(2013, 5, 5, 10, 0, 0).replace(microsecond=0)
     now = tzinfo.localize(now)  # set tzinfo with correct DST offset
     return now
+
+
+def normalize_etag(value):
+    split_value = value.split('|')
+    # The last component is expected to be the resourceRegistries ETag,
+    # which is a time-based component, making it hard to test.
+    last = split_value.pop()
+    if str(date.today().year) in last:
+        # yes, this is time based, remove it
+        return '|'.join(split_value)
+    # return original
+    return value
 
 
 @implementer(IBrowserDefault, IDynamicType)
