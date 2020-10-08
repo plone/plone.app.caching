@@ -15,11 +15,14 @@ from zope.component import provideAdapter
 from zope.component import provideUtility
 from zope.interface import implementer
 
+import pkg_resources
 import pytz
 import unittest
 
 
-TEST_TIMEZONE = "Europe/Vienna"
+TEST_TIMEZONE = 'Europe/Vienna'
+TEST_IMAGE = pkg_resources.resource_filename(
+    'plone.app.caching.tests', 'test.gif')
 
 
 def stable_now():
@@ -40,6 +43,15 @@ def normalize_etag(value):
         return '|'.join(split_value)
     # return original
     return value
+
+
+def test_image():
+    from plone.namedfile.file import NamedBlobImage
+    with open(TEST_IMAGE, 'rb') as myfile:
+        return NamedBlobImage(
+            data=myfile.read(),
+            filename=TEST_IMAGE,
+        )
 
 
 @implementer(IBrowserDefault, IDynamicType)
