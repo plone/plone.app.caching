@@ -14,7 +14,6 @@ from plone.caching.interfaces import ICacheSettings
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from plone.testing.z2 import Browser
-from Products.CMFCore.FSFile import FSFile
 from Products.CMFCore.utils import getToolByName
 from zope.component import getUtility
 from zope.globalrequest import setRequest
