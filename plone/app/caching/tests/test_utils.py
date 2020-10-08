@@ -23,7 +23,7 @@ import unittest
 
 TEST_TIMEZONE = 'Europe/Vienna'
 TEST_IMAGE = pkg_resources.resource_filename(
-    'plone.app.caching.tests', 'test.gif')
+    u'plone.app.caching.tests', u'test.gif')
 
 
 def stable_now():
