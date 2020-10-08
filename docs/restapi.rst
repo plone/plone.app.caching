@@ -12,7 +12,7 @@ We have endpoints following classic `plone.content.itemView` content and do not 
 Those can be handled with the default rules, including purge.
 
 There are others delivering dynamic content, like search, impossible to purge.
-Those shall be cached using a shorttime cache (lie some seconds to some minutes.
+Those shall be cached using a shorttime cache (like some seconds to some minutes.
 
 A rulesetType will be introduced called `plone.content.dynamic`.
 It will is similar to  be configured to cache by default in browser 15sec, in caching-proxy 60 seconds.

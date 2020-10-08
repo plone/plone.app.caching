@@ -307,6 +307,35 @@ class StrongCaching(BaseCaching):
     smaxage = etags = vary = None
     lastModified = ramCache = anonOnly = False
 
+@provider(ICachingOperationType)
+class TerseCaching(BaseCaching):
+    """Terse caching operation.
+    """
+
+    title = _(u'Terse caching')
+    description = _(
+        u'Cache in browser (default: 30s) and proxy (default: 5 min). '
+        u'Keep very short in cache to buffer hi-load scenarios ',
+        u'Use for very dynamic content, like collecting data from '
+        u'the whole portal. '
+        u'Temporary outdated is less important than performance.'
+        u'Reduce in-cache time to just 3-10 seconds to only buffer peak load '
+        u'if behind a proxy'
+
+    )
+    prefix = 'plone.app.caching.terseCaching'
+    sort = 4
+
+    # Configurable options
+    options = ('maxage', 'smaxage', 'etags', 'lastModified',
+               'ramCache', 'vary', 'anonOnly')
+
+    # Default option values
+    maxage = 30
+    smaxage = 300
+    etags = vary = None
+    lastModified = ramCache = anonOnly = False
+
 
 @implementer(ICachingOperation)
 @provider(ICachingOperationType)
@@ -320,7 +349,7 @@ class NoCaching(object):
     description = _(u'Use this operation to keep the response '
                     u'out of all caches.')
     prefix = 'plone.app.caching.noCaching'
-    sort = 4
+    sort = 5
     options = ()
 
     def __init__(self, published, request):
