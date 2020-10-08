@@ -57,8 +57,8 @@ def getData(filename):
     from plone.app.caching import tests
 
     filename = join(dirname(tests.__file__), filename)
-    data = open(filename, "rb").read()
-    return data
+    with open(filename, "rb") as myfile:
+        return myfile.read()
 
 
 class Handler(object):
