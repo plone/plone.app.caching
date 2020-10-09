@@ -1,0 +1,1 @@
+Do not assume request or request.URL is a string. It might be None. [jensens, iham]
