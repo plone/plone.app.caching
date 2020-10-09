@@ -282,13 +282,13 @@ def purgeOnModified(object, event):
 def purgeOnMovedOrRemoved(object, event):
     request = getRequest()
     confirmed_delete = (
-        request
+        request is not None
         and getattr(request, 'URL', None)
         and 'delete_confirmation' in request.URL
         and request.REQUEST_METHOD == 'POST'
         and 'form.submitted' in request.form
     )
-    if IObjectRemovedEvent.providedBy(event) and not confirmed_delete:
+    if not confirmed_delete and IObjectRemovedEvent.providedBy(event):
         # ignore extra delete events
         return
     # Don't purge when added
