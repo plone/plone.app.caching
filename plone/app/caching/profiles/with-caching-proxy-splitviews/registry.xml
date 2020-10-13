@@ -64,6 +64,35 @@
   </record>
 
 
+  <!-- plone.content.dynamic -->
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.etags">
+      <field ref="plone.app.caching.terseCaching.etags" />
+      <value>
+          <element>userid</element>
+          <element>catalogCounter</element>
+          <element>userLanguage</element>
+          <element>skin</element>
+          <element>locked</element>
+          <element>copy</element>
+      </value>
+  </record>
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.ramCache">
+      <field ref="plone.app.caching.terseCaching.ramCache" />
+      <value>True</value>
+  </record>
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.maxage">
+      <field ref="plone.app.caching.terseCaching.maxage" />
+      <value>2</value>
+  </record>
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.smaxage">
+      <field ref="plone.app.caching.terseCaching.smaxage" />
+      <value>5</value>
+  </record>
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.vary">
+      <field ref="plone.app.caching.terseCaching.vary" />
+      <value>X-Anonymous</value>
+
+
   <!-- plone.content.feed -->
   <record name="plone.app.caching.moderateCaching.plone.content.feed.smaxage">
       <field ref="plone.app.caching.moderateCaching.smaxage" />

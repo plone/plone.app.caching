@@ -158,13 +158,15 @@
     <!-- plone.restapi content -->
     <configure zcml:condition="installed plone.restapi">
 
+        <include package="plone.restapi" />
+
         <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.breadcrumbs.get.BreadcrumbsGet" />
-        <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.comments.get.CommentsGet" />
+        <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.discussion.conversation.CommentsGet" />
         <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.content.get.ContentGet" />
         <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.multilingual.pam.TranslationInfo" />
         <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.navigation.get.NavigationGet" />
         <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.querysources.get.QuerySourcesGet" />
-        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.querystring.get.QueryStringGet" />
+        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.querystring.get.QuerystringGet" />
         <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.search.get.SearchGet" />
 
     </configure>
