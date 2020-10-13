@@ -594,3 +594,44 @@ class TestProfileWithCaching(unittest.TestCase):
         # What is the best way to test this?
         # Maybe not important since the RR test exercises the same code?
         pass
+
+    def test_restapi_breadcrumbs(self):
+        # plone.content.itemView for plone.restapi.services.breadcrumbs.get.BreadcrumbsGet
+        setRoles(self.portal, TEST_USER_ID, ('Manager',))
+        self.portal.invokeFactory('Folder', 'f1')
+        self.portal['f1'].title = u'Folder one'
+        self.portal['f1'].invokeFactory('Folder', 'f1.1')
+        self.portal['f1']['f1.1'].title = u'Folder one sub one'
+        browser = Browser(self.app)
+        browser.addHeader('Accept', 'application/json')
+        browser.open(self.portal['f1']['f1.1'].absolute_url() + '/@breadcrumbs')
+        import pdb; pdb.set_trace()
+
+
+    def test_restapi_comments(self):
+        # plone.content.itemView for plone.restapi.services.discussion.conversation.CommentsGet
+        pass
+
+    def test_restapi_content(self):
+        # plone.content.dynamic for plone.restapi.services.content.get.ContentGet
+        pass
+
+    def test_restapi_translationinfo(self):
+        # plone.content.dynamic for plone.restapi.services.multilingual.pam.TranslationInfo
+        pass
+
+    def test_restapi_navigation(self):
+        # plone.content.dynamic for plone.restapi.services.navigation.get.NavigationGet
+        pass
+
+    def test_restapi_querysource(self):
+        # plone.content.dynamic for plone.restapi.services.querysources.get.QuerySourcesGet
+        pass
+
+    def test_restapi_querystring(self):
+        # plone.content.dynamic for plone.restapi.services.querystring.get.QueryStringGet
+        pass
+
+    def test_restapi_search(self):
+        # plone.content.dynamic for plone.restapi.services.search.get.SearchGet
+        pass
