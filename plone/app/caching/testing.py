@@ -48,6 +48,9 @@ class PloneAppCaching(PloneSandboxLayer):
         import plone.app.caching
         xmlconfig.file('configure.zcml', plone.app.caching,
                        context=configurationContext)
+        import plone.restapi
+        xmlconfig.file('configure.zcml', plone.restapi,
+                       context=configurationContext)
 
         # Install fake purger
         self.oldPurger = getUtility(IPurger)
@@ -55,6 +58,7 @@ class PloneAppCaching(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'plone.app.caching:default')
+        applyProfile(portal, 'plone.restapi:default')
 
         portal['portal_workflow'].setDefaultChain(
             'simple_publication_workflow')

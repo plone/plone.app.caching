@@ -604,8 +604,8 @@ class TestProfileWithCaching(unittest.TestCase):
         self.portal['f1']['f1.1'].title = u'Folder one sub one'
         browser = Browser(self.app)
         browser.addHeader('Accept', 'application/json')
-        browser.open(self.portal['f1']['f1.1'].absolute_url() + '/@breadcrumbs')
         import pdb; pdb.set_trace()
+        browser.open(self.portal['f1']['f1.1'].absolute_url() + '/@breadcrumbs')
 
 
     def test_restapi_comments(self):
