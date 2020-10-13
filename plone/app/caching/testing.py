@@ -9,7 +9,6 @@ from plone.cachepurging.interfaces import IPurger
 from plone.protect.authenticator import _getKeyring
 from zope.component import getUtility
 from zope.component import provideUtility
-from zope.configuration import xmlconfig
 from zope.interface import implementer
 
 import hmac
@@ -45,23 +44,22 @@ class PloneAppCaching(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
 
         # Load ZCML
-        import plone.app.caching
-        xmlconfig.file('configure.zcml', plone.app.caching,
-                       context=configurationContext)
         import plone.restapi
-        xmlconfig.file('configure.zcml', plone.restapi,
-                       context=configurationContext)
+        import plone.app.caching
+        self.loadZCML(package=plone.restapi)
+        self.loadZCML(package=plone.app.caching)
 
         # Install fake purger
         self.oldPurger = getUtility(IPurger)
         provideUtility(FauxPurger(), IPurger)
 
     def setUpPloneSite(self, portal):
-        applyProfile(portal, 'plone.app.caching:default')
         applyProfile(portal, 'plone.restapi:default')
+        applyProfile(portal, 'plone.app.caching:default')
 
         portal['portal_workflow'].setDefaultChain(
-            'simple_publication_workflow')
+            'simple_publication_workflow',
+        )
 
     def tearDownZope(self, app):
         # Store old purger
