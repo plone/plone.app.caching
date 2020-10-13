@@ -18,8 +18,8 @@
     <adapter   factory=".default.WeakCaching"           name="plone.app.caching.weakCaching" />
     <utility component=".default.WeakCaching"           name="plone.app.caching.weakCaching" />
 
-    <adapter   factory=".default.TerseCaching"           name="plone.app.caching.TerseCaching" />
-    <utility component=".default.TerseCaching"           name="plone.app.caching.TerseCaching" />
+    <adapter   factory=".default.TerseCaching"           name="plone.app.caching.terseCaching" />
+    <utility component=".default.TerseCaching"           name="plone.app.caching.terseCaching" />
 
     <adapter   factory=".default.NoCaching"             name="plone.app.caching.noCaching" />
     <utility component=".default.NoCaching"             name="plone.app.caching.noCaching" />
