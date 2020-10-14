@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_RESTAPI_TESTING
 from plone.app.caching.tests.test_utils import stable_now
 from plone.app.testing import applyProfile
 from plone.app.testing import setRoles
@@ -14,6 +15,7 @@ from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.cachepurging.interfaces import IPurger
 from plone.caching.interfaces import ICacheSettings
 from plone.registry.interfaces import IRegistry
+from plone.restapi.testing import RelativeSession
 from plone.testing.z2 import Browser
 from Products.CMFCore.FSFile import FSFile
 from Products.CMFCore.utils import getToolByName
@@ -38,10 +40,11 @@ def test_image():
     filename = pkg_resources.resource_filename(
         'plone.app.caching.tests', 'test.gif')
     filename = os.path.join(os.path.dirname(__file__), u'test.gif')
-    return NamedBlobImage(
-        data=open(filename, 'rb').read(),
-        filename=filename,
-    )
+    with open(filename, 'rb') as imagefile:
+        return NamedBlobImage(
+            data=imagefile.read(),
+            filename=filename,
+        )
 
 
 def _normalize_etag(s):
@@ -595,6 +598,43 @@ class TestProfileWithCaching(unittest.TestCase):
         # Maybe not important since the RR test exercises the same code?
         pass
 
+class TestProfileWithCachingRestAPI(unittest.TestCase):
+    """This test aims to exercise the caching operations expected from the
+    `with-caching-proxy` profile for supported restapi calls.
+    """
+
+    layer = PLONE_APP_CACHING_FUNCTIONAL_RESTAPI_TESTING
+
+    def setUp(self):
+        self.app = self.layer['app']
+        self.portal = self.layer['portal']
+
+        test_css = FSFile('test.css', os.path.join(
+            os.path.dirname(__file__), 'test.css'))
+        self.portal.portal_skins.custom._setOb('test.css', test_css)
+
+        setRequest(self.portal.REQUEST)
+
+        applyProfile(self.portal, 'plone.app.caching:with-caching-proxy')
+
+        self.registry = getUtility(IRegistry)
+
+        self.cacheSettings = self.registry.forInterface(ICacheSettings)
+        self.cachePurgingSettings = self.registry.forInterface(
+            ICachePurgingSettings)
+        self.ploneCacheSettings = self.registry.forInterface(
+            IPloneCacheSettings)
+
+        self.cacheSettings.enabled = True
+
+        self.purger = getUtility(IPurger)
+        self.purger.reset()
+
+        # restapi test session
+        self.api_session = RelativeSession(self.layer["portal"].absolute_url())
+        self.api_session.headers.update({"Accept": "application/json"})
+
+
     def test_restapi_breadcrumbs(self):
         # plone.content.itemView for plone.restapi.services.breadcrumbs.get.BreadcrumbsGet
         setRoles(self.portal, TEST_USER_ID, ('Manager',))
@@ -602,10 +642,8 @@ class TestProfileWithCaching(unittest.TestCase):
         self.portal['f1'].title = u'Folder one'
         self.portal['f1'].invokeFactory('Folder', 'f1.1')
         self.portal['f1']['f1.1'].title = u'Folder one sub one'
-        browser = Browser(self.app)
-        browser.addHeader('Accept', 'application/json')
+        response = self.api_session.get("/f1/f.1.1/@breadcrumbs")
         import pdb; pdb.set_trace()
-        browser.open(self.portal['f1']['f1.1'].absolute_url() + '/@breadcrumbs')
 
 
     def test_restapi_comments(self):
