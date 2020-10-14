@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_RESTAPI_TESTING
 from plone.app.caching.tests.test_utils import stable_now
 from plone.app.testing import applyProfile
 from plone.app.testing import setRoles
@@ -11,6 +12,7 @@ from plone.app.textfield.value import RichTextValue
 from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.caching.interfaces import ICacheSettings
 from plone.registry.interfaces import IRegistry
+from plone.restapi.testing import RelativeSession
 from plone.testing.z2 import Browser
 from Products.CMFCore.FSFile import FSFile
 from Products.CMFCore.utils import getToolByName
@@ -24,6 +26,7 @@ import os
 import pkg_resources
 import six
 import unittest
+import transaction
 
 
 TEST_FILE = pkg_resources.resource_filename(
@@ -35,10 +38,11 @@ def test_image():
     filename = pkg_resources.resource_filename(
         'plone.app.caching.tests', 'test.gif')
     filename = os.path.join(os.path.dirname(__file__), u'test.gif')
-    return NamedBlobImage(
-        data=open(filename, 'rb').read(),
-        filename=filename,
-    )
+    with open(filename, 'rb') as imagefile:
+        return NamedBlobImage(
+            data=imagefile.read(),
+            filename=filename,
+        )
 
 
 def _normalize_etag(s):
@@ -69,8 +73,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.registry = getUtility(IRegistry)
 
         self.cacheSettings = self.registry.forInterface(ICacheSettings)
-        self.cachePurgingSettings = self.registry.forInterface(
-            ICachePurgingSettings)
         self.ploneCacheSettings = self.registry.forInterface(
             IPloneCacheSettings)
 
@@ -533,3 +535,104 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # What is the best way to test this?
         # Maybe not important since the RR test exercises the same code?
         pass
+
+
+class TestProfileWithoutCachingRestAPI(unittest.TestCase):
+    """This test aims to exercise the caching operations expected from the
+    `without-caching-proxy` profile for supported restapi calls.
+    """
+
+    layer = PLONE_APP_CACHING_FUNCTIONAL_RESTAPI_TESTING
+
+    def setUp(self):
+        self.app = self.layer['app']
+        self.portal = self.layer['portal']
+
+        test_css = FSFile('test.css', os.path.join(
+            os.path.dirname(__file__), 'test.css'))
+        self.portal.portal_skins.custom._setOb('test.css', test_css)
+
+        setRequest(self.portal.REQUEST)
+
+        applyProfile(self.portal, 'plone.app.caching:without-caching-proxy')
+
+        self.registry = getUtility(IRegistry)
+
+        self.cacheSettings = self.registry.forInterface(ICacheSettings)
+        self.cachePurgingSettings = self.registry.forInterface(
+            ICachePurgingSettings)
+        self.ploneCacheSettings = self.registry.forInterface(
+            IPloneCacheSettings)
+
+        self.cacheSettings.enabled = True
+
+        # some test content
+        setRoles(self.portal, TEST_USER_ID, ('Manager',))
+
+        self.portal.invokeFactory('Folder', 'f1')
+        self.portal['f1'].title = u'Folder one'
+        self.portal.portal_workflow.doActionFor(self.portal['f1'], 'publish')
+
+        self.portal['f1'].invokeFactory('Folder', 'f2')
+        self.portal['f1']['f2'].title = u'Folder one sub one'
+        self.portal.portal_workflow.doActionFor(self.portal['f1']['f2'], 'publish')
+
+        self.portal.invokeFactory('Collection', 'c')
+        self.portal['c'].title = u'A Collection'
+        self.portal.portal_workflow.doActionFor(self.portal['c'], 'publish')
+
+        transaction.commit()
+
+        # restapi test session
+        self.api_session = RelativeSession(self.layer["portal"].absolute_url())
+        self.api_session.headers.update({"Accept": "application/json"})
+
+    def test_restapi_breadcrumbs(self):
+        # plone.content.itemView for plone.restapi.services.breadcrumbs.get.BreadcrumbsGet
+        response = self.api_session.get("/f1/f2/@breadcrumbs")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.itemView')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.weakCaching')
+
+    def test_restapi_comments(self):
+        # plone.content.itemView for plone.restapi.services.discussion.conversation.CommentsGet
+        response = self.api_session.get("/f1/f2/@comments")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.itemView')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.weakCaching')
+
+    def test_restapi_content(self):
+        # plone.content.dynamic for plone.restapi.services.content.get.ContentGet
+        response = self.api_session.get("/f1/f2")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.dynamic')
+        import pdb; pdb.set_trace()
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.terseCaching')
+
+    def test_restapi_translationinfo(self):
+        # plone.content.dynamic for plone.restapi.services.multilingual.pam.TranslationInfo
+        response = self.api_session.get("/f1/f2/@translations")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.dynamic')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.terseCaching')
+
+    def test_restapi_navigation(self):
+        # plone.content.dynamic for plone.restapi.services.navigation.get.NavigationGet
+        response = self.api_session.get("/f1/f2/@navigation")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.dynamic')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.terseCaching')
+
+    def test_restapi_querystring(self):
+        # plone.content.dynamic for plone.restapi.services.querystring.get.QueryStringGet
+        response = self.api_session.get("/@querystring")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.dynamic')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.terseCaching')
+
+    def test_restapi_search(self):
+        # plone.content.dynamic for plone.restapi.services.search.get.SearchGet
+        response = self.api_session.get("/@search")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.dynamic')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.terseCaching')

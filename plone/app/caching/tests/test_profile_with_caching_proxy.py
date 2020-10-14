@@ -28,6 +28,7 @@ import dateutil.tz
 import os
 import pkg_resources
 import six
+import transaction
 import unittest
 
 
@@ -630,46 +631,72 @@ class TestProfileWithCachingRestAPI(unittest.TestCase):
         self.purger = getUtility(IPurger)
         self.purger.reset()
 
+        # some test content
+        setRoles(self.portal, TEST_USER_ID, ('Manager',))
+
+        self.portal.invokeFactory('Folder', 'f1')
+        self.portal['f1'].title = u'Folder one'
+        self.portal.portal_workflow.doActionFor(self.portal['f1'], 'publish')
+
+        self.portal['f1'].invokeFactory('Folder', 'f2')
+        self.portal['f1']['f2'].title = u'Folder one sub one'
+        self.portal.portal_workflow.doActionFor(self.portal['f1']['f2'], 'publish')
+
+        self.portal.invokeFactory('Collection', 'c')
+        self.portal['c'].title = u'A Collection'
+        self.portal.portal_workflow.doActionFor(self.portal['c'], 'publish')
+
+        transaction.commit()
+
         # restapi test session
         self.api_session = RelativeSession(self.layer["portal"].absolute_url())
         self.api_session.headers.update({"Accept": "application/json"})
 
-
     def test_restapi_breadcrumbs(self):
         # plone.content.itemView for plone.restapi.services.breadcrumbs.get.BreadcrumbsGet
-        setRoles(self.portal, TEST_USER_ID, ('Manager',))
-        self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].title = u'Folder one'
-        self.portal['f1'].invokeFactory('Folder', 'f1.1')
-        self.portal['f1']['f1.1'].title = u'Folder one sub one'
-        response = self.api_session.get("/f1/f.1.1/@breadcrumbs")
-        import pdb; pdb.set_trace()
-
+        response = self.api_session.get("/f1/f2/@breadcrumbs")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.itemView')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.weakCaching')
 
     def test_restapi_comments(self):
         # plone.content.itemView for plone.restapi.services.discussion.conversation.CommentsGet
-        pass
+        response = self.api_session.get("/f1/f2/@comments")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.itemView')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.weakCaching')
 
     def test_restapi_content(self):
         # plone.content.dynamic for plone.restapi.services.content.get.ContentGet
-        pass
+        response = self.api_session.get("/f1/f2")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.dynamic')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.terseCaching')
 
     def test_restapi_translationinfo(self):
         # plone.content.dynamic for plone.restapi.services.multilingual.pam.TranslationInfo
-        pass
+        response = self.api_session.get("/f1/f2/@translations")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.dynamic')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.terseCaching')
 
     def test_restapi_navigation(self):
         # plone.content.dynamic for plone.restapi.services.navigation.get.NavigationGet
-        pass
-
-    def test_restapi_querysource(self):
-        # plone.content.dynamic for plone.restapi.services.querysources.get.QuerySourcesGet
-        pass
+        response = self.api_session.get("/f1/f2/@navigation")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.dynamic')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.terseCaching')
 
     def test_restapi_querystring(self):
         # plone.content.dynamic for plone.restapi.services.querystring.get.QueryStringGet
-        pass
+        response = self.api_session.get("/@querystring")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.dynamic')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.terseCaching')
 
     def test_restapi_search(self):
         # plone.content.dynamic for plone.restapi.services.search.get.SearchGet
-        pass
+        response = self.api_session.get("/@search")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['X-Cache-Rule'], 'plone.content.dynamic')
+        self.assertEqual(response.headers['X-Cache-Operation'], 'plone.app.caching.terseCaching')

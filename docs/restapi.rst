@@ -81,9 +81,9 @@ And its environment and assignments:
 
 - ``@querysources``
 
-  - Anonymous
+  - Authenticated
   - with parameters
-  - rule plone.content.dynamic
+  - can not be cached
 
 - ``@querystring``
 

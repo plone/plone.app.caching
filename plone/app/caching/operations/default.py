@@ -331,9 +331,10 @@ class TerseCaching(BaseCaching):
                'ramCache', 'vary', 'anonOnly')
 
     # Default option values
-    maxage = 30
-    smaxage = 300
-    etags = vary = None
+    maxage = 10
+    smaxage = 60
+    vary = "Accept"
+    etags = None
     lastModified = ramCache = anonOnly = False
 
 

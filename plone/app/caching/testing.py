@@ -7,7 +7,7 @@ from plone.app.testing import IntegrationTesting
 from plone.app.testing import PloneSandboxLayer
 from plone.cachepurging.interfaces import IPurger
 from plone.protect.authenticator import _getKeyring
-from plone.restapi.testing import PLONE_RESTAPI_DX_FIXTURE
+from plone.restapi.testing import PLONE_RESTAPI_DX_PAM_FIXTURE
 from plone.testing import z2
 from zope.component import getUtility
 from zope.component import provideUtility
@@ -69,7 +69,7 @@ class PloneAppCaching(PloneAppCachingBase):
 
 class PloneAppCachingRestAPI(PloneAppCachingBase):
 
-    defaultBases = (PLONE_RESTAPI_DX_FIXTURE,)
+    defaultBases = (PLONE_RESTAPI_DX_PAM_FIXTURE,)
 
 
 PLONE_APP_CACHING_FIXTURE = PloneAppCaching()

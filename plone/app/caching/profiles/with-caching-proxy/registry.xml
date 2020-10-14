@@ -62,15 +62,15 @@
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.ramCache">
       <field ref="plone.app.caching.terseCaching.ramCache" />
-      <value>True</value>
+      <value>False</value>
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.maxage">
       <field ref="plone.app.caching.terseCaching.maxage" />
-      <value>30</value>
+      <value>10</value>
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.smaxage">
       <field ref="plone.app.caching.terseCaching.smaxage" />
-      <value>300</value>
+      <value>60</value>
   </record>
 
 
