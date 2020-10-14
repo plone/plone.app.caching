@@ -65,7 +65,7 @@
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.maxage">
       <field ref="plone.app.caching.terseCaching.maxage" />
-      <value>30</value>
+      <value>10</value>
   </record>
 
   <!-- plone.content.feed -->

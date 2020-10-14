@@ -82,15 +82,16 @@
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.maxage">
       <field ref="plone.app.caching.terseCaching.maxage" />
-      <value>2</value>
+      <value>0</value>
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.smaxage">
       <field ref="plone.app.caching.terseCaching.smaxage" />
-      <value>5</value>
+      <value>0</value>
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.vary">
       <field ref="plone.app.caching.terseCaching.vary" />
-      <value>X-Anonymous</value>
+      <value>X-Anonymous, Accept</value>
+  </record>
 
 
   <!-- plone.content.feed -->
