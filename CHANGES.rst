@@ -8,6 +8,18 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.8 (2020-10-30)
+------------------
+
+Bug fixes:
+
+
+- Do not assume request or request.URL is a string. It might be None. [jensens, iham] (#59)
+- Remove hopelessly outdated proxy config examples.
+  Look at plone.recipe.varnish for excellent examples!
+  [jensens] (#64)
+
+
 2.0.7 (2020-09-28)
 ------------------
 
