@@ -314,7 +314,7 @@ class TerseCaching(BaseCaching):
 
     title = _(u'Terse caching')
     description = _(
-        u'Cache in browser (default: 30s) and proxy (default: 5 min). '
+        u'Cache in browser (default: 10s) and proxy (default: 1 min). '
         u'Keep very short in cache to buffer hi-load scenarios ',
         u'Use for very dynamic content, like collecting data from '
         u'the whole portal. '
