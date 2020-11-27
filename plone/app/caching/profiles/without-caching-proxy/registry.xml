@@ -63,6 +63,10 @@
       <field ref="plone.app.caching.terseCaching.ramCache" />
       <value>True</value>
   </record>
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.vary">
+      <field ref="plone.app.caching.terseCaching.vary" />
+      <value>Accept</value>
+  </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.maxage">
       <field ref="plone.app.caching.terseCaching.maxage" />
       <value>10</value>
