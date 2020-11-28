@@ -65,11 +65,10 @@ class ContentItemLookup(object):
         if registry is None:
             return None
 
-        ploneCacheSettings = registry.forInterface(
-            IPloneCacheSettings, check=False)
+        ploneCacheSettings = registry.forInterface(IPloneCacheSettings, check=False)
 
         # 2. Get the name of the published object
-        name = getattr(self.published, '__name__', None)
+        name = getattr(self.published, "__name__", None)
         if name is None:
             return None
 
@@ -80,12 +79,12 @@ class ContentItemLookup(object):
                 return ruleset
 
         # 4. Find the parent of the published object
-        parent = getattr(self.published, '__parent__', None)
+        parent = getattr(self.published, "__parent__", None)
         if parent is None:
             return None
 
         # 4.1. If the parent is a content object:
-        parentPortalType = getattr(aq_base(parent), 'portal_type', None)
+        parentPortalType = getattr(aq_base(parent), "portal_type", None)
         if parentPortalType is None:
             return None
 

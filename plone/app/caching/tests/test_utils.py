@@ -19,12 +19,11 @@ import pytz
 import unittest
 
 
-TEST_TIMEZONE = 'Europe/Vienna'
+TEST_TIMEZONE = "Europe/Vienna"
 
 
 def stable_now():
-    """Patch localized_now to allow stable results in tests.
-    """
+    """Patch localized_now to allow stable results in tests."""
     tzinfo = pytz.timezone(TEST_TIMEZONE)
     now = datetime(2013, 5, 5, 10, 0, 0).replace(microsecond=0)
     now = tzinfo.localize(now)  # set tzinfo with correct DST offset
@@ -33,8 +32,7 @@ def stable_now():
 
 @implementer(IBrowserDefault, IDynamicType)
 class DummyContent(Explicit):
-
-    def __init__(self, portal_type='testtype', defaultView='defaultView'):
+    def __init__(self, portal_type="testtype", defaultView="defaultView"):
         self.portal_type = portal_type
         self._defaultView = defaultView
 
@@ -47,28 +45,26 @@ class DummyNotContent(Explicit):
 
 
 class DummyFTI(object):
-
-    def __init__(self, portal_type, viewAction=''):
+    def __init__(self, portal_type, viewAction=""):
         self.id = portal_type
         self._actions = {
-            'object/view': {'url': viewAction},
+            "object/view": {"url": viewAction},
         }
 
     def getActionInfo(self, name):
         return self._actions[name]
 
     def queryMethodID(self, id, default=None, context=None):
-        if id == '(Default)':
-            return 'defaultView'
-        elif id == 'view':
-            return '@@defaultView'
+        if id == "(Default)":
+            return "defaultView"
+        elif id == "view":
+            return "@@defaultView"
         return default
 
 
 @implementer(IDynamicType)
 class DummyNotBrowserDefault(Explicit):
-
-    def __init__(self, portal_type='testtype', viewAction=''):
+    def __init__(self, portal_type="testtype", viewAction=""):
         self.portal_type = portal_type
         self._viewAction = viewAction
 
@@ -98,7 +94,7 @@ class TestIsPurged(unittest.TestCase):
         registry.registerInterface(IPloneCacheSettings)
 
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.purgedContentTypes = ('testtype',)
+        ploneSettings.purgedContentTypes = ("testtype",)
 
         content = DummyNotContent()
         self.assertFalse(isPurged(content))
@@ -109,7 +105,10 @@ class TestIsPurged(unittest.TestCase):
         registry.registerInterface(IPloneCacheSettings)
 
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.purgedContentTypes = ('File', 'Image',)
+        ploneSettings.purgedContentTypes = (
+            "File",
+            "Image",
+        )
 
         content = DummyContent()
         self.assertFalse(isPurged(content))
@@ -120,7 +119,11 @@ class TestIsPurged(unittest.TestCase):
         registry.registerInterface(IPloneCacheSettings)
 
         ploneSettings = registry.forInterface(IPloneCacheSettings)
-        ploneSettings.purgedContentTypes = ('File', 'Image', 'testtype',)
+        ploneSettings.purgedContentTypes = (
+            "File",
+            "Image",
+            "testtype",
+        )
 
         content = DummyContent()
         self.assertTrue(isPurged(content))
@@ -136,22 +139,20 @@ class TestGetObjectDefaultPath(unittest.TestCase):
 
     def test_browserdefault(self):
         context = DummyContent()
-        self.assertEqual('defaultView', getObjectDefaultView(context))
+        self.assertEqual("defaultView", getObjectDefaultView(context))
 
     def test_browserviewdefault(self):
-        context = DummyContent(defaultView='@@defaultView')
-        self.assertEqual('defaultView', getObjectDefaultView(context))
+        context = DummyContent(defaultView="@@defaultView")
+        self.assertEqual("defaultView", getObjectDefaultView(context))
 
     def test_not_IBrowserDefault_methodid(self):
-        context = DummyNotBrowserDefault(
-            'testtype', 'string:${object_url}/view')
-        self.assertEqual('defaultView', getObjectDefaultView(context))
+        context = DummyNotBrowserDefault("testtype", "string:${object_url}/view")
+        self.assertEqual("defaultView", getObjectDefaultView(context))
 
     def test_not_IBrowserDefault_default_method(self):
-        context = DummyNotBrowserDefault('testtype', 'string:${object_url}/')
-        self.assertEqual('defaultView', getObjectDefaultView(context))
+        context = DummyNotBrowserDefault("testtype", "string:${object_url}/")
+        self.assertEqual("defaultView", getObjectDefaultView(context))
 
     def test_not_IBrowserDefault_actiononly(self):
-        context = DummyNotBrowserDefault(
-            'testtype', 'string:${object_url}/defaultView')
-        self.assertEqual('defaultView', getObjectDefaultView(context))
+        context = DummyNotBrowserDefault("testtype", "string:${object_url}/defaultView")
+        self.assertEqual("defaultView", getObjectDefaultView(context))

@@ -61,17 +61,24 @@ class BaseCaching(object):
         is a string to add as a Vary header value in the response.
     """
 
-    title = _(u'Generic caching')
+    title = _(u"Generic caching")
     description = _(
-        u'Through this operation, all standard caching functions '
-        u'can be performed via various combinations of the optional '
-        u'parameter settings. For most cases, it\'s probably easier '
-        u'to use one of the other simpler operations (Strong caching, '
-        u'Moderate caching, Weak caching, or No caching).'
+        u"Through this operation, all standard caching functions "
+        u"can be performed via various combinations of the optional "
+        u"parameter settings. For most cases, it's probably easier "
+        u"to use one of the other simpler operations (Strong caching, "
+        u"Moderate caching, Weak caching, or No caching)."
     )
-    prefix = 'plone.app.caching.baseCaching'
-    options = ('maxage', 'smaxage', 'etags', 'lastModified',
-               'ramCache', 'vary', 'anonOnly')
+    prefix = "plone.app.caching.baseCaching"
+    options = (
+        "maxage",
+        "smaxage",
+        "etags",
+        "lastModified",
+        "ramCache",
+        "vary",
+        "anonOnly",
+    )
 
     # Default option values
     maxage = smaxage = etags = vary = None
@@ -84,26 +91,27 @@ class BaseCaching(object):
     def interceptResponse(self, rulename, response, class_=None):
         options = lookupOptions(class_ or self.__class__, rulename)
 
-        etags = options.get('etags') or self.etags
-        anonOnly = options.get('anonOnly', self.anonOnly)
-        ramCache = options.get('ramCache', self.ramCache)
-        lastModified = options.get('lastModified', self.lastModified)
+        etags = options.get("etags") or self.etags
+        anonOnly = options.get("anonOnly", self.anonOnly)
+        ramCache = options.get("ramCache", self.ramCache)
+        lastModified = options.get("lastModified", self.lastModified)
 
         # Add the ``anonymousOrRandom`` etag if we are anonymous only
         if anonOnly:
             if etags is None:
-                etags = ['anonymousOrRandom']
-            elif 'anonymousOrRandom' not in etags:
-                etags = tuple(etags) + ('anonymousOrRandom',)
+                etags = ["anonymousOrRandom"]
+            elif "anonymousOrRandom" not in etags:
+                etags = tuple(etags) + ("anonymousOrRandom",)
 
         etag = getETagAnnotation(self.published, self.request, keys=etags)
         lastModified = getLastModifiedAnnotation(
-            self.published, self.request, lastModified=lastModified)
+            self.published, self.request, lastModified=lastModified
+        )
 
         # Remove Range from request if the If-Range condition is not fulfilled
-        if_range = self.request.environ.get('HTTP_IF_RANGE', '').strip('"')
+        if_range = self.request.environ.get("HTTP_IF_RANGE", "").strip('"')
         if if_range:
-            if 'HTTP_RANGE' in self.request.environ:
+            if "HTTP_RANGE" in self.request.environ:
                 if_range_dt = parseDateTime(if_range)
                 delta_sec = datetime.timedelta(seconds=1)
                 if if_range_dt and (lastModified - if_range_dt) < delta_sec:
@@ -111,9 +119,9 @@ class BaseCaching(object):
                 elif if_range == etag:
                     pass
                 else:
-                    del self.request.environ['HTTP_RANGE']
+                    del self.request.environ["HTTP_RANGE"]
             # If-Range check is done here so we could remove it from the request
-            del self.request.environ['HTTP_IF_RANGE']
+            del self.request.environ["HTTP_IF_RANGE"]
 
         # Check for cache stop request variables
         if cacheStop(self.request, rulename):
@@ -133,17 +141,16 @@ class BaseCaching(object):
         if ramCache:
             context = getContext(self.published)
             portal_state = getMultiAdapter(
-                (context, self.request), name=u'plone_portal_state')
+                (context, self.request), name=u"plone_portal_state"
+            )
 
             if portal_state.anonymous():
                 cached = fetchFromRAMCache(
-                    self.request, etag=etag, lastModified=lastModified)
+                    self.request, etag=etag, lastModified=lastModified
+                )
                 if cached is not None:
                     return cachedResponse(
-                        self.published,
-                        self.request,
-                        response,
-                        *cached
+                        self.published, self.request, response, *cached
                     )
 
         return None
@@ -151,30 +158,31 @@ class BaseCaching(object):
     def modifyResponse(self, rulename, response, class_=None):
         options = lookupOptions(class_ or self.__class__, rulename)
 
-        maxage = options.get('maxage', self.maxage)
-        smaxage = options.get('smaxage', self.smaxage)
-        etags = options.get('etags') or self.etags
+        maxage = options.get("maxage", self.maxage)
+        smaxage = options.get("smaxage", self.smaxage)
+        etags = options.get("etags") or self.etags
 
-        anonOnly = options.get('anonOnly', self.anonOnly)
-        ramCache = options.get('ramCache', self.ramCache)
-        vary = options.get('vary', self.vary)
+        anonOnly = options.get("anonOnly", self.anonOnly)
+        ramCache = options.get("ramCache", self.ramCache)
+        vary = options.get("vary", self.vary)
 
         # Add the ``anonymousOrRandom`` etag if we are anonymous only
         if anonOnly:
             if etags is None:
-                etags = ['anonymousOrRandom']
-            elif 'anonymousOrRandom' not in etags:
-                etags = tuple(etags) + ('anonymousOrRandom',)
+                etags = ["anonymousOrRandom"]
+            elif "anonymousOrRandom" not in etags:
+                etags = tuple(etags) + ("anonymousOrRandom",)
 
         etag = getETagAnnotation(self.published, self.request, etags)
         lastModified = getLastModifiedAnnotation(
-            self.published, self.request, options['lastModified'])
+            self.published, self.request, options["lastModified"]
+        )
 
         # Check for cache stop request variables
         if cacheStop(self.request, rulename):
             # only stop with etags if configured
             if etags:
-                etag = '{0}{1}'.format(time.time(), random.randint(0, 1000))
+                etag = "{0}{1}".format(time.time(), random.randint(0, 1000))
                 return setCacheHeaders(
                     self.published,
                     self.request,
@@ -193,18 +201,17 @@ class BaseCaching(object):
         if ramCache or proxyCache:
             if etags is not None:
                 if (
-                    'userid' in etags or
-                    'anonymousOrRandom' in etags or
-                    'roles' in etags
-
+                    "userid" in etags
+                    or "anonymousOrRandom" in etags
+                    or "roles" in etags
                 ):
                     context = getContext(self.published)
                     portal_state = getMultiAdapter(
                         (context, self.request),
-                        name=u'plone_portal_state',
+                        name=u"plone_portal_state",
                     )
                     public = portal_state.anonymous()
-            public = public and visibleToRole(self.published, role='Anonymous')
+            public = public and visibleToRole(self.published, role="Anonymous")
 
         if proxyCache and not public:
             # This is private so keep it out of both shared and browser caches
@@ -222,8 +229,13 @@ class BaseCaching(object):
         )
 
         if ramCache and public:
-            cacheInRAM(self.published, self.request, response,
-                       etag=etag, lastModified=lastModified)
+            cacheInRAM(
+                self.published,
+                self.request,
+                response,
+                etag=etag,
+                lastModified=lastModified,
+            )
 
 
 @provider(ICachingOperationType)
@@ -232,21 +244,21 @@ class WeakCaching(BaseCaching):
     operation to help make the UI approachable by mortals
     """
 
-    title = _(u'Weak caching')
+    title = _(u"Weak caching")
     description = _(
-        u'Cache in browser but expire immediately and enable 304 '
-        u'responses on subsequent requests. 304\'s require configuration '
-        u'of the \'Last-modified\' and/or \'ETags\' settings. If '
-        u'Last-Modified  header is insufficient to ensure freshness, turn on '
-        u'ETag checking by listing each ETag components that should be used '
-        u'to construct the ETag header. To also cache public responses in '
-        u'Zope memory, set \'RAM cache\' to True.'
+        u"Cache in browser but expire immediately and enable 304 "
+        u"responses on subsequent requests. 304's require configuration "
+        u"of the 'Last-modified' and/or 'ETags' settings. If "
+        u"Last-Modified  header is insufficient to ensure freshness, turn on "
+        u"ETag checking by listing each ETag components that should be used "
+        u"to construct the ETag header. To also cache public responses in "
+        u"Zope memory, set 'RAM cache' to True."
     )
-    prefix = 'plone.app.caching.weakCaching'
+    prefix = "plone.app.caching.weakCaching"
     sort = 3
 
     # Configurable options
-    options = ('etags', 'lastModified', 'ramCache', 'vary', 'anonOnly')
+    options = ("etags", "lastModified", "ramCache", "vary", "anonOnly")
 
     # Default option values
     maxage = 0
@@ -260,20 +272,20 @@ class ModerateCaching(BaseCaching):
     operation to help make the UI approachable by mortals
     """
 
-    title = _(u'Moderate caching')
+    title = _(u"Moderate caching")
     description = _(
-        u'Cache in browser but expire immediately (same as \'weak caching\'), '
-        u'and cache in proxy (default: 24 hrs). '
-        u'Use a purgable caching reverse proxy for best results. '
-        u'Caution: If proxy cannot be purged, or cannot be configured '
-        u'to remove the \'s-maxage\' token from the response, then stale '
-        u'responses might be seen until the cached entry expires.')
-    prefix = 'plone.app.caching.moderateCaching'
+        u"Cache in browser but expire immediately (same as 'weak caching'), "
+        u"and cache in proxy (default: 24 hrs). "
+        u"Use a purgable caching reverse proxy for best results. "
+        u"Caution: If proxy cannot be purged, or cannot be configured "
+        u"to remove the 's-maxage' token from the response, then stale "
+        u"responses might be seen until the cached entry expires."
+    )
+    prefix = "plone.app.caching.moderateCaching"
     sort = 2
 
     # Configurable options
-    options = ('smaxage', 'etags', 'lastModified',
-               'ramCache', 'vary', 'anonOnly')
+    options = ("smaxage", "etags", "lastModified", "ramCache", "vary", "anonOnly")
 
     # Default option values
     maxage = 0
@@ -288,19 +300,26 @@ class StrongCaching(BaseCaching):
     operation to help make the UI approachable by mortals
     """
 
-    title = _(u'Strong caching')
+    title = _(u"Strong caching")
     description = _(
-        u'Cache in browser and proxy (default: 24 hrs). '
-        u'Caution: Only use for stable resources '
-        u'that never change without changing their URL, or resources '
-        u'for which temporary staleness is not critical.'
+        u"Cache in browser and proxy (default: 24 hrs). "
+        u"Caution: Only use for stable resources "
+        u"that never change without changing their URL, or resources "
+        u"for which temporary staleness is not critical."
     )
-    prefix = 'plone.app.caching.strongCaching'
+    prefix = "plone.app.caching.strongCaching"
     sort = 1
 
     # Configurable options
-    options = ('maxage', 'smaxage', 'etags', 'lastModified',
-               'ramCache', 'vary', 'anonOnly')
+    options = (
+        "maxage",
+        "smaxage",
+        "etags",
+        "lastModified",
+        "ramCache",
+        "vary",
+        "anonOnly",
+    )
 
     # Default option values
     maxage = 86400
@@ -316,10 +335,9 @@ class NoCaching(object):
     out of all caches.
     """
 
-    title = _(u'No caching')
-    description = _(u'Use this operation to keep the response '
-                    u'out of all caches.')
-    prefix = 'plone.app.caching.noCaching'
+    title = _(u"No caching")
+    description = _(u"Use this operation to keep the response " u"out of all caches.")
+    prefix = "plone.app.caching.noCaching"
     sort = 4
     options = ()
 

@@ -22,8 +22,8 @@ class TestOperationDefault(unittest.TestCase):
     layer = PLONE_APP_CACHING_FUNCTIONAL_TESTING
 
     def setUp(self):
-        self.app = self.layer['app']
-        self.portal = self.layer['portal']
+        self.app = self.layer["app"]
+        self.portal = self.layer["portal"]
 
         setRequest(self.portal.REQUEST)
 
@@ -41,43 +41,52 @@ class TestOperationDefault(unittest.TestCase):
         if its been configured to use etags
         """
         # Add folder content
-        setRoles(self.portal, TEST_USER_ID, ('Manager',))
-        self.portal.invokeFactory('Folder', 'f1')
-        self.portal['f1'].title = u'Folder one'
-        self.portal['f1'].description = u'Folder one description'
-        self.portal['f1'].reindexObject()
+        setRoles(self.portal, TEST_USER_ID, ("Manager",))
+        self.portal.invokeFactory("Folder", "f1")
+        self.portal["f1"].title = u"Folder one"
+        self.portal["f1"].description = u"Folder one description"
+        self.portal["f1"].reindexObject()
 
         self.cacheSettings.operationMapping = {
-            'plone.content.itemView': 'plone.app.caching.weakCaching'}
-        self.registry['plone.app.caching.weakCaching.lastModified'] = True
-        self.registry['plone.app.caching.weakCaching.etags'] = None
+            "plone.content.itemView": "plone.app.caching.weakCaching"
+        }
+        self.registry["plone.app.caching.weakCaching.lastModified"] = True
+        self.registry["plone.app.caching.weakCaching.etags"] = None
 
         import transaction
+
         transaction.commit()
 
         # log in and create a content type
         browser = Browser(self.app)
         browser.addHeader(
-            'Authorization',
-            'Basic {0}:{1}'.format(TEST_USER_NAME, TEST_USER_PASSWORD, ),
+            "Authorization",
+            "Basic {0}:{1}".format(
+                TEST_USER_NAME,
+                TEST_USER_PASSWORD,
+            ),
         )
-        browser.open('{0}/++add++Document'.format(
-            self.portal['f1'].absolute_url()),)
+        browser.open(
+            "{0}/++add++Document".format(self.portal["f1"].absolute_url()),
+        )
         browser.getControl(
-            name='form.widgets.IDublinCore.title').value = 'dummy content'
-        browser.getControl('Save').click()
-        self.assertNotIn('Etag', browser.headers)
+            name="form.widgets.IDublinCore.title"
+        ).value = "dummy content"
+        browser.getControl("Save").click()
+        self.assertNotIn("Etag", browser.headers)
 
         # now set up etags and make sure that a header is added
-        self.registry['plone.app.caching.weakCaching.etags'] = (
-            'lastModified',
-        )
+        self.registry["plone.app.caching.weakCaching.etags"] = ("lastModified",)
         import transaction
+
         transaction.commit()
-        browser.open('{0}/dummy-content/edit?_authenticator={1}'.format(
-            self.portal['f1'].absolute_url(),
-            getToken(TEST_USER_NAME)))
+        browser.open(
+            "{0}/dummy-content/edit?_authenticator={1}".format(
+                self.portal["f1"].absolute_url(), getToken(TEST_USER_NAME)
+            )
+        )
         browser.getControl(
-            name='form.widgets.IDublinCore.title').value = 'dummy content'
-        browser.getControl('Save').click()
-        self.assertIn('Etag', browser.headers)
+            name="form.widgets.IDublinCore.title"
+        ).value = "dummy content"
+        browser.getControl("Save").click()
+        self.assertIn("Etag", browser.headers)

@@ -7,7 +7,7 @@ from zope.interface import implementer
 from zope.interface import Interface
 
 
-GLOBAL_KEY = 'plone.app.caching.operations.ramcache'
+GLOBAL_KEY = "plone.app.caching.operations.ramcache"
 
 
 @implementer(ITransform)
@@ -28,21 +28,20 @@ class Store(object):
 
     def transformUnicode(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
-            storeResponseInRAMCache(self.request, self.request.response,
-                                    result.encode(encoding))
+            storeResponseInRAMCache(
+                self.request, self.request.response, result.encode(encoding)
+            )
         return None
 
     def transformBytes(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
-            storeResponseInRAMCache(self.request, self.request.response,
-                                    result)
+            storeResponseInRAMCache(self.request, self.request.response, result)
         return None
 
     def transformIterable(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
-            result = b''.join(result)
-            storeResponseInRAMCache(self.request, self.request.response,
-                                    result)
+            result = b"".join(result)
+            storeResponseInRAMCache(self.request, self.request.response, result)
             # as we have iterated the iterable, we must return a new one
             return iter([result])
         return None

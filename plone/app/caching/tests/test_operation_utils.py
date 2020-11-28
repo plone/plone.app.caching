@@ -27,7 +27,6 @@ import wsgiref.handlers
 
 
 class DummyPublished(object):
-
     def __init__(self, parent=None):
         self.__parent__ = parent
 
@@ -35,8 +34,8 @@ class DummyPublished(object):
 def normalize_response_cache(value):
     # Zope < 2.13 incorrectly includes the HTTP status as a header;
     # Zope 2.13 does not
-    if isinstance(value, tuple) and 'status' in value[1]:
-        del value[1]['status']
+    if isinstance(value, tuple) and "status" in value[1]:
+        del value[1]["status"]
     return value
 
 
@@ -53,7 +52,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
     def test_doNotCache(self):
         from plone.app.caching.operations.utils import doNotCache
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
@@ -63,35 +62,37 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         doNotCache(published, request, response)
 
         self.assertEqual(200, response.getStatus())
-        self.assertEqual('max-age=0, must-revalidate, private',
-                         response.getHeader('Cache-Control'))
-        self.assertIsNone(response.getHeader('Last-Modified'))
+        self.assertEqual(
+            "max-age=0, must-revalidate, private", response.getHeader("Cache-Control")
+        )
+        self.assertIsNone(response.getHeader("Last-Modified"))
 
-        expires = dateutil.parser.parse(response.getHeader('Expires'))
+        expires = dateutil.parser.parse(response.getHeader("Expires"))
         self.assertGreater(now, expires)
 
     def test_doNotCache_deletes_last_modified(self):
         from plone.app.caching.operations.utils import doNotCache
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
         response.setHeader(
-            'Last-Modified',
+            "Last-Modified",
             wsgiref.handlers.format_date_time(time.mktime(now.timetuple())),
         )
 
         doNotCache(published, request, response)
 
         self.assertEqual(200, response.getStatus())
-        self.assertEqual('max-age=0, must-revalidate, private',
-                         response.getHeader('Cache-Control'))
-        self.assertIsNone(response.getHeader('Last-Modified'))
+        self.assertEqual(
+            "max-age=0, must-revalidate, private", response.getHeader("Cache-Control")
+        )
+        self.assertIsNone(response.getHeader("Last-Modified"))
 
-        expires = dateutil.parser.parse(response.getHeader('Expires'))
+        expires = dateutil.parser.parse(response.getHeader("Expires"))
         self.assertGreater(now, expires)
 
     # cacheInBrowser()
@@ -99,7 +100,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
     def test_cacheInBrowser_no_etag_no_last_modified(self):
         from plone.app.caching.operations.utils import cacheInBrowser
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
@@ -109,83 +110,84 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInBrowser(published, request, response)
 
         self.assertEqual(200, response.getStatus())
-        self.assertEqual('max-age=0, must-revalidate, private',
-                         response.getHeader('Cache-Control'))
-        self.assertIsNone(response.getHeader('Last-Modified'))
-        self.assertIsNone(response.getHeader('ETag', literal=1))
+        self.assertEqual(
+            "max-age=0, must-revalidate, private", response.getHeader("Cache-Control")
+        )
+        self.assertIsNone(response.getHeader("Last-Modified"))
+        self.assertIsNone(response.getHeader("ETag", literal=1))
 
-        expires = dateutil.parser.parse(response.getHeader('Expires'))
+        expires = dateutil.parser.parse(response.getHeader("Expires"))
         self.assertGreater(now, expires)
 
     def test_cacheInBrowser_etag(self):
         from plone.app.caching.operations.utils import cacheInBrowser
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        etag = '|foo|bar|'
+        etag = "|foo|bar|"
 
         cacheInBrowser(published, request, response, etag=etag)
 
         self.assertEqual(200, response.getStatus())
-        self.assertEqual('max-age=0, must-revalidate, private',
-                         response.getHeader('Cache-Control'))
-        self.assertIsNone(response.getHeader('Last-Modified'))
-        self.assertEqual('"|foo|bar|"', response.getHeader('ETag', literal=1))
+        self.assertEqual(
+            "max-age=0, must-revalidate, private", response.getHeader("Cache-Control")
+        )
+        self.assertIsNone(response.getHeader("Last-Modified"))
+        self.assertEqual('"|foo|bar|"', response.getHeader("ETag", literal=1))
 
-        expires = dateutil.parser.parse(response.getHeader('Expires'))
+        expires = dateutil.parser.parse(response.getHeader("Expires"))
         self.assertGreater(now, expires)
 
     def test_cacheInBrowser_lastModified(self):
         from plone.app.caching.operations.utils import cacheInBrowser
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        nowFormatted = wsgiref.handlers.format_date_time(
-            time.mktime(now.timetuple()))
+        nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
 
         cacheInBrowser(published, request, response, lastModified=now)
 
         self.assertEqual(200, response.getStatus())
-        self.assertEqual('max-age=0, must-revalidate, private',
-                         response.getHeader('Cache-Control'))
-        self.assertEqual(nowFormatted, response.getHeader('Last-Modified'))
-        self.assertIsNone(response.getHeader('ETag', literal=1))
+        self.assertEqual(
+            "max-age=0, must-revalidate, private", response.getHeader("Cache-Control")
+        )
+        self.assertEqual(nowFormatted, response.getHeader("Last-Modified"))
+        self.assertIsNone(response.getHeader("ETag", literal=1))
 
-        expires = dateutil.parser.parse(response.getHeader('Expires'))
+        expires = dateutil.parser.parse(response.getHeader("Expires"))
         self.assertGreater(now, expires)
 
     def test_cacheInBrowser_lastModified_and_etag(self):
         from plone.app.caching.operations.utils import cacheInBrowser
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        etag = '|foo|bar|'
+        etag = "|foo|bar|"
 
-        nowFormatted = wsgiref.handlers.format_date_time(
-            time.mktime(now.timetuple()))
+        nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
 
-        cacheInBrowser(published, request, response,
-                       etag=etag, lastModified=now)
+        cacheInBrowser(published, request, response, etag=etag, lastModified=now)
 
         self.assertEqual(200, response.getStatus())
-        self.assertEqual('max-age=0, must-revalidate, private',
-                         response.getHeader('Cache-Control'))
-        self.assertEqual(nowFormatted, response.getHeader('Last-Modified'))
-        self.assertEqual('"|foo|bar|"', response.getHeader('ETag', literal=1))
+        self.assertEqual(
+            "max-age=0, must-revalidate, private", response.getHeader("Cache-Control")
+        )
+        self.assertEqual(nowFormatted, response.getHeader("Last-Modified"))
+        self.assertEqual('"|foo|bar|"', response.getHeader("ETag", literal=1))
 
-        expires = dateutil.parser.parse(response.getHeader('Expires'))
+        expires = dateutil.parser.parse(response.getHeader("Expires"))
         self.assertGreater(now, expires)
 
     # cacheInProxy()
@@ -193,7 +195,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
     def test_cacheInProxy_minimal(self):
         from plone.app.caching.operations.utils import cacheInProxy
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
@@ -203,41 +205,51 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInProxy(published, request, response, smaxage=60)
 
         self.assertEqual(200, response.getStatus())
-        self.assertEqual('max-age=0, s-maxage=60, must-revalidate',
-                         response.getHeader('Cache-Control'))
-        self.assertIsNone(response.getHeader('Last-Modified'))
-        self.assertIsNone(response.getHeader('ETag', literal=1))
-        self.assertIsNone(response.getHeader('Vary'))
+        self.assertEqual(
+            "max-age=0, s-maxage=60, must-revalidate",
+            response.getHeader("Cache-Control"),
+        )
+        self.assertIsNone(response.getHeader("Last-Modified"))
+        self.assertIsNone(response.getHeader("ETag", literal=1))
+        self.assertIsNone(response.getHeader("Vary"))
 
-        expires = dateutil.parser.parse(response.getHeader('Expires'))
+        expires = dateutil.parser.parse(response.getHeader("Expires"))
         self.assertGreater(now, expires)
 
     def test_cacheInProxy_full(self):
         from plone.app.caching.operations.utils import cacheInProxy
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        etag = '|foo|bar|'
-        vary = 'Accept-Language'
+        etag = "|foo|bar|"
+        vary = "Accept-Language"
 
-        nowFormatted = wsgiref.handlers.format_date_time(
-            time.mktime(now.timetuple()))
+        nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
 
-        cacheInProxy(published, request, response, smaxage=60,
-                     etag=etag, lastModified=now, vary=vary)
+        cacheInProxy(
+            published,
+            request,
+            response,
+            smaxage=60,
+            etag=etag,
+            lastModified=now,
+            vary=vary,
+        )
 
         self.assertEqual(200, response.getStatus())
-        self.assertEqual('max-age=0, s-maxage=60, must-revalidate',
-                         response.getHeader('Cache-Control'))
-        self.assertEqual(nowFormatted, response.getHeader('Last-Modified'))
-        self.assertEqual('"|foo|bar|"', response.getHeader('ETag', literal=1))
-        self.assertEqual('Accept-Language', response.getHeader('Vary'))
+        self.assertEqual(
+            "max-age=0, s-maxage=60, must-revalidate",
+            response.getHeader("Cache-Control"),
+        )
+        self.assertEqual(nowFormatted, response.getHeader("Last-Modified"))
+        self.assertEqual('"|foo|bar|"', response.getHeader("ETag", literal=1))
+        self.assertEqual("Accept-Language", response.getHeader("Vary"))
 
-        expires = dateutil.parser.parse(response.getHeader('Expires'))
+        expires = dateutil.parser.parse(response.getHeader("Expires"))
         self.assertGreater(now, expires)
 
     # cacheInBrowserAndProxy()
@@ -245,7 +257,7 @@ class ResponseModificationHelpersTest(unittest.TestCase):
     def test_cacheInBrowserAndProxy_minimal(self):
         from plone.app.caching.operations.utils import cacheInBrowserAndProxy
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
@@ -255,30 +267,30 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         cacheInBrowserAndProxy(published, request, response, maxage=60)
 
         self.assertEqual(200, response.getStatus())
-        self.assertEqual('max-age=60, proxy-revalidate, public',
-                         response.getHeader('Cache-Control'))
-        self.assertIsNone(response.getHeader('Last-Modified'))
-        self.assertIsNone(response.getHeader('ETag', literal=1))
-        self.assertIsNone(response.getHeader('Vary'))
+        self.assertEqual(
+            "max-age=60, proxy-revalidate, public", response.getHeader("Cache-Control")
+        )
+        self.assertIsNone(response.getHeader("Last-Modified"))
+        self.assertIsNone(response.getHeader("ETag", literal=1))
+        self.assertIsNone(response.getHeader("Vary"))
 
-        timedelta = dateutil.parser.parse(response.getHeader('Expires')) - now
+        timedelta = dateutil.parser.parse(response.getHeader("Expires")) - now
         self.assertGreaterEqual(timedelta, datetime.timedelta(seconds=59))
         self.assertLessEqual(timedelta, datetime.timedelta(seconds=60))
 
     def test_cacheInBrowserAndProxy_full(self):
         from plone.app.caching.operations.utils import cacheInBrowserAndProxy
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        etag = '|foo|bar|'
-        vary = 'Accept-Language'
+        etag = "|foo|bar|"
+        vary = "Accept-Language"
 
-        nowFormatted = wsgiref.handlers.format_date_time(
-            time.mktime(now.timetuple()))
+        nowFormatted = wsgiref.handlers.format_date_time(time.mktime(now.timetuple()))
 
         cacheInBrowserAndProxy(
             published,
@@ -291,22 +303,23 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         )
 
         self.assertEqual(200, response.getStatus())
-        self.assertEqual('max-age=60, proxy-revalidate, public',
-                         response.getHeader('Cache-Control'))
-        self.assertEqual(nowFormatted, response.getHeader('Last-Modified'))
-        self.assertEqual('"|foo|bar|"', response.getHeader('ETag', literal=1))
-        self.assertEqual('Accept-Language', response.getHeader('Vary'))
+        self.assertEqual(
+            "max-age=60, proxy-revalidate, public", response.getHeader("Cache-Control")
+        )
+        self.assertEqual(nowFormatted, response.getHeader("Last-Modified"))
+        self.assertEqual('"|foo|bar|"', response.getHeader("ETag", literal=1))
+        self.assertEqual("Accept-Language", response.getHeader("Vary"))
 
-        timedelta = dateutil.parser.parse(response.getHeader('Expires')) - now
+        timedelta = dateutil.parser.parse(response.getHeader("Expires")) - now
         delta = datetime.timedelta(seconds=58)
         self.assertFalse(
             timedelta < delta,
-            '{0} is not < {1}'.format(timedelta, delta),
+            "{0} is not < {1}".format(timedelta, delta),
         )
         delta = datetime.timedelta(seconds=61)
         self.assertFalse(
             timedelta > delta,
-            '{0} is not > {1}'.format(timedelta, delta),
+            "{0} is not > {1}".format(timedelta, delta),
         )
 
     # cacheInRAM()
@@ -317,20 +330,21 @@ class ResponseModificationHelpersTest(unittest.TestCase):
 
         from plone.app.caching.interfaces import IRAMCached
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
-        request.environ['PATH_INFO'] = '/foo'
+        request.environ["PATH_INFO"] = "/foo"
 
         assert not IRAMCached.providedBy(response)
 
         cacheInRAM(published, request, response)
 
         annotations = IAnnotations(request)
-        self.assertEqual('http://example.com/foo?',
-                         annotations[PAGE_CACHE_ANNOTATION_KEY])
+        self.assertEqual(
+            "http://example.com/foo?", annotations[PAGE_CACHE_ANNOTATION_KEY]
+        )
         self.assertTrue(IRAMCached.providedBy(request))
 
     def test_cacheInRAM_etag(self):
@@ -339,21 +353,23 @@ class ResponseModificationHelpersTest(unittest.TestCase):
 
         from plone.app.caching.interfaces import IRAMCached
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
-        request.environ['PATH_INFO'] = '/foo'
-        etag = '|foo|bar|'
+        request.environ["PATH_INFO"] = "/foo"
+        etag = "|foo|bar|"
 
         assert not IRAMCached.providedBy(response)
 
         cacheInRAM(published, request, response, etag=etag)
 
         annotations = IAnnotations(request)
-        self.assertEqual('||foo|bar|||http://example.com/foo?',
-                         annotations[PAGE_CACHE_ANNOTATION_KEY])
+        self.assertEqual(
+            "||foo|bar|||http://example.com/foo?",
+            annotations[PAGE_CACHE_ANNOTATION_KEY],
+        )
         self.assertTrue(IRAMCached.providedBy(request))
 
     def test_cacheInRAM_etag_alternate_key(self):
@@ -361,22 +377,20 @@ class ResponseModificationHelpersTest(unittest.TestCase):
 
         from plone.app.caching.interfaces import IRAMCached
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
-        request.environ['PATH_INFO'] = '/foo'
-        etag = '|foo|bar|'
+        request.environ["PATH_INFO"] = "/foo"
+        etag = "|foo|bar|"
 
         assert not IRAMCached.providedBy(response)
 
-        cacheInRAM(published, request, response,
-                   etag=etag, annotationsKey='alt.key')
+        cacheInRAM(published, request, response, etag=etag, annotationsKey="alt.key")
 
         annotations = IAnnotations(request)
-        self.assertEqual('||foo|bar|||http://example.com/foo?',
-                         annotations['alt.key'])
+        self.assertEqual("||foo|bar|||http://example.com/foo?", annotations["alt.key"])
         self.assertTrue(IRAMCached.providedBy(request))
 
 
@@ -393,98 +407,95 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
     def test_cachedResponse(self):
         from plone.app.caching.operations.utils import cachedResponse
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
         headers = {
-            'X-Cache-Rule': 'foo',
-            'X-Foo': 'bar',
-            'ETag': '||blah||',
+            "X-Cache-Rule": "foo",
+            "X-Foo": "bar",
+            "ETag": "||blah||",
         }
 
-        response.setHeader('X-Foo', 'baz')
-        response.setHeader('X-Bar', 'qux')
+        response.setHeader("X-Foo", "baz")
+        response.setHeader("X-Bar", "qux")
         response.setStatus(200)
 
-        body = cachedResponse(published, request,
-                              response, 404, headers, u'body')
+        body = cachedResponse(published, request, response, 404, headers, u"body")
 
-        self.assertEqual(u'body', body)
+        self.assertEqual(u"body", body)
         self.assertEqual(404, response.getStatus())
-        self.assertEqual('foo', response.getHeader('X-Cache-Rule'))
-        self.assertEqual('bar', response.getHeader('X-Foo'))
-        self.assertEqual('qux', response.getHeader('X-Bar'))
-        self.assertEqual('||blah||', response.getHeader('ETag', literal=1))
+        self.assertEqual("foo", response.getHeader("X-Cache-Rule"))
+        self.assertEqual("bar", response.getHeader("X-Foo"))
+        self.assertEqual("qux", response.getHeader("X-Bar"))
+        self.assertEqual("||blah||", response.getHeader("ETag", literal=1))
 
     def test_cachedResponse_gzip_off(self):
         from plone.app.caching.operations.utils import cachedResponse
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
         headers = {
-            'X-Cache-Rule': 'foo',
-            'X-Foo': 'bar',
-            'ETag': '||blah||',
+            "X-Cache-Rule": "foo",
+            "X-Foo": "bar",
+            "ETag": "||blah||",
         }
 
-        response.setHeader('X-Foo', 'baz')
-        response.setHeader('X-Bar', 'qux')
+        response.setHeader("X-Foo", "baz")
+        response.setHeader("X-Bar", "qux")
         response.setStatus(200)
 
-        request.environ['HTTP_ACCEPT_ENCODING'] = 'gzip; deflate'
+        request.environ["HTTP_ACCEPT_ENCODING"] = "gzip; deflate"
         response.enableHTTPCompression(request)
 
         assert response.enableHTTPCompression(query=True)
 
-        body = cachedResponse(published, request, response,
-                              404, headers, u'body', 0)
+        body = cachedResponse(published, request, response, 404, headers, u"body", 0)
 
-        self.assertEqual(u'body', body)
+        self.assertEqual(u"body", body)
         self.assertEqual(404, response.getStatus())
-        self.assertEqual('foo', response.getHeader('X-Cache-Rule'))
-        self.assertEqual('bar', response.getHeader('X-Foo'))
-        self.assertEqual('qux', response.getHeader('X-Bar'))
-        self.assertEqual('||blah||', response.getHeader('ETag', literal=1))
+        self.assertEqual("foo", response.getHeader("X-Cache-Rule"))
+        self.assertEqual("bar", response.getHeader("X-Foo"))
+        self.assertEqual("qux", response.getHeader("X-Bar"))
+        self.assertEqual("||blah||", response.getHeader("ETag", literal=1))
 
         self.assertFalse(response.enableHTTPCompression(query=True))
 
     def test_cachedResponse_gzip_on(self):
         from plone.app.caching.operations.utils import cachedResponse
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
         headers = {
-            'X-Cache-Rule': 'foo',
-            'X-Foo': 'bar',
-            'ETag': '||blah||',
+            "X-Cache-Rule": "foo",
+            "X-Foo": "bar",
+            "ETag": "||blah||",
         }
 
-        response.setHeader('X-Foo', 'baz')
-        response.setHeader('X-Bar', 'qux')
+        response.setHeader("X-Foo", "baz")
+        response.setHeader("X-Bar", "qux")
         response.setStatus(200)
 
-        request.environ['HTTP_ACCEPT_ENCODING'] = 'gzip; deflate'
+        request.environ["HTTP_ACCEPT_ENCODING"] = "gzip; deflate"
         response.enableHTTPCompression(request, disable=True)
 
         assert not response.enableHTTPCompression(query=True)
 
-        body = cachedResponse(published, request, response,
-                              404, headers, u'body', 1)
+        body = cachedResponse(published, request, response, 404, headers, u"body", 1)
 
-        self.assertEqual(u'body', body)
+        self.assertEqual(u"body", body)
         self.assertEqual(404, response.getStatus())
-        self.assertEqual('foo', response.getHeader('X-Cache-Rule'))
-        self.assertEqual('bar', response.getHeader('X-Foo'))
-        self.assertEqual('qux', response.getHeader('X-Bar'))
-        self.assertEqual('||blah||', response.getHeader('ETag', literal=1))
+        self.assertEqual("foo", response.getHeader("X-Cache-Rule"))
+        self.assertEqual("bar", response.getHeader("X-Foo"))
+        self.assertEqual("qux", response.getHeader("X-Bar"))
+        self.assertEqual("||blah||", response.getHeader("ETag", literal=1))
 
         self.assertTrue(response.enableHTTPCompression(query=True))
 
@@ -493,7 +504,7 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
     def test_notModified_minimal(self):
         from plone.app.caching.operations.utils import notModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
@@ -502,13 +513,13 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
 
         body = notModified(published, request, response)
 
-        self.assertEqual('', body)
+        self.assertEqual("", body)
         self.assertEqual(304, response.getStatus())
 
     def test_notModified_full(self):
         from plone.app.caching.operations.utils import notModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
@@ -516,16 +527,15 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         response.setStatus(200)
 
         now = datetime.datetime.now(dateutil.tz.tzlocal())
-        etag = '|foo|bar|'
+        etag = "|foo|bar|"
 
-        body = notModified(published, request, response,
-                           etag=etag, lastModified=now)
+        body = notModified(published, request, response, etag=etag, lastModified=now)
 
-        self.assertEqual(u'', body)
-        self.assertEqual(etag, response.getHeader('ETag', literal=1))
-        self.assertIsNone(response.getHeader('Last-Modified'))
-        self.assertIsNone(response.getHeader('Expires'))
-        self.assertIsNone(response.getHeader('Cache-Control'))
+        self.assertEqual(u"", body)
+        self.assertEqual(etag, response.getHeader("ETag", literal=1))
+        self.assertIsNone(response.getHeader("Last-Modified"))
+        self.assertIsNone(response.getHeader("Expires"))
+        self.assertIsNone(response.getHeader("Cache-Control"))
         self.assertEqual(304, response.getStatus())
 
 
@@ -542,7 +552,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
     def test_isModified_no_headers_no_keys(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
@@ -551,166 +561,156 @@ class CacheCheckHelpersTest(unittest.TestCase):
     def test_isModified_no_headers_with_keys(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        etag = '|foo'
-        lastModified = datetime.datetime(
-            2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        etag = "|foo"
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertTrue(isModified(
-            request, etag=etag, lastModified=lastModified))
+        self.assertTrue(isModified(request, etag=etag, lastModified=lastModified))
 
     def test_isModified_ims_invalid_date(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_MODIFIED_SINCE'] = 'blah'
+        request.environ["HTTP_IF_MODIFIED_SINCE"] = "blah"
 
-        lastModified = datetime.datetime(
-            2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
         self.assertTrue(isModified(request, lastModified=lastModified))
 
     def test_isModified_ims_modified(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ[
-            'HTTP_IF_MODIFIED_SINCE'] = 'Tue, 24 Nov 2009 03:04:05 GMT'
+        request.environ["HTTP_IF_MODIFIED_SINCE"] = "Tue, 24 Nov 2009 03:04:05 GMT"
 
-        lastModified = datetime.datetime(
-            2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
         self.assertTrue(isModified(request, lastModified=lastModified))
 
     def test_isModified_ims_not_modified(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ[
-            'HTTP_IF_MODIFIED_SINCE'] = 'Thu, 24 Nov 2011 03:04:05 GMT'
+        request.environ["HTTP_IF_MODIFIED_SINCE"] = "Thu, 24 Nov 2011 03:04:05 GMT"
 
-        lastModified = datetime.datetime(
-            2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
         self.assertFalse(isModified(request, lastModified=lastModified))
 
     def test_isModified_ims_not_modified_two_dates(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_MODIFIED_SINCE'] = \
-            'Thu, 24 Nov 2011 03:04:05 GMT; Thu, 24 Nov 2011 03:04:05'
+        request.environ[
+            "HTTP_IF_MODIFIED_SINCE"
+        ] = "Thu, 24 Nov 2011 03:04:05 GMT; Thu, 24 Nov 2011 03:04:05"
 
-        lastModified = datetime.datetime(
-            2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
         self.assertFalse(isModified(request, lastModified=lastModified))
 
     def test_isModified_ims_not_modified_etag_no_inm_header(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ[
-            'HTTP_IF_MODIFIED_SINCE'] = 'Thu, 24 Nov 2011 03:04:05 GMT'
+        request.environ["HTTP_IF_MODIFIED_SINCE"] = "Thu, 24 Nov 2011 03:04:05 GMT"
 
-        etag = '|foo'
-        lastModified = datetime.datetime(
-            2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        etag = "|foo"
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertTrue(isModified(
-            request, etag=etag, lastModified=lastModified))
+        self.assertTrue(isModified(request, etag=etag, lastModified=lastModified))
 
     def test_isModified_inm_no_tags(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        etag = '|foo'
+        etag = "|foo"
 
         self.assertTrue(isModified(request, etag=etag))
 
     def test_isModified_inm_one_tag_no_match(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_NONE_MATCH'] = '"|bar"'
+        request.environ["HTTP_IF_NONE_MATCH"] = '"|bar"'
 
-        etag = '|foo'
+        etag = "|foo"
 
         self.assertTrue(isModified(request, etag=etag))
 
     def test_isModified_inm_multiple_tags_no_match(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_NONE_MATCH'] = '"|bar", W/"|baz"'
+        request.environ["HTTP_IF_NONE_MATCH"] = '"|bar", W/"|baz"'
 
-        etag = '|foo'
+        etag = "|foo"
 
         self.assertTrue(isModified(request, etag=etag))
 
     def test_isModified_inm_invalid_tag(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_NONE_MATCH'] = '"'
+        request.environ["HTTP_IF_NONE_MATCH"] = '"'
 
-        etag = '|foo'
+        etag = "|foo"
 
         self.assertTrue(isModified(request, etag=etag))
 
     def test_isModified_inm_star(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_NONE_MATCH'] = '"*", W/"|baz"'
+        request.environ["HTTP_IF_NONE_MATCH"] = '"*", W/"|baz"'
 
-        etag = '|foo'
+        etag = "|foo"
 
         self.assertFalse(isModified(request, etag=etag))
 
     def test_isModified_inm_match_single(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_NONE_MATCH'] = '"|foo"'
+        request.environ["HTTP_IF_NONE_MATCH"] = '"|foo"'
 
-        etag = '|foo'
+        etag = "|foo"
 
         self.assertFalse(isModified(request, etag=etag))
 
@@ -727,115 +727,120 @@ class CacheCheckHelpersTest(unittest.TestCase):
         """
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
         # at some point the code added dummy timestamps to this header
-        request.environ['HTTP_IF_NONE_MATCH'] = '"1232342354.65"'
+        request.environ["HTTP_IF_NONE_MATCH"] = '"1232342354.65"'
 
         etag = None
 
-        self.assertTrue(isModified(
-            request,
-            etag=etag,
-            lastModified='doesnt_really_matter'),
+        self.assertTrue(
+            isModified(request, etag=etag, lastModified="doesnt_really_matter"),
         )
 
     def test_isModified_inm_match_multiple(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_NONE_MATCH'] = '"|foo", "|bar"'
+        request.environ["HTTP_IF_NONE_MATCH"] = '"|foo", "|bar"'
 
-        etag = '|foo'
+        etag = "|foo"
 
         self.assertFalse(isModified(request, etag=etag))
 
     def test_isModified_inm_match_weak(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_NONE_MATCH'] = 'W/"|foo"'
+        request.environ["HTTP_IF_NONE_MATCH"] = 'W/"|foo"'
 
-        etag = '|foo'
+        etag = "|foo"
 
         self.assertFalse(isModified(request, etag=etag))
 
     def test_isModified_inm_match_ignores_ims_if_no_last_modified_date(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_NONE_MATCH'] = '"|foo"'
-        request.environ[
-            'HTTP_IF_MODIFIED_SINCE'] = 'Tue, 24 Nov 2009 03:04:05 GMT'
+        request.environ["HTTP_IF_NONE_MATCH"] = '"|foo"'
+        request.environ["HTTP_IF_MODIFIED_SINCE"] = "Tue, 24 Nov 2009 03:04:05 GMT"
 
-        etag = '|foo'
+        etag = "|foo"
 
         self.assertFalse(isModified(request, etag=etag))
 
     def test_isModified_inm_match_modified(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_NONE_MATCH'] = '"|foo"'
-        request.environ[
-            'HTTP_IF_MODIFIED_SINCE'] = 'Tue, 24 Nov 2009 03:04:05 GMT'
+        request.environ["HTTP_IF_NONE_MATCH"] = '"|foo"'
+        request.environ["HTTP_IF_MODIFIED_SINCE"] = "Tue, 24 Nov 2009 03:04:05 GMT"
 
-        etag = '|foo'
-        lastModified = datetime.datetime(
-            2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        etag = "|foo"
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertTrue(isModified(
-            request, etag=etag, lastModified=lastModified))
+        self.assertTrue(isModified(request, etag=etag, lastModified=lastModified))
 
     def test_isModified_inm_match_not_modified(self):
         from plone.app.caching.operations.utils import isModified
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_IF_NONE_MATCH'] = '"|foo"'
-        request.environ[
-            'HTTP_IF_MODIFIED_SINCE'] = 'Thu, 24 Nov 2011 03:04:05 GMT'
+        request.environ["HTTP_IF_NONE_MATCH"] = '"|foo"'
+        request.environ["HTTP_IF_MODIFIED_SINCE"] = "Thu, 24 Nov 2011 03:04:05 GMT"
 
-        etag = '|foo'
-        lastModified = datetime.datetime(
-            2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
+        etag = "|foo"
+        lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
-        self.assertFalse(isModified(
-            request, etag=etag, lastModified=lastModified))
+        self.assertFalse(isModified(request, etag=etag, lastModified=lastModified))
 
     # visibleToRole()
 
     def test_visibleToRole_not_real(self):
         from plone.app.caching.operations.utils import visibleToRole
+
         published = DummyPublished()
-        self.assertFalse(visibleToRole(published, role='Anonymous'))
+        self.assertFalse(visibleToRole(published, role="Anonymous"))
 
     def test_visibleToRole_permission(self):
         from plone.app.caching.operations.utils import visibleToRole
 
         s = SimpleItem()
 
-        s.manage_permission('View', ('Member', 'Manager',))
-        self.assertFalse(visibleToRole(s, role='Anonymous'))
+        s.manage_permission(
+            "View",
+            (
+                "Member",
+                "Manager",
+            ),
+        )
+        self.assertFalse(visibleToRole(s, role="Anonymous"))
 
-        s.manage_permission('View', ('Member', 'Manager', 'Anonymous',))
-        self.assertTrue(visibleToRole(s, role='Anonymous'))
+        s.manage_permission(
+            "View",
+            (
+                "Member",
+                "Manager",
+                "Anonymous",
+            ),
+        )
+        self.assertTrue(visibleToRole(s, role="Anonymous"))
 
 
 class MiscHelpersTest(unittest.TestCase):
@@ -866,7 +871,6 @@ class MiscHelpersTest(unittest.TestCase):
 
         @implementer(IContentish)
         class Parent(object):
-
             def __init__(self, parent=None):
                 self.__parent__ = parent
 
@@ -891,7 +895,7 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.operations.utils import formatDateTime
 
         dt = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
-        self.assertEqual('Wed, 24 Nov 2010 03:04:05 GMT', formatDateTime(dt))
+        self.assertEqual("Wed, 24 Nov 2010 03:04:05 GMT", formatDateTime(dt))
 
     def test_formatDateTime_local(self):
         from plone.app.caching.operations.utils import formatDateTime
@@ -900,13 +904,12 @@ class MiscHelpersTest(unittest.TestCase):
         inGMT = formatDateTime(dt)
 
         # Who knows what your local timezone is :-)
-        self.assertTrue(inGMT.endswith(' GMT'))
-        self.assertIn('Nov 2010', inGMT)
+        self.assertTrue(inGMT.endswith(" GMT"))
+        self.assertIn("Nov 2010", inGMT)
 
         # We lose microseconds. Big whoop.
         p = dateutil.parser.parse(inGMT).astimezone(dateutil.tz.tzlocal())
-        lofi = datetime.datetime(
-            2010, 11, 24, 3, 4, 5, 0, dateutil.tz.tzlocal())
+        lofi = datetime.datetime(2010, 11, 24, 3, 4, 5, 0, dateutil.tz.tzlocal())
         self.assertEqual(p, lofi)
 
     def test_formatDateTime_naive(self):
@@ -916,20 +919,22 @@ class MiscHelpersTest(unittest.TestCase):
         inGMT = formatDateTime(dt)
 
         # Who knows what your local timezone is :-)
-        self.assertTrue(inGMT.endswith(' GMT'))
-        self.assertIn('Nov 2010', inGMT)
+        self.assertTrue(inGMT.endswith(" GMT"))
+        self.assertIn("Nov 2010", inGMT)
 
         # Can't compare offset aware and naive
         p = dateutil.parser.parse(inGMT).astimezone(dateutil.tz.tzlocal())
-        self.assertEqual((2010, 11, 24, 3, 4, 5),
-                         (p.year, p.month, p.day, p.hour, p.minute, p.second))
+        self.assertEqual(
+            (2010, 11, 24, 3, 4, 5),
+            (p.year, p.month, p.day, p.hour, p.minute, p.second),
+        )
 
     # parseDateTime()
 
     def test_parseDateTime_invalid(self):
         from plone.app.caching.operations.utils import parseDateTime
 
-        self.assertIsNone(parseDateTime('foo'))
+        self.assertIsNone(parseDateTime("foo"))
 
     def test_parseDateTime_rfc1123(self):
         from plone.app.caching.operations.utils import parseDateTime
@@ -941,8 +946,7 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.operations.utils import parseDateTime
 
         # parser will assume input was local time
-        dt = datetime.datetime(2010, 11, 23, 19, 4, 5,
-                               0, dateutil.tz.tzlocal())
+        dt = datetime.datetime(2010, 11, 23, 19, 4, 5, 0, dateutil.tz.tzlocal())
         self.assertEqual(dt, parseDateTime("'Tue, 23 Nov 2010 19:04:05'"))
 
     # getLastModified()
@@ -959,7 +963,6 @@ class MiscHelpersTest(unittest.TestCase):
         @implementer(ILastModified)
         @adapter(DummyPublished)
         class DummyLastModified(object):
-
             def __init__(self, context):
                 self.context = context
 
@@ -977,7 +980,6 @@ class MiscHelpersTest(unittest.TestCase):
         @implementer(ILastModified)
         @adapter(DummyPublished)
         class DummyLastModified(object):
-
             def __init__(self, context):
                 self.context = context
 
@@ -998,13 +1000,19 @@ class MiscHelpersTest(unittest.TestCase):
         @implementer(ILastModified)
         @adapter(DummyPublished)
         class DummyLastModified(object):
-
             def __init__(self, context):
                 self.context = context
 
             def __call__(self):
                 return datetime.datetime(
-                    2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc(),
+                    2010,
+                    11,
+                    24,
+                    3,
+                    4,
+                    5,
+                    6,
+                    dateutil.tz.tzutc(),
                 )
 
         provideAdapter(DummyLastModified)
@@ -1057,23 +1065,33 @@ class MiscHelpersTest(unittest.TestCase):
     def test_getETag_extra_only(self):
         from plone.app.caching.operations.utils import getETag
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
-        self.assertEqual('|foo|bar;baz', getETag(
-            published, request, extraTokens=('foo', 'bar,baz')))
+        self.assertEqual(
+            "|foo|bar;baz", getETag(published, request, extraTokens=("foo", "bar,baz"))
+        )
 
     def test_getETag_key_not_found(self):
         from plone.app.caching.operations.utils import getETag
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
-        self.assertIsNone(getETag(published, request, keys=('foo', 'bar',)))
+        self.assertIsNone(
+            getETag(
+                published,
+                request,
+                keys=(
+                    "foo",
+                    "bar",
+                ),
+            )
+        )
 
     def test_getETag_adapter_returns_none(self):
         from plone.app.caching.operations.utils import getETag
@@ -1082,20 +1100,18 @@ class MiscHelpersTest(unittest.TestCase):
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
         class FooETag(object):
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def __call__(self):
-                return 'foo'
+                return "foo"
 
-        provideAdapter(FooETag, name=u'foo')
+        provideAdapter(FooETag, name=u"foo")
 
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
         class BarETag(object):
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1103,15 +1119,24 @@ class MiscHelpersTest(unittest.TestCase):
             def __call__(self):
                 return None
 
-        provideAdapter(BarETag, name=u'bar')
+        provideAdapter(BarETag, name=u"bar")
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
-        self.assertEqual('|foo|', getETag(
-            published, request, keys=('foo', 'bar',)))
+        self.assertEqual(
+            "|foo|",
+            getETag(
+                published,
+                request,
+                keys=(
+                    "foo",
+                    "bar",
+                ),
+            ),
+        )
 
     def test_getETag_full(self):
         from plone.app.caching.operations.utils import getETag
@@ -1120,41 +1145,42 @@ class MiscHelpersTest(unittest.TestCase):
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
         class FooETag(object):
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def __call__(self):
-                return 'foo'
+                return "foo"
 
-        provideAdapter(FooETag, name=u'foo')
+        provideAdapter(FooETag, name=u"foo")
 
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
         class BarETag(object):
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def __call__(self):
-                return 'bar'
+                return "bar"
 
-        provideAdapter(BarETag, name=u'bar')
+        provideAdapter(BarETag, name=u"bar")
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished()
 
         self.assertEqual(
-            '|foo|bar|baz;qux',
+            "|foo|bar|baz;qux",
             getETag(
                 published,
                 request,
-                keys=('foo', 'bar',),
-                extraTokens=('baz,qux',),
+                keys=(
+                    "foo",
+                    "bar",
+                ),
+                extraTokens=("baz,qux",),
             ),
         )
 
@@ -1162,67 +1188,79 @@ class MiscHelpersTest(unittest.TestCase):
 
     def test_parseETags_empty(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual([], parseETags(''))
+
+        self.assertEqual([], parseETags(""))
 
     def test_parseETags_None(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual([], parseETags(''))
+
+        self.assertEqual([], parseETags(""))
 
     def test_parseETags_star(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['*'], parseETags('*'))
+
+        self.assertEqual(["*"], parseETags("*"))
 
     def test_parseETags_star_quoted(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['*'], parseETags('"*"'))
+
+        self.assertEqual(["*"], parseETags('"*"'))
 
     def test_parseETags_single(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['|foo|bar;baz'], parseETags('|foo|bar;baz'))
+
+        self.assertEqual(["|foo|bar;baz"], parseETags("|foo|bar;baz"))
 
     def test_parseETags_single_quoted(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['|foo|bar;baz'], parseETags('"|foo|bar;baz"'))
+
+        self.assertEqual(["|foo|bar;baz"], parseETags('"|foo|bar;baz"'))
 
     def test_parseETags_multiple(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['|foo|bar;baz', '1234'],
-                         parseETags('|foo|bar;baz, 1234'))
+
+        self.assertEqual(["|foo|bar;baz", "1234"], parseETags("|foo|bar;baz, 1234"))
 
     def test_parseETags_multiple_quoted(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['|foo|bar;baz', '1234'],
-                         parseETags('"|foo|bar;baz", "1234"'))
+
+        self.assertEqual(["|foo|bar;baz", "1234"], parseETags('"|foo|bar;baz", "1234"'))
 
     def test_parseETags_multiple_nospace(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['|foo|bar;baz', '1234'],
-                         parseETags('|foo|bar;baz,1234'))
+
+        self.assertEqual(["|foo|bar;baz", "1234"], parseETags("|foo|bar;baz,1234"))
 
     def test_parseETags_multiple_quoted_nospace(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['|foo|bar;baz', '1234'],
-                         parseETags('"|foo|bar;baz","1234"'))
+
+        self.assertEqual(["|foo|bar;baz", "1234"], parseETags('"|foo|bar;baz","1234"'))
 
     def test_parseETags_multiple_weak(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['|foo|bar;baz', '1234'],
-                         parseETags('|foo|bar;baz, W/1234'))
+
+        self.assertEqual(["|foo|bar;baz", "1234"], parseETags("|foo|bar;baz, W/1234"))
 
     def test_parseETags_multiple_quoted_weak(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['|foo|bar;baz', '1234'],
-                         parseETags('"|foo|bar;baz", W/"1234"'))
+
+        self.assertEqual(
+            ["|foo|bar;baz", "1234"], parseETags('"|foo|bar;baz", W/"1234"')
+        )
 
     def test_parseETags_multiple_weak_disallowed(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['|foo|bar;baz'], parseETags(
-            '|foo|bar;baz, W/1234', allowWeak=False))
+
+        self.assertEqual(
+            ["|foo|bar;baz"], parseETags("|foo|bar;baz, W/1234", allowWeak=False)
+        )
 
     def test_parseETags_multiple_quoted_weak_disallowed(self):
         from plone.app.caching.operations.utils import parseETags
-        self.assertEqual(['|foo|bar;baz'], parseETags(
-            '"|foo|bar;baz", W/"1234"', allowWeak=False))
+
+        self.assertEqual(
+            ["|foo|bar;baz"], parseETags('"|foo|bar;baz", W/"1234"', allowWeak=False)
+        )
 
 
 class RAMCacheTest(unittest.TestCase):
@@ -1237,6 +1275,7 @@ class RAMCacheTest(unittest.TestCase):
 
     def test_getRAMCache_no_chooser(self):
         from plone.app.caching.operations.utils import getRAMCache
+
         self.assertIsNone(getRAMCache())
 
     def test_getRAMCache_custom_global_key(self):
@@ -1249,13 +1288,12 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'foo'
+                assert key == "foo"
                 return cache
 
         provideUtility(Chooser())
-        self.assertEqual(cache, getRAMCache('foo'))
+        self.assertEqual(cache, getRAMCache("foo"))
 
     def test_getRAMCache_normal(self):
         from plone.app.caching.operations.utils import getRAMCache
@@ -1267,9 +1305,8 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'plone.app.caching.operations.ramcache'
+                assert key == "plone.app.caching.operations.ramcache"
                 return cache
 
         provideUtility(Chooser())
@@ -1280,37 +1317,38 @@ class RAMCacheTest(unittest.TestCase):
     def test_getRAMCacheKey_empty(self):
         from plone.app.caching.operations.utils import getRAMCacheKey
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        self.assertEqual('http://example.com?', getRAMCacheKey(request))
+        self.assertEqual("http://example.com?", getRAMCacheKey(request))
 
     def test_getRAMCacheKey_normal(self):
         from plone.app.caching.operations.utils import getRAMCacheKey
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['PATH_INFO'] = '/foo/bar'
-        request.environ['QUERY_STRING'] = 'x=1&y=2'
+        request.environ["PATH_INFO"] = "/foo/bar"
+        request.environ["QUERY_STRING"] = "x=1&y=2"
 
-        self.assertEqual('http://example.com/foo/bar?x=1&y=2',
-                         getRAMCacheKey(request))
+        self.assertEqual("http://example.com/foo/bar?x=1&y=2", getRAMCacheKey(request))
 
     def test_getRAMCacheKey_etag(self):
         from plone.app.caching.operations.utils import getRAMCacheKey
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['PATH_INFO'] = '/foo/bar'
-        request.environ['QUERY_STRING'] = 'x=1&y=2'
+        request.environ["PATH_INFO"] = "/foo/bar"
+        request.environ["QUERY_STRING"] = "x=1&y=2"
 
-        self.assertEqual('||foo|bar||http://example.com/foo/bar?x=1&y=2',
-                         getRAMCacheKey(request, etag='|foo|bar'))
+        self.assertEqual(
+            "||foo|bar||http://example.com/foo/bar?x=1&y=2",
+            getRAMCacheKey(request, etag="|foo|bar"),
+        )
 
     # storeResponseInRAMCache()
 
@@ -1324,19 +1362,18 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'plone.app.caching.operations.ramcache'
+                assert key == "plone.app.caching.operations.ramcache"
                 return cache
 
         provideUtility(Chooser())
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u'Body'
-        response.setHeader('X-Foo', 'bar')
+        result = u"Body"
+        response.setHeader("X-Foo", "bar")
 
         storeResponseInRAMCache(request, response, result)
 
@@ -1345,15 +1382,14 @@ class RAMCacheTest(unittest.TestCase):
     def test_storeResponseInRAMCache_no_cache(self):
         from plone.app.caching.operations.utils import storeResponseInRAMCache
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u'Body'
-        response.setHeader('X-Foo', 'bar')
+        result = u"Body"
+        response.setHeader("X-Foo", "bar")
 
-        IAnnotations(request)[
-            'plone.app.caching.operations.ramcache.key'] = 'foo'
+        IAnnotations(request)["plone.app.caching.operations.ramcache.key"] = "foo"
 
         storeResponseInRAMCache(request, response, result)
 
@@ -1367,28 +1403,26 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'plone.app.caching.operations.ramcache'
+                assert key == "plone.app.caching.operations.ramcache"
                 return cache
 
         provideUtility(Chooser())
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u'Body'
-        response.setHeader('X-Foo', 'bar')
+        result = u"Body"
+        response.setHeader("X-Foo", "bar")
 
-        IAnnotations(request)[
-            'plone.app.caching.operations.ramcache.key'] = 'foo'
+        IAnnotations(request)["plone.app.caching.operations.ramcache.key"] = "foo"
 
         storeResponseInRAMCache(request, response, result)
 
         self.assertEqual(1, len(cache))
-        cached = normalize_response_cache(cache['foo'])
-        self.assertEqual((200, {'x-foo': 'bar'}, u'Body', 0), cached)
+        cached = normalize_response_cache(cache["foo"])
+        self.assertEqual((200, {"x-foo": "bar"}, u"Body", 0), cached)
 
     def test_storeResponseInRAMCache_gzip(self):
         from plone.app.caching.operations.utils import storeResponseInRAMCache
@@ -1400,31 +1434,29 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'plone.app.caching.operations.ramcache'
+                assert key == "plone.app.caching.operations.ramcache"
                 return cache
 
         provideUtility(Chooser())
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['HTTP_ACCEPT_ENCODING'] = 'gzip; deflate'
+        request.environ["HTTP_ACCEPT_ENCODING"] = "gzip; deflate"
         response.enableHTTPCompression(request)
 
-        result = u'Body'
-        response.setHeader('X-Foo', 'bar')
+        result = u"Body"
+        response.setHeader("X-Foo", "bar")
 
-        IAnnotations(request)[
-            'plone.app.caching.operations.ramcache.key'] = 'foo'
+        IAnnotations(request)["plone.app.caching.operations.ramcache.key"] = "foo"
 
         storeResponseInRAMCache(request, response, result)
 
         self.assertEqual(1, len(cache))
-        cached = normalize_response_cache(cache['foo'])
-        self.assertEqual((200, {'x-foo': 'bar'}, u'Body', 1), cached)
+        cached = normalize_response_cache(cache["foo"])
+        self.assertEqual((200, {"x-foo": "bar"}, u"Body", 1), cached)
 
     def test_storeResponseInRAMCache_custom_keys(self):
         from plone.app.caching.operations.utils import storeResponseInRAMCache
@@ -1436,40 +1468,40 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'cachekey'
+                assert key == "cachekey"
                 return cache
 
         provideUtility(Chooser())
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u'Body'
-        response.setHeader('X-Foo', 'bar')
+        result = u"Body"
+        response.setHeader("X-Foo", "bar")
 
-        IAnnotations(request)['annkey'] = 'foo'
+        IAnnotations(request)["annkey"] = "foo"
 
-        storeResponseInRAMCache(request, response, result,
-                                globalKey='cachekey', annotationsKey='annkey')
+        storeResponseInRAMCache(
+            request, response, result, globalKey="cachekey", annotationsKey="annkey"
+        )
 
         self.assertEqual(1, len(cache))
-        cached = normalize_response_cache(cache['foo'])
-        self.assertEqual((200, {'x-foo': 'bar'}, u'Body', 0), cached)
+        cached = normalize_response_cache(cache["foo"])
+        self.assertEqual((200, {"x-foo": "bar"}, u"Body", 0), cached)
 
     # fetchFromRAMCache()
 
     def test_fetchFromRAMCache_no_cache(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['PATH_INFO'] = '/foo/bar'
-        request.environ['QUERY_STRING'] = ''
+        request.environ["PATH_INFO"] = "/foo/bar"
+        request.environ["QUERY_STRING"] = ""
 
         self.assertIsNone(fetchFromRAMCache(request))
 
@@ -1483,24 +1515,23 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'plone.app.caching.operations.ramcache'
+                assert key == "plone.app.caching.operations.ramcache"
                 return cache
 
         provideUtility(Chooser())
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['PATH_INFO'] = '/foo/bar'
-        request.environ['QUERY_STRING'] = ''
+        request.environ["PATH_INFO"] = "/foo/bar"
+        request.environ["QUERY_STRING"] = ""
 
-        cache['http://example.com/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
+        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, u"Body")
 
         cached = normalize_response_cache(fetchFromRAMCache(request))
-        self.assertEqual((200, {'x-foo': 'bar'}, u'Body'), cached)
+        self.assertEqual((200, {"x-foo": "bar"}, u"Body"), cached)
 
     def test_fetchFromRAMCache_with_etag(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1512,27 +1543,27 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'plone.app.caching.operations.ramcache'
+                assert key == "plone.app.caching.operations.ramcache"
                 return cache
 
         provideUtility(Chooser())
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['PATH_INFO'] = '/foo/bar'
-        request.environ['QUERY_STRING'] = ''
+        request.environ["PATH_INFO"] = "/foo/bar"
+        request.environ["QUERY_STRING"] = ""
 
-        cache['||a|b||http://example.com/foo/bar?'] = (
-            200, {'x-foo': 'bar'}, u'Body',
+        cache["||a|b||http://example.com/foo/bar?"] = (
+            200,
+            {"x-foo": "bar"},
+            u"Body",
         )
 
-        cached = normalize_response_cache(
-            fetchFromRAMCache(request, etag='|a|b'))
-        self.assertEqual((200, {'x-foo': 'bar'}, u'Body'), cached)
+        cached = normalize_response_cache(fetchFromRAMCache(request, etag="|a|b"))
+        self.assertEqual((200, {"x-foo": "bar"}, u"Body"), cached)
 
     def test_fetchFromRAMCache_custom_key(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1544,25 +1575,25 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'cachekey'
+                assert key == "cachekey"
                 return cache
 
         provideUtility(Chooser())
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['PATH_INFO'] = '/foo/bar'
-        request.environ['QUERY_STRING'] = ''
+        request.environ["PATH_INFO"] = "/foo/bar"
+        request.environ["QUERY_STRING"] = ""
 
-        cache['http://example.com/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
+        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, u"Body")
 
         cached = normalize_response_cache(
-            fetchFromRAMCache(request, globalKey='cachekey'))
-        self.assertEqual((200, {'x-foo': 'bar'}, u'Body'), cached)
+            fetchFromRAMCache(request, globalKey="cachekey")
+        )
+        self.assertEqual((200, {"x-foo": "bar"}, u"Body"), cached)
 
     def test_fetchFromRAMCache_miss(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1574,24 +1605,22 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'plone.app.caching.operations.ramcache'
+                assert key == "plone.app.caching.operations.ramcache"
                 return cache
 
         provideUtility(Chooser())
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['PATH_INFO'] = '/foo/bar'
-        request.environ['QUERY_STRING'] = ''
+        request.environ["PATH_INFO"] = "/foo/bar"
+        request.environ["QUERY_STRING"] = ""
 
-        cache['http://example.com/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
+        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, u"Body")
 
-        cached = normalize_response_cache(
-            fetchFromRAMCache(request, etag='|foo'))
+        cached = normalize_response_cache(fetchFromRAMCache(request, etag="|foo"))
         self.assertIsNone(cached)
 
     def test_fetchFromRAMCache_miss_custom_default(self):
@@ -1604,23 +1633,23 @@ class RAMCacheTest(unittest.TestCase):
 
         @implementer(ICacheChooser)
         class Chooser(object):
-
             def __call__(self, key):
-                assert key == 'plone.app.caching.operations.ramcache'
+                assert key == "plone.app.caching.operations.ramcache"
                 return cache
 
         provideUtility(Chooser())
 
-        environ = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ['PATH_INFO'] = '/foo/bar'
-        request.environ['QUERY_STRING'] = ''
+        request.environ["PATH_INFO"] = "/foo/bar"
+        request.environ["QUERY_STRING"] = ""
 
-        cache['http://example.com/foo/bar?'] = (200, {'x-foo': 'bar'}, u'Body')
+        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, u"Body")
 
         marker = object()
         cached = normalize_response_cache(
-            fetchFromRAMCache(request, etag='|foo', default=marker))
+            fetchFromRAMCache(request, etag="|foo", default=marker)
+        )
         self.assertIs(cached, marker)

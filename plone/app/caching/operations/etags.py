@@ -15,8 +15,7 @@ import time
 @implementer(IETagValue)
 @adapter(Interface, Interface)
 class UserID(object):
-    """The ``userid`` etag component, returning the current user's id
-    """
+    """The ``userid`` etag component, returning the current user's id"""
 
     def __init__(self, published, request):
         self.published = published
@@ -25,7 +24,8 @@ class UserID(object):
     def __call__(self):
         context = getContext(self.published)
         portal_state = queryMultiAdapter(
-            (context, self.request), name=u'plone_portal_state')
+            (context, self.request), name=u"plone_portal_state"
+        )
         if portal_state is None:
             return None
 
@@ -50,18 +50,19 @@ class Roles(object):
     def __call__(self):
         context = getContext(self.published)
         portal_state = queryMultiAdapter(
-            (context, self.request), name=u'plone_portal_state')
+            (context, self.request), name=u"plone_portal_state"
+        )
         if portal_state is None:
             return None
 
         if portal_state.anonymous():
-            return 'Anonymous'
+            return "Anonymous"
 
         member = portal_state.member()
         if member is None:
             return None
 
-        return ';'.join(sorted(member.getRolesInContext(context)))
+        return ";".join(sorted(member.getRolesInContext(context)))
 
 
 @implementer(IETagValue)
@@ -76,7 +77,7 @@ class Language(object):
         self.request = request
 
     def __call__(self):
-        return self.request.get('HTTP_ACCEPT_LANGUAGE', '')
+        return self.request.get("HTTP_ACCEPT_LANGUAGE", "")
 
 
 @implementer(IETagValue)
@@ -93,7 +94,8 @@ class UserLanguage(object):
     def __call__(self):
         context = getContext(self.published)
         portal_state = queryMultiAdapter(
-            (context, self.request), name=u'plone_portal_state')
+            (context, self.request), name=u"plone_portal_state"
+        )
         if portal_state is None:
             return None
 
@@ -131,7 +133,7 @@ class CatalogCounter(object):
 
     def __call__(self):
         context = getContext(self.published)
-        tools = queryMultiAdapter((context, self.request), name=u'plone_tools')
+        tools = queryMultiAdapter((context, self.request), name=u"plone_tools")
         if tools is None:
             return None
 
@@ -152,7 +154,8 @@ class ObjectLocked(object):
     def __call__(self):
         context = getContext(self.published)
         context_state = queryMultiAdapter(
-            (context, self.request), name=u'plone_context_state')
+            (context, self.request), name=u"plone_context_state"
+        )
         if context_state is None:
             return None
         return str(int(context_state.is_locked()))
@@ -161,8 +164,7 @@ class ObjectLocked(object):
 @implementer(IETagValue)
 @adapter(Interface, Interface)
 class Skin(object):
-    """The ``skin`` etag component, returning the current skin name.
-    """
+    """The ``skin`` etag component, returning the current skin name."""
 
     def __init__(self, published, request):
         self.published = published
@@ -171,7 +173,7 @@ class Skin(object):
     def __call__(self):
         context = getContext(self.published)
 
-        portal_skins = getToolByName(context, 'portal_skins', None)
+        portal_skins = getToolByName(context, "portal_skins", None)
         if portal_skins is None:
             return None
 
@@ -198,12 +200,13 @@ class AnonymousOrRandom(object):
     def __call__(self):
         context = getContext(self.published)
         portal_state = queryMultiAdapter(
-            (context, self.request), name=u'plone_portal_state')
+            (context, self.request), name=u"plone_portal_state"
+        )
         if portal_state is None:
             return None
         if portal_state.anonymous():
             return None
-        return '{0}{1}'.format(time.time(), random.randint(0, 1000))
+        return "{0}{1}".format(time.time(), random.randint(0, 1000))
 
 
 @implementer(IETagValue)
@@ -218,4 +221,4 @@ class CopyCookie(object):
         self.request = request
 
     def __call__(self):
-        return self.request.get('__cp') and '1' or '0'
+        return self.request.get("__cp") and "1" or "0"

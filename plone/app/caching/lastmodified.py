@@ -18,6 +18,7 @@ from zope.pagetemplate.interfaces import IPageTemplate
 try:
     from zope.dublincore.interfaces import IDCTimes
 except ImportError:
+
     class IDCTimes(Interface):
         pass
 
@@ -55,7 +56,7 @@ class PersistentLastModified(object):
 
     def __call__(self):
         context = aq_base(self.context)
-        mtime = getattr(context, '_p_mtime', None)
+        mtime = getattr(context, "_p_mtime", None)
         if mtime is not None and mtime > 0:
             return datetime.fromtimestamp(mtime, tzlocal())
         return None
@@ -63,15 +64,13 @@ class PersistentLastModified(object):
 
 @adapter(File)
 class OFSFileLastModified(PersistentLastModified):
-    """ILastModified adapter for OFS.Image.File
-    """
+    """ILastModified adapter for OFS.Image.File"""
 
 
 @implementer(ILastModified)
 @adapter(FSObject)
 class FSObjectLastModified(object):
-    """ILastModified adapter for FSFile and FSImage
-    """
+    """ILastModified adapter for FSFile and FSImage"""
 
     def __init__(self, context):
         self.context = context
@@ -105,8 +104,7 @@ class CatalogableDublinCoreLastModified(object):
 @implementer(ILastModified)
 @adapter(IDCTimes)
 class DCTimesLastModified(object):
-    """ILastModified adapter for zope.dublincore IDCTimes
-    """
+    """ILastModified adapter for zope.dublincore IDCTimes"""
 
     def __init__(self, context):
         self.context = context
@@ -118,13 +116,12 @@ class DCTimesLastModified(object):
 @implementer(ILastModified)
 @adapter(IResource)
 class ResourceLastModified(object):
-    """ILastModified for Zope 3 style browser resources
-    """
+    """ILastModified for Zope 3 style browser resources"""
 
     def __init__(self, context):
         self.context = context
 
     def __call__(self):
-        lmt = getattr(self.context.context, 'lmt', None)
+        lmt = getattr(self.context.context, "lmt", None)
         if lmt is not None:
             return datetime.fromtimestamp(lmt, tzlocal())
