@@ -56,7 +56,6 @@
     <adapter factory=".lastmodified.PageTemplateDelegateLastModified" />
     <adapter factory=".lastmodified.FSPageTemplateDelegateLastModified" />
     <adapter factory=".lastmodified.OFSFileLastModified" />
-    <adapter factory=".lastmodified.ImageScaleLastModified" />
     <adapter factory=".lastmodified.FSObjectLastModified" />
     <adapter factory=".lastmodified.CatalogableDublinCoreLastModified" />
     <adapter factory=".lastmodified.DCTimesLastModified" />

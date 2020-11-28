@@ -21,13 +21,6 @@ except ImportError:
     class IDCTimes(Interface):
         pass
 
-try:
-    from Products.Archetypes.Field import Image as ImageScale
-except ImportError:
-    class ImageScale(object):
-        pass
-
-
 @implementer(ILastModified)
 @adapter(IPageTemplate)
 def PageTemplateDelegateLastModified(template):
@@ -72,22 +65,6 @@ class PersistentLastModified(object):
 class OFSFileLastModified(PersistentLastModified):
     """ILastModified adapter for OFS.Image.File
     """
-
-
-@implementer(ILastModified)
-@adapter(ImageScale)
-class ImageScaleLastModified(object):
-    """ILastModified adapter for Products.Archetypes.Field.Image
-    """
-
-    def __init__(self, context):
-        self.context = context
-
-    def __call__(self):
-        parent = getContext(self.context)
-        if parent is not None:
-            return ILastModified(parent)()
-        return None
 
 
 @implementer(ILastModified)

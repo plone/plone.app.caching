@@ -31,17 +31,6 @@ from zope.schema import getFieldsInOrder
 import six
 
 
-try:
-    from plone.app.blob.interfaces import IBlobField
-    from Products.Archetypes.interfaces import IBaseObject
-    from Products.Archetypes.interfaces import IFileField
-    from Products.Archetypes.interfaces import IImageField
-    from Products.Archetypes.interfaces import ITextField
-    HAVE_AT = True
-except ImportError:
-    HAVE_AT = False
-
-
 @implementer(IPurgePaths)
 @adapter(IDynamicType)
 class ContentPurgePaths(object):
@@ -224,49 +213,6 @@ class ScalesPurgePaths(object):
     def getAbsolutePaths(self):
         return []
 
-
-if HAVE_AT:
-
-    @implementer(IPurgePaths)
-    @adapter(IBaseObject)
-    class ObjectFieldPurgePaths(object):
-        """Paths to purge for Archetypes object fields
-        """
-
-        def __init__(self, context):
-            self.context = context
-
-        def getRelativePaths(self):
-            prefix = '/' + self.context.virtual_url_path()
-            schema = self.context.Schema()
-
-            def fieldFilter(field):
-                return (
-                    (
-                        IBlobField.providedBy(field) or
-                        IFileField.providedBy(field) or
-                        IImageField.providedBy(field)
-                    ) and
-                    not ITextField.providedBy(field)
-                )
-            seenDownloads = False
-            for field in schema.filterFields(fieldFilter):
-                if not seenDownloads:
-                    yield prefix + '/download'
-                    yield prefix + '/at_download'
-                    seenDownloads = True
-
-                yield prefix + '/at_download/' + field.getName()
-
-                fieldURL = '{0}/{1}'.format(prefix, field.getName(),)
-                yield fieldURL
-
-                if IImageField.providedBy(field):
-                    for size in field.getAvailableSizes(self.context).keys():
-                        yield '{0}_{1}'.format(fieldURL, size,)
-
-        def getAbsolutePaths(self):
-            return []
 
 # Event redispatch for content items - we check the list of content items
 # instead of the marker interface

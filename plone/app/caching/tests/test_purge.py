@@ -4,7 +4,6 @@ from Acquisition import Explicit
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.purge import ContentPurgePaths
 from plone.app.caching.purge import DiscussionItemPurgePaths
-from plone.app.caching.purge import HAVE_AT
 from plone.app.caching.purge import purgeOnModified
 from plone.app.caching.purge import purgeOnMovedOrRemoved
 from plone.app.caching.purge import ScalesPurgePaths
@@ -45,11 +44,6 @@ from zope.lifecycleevent import ObjectRemovedEvent
 
 import six
 import unittest
-
-if HAVE_AT:
-    from plone.app.caching.purge import ObjectFieldPurgePaths
-    from Products.Archetypes import atapi
-    from Products.Archetypes.Schema.factory import instanceSchemaFactory
 
 
 def getData(filename):
@@ -324,102 +318,6 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
 
         self.assertEqual(["/app/foo"], list(purge.getRelativePaths()))
         self.assertEqual(["/purgeme"], list(purge.getAbsolutePaths()))
-
-
-@unittest.skipUnless(HAVE_AT, "Only run with AT")
-class TestObjectFieldPurgePaths(unittest.TestCase):
-
-    maxDiff = None
-    layer = UNIT_TESTING
-
-    def setUp(self):
-        provideAdapter(instanceSchemaFactory)
-
-    def test_no_file_image_fields(self):
-        class ATNoFields(atapi.BaseContent):
-            schema = atapi.Schema((atapi.StringField("foo"),))
-
-        context = ATNoFields("foo")
-        purger = ObjectFieldPurgePaths(context)
-
-        self.assertEqual([], list(purger.getRelativePaths()))
-        self.assertEqual([], list(purger.getAbsolutePaths()))
-
-    def test_file_image_fields(self):
-        from plone.app.blob.field import BlobField
-
-        class ATMultipleFields(atapi.BaseContent):
-            schema = atapi.Schema(
-                (
-                    atapi.StringField("foo"),
-                    atapi.FileField("file1"),
-                    atapi.ImageField("image1"),
-                    atapi.ImageField(
-                        "image2", sizes={"mini": (50, 50), "normal": (100, 100)}
-                    ),
-                    BlobField("blob1"),
-                )
-            )
-
-        root = FauxContent("")
-        context = ATMultipleFields("foo").__of__(root)
-        purger = ObjectFieldPurgePaths(context)
-
-        self.assertEqual(
-            [
-                "/foo/download",
-                "/foo/at_download",
-                "/foo/at_download/file1",
-                "/foo/file1",
-                "/foo/at_download/image1",
-                "/foo/image1",
-                "/foo/image1_thumb",
-                "/foo/at_download/image2",
-                "/foo/image2",
-                "/foo/image2_mini",
-                "/foo/image2_normal",
-                "/foo/at_download/blob1",
-                "/foo/blob1",
-            ],
-            list(purger.getRelativePaths()),
-        )
-        self.assertEqual([], list(purger.getAbsolutePaths()))
-
-    def test_file_image_text_fields(self):
-        class ATMultipleFields(atapi.BaseContent):
-            schema = atapi.Schema(
-                (
-                    atapi.StringField("foo"),
-                    atapi.FileField("file1"),
-                    atapi.ImageField("image1"),
-                    atapi.ImageField(
-                        "image2", sizes={"mini": (50, 50), "normal": (100, 100)}
-                    ),
-                    atapi.TextField("text"),
-                )
-            )
-
-        root = FauxContent("")
-        context = ATMultipleFields("foo").__of__(root)
-        purger = ObjectFieldPurgePaths(context)
-
-        self.assertEqual(
-            [
-                "/foo/download",
-                "/foo/at_download",
-                "/foo/at_download/file1",
-                "/foo/file1",
-                "/foo/at_download/image1",
-                "/foo/image1",
-                "/foo/image1_thumb",
-                "/foo/at_download/image2",
-                "/foo/image2",
-                "/foo/image2_mini",
-                "/foo/image2_normal",
-            ],
-            list(purger.getRelativePaths()),
-        )
-        self.assertEqual([], list(purger.getAbsolutePaths()))
 
 
 class TestScalesPurgePaths(unittest.TestCase):
