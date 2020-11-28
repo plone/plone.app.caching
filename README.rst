@@ -8,8 +8,12 @@ Introduction
 ``plone.app.caching`` provides a Plone UI and default rules for managing HTTP response caching in Plone.
 It builds on ``z3c.caching``, ``plone.caching`` and ``plone.cachepurging``.
 
-``plone.app.caching`` version 2.x requires Plone 5.2 or later.
-For earlier Plone versions, use a release from branch 1.x.
+
+Version information:
+
+- Version 3.x requires Plone 6.0 or later. Plone 5.2 with Python 3 should work too.
+- Plone 5.2 release uses the version 2.x series.
+- Earlier Plone versions: use a release from 1.x series.
 
 
 Installation
@@ -17,6 +21,8 @@ Installation
 
 ``plone.app.caching`` is shipped as a dependency of the ``Plone`` package.
 Caching is **not enabled by default**.
+It is highly recommended to configure caching.
+
 When you create a default Plone site, it is available in the Site Setup.
 Under the Advanced header, look for the Caching control panel.
 There you can enable caching.
