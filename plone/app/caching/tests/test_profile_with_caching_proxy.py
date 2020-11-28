@@ -18,13 +18,13 @@ from Products.CMFCore.FSFile import FSFile
 from Products.CMFCore.utils import getToolByName
 from zope.component import getUtility
 from zope.globalrequest import setRequest
+from io import BytesIO
 
 import datetime
 import dateutil.parser
 import dateutil.tz
 import os
 import pkg_resources
-import six
 import unittest
 
 
@@ -623,7 +623,7 @@ class TestProfileWithCaching(unittest.TestCase):
         # method to initiate a streamed response.
         s = b"a" * (1 << 16) * 3
         self.portal.manage_addFile(
-            "bigfile", file=six.BytesIO(s), content_type="application/octet-stream"
+            "bigfile", file=BytesIO(s), content_type="application/octet-stream"
         )
 
         import transaction

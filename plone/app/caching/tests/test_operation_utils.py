@@ -2,7 +2,7 @@ from OFS.SimpleItem import SimpleItem
 from plone.memoize.interfaces import ICacheChooser
 from plone.testing.zca import UNIT_TESTING
 from Products.CMFCore.interfaces import IContentish
-from six import StringIO
+from io import StringIO
 from z3c.caching.interfaces import ILastModified
 from zope.annotation.attribute import AttributeAnnotations
 from zope.annotation.interfaces import IAnnotations

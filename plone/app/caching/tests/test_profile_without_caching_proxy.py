@@ -21,7 +21,7 @@ import dateutil.parser
 import dateutil.tz
 import os
 import pkg_resources
-import six
+import io
 import unittest
 
 
@@ -536,7 +536,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # method to initiate a streamed response.
         s = b"a" * (1 << 16) * 3
         self.portal.manage_addFile(
-            "bigfile", file=six.BytesIO(s), content_type="application/octet-stream"
+            "bigfile", file=io.BytesIO(s), content_type="application/octet-stream"
         )
 
         import transaction

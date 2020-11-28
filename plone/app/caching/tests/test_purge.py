@@ -41,7 +41,6 @@ from zope.lifecycleevent import ObjectModifiedEvent
 from zope.lifecycleevent import ObjectMovedEvent
 from zope.lifecycleevent import ObjectRemovedEvent
 
-import six
 import unittest
 
 
@@ -393,12 +392,9 @@ class TestScalesPurgePaths(unittest.TestCase):
     def test_scale_purge_paths_unicode(self):
         purge = ScalesPurgePaths(self.file)
         expected = [
-            "/plone/media/file/view/++widget++form.widgets.file/@@download/data/töstfile.csv",  # noqa: E501
+            "/plone/media/file/view/++widget++form.widgets.file/@@download/data/töstfile.csv",
             "/plone/media/file/@@download/file/data/töstfile.csv",
         ]
-        if six.PY2:
-            # the getRelativePaths method returns bytes on Python 2
-            expected = [x.encode("utf8") for x in expected]
         self.assertListEqual(
             list(purge.getRelativePaths()),
             expected,

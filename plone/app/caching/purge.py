@@ -27,8 +27,6 @@ from zope.lifecycleevent.interfaces import IObjectMovedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from zope.schema import getFieldsInOrder
 
-import six
-
 
 @implementer(IPurgePaths)
 @adapter(IDynamicType)
@@ -204,8 +202,6 @@ class ScalesPurgePaths:
                     yield f"{prefix}/@@download/{field}"
             else:
                 filename = value.filename
-                if six.PY2 and isinstance(filename, str):
-                    filename = filename.encode("utf-8")
                 yield "{}/view/{}.{}/@@download/{}".format(
                     prefix, "++widget++form.widgets", field, filename
                 )
