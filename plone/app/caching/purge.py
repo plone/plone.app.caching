@@ -31,21 +31,6 @@ from zope.schema import getFieldsInOrder
 import six
 
 
-<<<<<<< HEAD
-=======
-try:
-    from plone.app.blob.interfaces import IBlobField
-    from Products.Archetypes.interfaces import IBaseObject
-    from Products.Archetypes.interfaces import IFileField
-    from Products.Archetypes.interfaces import IImageField
-    from Products.Archetypes.interfaces import ITextField
-
-    HAVE_AT = True
-except ImportError:
-    HAVE_AT = False
-
-
->>>>>>> code style black
 @implementer(IPurgePaths)
 @adapter(IDynamicType)
 class ContentPurgePaths(object):

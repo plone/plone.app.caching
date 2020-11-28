@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-from Products.CMFCore.utils import getToolByName
-from Products.GenericSetup.interfaces import BASE
-from Products.GenericSetup.interfaces import EXTENSION
-from Products.statusmessages.interfaces import IStatusMessage
 from operator import itemgetter
 from plone.app.caching.browser.edit import EditForm
+from plone.app.caching.interfaces import _
 from plone.app.caching.interfaces import ICacheProfiles
 from plone.app.caching.interfaces import IPloneCacheSettings
-from plone.app.caching.interfaces import _
 from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.cachepurging.interfaces import IPurger
 from plone.cachepurging.utils import getPathsToPurge
@@ -19,6 +15,10 @@ from plone.memoize.instance import memoize
 from plone.protect import CheckAuthenticator
 from plone.registry.interfaces import IRegistry
 from plone.z3cform.z2 import processInputs
+from Products.CMFCore.utils import getToolByName
+from Products.GenericSetup.interfaces import BASE
+from Products.GenericSetup.interfaces import EXTENSION
+from Products.statusmessages.interfaces import IStatusMessage
 from z3c.caching.interfaces import IRulesetType
 from z3c.caching.registry import enumerateTypes
 from zope.component import getUtilitiesFor

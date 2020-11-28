@@ -38,8 +38,8 @@ class TestLastModified(unittest.TestCase):
         provideAdapter(lastmodified.ResourceLastModified)
 
     def test_PageTemplateDelegateLastModified(self):
-        from persistent import Persistent
         from Acquisition import Explicit
+        from persistent import Persistent
 
         class Dummy(Persistent, Explicit):
             _p_mtime = None
@@ -62,8 +62,8 @@ class TestLastModified(unittest.TestCase):
         self.assertEqual(mod, ILastModified(zpt)())
 
     def test_FSPageTemplateDelegateLastModified(self):
-        from persistent import Persistent
         from Acquisition import Explicit
+        from persistent import Persistent
 
         class Dummy(Persistent, Explicit):
             _p_mtime = None
@@ -188,8 +188,8 @@ class TestLastModified(unittest.TestCase):
         self.assertEqual(d._mod, ILastModified(d)())
 
     def test_ResourceLastModified_zope_app(self):
-        from zope.browserresource.file import FileResource
         from zope.browserresource.file import File
+        from zope.browserresource.file import FileResource
 
         class DummyRequest(dict):
             pass

@@ -47,7 +47,8 @@ import unittest
 
 
 def getData(filename):
-    from os.path import dirname, join
+    from os.path import dirname
+    from os.path import join
     from plone.app.caching import tests
 
     filename = join(dirname(tests.__file__), filename)

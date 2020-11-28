@@ -325,10 +325,9 @@ class ResponseModificationHelpersTest(unittest.TestCase):
     # cacheInRAM()
 
     def test_cacheInRAM_no_etag(self):
+        from plone.app.caching.interfaces import IRAMCached
         from plone.app.caching.operations.utils import cacheInRAM
         from plone.app.caching.operations.utils import PAGE_CACHE_ANNOTATION_KEY  # noqa
-
-        from plone.app.caching.interfaces import IRAMCached
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -348,10 +347,9 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertTrue(IRAMCached.providedBy(request))
 
     def test_cacheInRAM_etag(self):
+        from plone.app.caching.interfaces import IRAMCached
         from plone.app.caching.operations.utils import cacheInRAM
         from plone.app.caching.operations.utils import PAGE_CACHE_ANNOTATION_KEY  # noqa
-
-        from plone.app.caching.interfaces import IRAMCached
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -373,9 +371,8 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         self.assertTrue(IRAMCached.providedBy(request))
 
     def test_cacheInRAM_etag_alternate_key(self):
-        from plone.app.caching.operations.utils import cacheInRAM
-
         from plone.app.caching.interfaces import IRAMCached
+        from plone.app.caching.operations.utils import cacheInRAM
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -1094,8 +1091,8 @@ class MiscHelpersTest(unittest.TestCase):
         )
 
     def test_getETag_adapter_returns_none(self):
-        from plone.app.caching.operations.utils import getETag
         from plone.app.caching.interfaces import IETagValue
+        from plone.app.caching.operations.utils import getETag
 
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
@@ -1139,8 +1136,8 @@ class MiscHelpersTest(unittest.TestCase):
         )
 
     def test_getETag_full(self):
-        from plone.app.caching.operations.utils import getETag
         from plone.app.caching.interfaces import IETagValue
+        from plone.app.caching.operations.utils import getETag
 
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
