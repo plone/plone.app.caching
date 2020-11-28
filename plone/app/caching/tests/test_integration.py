@@ -122,26 +122,25 @@ class TestOperations(unittest.TestCase):
         self.portal["f1"].invokeFactory("Image", "i1")
         self.portal["f1"]["i1"].title = "Image one"
         self.portal["f1"]["i1"].description = "Image one description"
-        self.portal["f1"]["i1"].image = NamedImage(
-            open(TEST_IMAGE, "rb"), "image/gif", "test.gif"
-        )
+        with open(TEST_IMAGE, "rb") as ti:
+            self.portal["f1"]["i1"].image = NamedImage(ti, "image/gif", "test.gif")
         self.portal["f1"]["i1"].reindexObject()
 
         # Content file
         self.portal["f1"].invokeFactory("File", "f1")
         self.portal["f1"]["f1"].title = "File one"
         self.portal["f1"]["f1"].description = "File one description"
-        self.portal["f1"]["f1"].file = OFS.Image.File(
-            "test.gif", "test.gif", open(TEST_FILE, "rb")
-        )
+        with open(TEST_FILE, "rb") as tf:
+            self.portal["f1"]["f1"].file = OFS.Image.File("test.gif", "test.gif", tf)
         self.portal["f1"]["f1"].reindexObject()
 
         # OFS image (custom folder)
-        OFS.Image.manage_addImage(
-            self.portal["portal_skins"]["custom"],
-            "test.gif",
-            open(TEST_IMAGE, "rb"),
-        )
+        with open(TEST_IMAGE, "rb") as ti:
+            OFS.Image.manage_addImage(
+                self.portal["portal_skins"]["custom"],
+                "test.gif",
+                ti,
+            )
 
         setRoles(self.portal, TEST_USER_ID, ("Member",))
 

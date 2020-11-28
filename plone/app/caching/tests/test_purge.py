@@ -1,5 +1,7 @@
 from Acquisition import aq_base
 from Acquisition import Explicit
+from os.path import dirname
+from os.path import join
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.purge import ContentPurgePaths
 from plone.app.caching.purge import DiscussionItemPurgePaths
@@ -45,12 +47,11 @@ import unittest
 
 
 def getData(filename):
-    from os.path import dirname
-    from os.path import join
     from plone.app.caching import tests
 
     filename = join(dirname(tests.__file__), filename)
-    data = open(filename, "rb").read()
+    with open(filename, "rb") as fh:
+        data = fh.read()
     return data
 
 
