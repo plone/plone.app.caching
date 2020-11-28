@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_parent
 from plone.app.caching.utils import getObjectDefaultView
 from plone.app.caching.utils import isPurged
@@ -33,7 +32,7 @@ import six
 
 @implementer(IPurgePaths)
 @adapter(IDynamicType)
-class ContentPurgePaths(object):
+class ContentPurgePaths:
     """Paths to purge for content items
 
     Includes:
@@ -93,7 +92,7 @@ class ContentPurgePaths(object):
 
 @implementer(IPurgePaths)
 @adapter(IDiscussionResponse)
-class DiscussionItemPurgePaths(object):
+class DiscussionItemPurgePaths:
     """Paths to purge for Discussion Item.
 
     Looks up paths for the ultimate parent.
@@ -121,8 +120,7 @@ class DiscussionItemPurgePaths(object):
                         yield relativePath
                     else:
                         rewrittenPaths = rewriter(relativePath) or []  # None -> []
-                        for rewrittenPath in rewrittenPaths:
-                            yield rewrittenPath
+                        yield from rewrittenPaths
 
     def getAbsolutePaths(self):
         root = self._getRoot()
@@ -137,8 +135,7 @@ class DiscussionItemPurgePaths(object):
             # add absoute paths, which are not
             absolutePaths = pathProvider.getAbsolutePaths()
             if absolutePaths:
-                for absolutePath in absolutePaths:
-                    yield absolutePath
+                yield from absolutePaths
 
     @memoize
     def _getRoot(self):
@@ -156,7 +153,7 @@ class DiscussionItemPurgePaths(object):
 
 @implementer(IPurgePaths)
 @adapter(IDexteritySchema)
-class ScalesPurgePaths(object):
+class ScalesPurgePaths:
     """Paths to purge for Dexterity object fields"""
 
     def __init__(self, context):
@@ -199,20 +196,20 @@ class ScalesPurgePaths(object):
 
             if INamedImageField.providedBy(item):
                 for size in self.getScales():
-                    yield "{0}/@@images/{1}/{2}".format(
+                    yield "{}/@@images/{}/{}".format(
                         prefix,
                         field,
                         size,
                     )
-                    yield "{0}/@@download/{1}".format(prefix, field)
+                    yield f"{prefix}/@@download/{field}"
             else:
                 filename = value.filename
-                if six.PY2 and isinstance(filename, six.text_type):
+                if six.PY2 and isinstance(filename, str):
                     filename = filename.encode("utf-8")
-                yield "{0}/view/{1}.{2}/@@download/{3}".format(
+                yield "{}/view/{}.{}/@@download/{}".format(
                     prefix, "++widget++form.widgets", field, filename
                 )
-                yield "{0}/@@download/{1}/{2}".format(prefix, field, filename)
+                yield f"{prefix}/@@download/{field}/{filename}"
 
     def getAbsolutePaths(self):
         return []
@@ -224,7 +221,7 @@ if HAVE_AT:
 
     @implementer(IPurgePaths)
     @adapter(IBaseObject)
-    class ObjectFieldPurgePaths(object):
+    class ObjectFieldPurgePaths:
         """Paths to purge for Archetypes object fields"""
 
         def __init__(self, context):
@@ -250,7 +247,7 @@ if HAVE_AT:
 
                 yield prefix + "/at_download/" + field.getName()
 
-                fieldURL = "{0}/{1}".format(
+                fieldURL = "{}/{}".format(
                     prefix,
                     field.getName(),
                 )
@@ -258,7 +255,7 @@ if HAVE_AT:
 
                 if IImageField.providedBy(field):
                     for size in field.getAvailableSizes(self.context).keys():
-                        yield "{0}_{1}".format(
+                        yield "{}_{}".format(
                             fieldURL,
                             size,
                         )

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import Explicit
 from datetime import datetime
 from plone.app.caching.interfaces import IPloneCacheSettings
@@ -44,7 +43,7 @@ class DummyNotContent(Explicit):
     pass
 
 
-class DummyFTI(object):
+class DummyFTI:
     def __init__(self, portal_type, viewAction=""):
         self.id = portal_type
         self._actions = {

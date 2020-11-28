@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.app.caching.testing import getToken
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 from plone.app.testing import setRoles
@@ -43,8 +42,8 @@ class TestOperationDefault(unittest.TestCase):
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ("Manager",))
         self.portal.invokeFactory("Folder", "f1")
-        self.portal["f1"].title = u"Folder one"
-        self.portal["f1"].description = u"Folder one description"
+        self.portal["f1"].title = "Folder one"
+        self.portal["f1"].description = "Folder one description"
         self.portal["f1"].reindexObject()
 
         self.cacheSettings.operationMapping = {
@@ -61,13 +60,13 @@ class TestOperationDefault(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
             ),
         )
         browser.open(
-            "{0}/++add++Document".format(self.portal["f1"].absolute_url()),
+            "{}/++add++Document".format(self.portal["f1"].absolute_url()),
         )
         browser.getControl(
             name="form.widgets.IDublinCore.title"
@@ -81,7 +80,7 @@ class TestOperationDefault(unittest.TestCase):
 
         transaction.commit()
         browser.open(
-            "{0}/dummy-content/edit?_authenticator={1}".format(
+            "{}/dummy-content/edit?_authenticator={}".format(
                 self.portal["f1"].absolute_url(), getToken(TEST_USER_NAME)
             )
         )

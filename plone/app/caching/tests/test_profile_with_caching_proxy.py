@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 from plone.app.caching.tests.test_utils import stable_now
@@ -36,7 +35,7 @@ def test_image():
     from plone.namedfile.file import NamedBlobImage
 
     filename = pkg_resources.resource_filename("plone.app.caching.tests", "test.gif")
-    filename = os.path.join(os.path.dirname(__file__), u"test.gif")
+    filename = os.path.join(os.path.dirname(__file__), "test.gif")
     return NamedBlobImage(
         data=open(filename, "rb").read(),
         filename=filename,
@@ -98,13 +97,13 @@ class TestProfileWithCaching(unittest.TestCase):
         setRoles(self.portal, TEST_USER_ID, ("Manager",))
         self.portal.invokeFactory("Folder", "f1")
         self.portal["f1"].title = "one"
-        self.portal["f1"].description = u"Folder one description"
+        self.portal["f1"].description = "Folder one description"
         self.portal["f1"].reindexObject()
 
         # Add page content
         self.portal["f1"].invokeFactory("Document", "d1")
-        self.portal["f1"]["d1"].title = u"Document one"
-        self.portal["f1"]["d1"].description = u"Document one description"
+        self.portal["f1"]["d1"].title = "Document one"
+        self.portal["f1"]["d1"].description = "Document one description"
         testText = "Testing... body one"
         self.portal["f1"]["d1"].text = RichTextValue(
             testText,
@@ -135,7 +134,7 @@ class TestProfileWithCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
             ),
@@ -178,7 +177,7 @@ class TestProfileWithCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
             ),
@@ -203,7 +202,7 @@ class TestProfileWithCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
             ),
@@ -223,7 +222,7 @@ class TestProfileWithCaching(unittest.TestCase):
         browser.raiseHttpErrors = False  # we really do want to see the 304
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
             ),
@@ -364,7 +363,7 @@ class TestProfileWithCaching(unittest.TestCase):
             "max-age=0, s-maxage=86400, must-revalidate",
             browser.headers["Cache-Control"],
         )
-        tag = '"||{0}|en|{1}"'.format(
+        tag = '"||{}|en|{}"'.format(
             catalog.getCounter(),
             skins_tool.default_skin,
         )
@@ -389,7 +388,7 @@ class TestProfileWithCaching(unittest.TestCase):
             "max-age=0, s-maxage=86400, must-revalidate",
             browser.headers["Cache-Control"],
         )
-        tag = '"||{0}|en|{1}"'.format(
+        tag = '"||{}|en|{}"'.format(
             catalog.getCounter(),
             skins_tool.default_skin,
         )
@@ -415,7 +414,7 @@ class TestProfileWithCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
             ),
@@ -429,7 +428,7 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = '"|test_user_1_|{0}|en|{1}"'.format(
+        tag = '"|test_user_1_|{}|en|{}"'.format(
             catalog.getCounter(),
             skins_tool.default_skin,
         )
@@ -440,7 +439,7 @@ class TestProfileWithCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
             ),
@@ -458,14 +457,14 @@ class TestProfileWithCaching(unittest.TestCase):
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ("Manager",))
         self.portal.invokeFactory("Folder", "f1")
-        self.portal["f1"].title = u"Folder one"
-        self.portal["f1"].description = u"Folder one description"
+        self.portal["f1"].title = "Folder one"
+        self.portal["f1"].description = "Folder one description"
         self.portal["f1"].reindexObject()
 
         # Add content image
         self.portal["f1"].invokeFactory("Image", "i1")
-        self.portal["f1"]["i1"].title = u"Image one"
-        self.portal["f1"]["i1"].description = u"Image one description"
+        self.portal["f1"]["i1"].title = "Image one"
+        self.portal["f1"]["i1"].description = "Image one description"
         self.portal["f1"]["i1"].image = test_image()
         self.portal["f1"]["i1"].reindexObject()
 
@@ -478,7 +477,7 @@ class TestProfileWithCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 SITE_OWNER_NAME,
                 SITE_OWNER_PASSWORD,
             ),
@@ -503,7 +502,7 @@ class TestProfileWithCaching(unittest.TestCase):
         browser.handleErrors = False
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 SITE_OWNER_NAME,
                 SITE_OWNER_PASSWORD,
             ),

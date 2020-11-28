@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import IRAMCached
 from plone.app.caching.operations.utils import storeResponseInRAMCache
 from plone.transformchain.interfaces import ITransform
@@ -12,7 +11,7 @@ GLOBAL_KEY = "plone.app.caching.operations.ramcache"
 
 @implementer(ITransform)
 @adapter(Interface, Interface)
-class Store(object):
+class Store:
     """Transform chain element which actually saves the page in RAM.
 
     This is registered for the ``IRAMCached`` request marker, which is set by

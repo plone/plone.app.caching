@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import Explicit
 from datetime import datetime
 from dateutil.tz import tzlocal
@@ -23,7 +22,7 @@ class DummyContext(Explicit):
     pass
 
 
-class DummyPublished(object):
+class DummyPublished:
     def __init__(self, parent=None):
         self.__parent__ = parent
 
@@ -42,14 +41,14 @@ class TestETags(unittest.TestCase):
 
         @implementer(Interface)
         @adapter(DummyContext, Interface)
-        class DummyPortalState(object):
+        class DummyPortalState:
             def __init__(self, context, request):
                 pass
 
             def member(self):
                 return None
 
-        provideAdapter(DummyPortalState, name=u"plone_portal_state")
+        provideAdapter(DummyPortalState, name="plone_portal_state")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -63,20 +62,20 @@ class TestETags(unittest.TestCase):
     def test_UserID_member(self):
         from plone.app.caching.operations.etags import UserID
 
-        class DummyMember(object):
+        class DummyMember:
             def getId(self):
                 return "bob"
 
         @implementer(Interface)
         @adapter(DummyContext, Interface)
-        class DummyPortalState(object):
+        class DummyPortalState:
             def __init__(self, context, request):
                 pass
 
             def member(self):
                 return DummyMember()
 
-        provideAdapter(DummyPortalState, name=u"plone_portal_state")
+        provideAdapter(DummyPortalState, name="plone_portal_state")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -94,7 +93,7 @@ class TestETags(unittest.TestCase):
 
         @implementer(Interface)
         @adapter(DummyContext, Interface)
-        class DummyPortalState(object):
+        class DummyPortalState:
             def __init__(self, context, request):
                 pass
 
@@ -104,7 +103,7 @@ class TestETags(unittest.TestCase):
             def member(self):
                 return None
 
-        provideAdapter(DummyPortalState, name=u"plone_portal_state")
+        provideAdapter(DummyPortalState, name="plone_portal_state")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -118,13 +117,13 @@ class TestETags(unittest.TestCase):
     def test_Roles_member(self):
         from plone.app.caching.operations.etags import Roles
 
-        class DummyMember(object):
+        class DummyMember:
             def getRolesInContext(self, context):
                 return ["Member", "Manager"]
 
         @implementer(Interface)
         @adapter(DummyContext, Interface)
-        class DummyPortalState(object):
+        class DummyPortalState:
             def __init__(self, context, request):
                 pass
 
@@ -134,7 +133,7 @@ class TestETags(unittest.TestCase):
             def member(self):
                 return DummyMember()
 
-        provideAdapter(DummyPortalState, name=u"plone_portal_state")
+        provideAdapter(DummyPortalState, name="plone_portal_state")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -180,14 +179,14 @@ class TestETags(unittest.TestCase):
 
         @implementer(Interface)
         @adapter(DummyContext, Interface)
-        class DummyPortalState(object):
+        class DummyPortalState:
             def __init__(self, context, request):
                 pass
 
             def language(self):
                 return "en"
 
-        provideAdapter(DummyPortalState, name=u"plone_portal_state")
+        provideAdapter(DummyPortalState, name="plone_portal_state")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -217,7 +216,7 @@ class TestETags(unittest.TestCase):
 
         @implementer(ILastModified)
         @adapter(DummyPublished)
-        class DummyLastModified(object):
+        class DummyLastModified:
             def __init__(self, context):
                 self.context = context
 
@@ -243,7 +242,7 @@ class TestETags(unittest.TestCase):
 
         @implementer(ILastModified)
         @adapter(DummyPublished)
-        class DummyLastModified(object):
+        class DummyLastModified:
             def __init__(self, context):
                 self.context = context
 
@@ -265,20 +264,20 @@ class TestETags(unittest.TestCase):
     def test_CatalogCounter(self):
         from plone.app.caching.operations.etags import CatalogCounter
 
-        class DummyCatalog(object):
+        class DummyCatalog:
             def getCounter(self):
                 return 10
 
         @implementer(Interface)
         @adapter(DummyContext, Interface)
-        class DummyTools(object):
+        class DummyTools:
             def __init__(self, context, request):
                 pass
 
             def catalog(self):
                 return DummyCatalog()
 
-        provideAdapter(DummyTools, name=u"plone_tools")
+        provideAdapter(DummyTools, name="plone_tools")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -296,14 +295,14 @@ class TestETags(unittest.TestCase):
 
         @implementer(Interface)
         @adapter(DummyContext, Interface)
-        class DummyContextState(object):
+        class DummyContextState:
             def __init__(self, context, request):
                 pass
 
             def is_locked(self):
                 return True
 
-        provideAdapter(DummyContextState, name=u"plone_context_state")
+        provideAdapter(DummyContextState, name="plone_context_state")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -319,14 +318,14 @@ class TestETags(unittest.TestCase):
 
         @implementer(Interface)
         @adapter(DummyContext, Interface)
-        class DummyContextState(object):
+        class DummyContextState:
             def __init__(self, context, request):
                 pass
 
             def is_locked(self):
                 return False
 
-        provideAdapter(DummyContextState, name=u"plone_context_state")
+        provideAdapter(DummyContextState, name="plone_context_state")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -347,7 +346,7 @@ class TestETags(unittest.TestCase):
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished(DummyContext())
 
-        class DummyPortalSkins(object):
+        class DummyPortalSkins:
             def getRequestVarname(self):
                 return "skin_name"
 
@@ -369,7 +368,7 @@ class TestETags(unittest.TestCase):
         request = HTTPRequest(StringIO(), environ, response)
         published = DummyPublished(DummyContext())
 
-        class DummyPortalSkins(object):
+        class DummyPortalSkins:
             def getRequestVarname(self):
                 return "skin_name"
 

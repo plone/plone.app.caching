@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from operator import itemgetter
 from plone.app.caching.browser.edit import EditForm
 from plone.app.caching.interfaces import _
@@ -40,7 +39,7 @@ _isuri = re.compile(
 ).match
 
 
-class BaseView(object):
+class BaseView:
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -154,15 +153,14 @@ class ControlPanel(BaseView):
         raise NotFound(self, name)
 
     def update(self):
-        if super(ControlPanel, self).update():
+        if super().update():
             if "form.button.Save" in self.request.form:
-                if six.PY3:
-                    # decode the inputs recursively to unicode
-                    processInputs(self.request)
+                # decode the inputs recursively to unicode
+                processInputs(self.request)
                 self.processSave()
             elif "form.button.Cancel" in self.request.form:
                 self.request.response.redirect(
-                    "{0}/@@overview-controlpanel".format(
+                    "{}/@@overview-controlpanel".format(
                         self.context.absolute_url(),
                     ),
                 )
@@ -213,8 +211,8 @@ class ControlPanel(BaseView):
 
                 if contentType in contentTypeRulesetMapping:
                     self.errors.setdefault("contenttypes", {},)[ruleset] = _(
-                        u"Content type ${contentType} is already mapped to "
-                        u"the rule ${ruleset}.",
+                        "Content type ${contentType} is already mapped to "
+                        "the rule ${ruleset}.",
                         mapping={
                             "contentType": self.contentTypesLookup.get(
                                 contentType,
@@ -241,8 +239,8 @@ class ControlPanel(BaseView):
 
                 if template in templateRulesetMapping:
                     self.errors.setdefault("templates", {},)[ruleset] = _(
-                        u"Template ${template} is already mapped to the rule "
-                        u"${ruleset}.",
+                        "Template ${template} is already mapped to the rule "
+                        "${ruleset}.",
                         mapping={
                             "template": template,
                             "ruleset": templateRulesetMapping[template],
@@ -255,13 +253,13 @@ class ControlPanel(BaseView):
         for cachingProxy in cachingProxies:
             if not _isuri(cachingProxy):
                 self.errors["cachingProxies"] = _(
-                    u"Invalid URL: ${url}", mapping={"url": cachingProxy}
+                    "Invalid URL: ${url}", mapping={"url": cachingProxy}
                 )  # noqa
 
         for domain in domains:
             if not _isuri(domain):
                 self.errors["domain"] = _(
-                    u"Invalid URL: ${url}",
+                    "Invalid URL: ${url}",
                     mapping={"url": domain},
                 )
 
@@ -272,11 +270,11 @@ class ControlPanel(BaseView):
             ValueError,
             TypeError,
         ):
-            self.errors["ramCacheMaxEntries"] = _(u"An integer is required.")
+            self.errors["ramCacheMaxEntries"] = _("An integer is required.")
         else:
             if ramCacheMaxEntries < 0:
                 self.errors["ramCacheMaxEntries"] = _(
-                    u"A positive number is required.",
+                    "A positive number is required.",
                 )
         try:
             ramCacheMaxAge = int(ramCacheMaxAge)
@@ -284,11 +282,11 @@ class ControlPanel(BaseView):
             ValueError,
             TypeError,
         ):
-            self.errors["ramCacheMaxAge"] = _(u"An integer is required.")
+            self.errors["ramCacheMaxAge"] = _("An integer is required.")
         else:
             if ramCacheMaxAge < 0:
                 self.errors["ramCacheMaxAge"] = _(
-                    u"A positive number is required.",
+                    "A positive number is required.",
                 )
 
         try:
@@ -298,18 +296,18 @@ class ControlPanel(BaseView):
             TypeError,
         ):
             self.errors["ramCacheCleanupInterval"] = _(
-                u"An integer is required.",
+                "An integer is required.",
             )
         else:
             if ramCacheMaxAge < 0:
                 self.errors["ramCacheCleanupInterval"] = _(
-                    u"A positive number is required.",
+                    "A positive number is required.",
                 )
 
         # Check for errors
         if self.errors:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"There were errors."), "error"
+                _("There were errors."), "error"
             )
             return
 
@@ -334,12 +332,12 @@ class ControlPanel(BaseView):
 
         if not enabled and purgingEnabled:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"Purging is still enabled while caching is disabled!"),
+                _("Purging is still enabled while caching is disabled!"),
                 "warning",
             )
 
         IStatusMessage(self.request).addStatusMessage(
-            _(u"Changes saved."),
+            _("Changes saved."),
             "info",
         )
 
@@ -366,39 +364,24 @@ class ControlPanel(BaseView):
 
     @property
     def operationMapping(self):
-        return dict(
-            [
-                (
-                    k.replace(".", "-"),
-                    v,
-                )
-                for k, v in (self.settings.operationMapping or {}).items()
-            ],
-        )
+        return {
+            k.replace(".", "-"): v
+            for k, v in (self.settings.operationMapping or {}).items()
+        }
 
     @property
     def templateMapping(self):
-        return dict(
-            [
-                (
-                    k,
-                    v.replace(".", "-"),
-                )
-                for k, v in (self.ploneSettings.templateRulesetMapping or {}).items()
-            ],
-        )
+        return {
+            k: v.replace(".", "-")
+            for k, v in (self.ploneSettings.templateRulesetMapping or {}).items()
+        }
 
     @property
     def contentTypeMapping(self):
-        return dict(
-            [
-                (
-                    k,
-                    v.replace(".", "-"),
-                )
-                for k, v in (self.ploneSettings.contentTypeRulesetMapping or {}).items()
-            ],
-        )
+        return {
+            k: v.replace(".", "-")
+            for k, v in (self.ploneSettings.contentTypeRulesetMapping or {}).items()
+        }
 
     # Type lookups (for accessing settings)
 
@@ -489,7 +472,7 @@ class ControlPanel(BaseView):
 
         for option in options:
             if (
-                "{0}.{1}".format(
+                "{}.{}".format(
                     prefix,
                     option,
                 )
@@ -507,7 +490,7 @@ class ControlPanel(BaseView):
             return False
 
         for option in options:
-            if "{0}.{1}.{2}".format(prefix, ruleset, option) in self.registry:
+            if f"{prefix}.{ruleset}.{option}" in self.registry:
                 return True
 
         return False
@@ -517,7 +500,7 @@ class Import(BaseView):
     """The import control panel"""
 
     def update(self):
-        if super(Import, self).update():
+        if super().update():
             if "form.button.Import" in self.request.form:
                 self.processImport()
 
@@ -526,11 +509,11 @@ class Import(BaseView):
         snapshot = self.request.form.get("snapshot", True)
 
         if not profile:
-            self.errors["profile"] = _(u"You must select a profile to import.")
+            self.errors["profile"] = _("You must select a profile to import.")
 
         if self.errors:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"There were errors."), "error"
+                _("There were errors."), "error"
             )
             return
 
@@ -538,17 +521,17 @@ class Import(BaseView):
 
         # Create a snapshot
         if snapshot:
-            snapshotId = "plone.app.caching.beforeimport.{0}".format(
+            snapshotId = "plone.app.caching.beforeimport.{}".format(
                 datetime.datetime.now().isoformat().replace(":", ".")
             )
             portal_setup.createSnapshot(snapshotId)
 
         # Import the new profile
         portal_setup.runAllImportStepsFromProfile(
-            "profile-{0}".format(profile),
+            f"profile-{profile}",
         )
 
-        IStatusMessage(self.request).addStatusMessage(_(u"Import complete."), "info"),
+        IStatusMessage(self.request).addStatusMessage(_("Import complete."), "info"),
 
     @property
     @memoize
@@ -569,7 +552,7 @@ class Purge(BaseView):
 
     def update(self):
         self.purgeLog = []
-        if super(Purge, self).update():
+        if super().update():
             if "form.button.Purge" in self.request.form:
                 self.processPurge()
 
@@ -578,18 +561,15 @@ class Purge(BaseView):
         sync = self.request.form.get("synchronous", True)
 
         if not urls:
-            self.errors["urls"] = _(u"No URLs or paths entered.")
+            self.errors["urls"] = _("No URLs or paths entered.")
 
         if self.errors:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"There were errors."), "error"
+                _("There were errors."), "error"
             )
             return
 
-        if six.PY3:
-            urls = [
-                x.decode("utf8") if isinstance(x, six.binary_type) else x for x in urls
-            ]
+        urls = [x.decode("utf8") if isinstance(x, bytes) else x for x in urls]
 
         purger = getUtility(IPurger)
         serverURL = self.request["SERVER_URL"]
@@ -655,7 +635,7 @@ class RAMCache(BaseView):
     """The RAM cache control panel"""
 
     def update(self):
-        if super(RAMCache, self).update():
+        if super().update():
             if "form.button.Purge" in self.request.form:
                 self.processPurge()
 
@@ -663,14 +643,14 @@ class RAMCache(BaseView):
 
         if self.ramCache is None:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"RAM cache not installed."), "error"
+                _("RAM cache not installed."), "error"
             )
 
         if self.errors:
             IStatusMessage(self.request).addStatusMessage(
-                _(u"There were errors."), "error"
+                _("There were errors."), "error"
             )
             return
 
         self.ramCache.invalidateAll()
-        IStatusMessage(self.request).addStatusMessage(_(u"Cache purged."), "info")
+        IStatusMessage(self.request).addStatusMessage(_("Cache purged."), "info")

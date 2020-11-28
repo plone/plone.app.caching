@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from Acquisition import Explicit
 from plone.app.caching.interfaces import IPloneCacheSettings
@@ -56,7 +55,7 @@ def getData(filename):
     return data
 
 
-class Handler(object):
+class Handler:
     def __init__(self):
         self.invocations = []
 
@@ -239,7 +238,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
     def setUp(self):
         @implementer(IPurgePaths)
         @adapter(FauxContent)
-        class FauxContentPurgePaths(object):
+        class FauxContentPurgePaths:
             def __init__(self, context):
                 self.context = context
 
@@ -269,7 +268,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         content = FauxContent("foo").__of__(root)
         discussable = FauxDiscussable().__of__(content)
 
-        class FauxPloneTool(object):
+        class FauxPloneTool:
             def getDiscussionThread(self, item):
                 return [content, item]
 
@@ -287,7 +286,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         content = FauxContent("foo").__of__(root)
         discussable = FauxDiscussable().__of__(content)
 
-        class FauxPloneTool(object):
+        class FauxPloneTool:
             def getDiscussionThread(self, item):
                 return []
 
@@ -306,7 +305,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         content = FauxContent("foo").__of__(root)
         discussable = FauxDiscussable().__of__(content)
 
-        class FauxPloneTool(object):
+        class FauxPloneTool:
             def getDiscussionThread(self, item):
                 return [content, item]
 
@@ -334,12 +333,12 @@ class TestScalesPurgePaths(unittest.TestCase):
         self.folder.invokeFactory("Image", "image", title="Test Image")
         self.image_type = self.folder["image"]
         self.image_type.image = NamedImage(
-            getData("data/plone-app-caching.jpg"), "image/jpg", u"plone-app-caching.jpg"
+            getData("data/plone-app-caching.jpg"), "image/jpg", "plone-app-caching.jpg"
         )
-        self.folder.invokeFactory("File", "file", title=u"Töst File")
+        self.folder.invokeFactory("File", "file", title="Töst File")
         self.file = self.folder["file"]
         self.file.file = NamedFile(
-            getData("data/testfile.csv"), "text/csv", u"data/töstfile.csv"
+            getData("data/testfile.csv"), "text/csv", "data/töstfile.csv"
         )
 
         # Create a page with a lead image.
@@ -348,7 +347,7 @@ class TestScalesPurgePaths(unittest.TestCase):
 
         @implementer(IBehaviorAssignable)
         @adapter(IDocument)
-        class TestingAssignable(object):
+        class TestingAssignable:
 
             enabled = [ILeadImageBehavior]
             name = "plone.leadimage"
@@ -371,7 +370,7 @@ class TestScalesPurgePaths(unittest.TestCase):
 
         leadimage_adapter = ILeadImageBehavior(self.page)
         leadimage_adapter.image = NamedImage(
-            getData("data/plone-app-caching.jpg"), "image/jpg", u"plone-app-caching.jpg"
+            getData("data/plone-app-caching.jpg"), "image/jpg", "plone-app-caching.jpg"
         )
 
         setRoles(self.portal, TEST_USER_ID, TEST_USER_ROLES)
@@ -394,8 +393,8 @@ class TestScalesPurgePaths(unittest.TestCase):
     def test_scale_purge_paths_unicode(self):
         purge = ScalesPurgePaths(self.file)
         expected = [
-            u"/plone/media/file/view/++widget++form.widgets.file/@@download/data/töstfile.csv",  # noqa: E501
-            u"/plone/media/file/@@download/file/data/töstfile.csv",
+            "/plone/media/file/view/++widget++form.widgets.file/@@download/data/töstfile.csv",  # noqa: E501
+            "/plone/media/file/@@download/file/data/töstfile.csv",
         ]
         if six.PY2:
             # the getRelativePaths method returns bytes on Python 2

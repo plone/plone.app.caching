@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from datetime import datetime
 from dateutil.tz import tzlocal
@@ -43,7 +42,7 @@ def FSPageTemplateDelegateLastModified(template):
 
 
 @implementer(ILastModified)
-class PersistentLastModified(object):
+class PersistentLastModified:
     """General ILastModified adapter for persistent objects that have a
     _p_mtime. Note that we don't register this for IPersistent, because
     that interface is mixed into too many things and may end up taking
@@ -68,8 +67,26 @@ class OFSFileLastModified(PersistentLastModified):
 
 
 @implementer(ILastModified)
+<<<<<<< HEAD
+=======
+@adapter(ImageScale)
+class ImageScaleLastModified:
+    """ILastModified adapter for Products.Archetypes.Field.Image"""
+
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self):
+        parent = getContext(self.context)
+        if parent is not None:
+            return ILastModified(parent)()
+        return None
+
+
+@implementer(ILastModified)
+>>>>>>> find . -name "*.py" |xargs pyupgrade --py36-plus
 @adapter(FSObject)
-class FSObjectLastModified(object):
+class FSObjectLastModified:
     """ILastModified adapter for FSFile and FSImage"""
 
     def __init__(self, context):
@@ -86,7 +103,7 @@ class FSObjectLastModified(object):
 
 @implementer(ILastModified)
 @adapter(ICatalogableDublinCore)
-class CatalogableDublinCoreLastModified(object):
+class CatalogableDublinCoreLastModified:
     """ILastModified adapter for ICatalogableDublinCore, which includes
     most CMF, Archetypes and Dexterity content
     """
@@ -103,7 +120,7 @@ class CatalogableDublinCoreLastModified(object):
 
 @implementer(ILastModified)
 @adapter(IDCTimes)
-class DCTimesLastModified(object):
+class DCTimesLastModified:
     """ILastModified adapter for zope.dublincore IDCTimes"""
 
     def __init__(self, context):
@@ -115,7 +132,7 @@ class DCTimesLastModified(object):
 
 @implementer(ILastModified)
 @adapter(IResource)
-class ResourceLastModified(object):
+class ResourceLastModified:
     """ILastModified for Zope 3 style browser resources"""
 
     def __init__(self, context):

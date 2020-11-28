@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import _
 from plone.memoize.instance import memoize
 from plone.registry import FieldRef
@@ -95,10 +94,10 @@ class EditForm(form.Form):
 
         for option in self.operation.options:
             newField = None
-            fieldName = "{0}.{1}".format(prefix, option)
+            fieldName = f"{prefix}.{option}"
 
             if self.rulesetName:
-                rulesetFieldName = "{0}.{1}.{2}".format(
+                rulesetFieldName = "{}.{}.{}".format(
                     prefix,
                     self.rulesetName,
                     option,
@@ -125,7 +124,7 @@ class EditForm(form.Form):
 
         # Set up widgets and actions as normal
 
-        super(EditForm, self).update()
+        super().update()
 
         # Plonify the buttons
 
@@ -151,7 +150,7 @@ class EditForm(form.Form):
         options = self.operation.options
 
         for option in options:
-            recordName = "{0}.{1}".format(
+            recordName = "{}.{}".format(
                 prefix,
                 option,
             )
@@ -161,7 +160,7 @@ class EditForm(form.Form):
             # as necessary in applyChanges()
 
             if self.rulesetName:
-                rulesetRecordName = "{0}.{1}.{2}".format(
+                rulesetRecordName = "{}.{}.{}".format(
                     prefix,
                     self.rulesetName,
                     option,
@@ -230,7 +229,7 @@ class EditForm(form.Form):
     def title(self):
         if self.rulesetName:
             return _(
-                u"Edit ${operation} options for Ruleset: ${ruleset}",
+                "Edit ${operation} options for Ruleset: ${ruleset}",
                 mapping={
                     "operation": self.operation.title,
                     "ruleset": self.ruleset.title,
@@ -238,7 +237,7 @@ class EditForm(form.Form):
             )
         else:
             return _(
-                u"Edit ${operation} options",
+                "Edit ${operation} options",
                 mapping={"operation": self.operation.title},
             )
 
@@ -248,37 +247,35 @@ class EditForm(form.Form):
 
     # Buttons/actions
 
-    @button.buttonAndHandler(_(u"Save"), name="save")
+    @button.buttonAndHandler(_("Save"), name="save")
     def save(self, action):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
             return
         self.applyChanges(data)
-        IStatusMessage(self.request).addStatusMessage(_(u"Changes saved."), "info")
+        IStatusMessage(self.request).addStatusMessage(_("Changes saved."), "info")
         self.request.response.redirect(
-            "{0}/@@caching-controlpanel#detailed-settings".format(
+            "{}/@@caching-controlpanel#detailed-settings".format(
                 self.context.absolute_url(),
             ),
         )
         return ""
 
-    @button.buttonAndHandler(_(u"Cancel"), name="cancel")
+    @button.buttonAndHandler(_("Cancel"), name="cancel")
     def cancel(self, action):
-        IStatusMessage(self.request).addStatusMessage(
-            _(u"Edit cancelled."), type="info"
-        )
+        IStatusMessage(self.request).addStatusMessage(_("Edit cancelled."), type="info")
         self.request.response.redirect(
-            "{0}/@@caching-controlpanel#detailed-settings".format(
+            "{}/@@caching-controlpanel#detailed-settings".format(
                 self.context.absolute_url(),
             ),
         )
         return ""
 
-    @button.buttonAndHandler(_(u"Delete settings (use defaults)"), name="clear")
+    @button.buttonAndHandler(_("Delete settings (use defaults)"), name="clear")
     def clear(self, action):
         for key in self.getContent().keys():
-            key_suffix = "{0}.{1}.".format(
+            key_suffix = "{}.{}.".format(
                 self.operation.prefix,
                 self.rulesetName,
             )
@@ -288,10 +285,10 @@ class EditForm(form.Form):
                 del self.registry.records[key]
 
         IStatusMessage(self.request).addStatusMessage(
-            _(u"Ruleset-specific settings removed."), type="info"
+            _("Ruleset-specific settings removed."), type="info"
         )
         self.request.response.redirect(
-            "{0}/@@caching-controlpanel#detailed-settings".format(
+            "{}/@@caching-controlpanel#detailed-settings".format(
                 self.context.absolute_url(),
             ),
         )

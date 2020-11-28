@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.registry.interfaces import IRegistry

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -40,14 +39,14 @@ class TestOperationParameters(unittest.TestCase):
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ("Manager",))
         self.portal.invokeFactory("Folder", "f1")
-        self.portal["f1"].title = u"Folder one"
-        self.portal["f1"].description = u"Folder one description"
+        self.portal["f1"].title = "Folder one"
+        self.portal["f1"].description = "Folder one description"
         self.portal["f1"].reindexObject()
 
         # Add page content
         self.portal["f1"].invokeFactory("Document", "d1")
-        self.portal["f1"]["d1"].title = u"Document one"
-        self.portal["f1"]["d1"].description = u"Document one description"
+        self.portal["f1"]["d1"].title = "Document one"
+        self.portal["f1"]["d1"].description = "Document one description"
         testText = "Testing... body one"
         self.portal["f1"]["d1"].text = RichTextValue(
             testText,
@@ -109,7 +108,7 @@ class TestOperationParameters(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
             ),
@@ -153,7 +152,7 @@ class TestOperationParameters(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {0}:{1}".format(
+            "Basic {}:{}".format(
                 TEST_USER_NAME,
                 TEST_USER_PASSWORD,
             ),

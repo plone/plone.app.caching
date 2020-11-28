@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from OFS.SimpleItem import SimpleItem
 from plone.memoize.interfaces import ICacheChooser
 from plone.testing.zca import UNIT_TESTING
@@ -26,7 +25,7 @@ import unittest
 import wsgiref.handlers
 
 
-class DummyPublished(object):
+class DummyPublished:
     def __init__(self, parent=None):
         self.__parent__ = parent
 
@@ -314,12 +313,12 @@ class ResponseModificationHelpersTest(unittest.TestCase):
         delta = datetime.timedelta(seconds=58)
         self.assertFalse(
             timedelta < delta,
-            "{0} is not < {1}".format(timedelta, delta),
+            f"{timedelta} is not < {delta}",
         )
         delta = datetime.timedelta(seconds=61)
         self.assertFalse(
             timedelta > delta,
-            "{0} is not > {1}".format(timedelta, delta),
+            f"{timedelta} is not > {delta}",
         )
 
     # cacheInRAM()
@@ -419,9 +418,9 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         response.setHeader("X-Bar", "qux")
         response.setStatus(200)
 
-        body = cachedResponse(published, request, response, 404, headers, u"body")
+        body = cachedResponse(published, request, response, 404, headers, "body")
 
-        self.assertEqual(u"body", body)
+        self.assertEqual("body", body)
         self.assertEqual(404, response.getStatus())
         self.assertEqual("foo", response.getHeader("X-Cache-Rule"))
         self.assertEqual("bar", response.getHeader("X-Foo"))
@@ -451,9 +450,9 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
 
         assert response.enableHTTPCompression(query=True)
 
-        body = cachedResponse(published, request, response, 404, headers, u"body", 0)
+        body = cachedResponse(published, request, response, 404, headers, "body", 0)
 
-        self.assertEqual(u"body", body)
+        self.assertEqual("body", body)
         self.assertEqual(404, response.getStatus())
         self.assertEqual("foo", response.getHeader("X-Cache-Rule"))
         self.assertEqual("bar", response.getHeader("X-Foo"))
@@ -485,9 +484,9 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
 
         assert not response.enableHTTPCompression(query=True)
 
-        body = cachedResponse(published, request, response, 404, headers, u"body", 1)
+        body = cachedResponse(published, request, response, 404, headers, "body", 1)
 
-        self.assertEqual(u"body", body)
+        self.assertEqual("body", body)
         self.assertEqual(404, response.getStatus())
         self.assertEqual("foo", response.getHeader("X-Cache-Rule"))
         self.assertEqual("bar", response.getHeader("X-Foo"))
@@ -528,7 +527,7 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
 
         body = notModified(published, request, response, etag=etag, lastModified=now)
 
-        self.assertEqual(u"", body)
+        self.assertEqual("", body)
         self.assertEqual(etag, response.getHeader("ETag", literal=1))
         self.assertIsNone(response.getHeader("Last-Modified"))
         self.assertIsNone(response.getHeader("Expires"))
@@ -854,7 +853,7 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.operations.utils import getContext
 
         @implementer(IContentish)
-        class Parent(object):
+        class Parent:
             pass
 
         parent = Parent()
@@ -867,7 +866,7 @@ class MiscHelpersTest(unittest.TestCase):
         from plone.app.caching.operations.utils import getContext
 
         @implementer(IContentish)
-        class Parent(object):
+        class Parent:
             def __init__(self, parent=None):
                 self.__parent__ = parent
 
@@ -959,7 +958,7 @@ class MiscHelpersTest(unittest.TestCase):
 
         @implementer(ILastModified)
         @adapter(DummyPublished)
-        class DummyLastModified(object):
+        class DummyLastModified:
             def __init__(self, context):
                 self.context = context
 
@@ -976,7 +975,7 @@ class MiscHelpersTest(unittest.TestCase):
 
         @implementer(ILastModified)
         @adapter(DummyPublished)
-        class DummyLastModified(object):
+        class DummyLastModified:
             def __init__(self, context):
                 self.context = context
 
@@ -996,7 +995,7 @@ class MiscHelpersTest(unittest.TestCase):
 
         @implementer(ILastModified)
         @adapter(DummyPublished)
-        class DummyLastModified(object):
+        class DummyLastModified:
             def __init__(self, context):
                 self.context = context
 
@@ -1096,7 +1095,7 @@ class MiscHelpersTest(unittest.TestCase):
 
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
-        class FooETag(object):
+        class FooETag:
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1104,11 +1103,11 @@ class MiscHelpersTest(unittest.TestCase):
             def __call__(self):
                 return "foo"
 
-        provideAdapter(FooETag, name=u"foo")
+        provideAdapter(FooETag, name="foo")
 
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
-        class BarETag(object):
+        class BarETag:
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1116,7 +1115,7 @@ class MiscHelpersTest(unittest.TestCase):
             def __call__(self):
                 return None
 
-        provideAdapter(BarETag, name=u"bar")
+        provideAdapter(BarETag, name="bar")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -1141,7 +1140,7 @@ class MiscHelpersTest(unittest.TestCase):
 
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
-        class FooETag(object):
+        class FooETag:
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1149,11 +1148,11 @@ class MiscHelpersTest(unittest.TestCase):
             def __call__(self):
                 return "foo"
 
-        provideAdapter(FooETag, name=u"foo")
+        provideAdapter(FooETag, name="foo")
 
         @implementer(IETagValue)
         @adapter(DummyPublished, HTTPRequest)
-        class BarETag(object):
+        class BarETag:
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1161,7 +1160,7 @@ class MiscHelpersTest(unittest.TestCase):
             def __call__(self):
                 return "bar"
 
-        provideAdapter(BarETag, name=u"bar")
+        provideAdapter(BarETag, name="bar")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -1284,7 +1283,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "foo"
                 return cache
@@ -1301,7 +1300,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "plone.app.caching.operations.ramcache"
                 return cache
@@ -1358,7 +1357,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "plone.app.caching.operations.ramcache"
                 return cache
@@ -1369,7 +1368,7 @@ class RAMCacheTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u"Body"
+        result = "Body"
         response.setHeader("X-Foo", "bar")
 
         storeResponseInRAMCache(request, response, result)
@@ -1383,7 +1382,7 @@ class RAMCacheTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u"Body"
+        result = "Body"
         response.setHeader("X-Foo", "bar")
 
         IAnnotations(request)["plone.app.caching.operations.ramcache.key"] = "foo"
@@ -1399,7 +1398,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "plone.app.caching.operations.ramcache"
                 return cache
@@ -1410,7 +1409,7 @@ class RAMCacheTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u"Body"
+        result = "Body"
         response.setHeader("X-Foo", "bar")
 
         IAnnotations(request)["plone.app.caching.operations.ramcache.key"] = "foo"
@@ -1419,7 +1418,7 @@ class RAMCacheTest(unittest.TestCase):
 
         self.assertEqual(1, len(cache))
         cached = normalize_response_cache(cache["foo"])
-        self.assertEqual((200, {"x-foo": "bar"}, u"Body", 0), cached)
+        self.assertEqual((200, {"x-foo": "bar"}, "Body", 0), cached)
 
     def test_storeResponseInRAMCache_gzip(self):
         from plone.app.caching.operations.utils import storeResponseInRAMCache
@@ -1430,7 +1429,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "plone.app.caching.operations.ramcache"
                 return cache
@@ -1444,7 +1443,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ["HTTP_ACCEPT_ENCODING"] = "gzip; deflate"
         response.enableHTTPCompression(request)
 
-        result = u"Body"
+        result = "Body"
         response.setHeader("X-Foo", "bar")
 
         IAnnotations(request)["plone.app.caching.operations.ramcache.key"] = "foo"
@@ -1453,7 +1452,7 @@ class RAMCacheTest(unittest.TestCase):
 
         self.assertEqual(1, len(cache))
         cached = normalize_response_cache(cache["foo"])
-        self.assertEqual((200, {"x-foo": "bar"}, u"Body", 1), cached)
+        self.assertEqual((200, {"x-foo": "bar"}, "Body", 1), cached)
 
     def test_storeResponseInRAMCache_custom_keys(self):
         from plone.app.caching.operations.utils import storeResponseInRAMCache
@@ -1464,7 +1463,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "cachekey"
                 return cache
@@ -1475,7 +1474,7 @@ class RAMCacheTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        result = u"Body"
+        result = "Body"
         response.setHeader("X-Foo", "bar")
 
         IAnnotations(request)["annkey"] = "foo"
@@ -1486,7 +1485,7 @@ class RAMCacheTest(unittest.TestCase):
 
         self.assertEqual(1, len(cache))
         cached = normalize_response_cache(cache["foo"])
-        self.assertEqual((200, {"x-foo": "bar"}, u"Body", 0), cached)
+        self.assertEqual((200, {"x-foo": "bar"}, "Body", 0), cached)
 
     # fetchFromRAMCache()
 
@@ -1511,7 +1510,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "plone.app.caching.operations.ramcache"
                 return cache
@@ -1525,10 +1524,10 @@ class RAMCacheTest(unittest.TestCase):
         request.environ["PATH_INFO"] = "/foo/bar"
         request.environ["QUERY_STRING"] = ""
 
-        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, u"Body")
+        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, "Body")
 
         cached = normalize_response_cache(fetchFromRAMCache(request))
-        self.assertEqual((200, {"x-foo": "bar"}, u"Body"), cached)
+        self.assertEqual((200, {"x-foo": "bar"}, "Body"), cached)
 
     def test_fetchFromRAMCache_with_etag(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1539,7 +1538,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "plone.app.caching.operations.ramcache"
                 return cache
@@ -1556,11 +1555,11 @@ class RAMCacheTest(unittest.TestCase):
         cache["||a|b||http://example.com/foo/bar?"] = (
             200,
             {"x-foo": "bar"},
-            u"Body",
+            "Body",
         )
 
         cached = normalize_response_cache(fetchFromRAMCache(request, etag="|a|b"))
-        self.assertEqual((200, {"x-foo": "bar"}, u"Body"), cached)
+        self.assertEqual((200, {"x-foo": "bar"}, "Body"), cached)
 
     def test_fetchFromRAMCache_custom_key(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1571,7 +1570,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "cachekey"
                 return cache
@@ -1585,12 +1584,12 @@ class RAMCacheTest(unittest.TestCase):
         request.environ["PATH_INFO"] = "/foo/bar"
         request.environ["QUERY_STRING"] = ""
 
-        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, u"Body")
+        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, "Body")
 
         cached = normalize_response_cache(
             fetchFromRAMCache(request, globalKey="cachekey")
         )
-        self.assertEqual((200, {"x-foo": "bar"}, u"Body"), cached)
+        self.assertEqual((200, {"x-foo": "bar"}, "Body"), cached)
 
     def test_fetchFromRAMCache_miss(self):
         from plone.app.caching.operations.utils import fetchFromRAMCache
@@ -1601,7 +1600,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "plone.app.caching.operations.ramcache"
                 return cache
@@ -1615,7 +1614,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ["PATH_INFO"] = "/foo/bar"
         request.environ["QUERY_STRING"] = ""
 
-        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, u"Body")
+        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, "Body")
 
         cached = normalize_response_cache(fetchFromRAMCache(request, etag="|foo"))
         self.assertIsNone(cached)
@@ -1629,7 +1628,7 @@ class RAMCacheTest(unittest.TestCase):
         cache = Cache()
 
         @implementer(ICacheChooser)
-        class Chooser(object):
+        class Chooser:
             def __call__(self, key):
                 assert key == "plone.app.caching.operations.ramcache"
                 return cache
@@ -1643,7 +1642,7 @@ class RAMCacheTest(unittest.TestCase):
         request.environ["PATH_INFO"] = "/foo/bar"
         request.environ["QUERY_STRING"] = ""
 
-        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, u"Body")
+        cache["http://example.com/foo/bar?"] = (200, {"x-foo": "bar"}, "Body")
 
         marker = object()
         cached = normalize_response_cache(

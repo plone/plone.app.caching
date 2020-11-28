@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from dateutil.tz import tzlocal
 from persistent.TimeStamp import TimeStamp
 from plone.app.caching import lastmodified
@@ -13,7 +12,7 @@ import time
 import unittest
 
 
-class FauxDataManager(object):
+class FauxDataManager:
     def setstate(self, object):
         pass
 
@@ -148,7 +147,7 @@ class TestLastModified(unittest.TestCase):
         from zope.interface import implementer
 
         @implementer(ICatalogableDublinCore)
-        class Dummy(object):
+        class Dummy:
 
             _mod = None
 
@@ -172,7 +171,7 @@ class TestLastModified(unittest.TestCase):
         from zope.interface import implementer
 
         @implementer(IDCTimes)
-        class Dummy(object):
+        class Dummy:
 
             _mod = None
 

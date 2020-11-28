@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from AccessControl.PermissionRole import rolesForPermissionOn
 from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.interfaces import IPloneCacheSettings
@@ -130,7 +129,7 @@ def cacheInBrowser(published, request, response, etag=None, lastModified=None):
     """
 
     if etag is not None:
-        response.setHeader("ETag", '"{0}"'.format(etag), literal=1)
+        response.setHeader("ETag", f'"{etag}"', literal=1)
 
     if lastModified is not None:
         response.setHeader("Last-Modified", formatDateTime(lastModified))
@@ -167,7 +166,7 @@ def cacheInProxy(
         del response.headers["last-modified"]
 
     if etag is not None:
-        response.setHeader("ETag", '"{0}"'.format(etag), literal=1)
+        response.setHeader("ETag", f'"{etag}"', literal=1)
 
     if vary is not None:
         response.setHeader("Vary", vary)
@@ -175,7 +174,7 @@ def cacheInProxy(
     response.setHeader("Expires", formatDateTime(getExpiration(0)))
     response.setHeader(
         "Cache-Control",
-        "max-age=0, s-maxage={0}, must-revalidate".format(smaxage),
+        f"max-age=0, s-maxage={smaxage}, must-revalidate",
     )
 
 
@@ -205,7 +204,7 @@ def cacheInBrowserAndProxy(
         del response.headers["last-modified"]
 
     if etag is not None:
-        response.setHeader("ETag", '"{0}"'.format(etag), literal=1)
+        response.setHeader("ETag", f'"{etag}"', literal=1)
 
     if vary is not None:
         response.setHeader("Vary", vary)
@@ -213,14 +212,14 @@ def cacheInBrowserAndProxy(
     response.setHeader("Expires", formatDateTime(getExpiration(maxage)))
 
     if smaxage is not None:
-        maxage = "{0}, s-maxage={1}".format(maxage, smaxage)
+        maxage = f"{maxage}, s-maxage={smaxage}"
 
     # Substituting proxy-validate in place of must=revalidate here because of
     # Safari bug
     # https://bugs.webkit.org/show_bug.cgi?id=13128
     response.setHeader(
         "Cache-Control",
-        "max-age={0}, proxy-revalidate, public".format(maxage),
+        f"max-age={maxage}, proxy-revalidate, public",
     )
 
 
@@ -328,7 +327,7 @@ def notModified(published, request, response, etag=None, lastModified=None):
         del response.headers["cache-control"]
 
     response.setStatus(304)
-    return u""
+    return ""
 
 
 #
@@ -755,7 +754,7 @@ def getRAMCacheKey(request, etag=None, lastModified=None):
     is needed to ensure the key changes when the resource view changes.
     """
 
-    resourceKey = "{0}{1}?{2}".format(
+    resourceKey = "{}{}?{}".format(
         request.get("SERVER_URL", ""),
         request.get("PATH_INFO", ""),
         request.get("QUERY_STRING", ""),

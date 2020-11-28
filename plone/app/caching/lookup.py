@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.utils import getObjectDefaultView
@@ -10,7 +9,7 @@ from zope.interface import implementer
 
 
 @implementer(IRulesetLookup)
-class ContentItemLookup(object):
+class ContentItemLookup:
     """General lookup for browser views and page templates.
 
     1. Attempt to look up a ruleset using z3c.caching.registry.lookup()

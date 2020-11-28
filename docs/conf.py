@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # plone.app.caching documentation build configuration file, created by
 # sphinx-quickstart on Tue May 20 16:53:52 2014.
@@ -42,8 +41,8 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"plone.app.caching"
-copyright = u"2014, Plone Foundation"
+project = "plone.app.caching"
+copyright = "2014, Plone Foundation"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -186,8 +185,8 @@ latex_documents = [
     (
         "index",
         "ploneappcaching.tex",
-        u"plone.app.caching Documentation",
-        u"Plone Foundation",
+        "plone.app.caching Documentation",
+        "Plone Foundation",
         "manual",
     ),
 ]
@@ -221,8 +220,8 @@ man_pages = [
     (
         "index",
         "ploneappcaching",
-        u"plone.app.caching Documentation",
-        [u"Plone Foundation"],
+        "plone.app.caching Documentation",
+        ["Plone Foundation"],
         1,
     )
 ]
@@ -240,8 +239,8 @@ texinfo_documents = [
     (
         "index",
         "ploneappcaching",
-        u"plone.app.caching Documentation",
-        u"Plone Foundation",
+        "plone.app.caching Documentation",
+        "Plone Foundation",
         "ploneappcaching",
         "One line description of project.",
         "Miscellaneous",
