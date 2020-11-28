@@ -211,56 +211,6 @@ class ScalesPurgePaths:
         return []
 
 
-<<<<<<< HEAD
-=======
-if HAVE_AT:
-
-    @implementer(IPurgePaths)
-    @adapter(IBaseObject)
-    class ObjectFieldPurgePaths:
-        """Paths to purge for Archetypes object fields"""
-
-        def __init__(self, context):
-            self.context = context
-
-        def getRelativePaths(self):
-            prefix = "/" + self.context.virtual_url_path()
-            schema = self.context.Schema()
-
-            def fieldFilter(field):
-                return (
-                    IBlobField.providedBy(field)
-                    or IFileField.providedBy(field)
-                    or IImageField.providedBy(field)
-                ) and not ITextField.providedBy(field)
-
-            seenDownloads = False
-            for field in schema.filterFields(fieldFilter):
-                if not seenDownloads:
-                    yield prefix + "/download"
-                    yield prefix + "/at_download"
-                    seenDownloads = True
-
-                yield prefix + "/at_download/" + field.getName()
-
-                fieldURL = "{}/{}".format(
-                    prefix,
-                    field.getName(),
-                )
-                yield fieldURL
-
-                if IImageField.providedBy(field):
-                    for size in field.getAvailableSizes(self.context).keys():
-                        yield "{}_{}".format(
-                            fieldURL,
-                            size,
-                        )
-
-        def getAbsolutePaths(self):
-            return []
-
-
->>>>>>> code style black
 # Event redispatch for content items - we check the list of content items
 # instead of the marker interface
 

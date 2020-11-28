@@ -67,24 +67,6 @@ class OFSFileLastModified(PersistentLastModified):
 
 
 @implementer(ILastModified)
-<<<<<<< HEAD
-=======
-@adapter(ImageScale)
-class ImageScaleLastModified:
-    """ILastModified adapter for Products.Archetypes.Field.Image"""
-
-    def __init__(self, context):
-        self.context = context
-
-    def __call__(self):
-        parent = getContext(self.context)
-        if parent is not None:
-            return ILastModified(parent)()
-        return None
-
-
-@implementer(ILastModified)
->>>>>>> find . -name "*.py" |xargs pyupgrade --py36-plus
 @adapter(FSObject)
 class FSObjectLastModified:
     """ILastModified adapter for FSFile and FSImage"""
