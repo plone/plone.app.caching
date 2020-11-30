@@ -71,6 +71,11 @@
       <field ref="plone.app.caching.terseCaching.maxage" />
       <value>10</value>
   </record>
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.smaxage">
+      <field ref="plone.app.caching.terseCaching.smaxage" />
+      <value>0</value>
+  </record>
+
 
   <!-- plone.content.feed -->
   <record name="plone.app.caching.weakCaching.plone.content.feed.etags">

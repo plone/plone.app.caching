@@ -27,6 +27,7 @@ import dateutil.parser
 import dateutil.tz
 import os
 import pkg_resources
+import transaction
 import unittest
 
 
@@ -710,13 +711,22 @@ class TestProfileWithCachingRestAPI(unittest.TestCase):
         self.api_session = RelativeSession(self.layer["portal"].absolute_url())
         self.api_session.headers.update({"Accept": "application/json"})
 
+    def test_restapi_actions(self):
+        # plone.content.dynamic for plone.restapi.services.actions.get.ActionsGet
+        response = self.api_session.get("/f1/f2/@actions")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["X-Cache-Rule"], "plone.content.dynamic")
+        self.assertEqual(
+            response.headers["X-Cache-Operation"], "plone.app.caching.terseCaching"
+        )
+
     def test_restapi_breadcrumbs(self):
-        # plone.content.itemView for plone.restapi.services.breadcrumbs.get.BreadcrumbsGet
+        # plone.content.dynamic for plone.restapi.services.breadcrumbs.get.BreadcrumbsGet
         response = self.api_session.get("/f1/f2/@breadcrumbs")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers["X-Cache-Rule"], "plone.content.itemView")
+        self.assertEqual(response.headers["X-Cache-Rule"], "plone.content.dynamic")
         self.assertEqual(
-            response.headers["X-Cache-Operation"], "plone.app.caching.weakCaching"
+            response.headers["X-Cache-Operation"], "plone.app.caching.terseCaching"
         )
 
     def test_restapi_comments(self):

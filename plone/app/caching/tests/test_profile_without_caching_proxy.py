@@ -114,9 +114,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # - set skin?  Maybe
         # - leave status unlocked
         # - set the mod date on the resource registries?  Probably.
-
-        import transaction
-
         transaction.commit()
 
         # Request the authenticated folder
@@ -328,8 +325,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.syndication.editProperties(isAllowed=True)
         self.syndication.enableSyndication(self.portal)
 
-        import transaction
-
         transaction.commit()
 
         # Request the rss feed
@@ -444,8 +439,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # Publish the folder
         self.portal.portal_workflow.doActionFor(self.portal["f1"], "publish")
 
-        import transaction
-
         transaction.commit()
 
         # Request the image
@@ -495,9 +488,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
     def test_resources(self):
-
-        import transaction
-
         transaction.commit()
 
         # Request a skin image
@@ -541,8 +531,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.portal.manage_addFile(
             "bigfile", file=io.BytesIO(s), content_type="application/octet-stream"
         )
-
-        import transaction
 
         transaction.commit()
 
@@ -617,13 +605,23 @@ class TestProfileWithoutCachingRestAPI(unittest.TestCase):
         self.api_session = RelativeSession(self.layer["portal"].absolute_url())
         self.api_session.headers.update({"Accept": "application/json"})
 
+    def test_restapi_actions(self):
+        # plone.content.dynamic for plone.restapi.services.actions.get.ActionsGet
+        response = self.api_session.get("/f1/f2/@actions")
+        import pdb; pdb.set_trace()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["X-Cache-Rule"], "plone.content.dynamic")
+        self.assertEqual(
+            response.headers["X-Cache-Operation"], "plone.app.caching.terseCaching"
+        )
+
     def test_restapi_breadcrumbs(self):
-        # plone.content.itemView for plone.restapi.services.breadcrumbs.get.BreadcrumbsGet
+        # plone.content.dynamic for plone.restapi.services.breadcrumbs.get.BreadcrumbsGet
         response = self.api_session.get("/f1/f2/@breadcrumbs")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers["X-Cache-Rule"], "plone.content.itemView")
+        self.assertEqual(response.headers["X-Cache-Rule"], "plone.content.dynamic")
         self.assertEqual(
-            response.headers["X-Cache-Operation"], "plone.app.caching.weakCaching"
+            response.headers["X-Cache-Operation"], "plone.app.caching.terseCaching"
         )
 
     def test_restapi_comments(self):
@@ -640,9 +638,6 @@ class TestProfileWithoutCachingRestAPI(unittest.TestCase):
         response = self.api_session.get("/f1/f2")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["X-Cache-Rule"], "plone.content.dynamic")
-        import pdb
-
-        pdb.set_trace()
         self.assertEqual(
             response.headers["X-Cache-Operation"], "plone.app.caching.terseCaching"
         )

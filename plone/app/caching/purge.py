@@ -41,7 +41,6 @@ CONTENT_PATHS_POSTFIXES = [
 ]
 if HAS_RESTAPI:
     CONTENT_PATHS_POSTFIXES += [
-        "/@breadcrumbs",
         "/@comments",
     ]
 
