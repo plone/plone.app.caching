@@ -325,28 +325,34 @@ class StrongCaching(BaseCaching):
     smaxage = etags = vary = None
     lastModified = ramCache = anonOnly = False
 
+
 @provider(ICachingOperationType)
 class TerseCaching(BaseCaching):
-    """Terse caching operation.
-    """
+    """Terse caching operation."""
 
-    title = _(u'Terse caching')
+    title = _(u"Terse caching")
     description = _(
-        u'Cache in browser (default: 10s) and proxy (default: 1 min). '
-        u'Keep very short in cache to buffer hi-load scenarios ',
-        u'Use for very dynamic content, like collecting data from '
-        u'the whole portal. '
-        u'Temporary outdated is less important than performance.'
-        u'Reduce in-cache time to just 3-10 seconds to only buffer peak load '
-        u'if behind a proxy'
-
+        u"Cache in browser (default: 10s) and proxy (default: 1 min). "
+        u"Keep very short in cache to buffer hi-load scenarios ",
+        u"Use for very dynamic content, like collecting data from "
+        u"the whole portal. "
+        u"Temporary outdated is less important than performance."
+        u"Reduce in-cache time to just 3-10 seconds to only buffer peak load "
+        u"if behind a proxy",
     )
-    prefix = 'plone.app.caching.terseCaching'
+    prefix = "plone.app.caching.terseCaching"
     sort = 4
 
     # Configurable options
-    options = ('maxage', 'smaxage', 'etags', 'lastModified',
-               'ramCache', 'vary', 'anonOnly')
+    options = (
+        "maxage",
+        "smaxage",
+        "etags",
+        "lastModified",
+        "ramCache",
+        "vary",
+        "anonOnly",
+    )
 
     # Default option values
     maxage = 10

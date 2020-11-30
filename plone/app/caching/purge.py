@@ -29,22 +29,24 @@ from zope.schema import getFieldsInOrder
 
 import pkg_resources
 
+
 try:
-    pkg_resources.get_distribution('plone.restapi')
+    pkg_resources.get_distribution("plone.restapi")
     HAS_RESTAPI = True
 except pkg_resources.DistributionNotFound:
     HAS_RESTAPI = False
 
 CONTENT_PATHS_POSTFIXES = [
-    '/view',
+    "/view",
 ]
 if HAS_RESTAPI:
     CONTENT_PATHS_POSTFIXES += [
-        '/@breadcrumbs',
-        '/@comments',
+        "/@breadcrumbs",
+        "/@comments",
     ]
 
-def _append_paths(paths, prefix=''):
+
+def _append_paths(paths, prefix=""):
     for postfix in CONTENT_PATHS_POSTFIXES:
         paths.append(prefix + postfix)
 
@@ -66,7 +68,6 @@ class ContentPurgePaths:
     * ${parent_path}
     * ${parent_path}/
     """
-
 
     def __init__(self, context):
         self.context = context
@@ -99,10 +100,10 @@ class ContentPurgePaths:
                 # /VirtualHostBase/http/site.com:80/site1/VirtualHostRoot/_vh_site1
                 # which would translate to http://site.come/ getting
                 # invalidated but not http://site.come
-                paths.append('')
+                paths.append("")
                 _append_paths(paths)
             else:
-                paths.append(parentPrefix + '/')
+                paths.append(parentPrefix + "/")
                 _append_paths(paths, prefix=parentPrefix)
 
         return paths

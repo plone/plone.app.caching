@@ -21,6 +21,7 @@ except ImportError:
     class IDCTimes(Interface):
         pass
 
+
 @implementer(ILastModified)
 @adapter(IPageTemplate)
 def PageTemplateDelegateLastModified(template):

@@ -36,12 +36,13 @@ class FauxPurger:
     errorHeaders = ("X-Squid-Error",)
     http_1_1 = True
 
-class PloneAppCachingBase(PloneSandboxLayer):
 
+class PloneAppCachingBase(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
 
         # Load ZCML
         import plone.app.caching
+
         self.loadZCML(package=plone.app.caching)
 
         # Install fake purger
@@ -80,7 +81,7 @@ PLONE_APP_CACHING_FUNCTIONAL_TESTING = FunctionalTesting(
 
 PLONE_APP_CACHING_FUNCTIONAL_RESTAPI_TESTING = FunctionalTesting(
     bases=(PLONE_APP_CACHING_RESTAPI_FIXTURE, z2.ZSERVER_FIXTURE),
-    name='PloneAppCachingRestAPI:Functional',
+    name="PloneAppCachingRestAPI:Functional",
 )
 
 
