@@ -27,7 +27,7 @@ And its environment and assignments:
 - ``@actions``
 
   - Anonymous
-  - rule plone.content.itemView
+  - rule plone.content.dynamic (might be influenced by other content)
   - purge
 
 - ``@addons``
@@ -38,7 +38,7 @@ And its environment and assignments:
 - ``@breadcrumbs``
 
   - Anonymous
-  - rule plone.content.itemView
+  - rule plone.content.dynamic (parent may change)
   - purge
 
 - ``@comments``

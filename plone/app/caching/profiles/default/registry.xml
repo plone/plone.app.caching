@@ -106,7 +106,7 @@
             <description>Time (in seconds) to cache the response in the browser</description>
             <required>False</required>
         </field>
-        <value>300</value>
+        <value>10</value>
     </record>
     <record name="plone.app.caching.terseCaching.smaxage">
         <field type="plone.registry.field.Int">
@@ -114,7 +114,7 @@
             <description>Time (in seconds) to cache the response in the caching proxy</description>
             <required>False</required>
         </field>
-        <value>3000</value>
+        <value>60</value>
     </record>
     <record name="plone.app.caching.terseCaching.etags">
         <field type="plone.registry.field.Tuple">
