@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_parent
 from plone.app.caching.utils import getObjectDefaultView
 from plone.app.caching.utils import isPurged
@@ -29,18 +28,6 @@ from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from zope.schema import getFieldsInOrder
 
 import pkg_resources
-import six
-
-
-try:
-    from plone.app.blob.interfaces import IBlobField
-    from Products.Archetypes.interfaces import IBaseObject
-    from Products.Archetypes.interfaces import IFileField
-    from Products.Archetypes.interfaces import IImageField
-    from Products.Archetypes.interfaces import ITextField
-    HAVE_AT = True
-except ImportError:
-    HAVE_AT = False
 
 try:
     pkg_resources.get_distribution('plone.restapi')
@@ -61,9 +48,10 @@ def _append_paths(paths, prefix=''):
     for postfix in CONTENT_PATHS_POSTFIXES:
         paths.append(prefix + postfix)
 
+
 @implementer(IPurgePaths)
 @adapter(IDynamicType)
-class ContentPurgePaths(object):
+class ContentPurgePaths:
     """Paths to purge for content items
 
     Includes:
@@ -84,12 +72,12 @@ class ContentPurgePaths(object):
         self.context = context
 
     def getRelativePaths(self):
-        prefix = '/' + self.context.virtual_url_path()
-        paths = [prefix + '/', prefix + '/view']
+        prefix = "/" + self.context.virtual_url_path()
+        paths = [prefix + "/", prefix + "/view"]
 
         defaultView = getObjectDefaultView(self.context)
         if defaultView:
-            path = prefix + '/' + defaultView
+            path = prefix + "/" + defaultView
             if path not in paths:  # it could be
                 paths.append(path)
 
@@ -99,9 +87,9 @@ class ContentPurgePaths(object):
 
         parentDefaultView = getObjectDefaultView(parent)
         if parentDefaultView == self.context.getId():
-            parentPrefix = '/' + parent.virtual_url_path()
+            parentPrefix = "/" + parent.virtual_url_path()
             paths.append(parentPrefix)
-            if parentPrefix == '/':
+            if parentPrefix == "/":
                 # special handling for site root since parentPrefix
                 # does not make sense in that case.
                 # Additionally, empty site roots were not getting
@@ -125,7 +113,7 @@ class ContentPurgePaths(object):
 
 @implementer(IPurgePaths)
 @adapter(IDiscussionResponse)
-class DiscussionItemPurgePaths(object):
+class DiscussionItemPurgePaths:
     """Paths to purge for Discussion Item.
 
     Looks up paths for the ultimate parent.
@@ -151,9 +139,8 @@ class DiscussionItemPurgePaths(object):
                 for relativePath in relativePaths:
                     if rewriter is None:
                         yield relativePath
-                    continue
-                    rewrittenPaths = rewriter(
-                        relativePath) or []  # None -> []
+                        continue
+                    rewrittenPaths = rewriter(relativePath) or []
                     for rewrittenPath in rewrittenPaths:
                         yield rewrittenPath
 
@@ -170,13 +157,12 @@ class DiscussionItemPurgePaths(object):
             # add absoute paths, which are not
             absolutePaths = pathProvider.getAbsolutePaths()
             if absolutePaths:
-                for absolutePath in absolutePaths:
-                    yield absolutePath
+                yield from absolutePaths
 
     @memoize
     def _getRoot(self):
 
-        plone_utils = getToolByName(self.context, 'plone_utils', None)
+        plone_utils = getToolByName(self.context, "plone_utils", None)
         if plone_utils is None:
             return None
 
@@ -189,21 +175,21 @@ class DiscussionItemPurgePaths(object):
 
 @implementer(IPurgePaths)
 @adapter(IDexteritySchema)
-class ScalesPurgePaths(object):
-    """Paths to purge for Dexterity object fields
-    """
+class ScalesPurgePaths:
+    """Paths to purge for Dexterity object fields"""
+
     def __init__(self, context):
         self.context = context
 
     def getScales(self):
         registry = getUtility(IRegistry)
-        reg_list = registry['plone.allowed_sizes']
-        sizes = [i.split(' ', 1)[0] for i in reg_list]
-        sizes.append('download')
+        reg_list = registry["plone.allowed_sizes"]
+        sizes = [i.split(" ", 1)[0] for i in reg_list]
+        sizes.append("download")
         return sizes
 
     def getRelativePaths(self):
-        prefix = '/' + self.context.virtual_url_path()
+        prefix = "/" + self.context.virtual_url_path()
 
         def fieldFilter():
             portal_type = self.context.getPortalTypeName()
@@ -232,62 +218,22 @@ class ScalesPurgePaths(object):
 
             if INamedImageField.providedBy(item):
                 for size in self.getScales():
-                    yield '{0}/@@images/{1}/{2}'.format(prefix, field, size,)
-                    yield '{0}/@@download/{1}'.format(prefix, field)
+                    yield "{}/@@images/{}/{}".format(
+                        prefix,
+                        field,
+                        size,
+                    )
+                    yield f"{prefix}/@@download/{field}"
             else:
                 filename = value.filename
-                if six.PY2 and isinstance(filename, six.text_type):
-                    filename = filename.encode('utf-8')
-                yield '{0}/view/{1}.{2}/@@download/{3}'.format(
-                    prefix, '++widget++form.widgets', field, filename)
-                yield '{0}/@@download/{1}/{2}'.format(prefix, field, filename)
+                yield "{}/view/{}.{}/@@download/{}".format(
+                    prefix, "++widget++form.widgets", field, filename
+                )
+                yield f"{prefix}/@@download/{field}/{filename}"
 
     def getAbsolutePaths(self):
         return []
 
-
-if HAVE_AT:
-
-    @implementer(IPurgePaths)
-    @adapter(IBaseObject)
-    class ObjectFieldPurgePaths(object):
-        """Paths to purge for Archetypes object fields
-        """
-
-        def __init__(self, context):
-            self.context = context
-
-        def getRelativePaths(self):
-            prefix = '/' + self.context.virtual_url_path()
-            schema = self.context.Schema()
-
-            def fieldFilter(field):
-                return (
-                    (
-                        IBlobField.providedBy(field) or
-                        IFileField.providedBy(field) or
-                        IImageField.providedBy(field)
-                    ) and
-                    not ITextField.providedBy(field)
-                )
-            seenDownloads = False
-            for field in schema.filterFields(fieldFilter):
-                if not seenDownloads:
-                    yield prefix + '/download'
-                    yield prefix + '/at_download'
-                    seenDownloads = True
-
-                yield prefix + '/at_download/' + field.getName()
-
-                fieldURL = '{0}/{1}'.format(prefix, field.getName(),)
-                yield fieldURL
-
-                if IImageField.providedBy(field):
-                    for size in field.getAvailableSizes(self.context).keys():
-                        yield '{0}_{1}'.format(fieldURL, size,)
-
-        def getAbsolutePaths(self):
-            return []
 
 # Event redispatch for content items - we check the list of content items
 # instead of the marker interface
@@ -304,10 +250,10 @@ def purgeOnMovedOrRemoved(object, event):
     request = getRequest()
     confirmed_delete = (
         request is not None
-        and getattr(request, 'URL', None)
-        and 'delete_confirmation' in request.URL
-        and request.REQUEST_METHOD == 'POST'
-        and 'form.submitted' in request.form
+        and getattr(request, "URL", None)
+        and "delete_confirmation" in request.URL
+        and request.REQUEST_METHOD == "POST"
+        and "form.submitted" in request.form
     )
     if not confirmed_delete and IObjectRemovedEvent.providedBy(event):
         # ignore extra delete events
@@ -315,7 +261,7 @@ def purgeOnMovedOrRemoved(object, event):
     # Don't purge when added
     if IObjectAddedEvent.providedBy(event):
         return
-    if isPurged(object) and 'portal_factory' not in request.URL:
+    if isPurged(object) and "portal_factory" not in request.URL:
         notify(Purge(object))
     parent = object.getParentNode()
     if parent:

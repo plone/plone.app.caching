@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.utils import getObjectDefaultView
@@ -10,7 +9,7 @@ from zope.interface import implementer
 
 
 @implementer(IRulesetLookup)
-class ContentItemLookup(object):
+class ContentItemLookup:
     """General lookup for browser views and page templates.
 
     1. Attempt to look up a ruleset using z3c.caching.registry.lookup()
@@ -65,11 +64,10 @@ class ContentItemLookup(object):
         if registry is None:
             return None
 
-        ploneCacheSettings = registry.forInterface(
-            IPloneCacheSettings, check=False)
+        ploneCacheSettings = registry.forInterface(IPloneCacheSettings, check=False)
 
         # 2. Get the name of the published object
-        name = getattr(self.published, '__name__', None)
+        name = getattr(self.published, "__name__", None)
         if name is None:
             return None
 
@@ -80,12 +78,12 @@ class ContentItemLookup(object):
                 return ruleset
 
         # 4. Find the parent of the published object
-        parent = getattr(self.published, '__parent__', None)
+        parent = getattr(self.published, "__parent__", None)
         if parent is None:
             return None
 
         # 4.1. If the parent is a content object:
-        parentPortalType = getattr(aq_base(parent), 'portal_type', None)
+        parentPortalType = getattr(aq_base(parent), "portal_type", None)
         if parentPortalType is None:
             return None
 

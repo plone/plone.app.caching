@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.app.caching.interfaces import _
 from plone.memoize.instance import memoize
 from plone.registry import FieldRef
@@ -53,11 +52,11 @@ class EditForm(form.Form):
     names.
     """
 
-    template = ViewPageTemplateFile('edit.pt')
+    template = ViewPageTemplateFile("edit.pt")
 
     # Keep the ZPublisher happy - would normally be done by the ZCML
     # registration
-    __name__ = 'cache-operation-edit'
+    __name__ = "cache-operation-edit"
 
     def __init__(
         self,
@@ -84,7 +83,7 @@ class EditForm(form.Form):
         if not IFormLayer.providedBy(self.request):
             alsoProvides(self.request, IFormLayer)
 
-        self.request.set('disable_border', True)
+        self.request.set("disable_border", True)
 
         # Create fields for records we actually have. Where applicable, fall
         # back on the  global record if a ruleset-specific record does not
@@ -95,28 +94,27 @@ class EditForm(form.Form):
 
         for option in self.operation.options:
             newField = None
-            fieldName = '{0}.{1}'.format(prefix, option)
+            fieldName = f"{prefix}.{option}"
 
             if self.rulesetName:
-                rulesetFieldName = '{0}.{1}.{2}'.format(
+                rulesetFieldName = "{}.{}.{}".format(
                     prefix,
                     self.rulesetName,
                     option,
                 )
 
                 if rulesetFieldName in self.registry.records:
-                    newField = self.cloneField(self.registry.records[
-                                               rulesetFieldName].field)
+                    newField = self.cloneField(
+                        self.registry.records[rulesetFieldName].field
+                    )
                     newField.__name__ = rulesetFieldName
                 elif fieldName in self.registry.records:
-                    newField = self.cloneField(
-                        self.registry.records[fieldName].field)
+                    newField = self.cloneField(self.registry.records[fieldName].field)
                     newField.__name__ = rulesetFieldName
 
             else:
                 if fieldName in self.registry.records:
-                    newField = self.cloneField(
-                        self.registry.records[fieldName].field)
+                    newField = self.cloneField(self.registry.records[fieldName].field)
                     newField.__name__ = fieldName
 
             if newField is not None:
@@ -126,18 +124,18 @@ class EditForm(form.Form):
 
         # Set up widgets and actions as normal
 
-        super(EditForm, self).update()
+        super().update()
 
         # Plonify the buttons
 
-        self.actions['save'].addClass('context')
-        self.actions['cancel'].addClass('standalone')
-        self.actions['clear'].addClass('destructive')
+        self.actions["save"].addClass("context")
+        self.actions["cancel"].addClass("standalone")
+        self.actions["clear"].addClass("destructive")
 
         # Hide 'clear' action if we're not editing a ruleset
 
         if not self.rulesetName:
-            del self.actions['clear']
+            del self.actions["clear"]
 
     # Context
 
@@ -152,19 +150,24 @@ class EditForm(form.Form):
         options = self.operation.options
 
         for option in options:
-            recordName = '{0}.{1}'.format(prefix, option,)
+            recordName = "{}.{}".format(
+                prefix,
+                option,
+            )
 
             # If a ruleset-specific record does not exist, we can fall back on
             # a global record, since the per-ruleset records will be created
             # as necessary in applyChanges()
 
             if self.rulesetName:
-                rulesetRecordName = '{0}.{1}.{2}'.format(
-                    prefix, self.rulesetName, option,)
+                rulesetRecordName = "{}.{}.{}".format(
+                    prefix,
+                    self.rulesetName,
+                    option,
+                )
 
                 if rulesetRecordName in self.registry.records:
-                    context[rulesetRecordName] = self.registry[
-                        rulesetRecordName]
+                    context[rulesetRecordName] = self.registry[rulesetRecordName]
                 elif recordName in self.registry.records:
                     context[rulesetRecordName] = self.registry[recordName]
 
@@ -175,8 +178,7 @@ class EditForm(form.Form):
         return context
 
     def applyChanges(self, data):
-        """Save changes in the given data dictionary to the registry.
-        """
+        """Save changes in the given data dictionary to the registry."""
 
         for key, value in data.items():
 
@@ -190,15 +192,15 @@ class EditForm(form.Form):
                 # Strip the ruleset name out, leaving the original key - this
                 # must exist, otherwise getContent() would not have put it in
                 # the data dictionary
-                globalKey = self.operation.prefix + \
-                    key[len(self.operation.prefix) +
-                        len(self.rulesetName) + 1:]
+                globalKey = (
+                    self.operation.prefix
+                    + key[len(self.operation.prefix) + len(self.rulesetName) + 1 :]
+                )
                 assert globalKey in self.registry.records
 
                 # Create a new record with a FieldRef
                 field = self.registry.records[globalKey].field
-                self.registry.records[key] = Record(
-                    FieldRef(globalKey, field), value)
+                self.registry.records[key] = Record(FieldRef(globalKey, field), value)
 
             else:
                 self.registry[key] = value
@@ -226,12 +228,18 @@ class EditForm(form.Form):
     @property
     def title(self):
         if self.rulesetName:
-            return _(u'Edit ${operation} options for Ruleset: ${ruleset}',
-                     mapping={'operation': self.operation.title,
-                              'ruleset': self.ruleset.title})
+            return _(
+                "Edit ${operation} options for Ruleset: ${ruleset}",
+                mapping={
+                    "operation": self.operation.title,
+                    "ruleset": self.ruleset.title,
+                },
+            )
         else:
-            return _(u'Edit ${operation} options',
-                     mapping={'operation': self.operation.title})
+            return _(
+                "Edit ${operation} options",
+                mapping={"operation": self.operation.title},
+            )
 
     @property
     def description(self):
@@ -239,40 +247,35 @@ class EditForm(form.Form):
 
     # Buttons/actions
 
-    @button.buttonAndHandler(_(u'Save'), name='save')
+    @button.buttonAndHandler(_("Save"), name="save")
     def save(self, action):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
             return
         self.applyChanges(data)
-        IStatusMessage(self.request).addStatusMessage(
-            _(u'Changes saved.'), 'info')
+        IStatusMessage(self.request).addStatusMessage(_("Changes saved."), "info")
         self.request.response.redirect(
-            '{0}/@@caching-controlpanel#detailed-settings'.format(
+            "{}/@@caching-controlpanel#detailed-settings".format(
                 self.context.absolute_url(),
             ),
         )
-        return ''
+        return ""
 
-    @button.buttonAndHandler(_(u'Cancel'), name='cancel')
+    @button.buttonAndHandler(_("Cancel"), name="cancel")
     def cancel(self, action):
-        IStatusMessage(self.request).addStatusMessage(
-            _(u'Edit cancelled.'), type='info')
+        IStatusMessage(self.request).addStatusMessage(_("Edit cancelled."), type="info")
         self.request.response.redirect(
-            '{0}/@@caching-controlpanel#detailed-settings'.format(
+            "{}/@@caching-controlpanel#detailed-settings".format(
                 self.context.absolute_url(),
             ),
         )
-        return ''
+        return ""
 
-    @button.buttonAndHandler(
-        _(u'Delete settings (use defaults)'),
-        name='clear'
-    )
+    @button.buttonAndHandler(_("Delete settings (use defaults)"), name="clear")
     def clear(self, action):
         for key in self.getContent().keys():
-            key_suffix = '{0}.{1}.'.format(
+            key_suffix = "{}.{}.".format(
                 self.operation.prefix,
                 self.rulesetName,
             )
@@ -282,10 +285,11 @@ class EditForm(form.Form):
                 del self.registry.records[key]
 
         IStatusMessage(self.request).addStatusMessage(
-            _(u'Ruleset-specific settings removed.'), type='info')
+            _("Ruleset-specific settings removed."), type="info"
+        )
         self.request.response.redirect(
-            '{0}/@@caching-controlpanel#detailed-settings'.format(
+            "{}/@@caching-controlpanel#detailed-settings".format(
                 self.context.absolute_url(),
             ),
         )
-        return ''
+        return ""

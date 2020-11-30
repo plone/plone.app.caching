@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from Acquisition import Explicit
+from os.path import dirname
+from os.path import join
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.purge import ContentPurgePaths
 from plone.app.caching.purge import DiscussionItemPurgePaths
-from plone.app.caching.purge import HAVE_AT
 from plone.app.caching.purge import purgeOnModified
 from plone.app.caching.purge import purgeOnMovedOrRemoved
 from plone.app.caching.purge import ScalesPurgePaths
@@ -43,25 +43,19 @@ from zope.lifecycleevent import ObjectModifiedEvent
 from zope.lifecycleevent import ObjectMovedEvent
 from zope.lifecycleevent import ObjectRemovedEvent
 
-import six
 import unittest
-
-if HAVE_AT:
-    from plone.app.caching.purge import ObjectFieldPurgePaths
-    from Products.Archetypes import atapi
-    from Products.Archetypes.Schema.factory import instanceSchemaFactory
 
 
 def getData(filename):
-    from os.path import dirname, join
     from plone.app.caching import tests
 
     filename = join(dirname(tests.__file__), filename)
-    data = open(filename, "rb").read()
+    with open(filename, "rb") as fh:
+        data = fh.read()
     return data
 
 
-class Handler(object):
+class Handler:
     def __init__(self):
         self.invocations = []
 
@@ -244,7 +238,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
     def setUp(self):
         @implementer(IPurgePaths)
         @adapter(FauxContent)
-        class FauxContentPurgePaths(object):
+        class FauxContentPurgePaths:
             def __init__(self, context):
                 self.context = context
 
@@ -274,7 +268,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         content = FauxContent("foo").__of__(root)
         discussable = FauxDiscussable().__of__(content)
 
-        class FauxPloneTool(object):
+        class FauxPloneTool:
             def getDiscussionThread(self, item):
                 return [content, item]
 
@@ -292,7 +286,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         content = FauxContent("foo").__of__(root)
         discussable = FauxDiscussable().__of__(content)
 
-        class FauxPloneTool(object):
+        class FauxPloneTool:
             def getDiscussionThread(self, item):
                 return []
 
@@ -311,7 +305,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         content = FauxContent("foo").__of__(root)
         discussable = FauxDiscussable().__of__(content)
 
-        class FauxPloneTool(object):
+        class FauxPloneTool:
             def getDiscussionThread(self, item):
                 return [content, item]
 
@@ -324,102 +318,6 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
 
         self.assertEqual(["/app/foo"], list(purge.getRelativePaths()))
         self.assertEqual(["/purgeme"], list(purge.getAbsolutePaths()))
-
-
-@unittest.skipUnless(HAVE_AT, "Only run with AT")
-class TestObjectFieldPurgePaths(unittest.TestCase):
-
-    maxDiff = None
-    layer = UNIT_TESTING
-
-    def setUp(self):
-        provideAdapter(instanceSchemaFactory)
-
-    def test_no_file_image_fields(self):
-        class ATNoFields(atapi.BaseContent):
-            schema = atapi.Schema((atapi.StringField("foo"),))
-
-        context = ATNoFields("foo")
-        purger = ObjectFieldPurgePaths(context)
-
-        self.assertEqual([], list(purger.getRelativePaths()))
-        self.assertEqual([], list(purger.getAbsolutePaths()))
-
-    def test_file_image_fields(self):
-        from plone.app.blob.field import BlobField
-
-        class ATMultipleFields(atapi.BaseContent):
-            schema = atapi.Schema(
-                (
-                    atapi.StringField("foo"),
-                    atapi.FileField("file1"),
-                    atapi.ImageField("image1"),
-                    atapi.ImageField(
-                        "image2", sizes={"mini": (50, 50), "normal": (100, 100)}
-                    ),
-                    BlobField("blob1"),
-                )
-            )
-
-        root = FauxContent("")
-        context = ATMultipleFields("foo").__of__(root)
-        purger = ObjectFieldPurgePaths(context)
-
-        self.assertEqual(
-            [
-                "/foo/download",
-                "/foo/at_download",
-                "/foo/at_download/file1",
-                "/foo/file1",
-                "/foo/at_download/image1",
-                "/foo/image1",
-                "/foo/image1_thumb",
-                "/foo/at_download/image2",
-                "/foo/image2",
-                "/foo/image2_mini",
-                "/foo/image2_normal",
-                "/foo/at_download/blob1",
-                "/foo/blob1",
-            ],
-            list(purger.getRelativePaths()),
-        )
-        self.assertEqual([], list(purger.getAbsolutePaths()))
-
-    def test_file_image_text_fields(self):
-        class ATMultipleFields(atapi.BaseContent):
-            schema = atapi.Schema(
-                (
-                    atapi.StringField("foo"),
-                    atapi.FileField("file1"),
-                    atapi.ImageField("image1"),
-                    atapi.ImageField(
-                        "image2", sizes={"mini": (50, 50), "normal": (100, 100)}
-                    ),
-                    atapi.TextField("text"),
-                )
-            )
-
-        root = FauxContent("")
-        context = ATMultipleFields("foo").__of__(root)
-        purger = ObjectFieldPurgePaths(context)
-
-        self.assertEqual(
-            [
-                "/foo/download",
-                "/foo/at_download",
-                "/foo/at_download/file1",
-                "/foo/file1",
-                "/foo/at_download/image1",
-                "/foo/image1",
-                "/foo/image1_thumb",
-                "/foo/at_download/image2",
-                "/foo/image2",
-                "/foo/image2_mini",
-                "/foo/image2_normal",
-            ],
-            list(purger.getRelativePaths()),
-        )
-        self.assertEqual([], list(purger.getAbsolutePaths()))
 
 
 class TestScalesPurgePaths(unittest.TestCase):
@@ -435,12 +333,12 @@ class TestScalesPurgePaths(unittest.TestCase):
         self.folder.invokeFactory("Image", "image", title="Test Image")
         self.image_type = self.folder["image"]
         self.image_type.image = NamedImage(
-            getData("data/plone-app-caching.jpg"), "image/jpg", u"plone-app-caching.jpg"
+            getData("data/plone-app-caching.jpg"), "image/jpg", "plone-app-caching.jpg"
         )
-        self.folder.invokeFactory("File", "file", title=u"Töst File")
+        self.folder.invokeFactory("File", "file", title="Töst File")
         self.file = self.folder["file"]
         self.file.file = NamedFile(
-            getData("data/testfile.csv"), "text/csv", u"data/töstfile.csv"
+            getData("data/testfile.csv"), "text/csv", "data/töstfile.csv"
         )
 
         # Create a page with a lead image.
@@ -449,7 +347,7 @@ class TestScalesPurgePaths(unittest.TestCase):
 
         @implementer(IBehaviorAssignable)
         @adapter(IDocument)
-        class TestingAssignable(object):
+        class TestingAssignable:
 
             enabled = [ILeadImageBehavior]
             name = "plone.leadimage"
@@ -472,7 +370,7 @@ class TestScalesPurgePaths(unittest.TestCase):
 
         leadimage_adapter = ILeadImageBehavior(self.page)
         leadimage_adapter.image = NamedImage(
-            getData("data/plone-app-caching.jpg"), "image/jpg", u"plone-app-caching.jpg"
+            getData("data/plone-app-caching.jpg"), "image/jpg", "plone-app-caching.jpg"
         )
 
         setRoles(self.portal, TEST_USER_ID, TEST_USER_ROLES)
@@ -495,12 +393,9 @@ class TestScalesPurgePaths(unittest.TestCase):
     def test_scale_purge_paths_unicode(self):
         purge = ScalesPurgePaths(self.file)
         expected = [
-            u"/plone/media/file/view/++widget++form.widgets.file/@@download/data/töstfile.csv",  # noqa: E501
-            u"/plone/media/file/@@download/file/data/töstfile.csv",
+            "/plone/media/file/view/++widget++form.widgets.file/@@download/data/töstfile.csv",
+            "/plone/media/file/@@download/file/data/töstfile.csv",
         ]
-        if six.PY2:
-            # the getRelativePaths method returns bytes on Python 2
-            expected = [x.encode("utf8") for x in expected]
         self.assertListEqual(
             list(purge.getRelativePaths()),
             expected,

@@ -84,76 +84,29 @@
          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
     <!-- CMF filesystem (skin layer) files and images -->
-    <configure zcml:condition="installed Products.CMFCore">
-
-        <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSFile.FSFile" />
-        <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSImage.FSImage" />
-
-    </configure>
+    <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSFile.FSFile" />
+    <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSImage.FSImage" />
 
     <!-- OFS (in-ZODB) files, images -->
-    <configure zcml:condition="installed OFS.Image">
+    <cache:ruleset ruleset="plone.resource" for="OFS.Image.File" />
 
-        <cache:ruleset ruleset="plone.resource" for="OFS.Image.File" />
+    <!-- Automatically purge these always -->
+    <class class="OFS.Image.File">
+        <implements interface="z3c.caching.interfaces.IPurgeable" />
+    </class>
 
-        <!-- Automatically purge these always -->
-        <class class="OFS.Image.File">
-            <implements interface="z3c.caching.interfaces.IPurgeable" />
-        </class>
-
-    </configure>
 
     <!-- Zope resources (including those in resource directories) -->
     <cache:ruleset ruleset="plone.resource" for="zope.browserresource.interfaces.IResource" />
 
-    <!-- Standard Plone (non-blob) file and image content objects -->
-    <configure zcml:condition="installed Products.ATContentTypes">
+    <!-- These rely on the ContentItemLookup delegation -->
+    <cache:ruleset ruleset="plone.content.itemView"   for="plone.dexterity.interfaces.IDexterityItem" />
+    <cache:ruleset ruleset="plone.content.folderView" for="plone.dexterity.interfaces.IDexterityContainer" />
 
-        <cache:ruleset ruleset="plone.content.file" for="Products.ATContentTypes.interfaces.IATFile" />
-        <cache:ruleset ruleset="plone.content.file" for="Products.ATContentTypes.interfaces.IATImage" />
 
-    </configure>
-
-    <!-- Standard image content saved in an Archetype field, like ATImage scales-->
-    <configure zcml:condition="installed Products.Archetypes">
-
-        <cache:ruleset ruleset="plone.content.file" for="Products.Archetypes.Field.Image" />
-
-    </configure>
-
-    <!-- Archetypes based folders and non-folderish content items -->
-    <configure zcml:condition="installed Products.Archetypes">
-
-        <!-- These rely on the ContentItemLookup delegation -->
-        <cache:ruleset ruleset="plone.content.itemView"   for="Products.Archetypes.BaseContent.BaseContent" />
-        <cache:ruleset ruleset="plone.content.folderView" for="Products.Archetypes.BaseFolder.BaseFolder" />
-
-    </configure>
-
-    <!-- Dexterity based folders and non-folderish content items -->
-    <configure zcml:condition="installed plone.dexterity">
-
-        <!-- These rely on the ContentItemLookup delegation -->
-        <cache:ruleset ruleset="plone.content.itemView"   for="plone.dexterity.interfaces.IDexterityItem" />
-        <cache:ruleset ruleset="plone.content.folderView" for="plone.dexterity.interfaces.IDexterityContainer" />
-
-    </configure>
-
-    <!-- plone.namedfile downloadable -->
-    <configure zcml:condition="installed plone.namedfile">
-
-        <!-- These rely on the ContentItemLookup delegation -->
-        <cache:ruleset ruleset="plone.content.file"   for="plone.namedfile.browser.Download" />
-        <cache:ruleset ruleset="plone.content.file" for="plone.namedfile.scaling.ImageScale" />
-
-    </configure>
-
-    <!-- plone.app.blob content -->
-    <configure zcml:condition="installed plone.app.blob">
-
-        <cache:ruleset ruleset="plone.content.file" for="plone.app.blob.interfaces.IATBlob" />
-
-    </configure>
+    <!-- These rely on the ContentItemLookup delegation -->
+    <cache:ruleset ruleset="plone.content.file"   for="plone.namedfile.browser.Download" />
+    <cache:ruleset ruleset="plone.content.file" for="plone.namedfile.scaling.ImageScale" />
 
     <!-- plone.restapi content -->
     <configure zcml:condition="installed plone.restapi">
@@ -181,12 +134,5 @@
 
     <!-- Image scales & file download paths -->
     <adapter factory=".purge.ScalesPurgePaths" name="plone.files" />
-
-    <!-- Archetypes object fields -->
-    <configure zcml:condition="installed plone.app.blob">
-    <configure zcml:condition="installed Products.Archetypes">
-        <adapter factory=".purge.ObjectFieldPurgePaths" name="plone.atobjectfields" />
-    </configure>
-    </configure>
 
 </configure>

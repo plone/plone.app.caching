@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from hashlib import sha1 as sha
 from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
 from plone.app.testing import applyProfile
@@ -17,8 +16,7 @@ import hmac
 
 
 @implementer(IPurger)
-class FauxPurger(object):
-
+class FauxPurger:
     def __init__(self):
         self.reset()
 
@@ -26,16 +24,16 @@ class FauxPurger(object):
         self._sync = []
         self._async = []
 
-    def purgeAsync(self, url, httpVerb='PURGE'):
+    def purgeAsync(self, url, httpVerb="PURGE"):
         self._async.append(url)
 
-    def purgeSync(self, url, httpVerb='PURGE'):
+    def purgeSync(self, url, httpVerb="PURGE"):
         self._sync.append(url)
 
     def stopThreads(self, wait=False):
         pass
 
-    errorHeaders = ('X-Squid-Error',)
+    errorHeaders = ("X-Squid-Error",)
     http_1_1 = True
 
 class PloneAppCachingBase(PloneSandboxLayer):
@@ -51,11 +49,8 @@ class PloneAppCachingBase(PloneSandboxLayer):
         provideUtility(FauxPurger(), IPurger)
 
     def setUpPloneSite(self, portal):
-        applyProfile(portal, 'plone.app.caching:default')
-
-        portal['portal_workflow'].setDefaultChain(
-            'simple_publication_workflow',
-        )
+        applyProfile(portal, "plone.app.caching:default")
+        portal["portal_workflow"].setDefaultChain("simple_publication_workflow")
 
     def tearDownZope(self, app):
         # Store old purger
@@ -76,11 +71,11 @@ PLONE_APP_CACHING_FIXTURE = PloneAppCaching()
 PLONE_APP_CACHING_RESTAPI_FIXTURE = PloneAppCachingRestAPI()
 PLONE_APP_CACHING_INTEGRATION_TESTING = IntegrationTesting(
     bases=(PLONE_APP_CACHING_FIXTURE,),
-    name='PloneAppCaching:Integration',
+    name="PloneAppCaching:Integration",
 )
 PLONE_APP_CACHING_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(PLONE_APP_CACHING_FIXTURE,),
-    name='PloneAppCaching:Functional',
+    name="PloneAppCaching:Functional",
 )
 
 PLONE_APP_CACHING_FUNCTIONAL_RESTAPI_TESTING = FunctionalTesting(
@@ -91,5 +86,5 @@ PLONE_APP_CACHING_FUNCTIONAL_RESTAPI_TESTING = FunctionalTesting(
 
 def getToken(username):
     ring = _getKeyring(username)
-    secret = ring.random().encode('utf8')
-    return hmac.new(secret, username.encode('utf8'), sha).hexdigest()
+    secret = ring.random().encode("utf8")
+    return hmac.new(secret, username.encode("utf8"), sha).hexdigest()
