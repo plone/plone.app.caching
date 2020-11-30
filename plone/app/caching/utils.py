@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.registry.interfaces import IRegistry
@@ -21,28 +20,26 @@ def isPurged(object):
     if not settings.purgedContentTypes:
         return False
 
-    portal_type = getattr(aq_base(object), 'portal_type', None)
+    portal_type = getattr(aq_base(object), "portal_type", None)
     if portal_type is None:
         return False
 
-    return (portal_type in settings.purgedContentTypes)
+    return portal_type in settings.purgedContentTypes
 
 
 def stripLeadingCharacters(name):
-    """Strip off leading / and/or @@
-    """
+    """Strip off leading / and/or @@"""
 
-    if name and name[0] == '/':
+    if name and name[0] == "/":
         name = name[1:]
-    if name and name.startswith('@@'):
+    if name and name.startswith("@@"):
         name = name[2:]
 
     return name
 
 
 def getObjectDefaultView(context):
-    """Get the id of an object's default view
-    """
+    """Get the id of an object's default view"""
 
     # courtesy of Producs.CacheSetup
 
@@ -62,7 +59,7 @@ def getObjectDefaultView(context):
     try:
         # XXX: This isn't quite right since it assumes the action starts
         # with ${object_url}
-        action = fti.getActionInfo('object/view')['url'].split('/')[-1]
+        action = fti.getActionInfo("object/view")["url"].split("/")[-1]
     except ValueError:
         # If the action doesn't exist, stop
         return None
@@ -71,7 +68,6 @@ def getObjectDefaultView(context):
     if action:
         action = fti.queryMethodID(action, default=action, context=context)
     else:
-        action = fti.queryMethodID('(Default)', default=action,
-                                   context=context)
+        action = fti.queryMethodID("(Default)", default=action, context=context)
 
     return stripLeadingCharacters(action)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from datetime import datetime
 from dateutil.tz import tzlocal
@@ -18,6 +17,7 @@ from zope.pagetemplate.interfaces import IPageTemplate
 try:
     from zope.dublincore.interfaces import IDCTimes
 except ImportError:
+
     class IDCTimes(Interface):
         pass
 
@@ -42,7 +42,7 @@ def FSPageTemplateDelegateLastModified(template):
 
 
 @implementer(ILastModified)
-class PersistentLastModified(object):
+class PersistentLastModified:
     """General ILastModified adapter for persistent objects that have a
     _p_mtime. Note that we don't register this for IPersistent, because
     that interface is mixed into too many things and may end up taking
@@ -55,7 +55,7 @@ class PersistentLastModified(object):
 
     def __call__(self):
         context = aq_base(self.context)
-        mtime = getattr(context, '_p_mtime', None)
+        mtime = getattr(context, "_p_mtime", None)
         if mtime is not None and mtime > 0:
             return datetime.fromtimestamp(mtime, tzlocal())
         return None
@@ -63,15 +63,13 @@ class PersistentLastModified(object):
 
 @adapter(File)
 class OFSFileLastModified(PersistentLastModified):
-    """ILastModified adapter for OFS.Image.File
-    """
+    """ILastModified adapter for OFS.Image.File"""
 
 
 @implementer(ILastModified)
 @adapter(FSObject)
-class FSObjectLastModified(object):
-    """ILastModified adapter for FSFile and FSImage
-    """
+class FSObjectLastModified:
+    """ILastModified adapter for FSFile and FSImage"""
 
     def __init__(self, context):
         self.context = context
@@ -87,7 +85,7 @@ class FSObjectLastModified(object):
 
 @implementer(ILastModified)
 @adapter(ICatalogableDublinCore)
-class CatalogableDublinCoreLastModified(object):
+class CatalogableDublinCoreLastModified:
     """ILastModified adapter for ICatalogableDublinCore, which includes
     most CMF, Archetypes and Dexterity content
     """
@@ -104,9 +102,8 @@ class CatalogableDublinCoreLastModified(object):
 
 @implementer(ILastModified)
 @adapter(IDCTimes)
-class DCTimesLastModified(object):
-    """ILastModified adapter for zope.dublincore IDCTimes
-    """
+class DCTimesLastModified:
+    """ILastModified adapter for zope.dublincore IDCTimes"""
 
     def __init__(self, context):
         self.context = context
@@ -117,14 +114,13 @@ class DCTimesLastModified(object):
 
 @implementer(ILastModified)
 @adapter(IResource)
-class ResourceLastModified(object):
-    """ILastModified for Zope 3 style browser resources
-    """
+class ResourceLastModified:
+    """ILastModified for Zope 3 style browser resources"""
 
     def __init__(self, context):
         self.context = context
 
     def __call__(self):
-        lmt = getattr(self.context.context, 'lmt', None)
+        lmt = getattr(self.context.context, "lmt", None)
         if lmt is not None:
             return datetime.fromtimestamp(lmt, tzlocal())

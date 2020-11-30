@@ -78,45 +78,29 @@
          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
     <!-- CMF filesystem (skin layer) files and images -->
-    <configure zcml:condition="installed Products.CMFCore">
-
-        <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSFile.FSFile" />
-        <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSImage.FSImage" />
-
-    </configure>
+    <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSFile.FSFile" />
+    <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSImage.FSImage" />
 
     <!-- OFS (in-ZODB) files, images -->
-    <configure zcml:condition="installed OFS.Image">
+    <cache:ruleset ruleset="plone.resource" for="OFS.Image.File" />
 
-        <cache:ruleset ruleset="plone.resource" for="OFS.Image.File" />
+    <!-- Automatically purge these always -->
+    <class class="OFS.Image.File">
+        <implements interface="z3c.caching.interfaces.IPurgeable" />
+    </class>
 
-        <!-- Automatically purge these always -->
-        <class class="OFS.Image.File">
-            <implements interface="z3c.caching.interfaces.IPurgeable" />
-        </class>
-
-    </configure>
 
     <!-- Zope resources (including those in resource directories) -->
     <cache:ruleset ruleset="plone.resource" for="zope.browserresource.interfaces.IResource" />
 
-    <!-- Dexterity based folders and non-folderish content items -->
-    <configure zcml:condition="installed plone.dexterity">
+    <!-- These rely on the ContentItemLookup delegation -->
+    <cache:ruleset ruleset="plone.content.itemView"   for="plone.dexterity.interfaces.IDexterityItem" />
+    <cache:ruleset ruleset="plone.content.folderView" for="plone.dexterity.interfaces.IDexterityContainer" />
 
-        <!-- These rely on the ContentItemLookup delegation -->
-        <cache:ruleset ruleset="plone.content.itemView"   for="plone.dexterity.interfaces.IDexterityItem" />
-        <cache:ruleset ruleset="plone.content.folderView" for="plone.dexterity.interfaces.IDexterityContainer" />
 
-    </configure>
-
-    <!-- plone.namedfile downloadable -->
-    <configure zcml:condition="installed plone.namedfile">
-
-        <!-- These rely on the ContentItemLookup delegation -->
-        <cache:ruleset ruleset="plone.content.file"   for="plone.namedfile.browser.Download" />
-        <cache:ruleset ruleset="plone.content.file" for="plone.namedfile.scaling.ImageScale" />
-
-    </configure>
+    <!-- These rely on the ContentItemLookup delegation -->
+    <cache:ruleset ruleset="plone.content.file"   for="plone.namedfile.browser.Download" />
+    <cache:ruleset ruleset="plone.content.file" for="plone.namedfile.scaling.ImageScale" />
 
     <!-- Paths to purge -->
 

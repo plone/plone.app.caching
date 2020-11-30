@@ -1,6 +1,7 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from Acquisition import Explicit
+from os.path import dirname
+from os.path import join
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.purge import ContentPurgePaths
 from plone.app.caching.purge import DiscussionItemPurgePaths
@@ -42,20 +43,19 @@ from zope.lifecycleevent import ObjectModifiedEvent
 from zope.lifecycleevent import ObjectMovedEvent
 from zope.lifecycleevent import ObjectRemovedEvent
 
-import six
 import unittest
 
 
 def getData(filename):
-    from os.path import dirname, join
     from plone.app.caching import tests
 
     filename = join(dirname(tests.__file__), filename)
-    data = open(filename, "rb").read()
+    with open(filename, "rb") as fh:
+        data = fh.read()
     return data
 
 
-class Handler(object):
+class Handler:
     def __init__(self):
         self.invocations = []
 
@@ -238,7 +238,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
     def setUp(self):
         @implementer(IPurgePaths)
         @adapter(FauxContent)
-        class FauxContentPurgePaths(object):
+        class FauxContentPurgePaths:
             def __init__(self, context):
                 self.context = context
 
@@ -268,7 +268,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         content = FauxContent("foo").__of__(root)
         discussable = FauxDiscussable().__of__(content)
 
-        class FauxPloneTool(object):
+        class FauxPloneTool:
             def getDiscussionThread(self, item):
                 return [content, item]
 
@@ -286,7 +286,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         content = FauxContent("foo").__of__(root)
         discussable = FauxDiscussable().__of__(content)
 
-        class FauxPloneTool(object):
+        class FauxPloneTool:
             def getDiscussionThread(self, item):
                 return []
 
@@ -305,7 +305,7 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
         content = FauxContent("foo").__of__(root)
         discussable = FauxDiscussable().__of__(content)
 
-        class FauxPloneTool(object):
+        class FauxPloneTool:
             def getDiscussionThread(self, item):
                 return [content, item]
 
@@ -333,12 +333,12 @@ class TestScalesPurgePaths(unittest.TestCase):
         self.folder.invokeFactory("Image", "image", title="Test Image")
         self.image_type = self.folder["image"]
         self.image_type.image = NamedImage(
-            getData("data/plone-app-caching.jpg"), "image/jpg", u"plone-app-caching.jpg"
+            getData("data/plone-app-caching.jpg"), "image/jpg", "plone-app-caching.jpg"
         )
-        self.folder.invokeFactory("File", "file", title=u"Töst File")
+        self.folder.invokeFactory("File", "file", title="Töst File")
         self.file = self.folder["file"]
         self.file.file = NamedFile(
-            getData("data/testfile.csv"), "text/csv", u"data/töstfile.csv"
+            getData("data/testfile.csv"), "text/csv", "data/töstfile.csv"
         )
 
         # Create a page with a lead image.
@@ -347,7 +347,7 @@ class TestScalesPurgePaths(unittest.TestCase):
 
         @implementer(IBehaviorAssignable)
         @adapter(IDocument)
-        class TestingAssignable(object):
+        class TestingAssignable:
 
             enabled = [ILeadImageBehavior]
             name = "plone.leadimage"
@@ -370,7 +370,7 @@ class TestScalesPurgePaths(unittest.TestCase):
 
         leadimage_adapter = ILeadImageBehavior(self.page)
         leadimage_adapter.image = NamedImage(
-            getData("data/plone-app-caching.jpg"), "image/jpg", u"plone-app-caching.jpg"
+            getData("data/plone-app-caching.jpg"), "image/jpg", "plone-app-caching.jpg"
         )
 
         setRoles(self.portal, TEST_USER_ID, TEST_USER_ROLES)
@@ -393,12 +393,9 @@ class TestScalesPurgePaths(unittest.TestCase):
     def test_scale_purge_paths_unicode(self):
         purge = ScalesPurgePaths(self.file)
         expected = [
-            u"/plone/media/file/view/++widget++form.widgets.file/@@download/data/töstfile.csv",  # noqa: E501
-            u"/plone/media/file/@@download/file/data/töstfile.csv",
+            "/plone/media/file/view/++widget++form.widgets.file/@@download/data/töstfile.csv",
+            "/plone/media/file/@@download/file/data/töstfile.csv",
         ]
-        if six.PY2:
-            # the getRelativePaths method returns bytes on Python 2
-            expected = [x.encode("utf8") for x in expected]
         self.assertListEqual(
             list(purge.getRelativePaths()),
             expected,
