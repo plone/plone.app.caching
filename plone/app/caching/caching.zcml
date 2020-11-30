@@ -160,6 +160,7 @@
 
         <include package="plone.restapi" />
 
+        <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.actions.get.ActionsGet" />
         <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.breadcrumbs.get.BreadcrumbsGet" />
         <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.discussion.conversation.CommentsGet" />
         <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.content.get.ContentGet" />

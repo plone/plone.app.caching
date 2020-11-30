@@ -26,8 +26,9 @@ And its environment and assignments:
 
 - ``@actions``
 
-  - Authenticated
-  - no rule assignment
+  - Anonymous
+  - rule plone.content.itemView
+  - purge
 
 - ``@addons``
 
