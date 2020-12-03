@@ -8,6 +8,34 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a1 (2020-12-03)
+--------------------
+
+Breaking changes:
+
+
+- Remove traces of Archetypes
+  [pbauer] (#68)
+- Drop Python 2 support.
+  Black code style and isort.
+  [jensens] (#69)
+
+
+New features:
+
+
+- Introduce *terseCaching* operation and `plone.content.dynamic` ruleset.
+  *terseCaching* is a rule with by default 10s in browser cache and 60s in edge cache.
+  It is intended to be used for highly dynamic content defined in the `plone.content.dynamic` ruleset.
+  The combination reduces load on the backend if there a lots of requests.
+  [jensens] (66-1)
+- Support for *plone.restapi*.
+  Define `cache:ruleset` assignments for anonymous accessible endpoints.
+  Attention: Relies on *Vary* header unless *plone.restapi* gives up content negotation.
+  Latter may conflict with edge side cache not supporting the Vary header.
+  [jensens] (66-2)
+
+
 2.0.8 (2020-10-30)
 ------------------
 
