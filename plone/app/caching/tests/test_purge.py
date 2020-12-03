@@ -225,6 +225,7 @@ class TestContentPurgePaths(unittest.TestCase):
                 "/bar",
                 "/bar/",
                 "/bar/view",
+                "/bar/@comments",
             ],
             list(purger.getRelativePaths()),
         )

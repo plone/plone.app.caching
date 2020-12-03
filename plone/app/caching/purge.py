@@ -27,6 +27,28 @@ from zope.lifecycleevent.interfaces import IObjectMovedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from zope.schema import getFieldsInOrder
 
+import pkg_resources
+
+
+try:
+    pkg_resources.get_distribution("plone.restapi")
+    HAS_RESTAPI = True
+except pkg_resources.DistributionNotFound:
+    HAS_RESTAPI = False
+
+CONTENT_PATHS_POSTFIXES = [
+    "/view",
+]
+if HAS_RESTAPI:
+    CONTENT_PATHS_POSTFIXES += [
+        "/@comments",
+    ]
+
+
+def _append_paths(paths, prefix=""):
+    for postfix in CONTENT_PATHS_POSTFIXES:
+        paths.append(prefix + postfix)
+
 
 @implementer(IPurgePaths)
 @adapter(IDynamicType)
@@ -38,6 +60,7 @@ class ContentPurgePaths:
     * ${object_path}/ (e.g. for folders)
     * ${object_path}/view
     * ${object_path}/${object_default_view}
+    * a bunch of restapi endpoints
 
     If the object is the default view of its parent, also purge:
 
@@ -77,10 +100,10 @@ class ContentPurgePaths:
                 # which would translate to http://site.come/ getting
                 # invalidated but not http://site.come
                 paths.append("")
-                paths.append("/view")
+                _append_paths(paths)
             else:
                 paths.append(parentPrefix + "/")
-                paths.append(parentPrefix + "/view")
+                _append_paths(paths, prefix=parentPrefix)
 
         return paths
 
@@ -116,9 +139,10 @@ class DiscussionItemPurgePaths:
                 for relativePath in relativePaths:
                     if rewriter is None:
                         yield relativePath
-                    else:
-                        rewrittenPaths = rewriter(relativePath) or []  # None -> []
-                        yield from rewrittenPaths
+                        continue
+                    rewrittenPaths = rewriter(relativePath) or []
+                    for rewrittenPath in rewrittenPaths:
+                        yield rewrittenPath
 
     def getAbsolutePaths(self):
         root = self._getRoot()

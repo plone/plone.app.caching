@@ -25,6 +25,7 @@ Contents:
    etags
    composite-views
    split-views
+   restapi
 
 
 Indices and tables

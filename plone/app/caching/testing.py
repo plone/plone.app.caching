@@ -6,9 +6,10 @@ from plone.app.testing import IntegrationTesting
 from plone.app.testing import PloneSandboxLayer
 from plone.cachepurging.interfaces import IPurger
 from plone.protect.authenticator import _getKeyring
+from plone.restapi.testing import PLONE_RESTAPI_DX_PAM_FIXTURE
+from plone.testing import z2
 from zope.component import getUtility
 from zope.component import provideUtility
-from zope.configuration import xmlconfig
 from zope.interface import implementer
 
 import hmac
@@ -36,18 +37,13 @@ class FauxPurger:
     http_1_1 = True
 
 
-class PloneAppCaching(PloneSandboxLayer):
-
-    defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
-
+class PloneAppCachingBase(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
 
         # Load ZCML
         import plone.app.caching
 
-        xmlconfig.file(
-            "configure.zcml", plone.app.caching, context=configurationContext
-        )
+        self.loadZCML(package=plone.app.caching)
 
         # Install fake purger
         self.oldPurger = getUtility(IPurger)
@@ -55,7 +51,6 @@ class PloneAppCaching(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, "plone.app.caching:default")
-
         portal["portal_workflow"].setDefaultChain("simple_publication_workflow")
 
     def tearDownZope(self, app):
@@ -63,7 +58,18 @@ class PloneAppCaching(PloneSandboxLayer):
         provideUtility(self.oldPurger, IPurger)
 
 
+class PloneAppCaching(PloneAppCachingBase):
+
+    defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
+
+
+class PloneAppCachingRestAPI(PloneAppCachingBase):
+
+    defaultBases = (PLONE_RESTAPI_DX_PAM_FIXTURE,)
+
+
 PLONE_APP_CACHING_FIXTURE = PloneAppCaching()
+PLONE_APP_CACHING_RESTAPI_FIXTURE = PloneAppCachingRestAPI()
 PLONE_APP_CACHING_INTEGRATION_TESTING = IntegrationTesting(
     bases=(PLONE_APP_CACHING_FIXTURE,),
     name="PloneAppCaching:Integration",
@@ -71,6 +77,11 @@ PLONE_APP_CACHING_INTEGRATION_TESTING = IntegrationTesting(
 PLONE_APP_CACHING_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(PLONE_APP_CACHING_FIXTURE,),
     name="PloneAppCaching:Functional",
+)
+
+PLONE_APP_CACHING_FUNCTIONAL_RESTAPI_TESTING = FunctionalTesting(
+    bases=(PLONE_APP_CACHING_RESTAPI_FIXTURE, z2.ZSERVER_FIXTURE),
+    name="PloneAppCachingRestAPI:Functional",
 )
 
 

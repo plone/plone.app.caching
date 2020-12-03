@@ -8,6 +8,7 @@
       <element key="plone.content.feed">plone.app.caching.weakCaching</element>
       <element key="plone.content.folderView">plone.app.caching.weakCaching</element>
       <element key="plone.content.file">plone.app.caching.weakCaching</element>
+      <element key="plone.content.dynamic">plone.app.caching.terseCaching</element>
     </value>
   </record>
 
@@ -44,6 +45,36 @@
   <record name="plone.app.caching.weakCaching.plone.content.folderView.ramCache">
       <field ref="plone.app.caching.weakCaching.ramCache" />
       <value>True</value>
+  </record>
+
+
+  <!-- plone.content.dynamic -->
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.etags">
+      <field ref="plone.app.caching.terseCaching.etags" />
+      <value>
+          <element>userid</element>
+          <element>catalogCounter</element>
+          <element>userLanguage</element>
+          <element>skin</element>
+          <element>locked</element>
+          <element>copy</element>
+      </value>
+  </record>
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.ramCache">
+      <field ref="plone.app.caching.terseCaching.ramCache" />
+      <value>True</value>
+  </record>
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.vary">
+      <field ref="plone.app.caching.terseCaching.vary" />
+      <value>Accept</value>
+  </record>
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.maxage">
+      <field ref="plone.app.caching.terseCaching.maxage" />
+      <value>10</value>
+  </record>
+  <record name="plone.app.caching.terseCaching.plone.content.dynamic.smaxage">
+      <field ref="plone.app.caching.terseCaching.smaxage" />
+      <value>0</value>
   </record>
 
 

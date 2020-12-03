@@ -74,6 +74,12 @@
         description="A dynamic feed, e.g. using RSS or ATOM"
         />
 
+    <cache:rulesetType
+        name="plone.content.dynamic"
+        title="Dynamic views, like collections, searches, ..."
+        description="A public-facing view for a contents that is collected dynamically from the whole site."
+        />
+
     <!-- Default caching ruleset assignments
          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
@@ -101,6 +107,23 @@
     <!-- These rely on the ContentItemLookup delegation -->
     <cache:ruleset ruleset="plone.content.file"   for="plone.namedfile.browser.Download" />
     <cache:ruleset ruleset="plone.content.file" for="plone.namedfile.scaling.ImageScale" />
+
+    <!-- plone.restapi content -->
+    <configure zcml:condition="installed plone.restapi">
+
+        <include package="plone.restapi" />
+
+        <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.discussion.conversation.CommentsGet" />
+
+        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.actions.get.ActionsGet" />
+        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.breadcrumbs.get.BreadcrumbsGet" />
+        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.content.get.ContentGet" />
+        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.multilingual.pam.TranslationInfo" />
+        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.navigation.get.NavigationGet" />
+        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.querystring.get.QuerystringGet" />
+        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.search.get.SearchGet" />
+
+    </configure>
 
     <!-- Paths to purge -->
 

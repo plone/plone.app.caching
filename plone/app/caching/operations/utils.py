@@ -1,3 +1,4 @@
+from _thread import allocate_lock
 from AccessControl.PermissionRole import rolesForPermissionOn
 from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.interfaces import IPloneCacheSettings
@@ -6,7 +7,6 @@ from plone.memoize.interfaces import ICacheChooser
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import ISiteRoot
-from _thread import allocate_lock
 from z3c.caching.interfaces import ILastModified
 from zope.annotation.interfaces import IAnnotations
 from zope.component import getUtility
