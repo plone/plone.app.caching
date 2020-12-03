@@ -8,6 +8,7 @@
       <element key="plone.content.feed">plone.app.caching.weakCaching</element>
       <element key="plone.content.folderView">plone.app.caching.weakCaching</element>
       <element key="plone.content.file">plone.app.caching.weakCaching</element>
+      <element key="plone.content.dynamic">plone.app.caching.terseCaching</element>
     </value>
   </record>
 

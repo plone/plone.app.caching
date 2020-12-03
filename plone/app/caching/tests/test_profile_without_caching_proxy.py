@@ -608,7 +608,6 @@ class TestProfileWithoutCachingRestAPI(unittest.TestCase):
     def test_restapi_actions(self):
         # plone.content.dynamic for plone.restapi.services.actions.get.ActionsGet
         response = self.api_session.get("/f1/f2/@actions")
-        import pdb; pdb.set_trace()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["X-Cache-Rule"], "plone.content.dynamic")
         self.assertEqual(
