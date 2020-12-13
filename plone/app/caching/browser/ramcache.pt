@@ -11,25 +11,28 @@
 <div metal:fill-slot="prefs_configlet_main">
 
             <div class="autotabs">
-                <ul class="formTabs autotoc-nav">
-                    <li class="formTab firstFormTab">
-                        <a href=""
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href=""
                            tal:attributes="href string:${portal_url}/@@caching-controlpanel"
                            i18n:translate="label_settings">Change settings</a>
                       </li>
-                      <li class="formTab">
-                        <a href=""
+                      <li class="nav-item">
+                        <a class="nav-link"
+                           href=""
                            tal:attributes="href string:${portal_url}/@@caching-controlpanel-import"
                            i18n:translate="label_import">Import settings</a>
                       </li>
-                      <li tal:condition="view/purgingEnabled" class="formTab">
-                        <a href=""
+                      <li tal:condition="view/purgingEnabled" class="nav-item">
+                        <a class="nav-link"
+                           href=""
                            tal:attributes="href string:${portal_url}/@@caching-controlpanel-purge"
                            i18n:translate="label_purging">Purge caching proxy</a>
                       </li>
-                      <li class="formTab lastFormTab">
-                        <a href=""
-                           class="active selected"
+                      <li class="nav-item">
+                        <a class="nav-link active"
+                           href=""
                            tal:attributes="href string:${portal_url}/@@caching-controlpanel-ramcache"
                            i18n:translate="label_ramcache">RAM cache</a>
                       </li>
@@ -51,7 +54,8 @@
                         Up to Site Setup
                 </a>
 
-                <p i18n:translate="description_ramcache_stats">
+                <p class="form-text"
+                    i18n:translate="description_ramcache_stats">
                     The table below shows statistics for the default RAM
                     cache. You can use the <em>Purge</em> button to manually
                     clear the cache if you suspect there are stale items there.
@@ -61,8 +65,9 @@
                     class="pat-formunloadalert"
                     tal:define="errors view/errors">
 
-                  <table tal:define="stats view/ramCache/getStatistics"
-                         class="listing nosort" summary="RAM cache statistics"
+                  <table class="table table-striped table-responsive"
+                         tal:define="stats view/ramCache/getStatistics"
+                         summary="RAM cache statistics"
                          i18n:attributes="summary heading_ramcache_stats;">
                     <thead>
                       <th i18n:translate="label_cache_key">Key</th>
@@ -83,12 +88,16 @@
                   </table>
 
                     <div class="formControls">
-                        <input
+                        <button
+                            class="btn btn-primary"
                             type="submit"
                             name="form.button.Purge"
-                            class="destructive"
                             value="Purge"
-                            i18n:attributes="value" />
+                            i18n:attributes="value"
+                            i18n:translate=""
+                        >
+                          Purge
+                        </button>
                     </div>
 
                     <input tal:replace="structure context/@@authenticator/authenticator" />
