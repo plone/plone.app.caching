@@ -11,25 +11,28 @@
 <div metal:fill-slot="prefs_configlet_main">
 
             <div class="autotabs">
-                <ul class="formTabs autotoc-nav">
-                    <li class="formTab firstFormTab">
-                        <a href=""
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href=""
                            tal:attributes="href string:${portal_url}/@@caching-controlpanel"
                            i18n:translate="label_settings">Change settings</a>
                       </li>
-                      <li class="formTab">
-                        <a href=""
-                           class="active selected"
+                      <li class="nav-item">
+                        <a class="nav-link active"
+                           href=""
                            tal:attributes="href string:${portal_url}/@@caching-controlpanel-import"
                            i18n:translate="label_import">Import settings</a>
                       </li>
-                      <li tal:condition="view/purgingEnabled" class="formTab">
-                        <a href=""
+                      <li tal:condition="view/purgingEnabled" class="nav-item">
+                        <a class="nav-link"
+                           href=""
                            tal:attributes="href string:${portal_url}/@@caching-controlpanel-purge"
                            i18n:translate="label_purging">Purge caching proxy</a>
                       </li>
-                      <li class="formTab lastFormTab">
-                        <a href=""
+                      <li class="nav-item">
+                        <a class="nav-link"
+                           href=""
                            tal:attributes="href string:${portal_url}/@@caching-controlpanel-ramcache"
                            i18n:translate="label_ramcache">RAM cache</a>
                       </li>
@@ -51,7 +54,8 @@
                         Up to Site Setup
                 </a>
 
-                <p i18n:translate="description_caching_ipmort">
+                <p class="form-text"
+                    i18n:translate="description_caching_ipmort">
                     Choose a profile below to import cache settings. Additional
                     profiles may be installed by third party products.
                     <strong>Warning:</strong> This may overwrite existing
@@ -62,24 +66,24 @@
                     class="pat-formunloadalert"
                     tal:define="errors view/errors">
 
-                    <div class="field">
+                    <div class="mb-3 field form-check ${python:'error' if errors else ''}">
 
                         <div
-                            class="error"
+                            class="invalid-feedback"
                             tal:condition="errors/profile | nothing"
                             tal:content="errors/profile"
                             />
 
                         <div tal:repeat="profile view/profiles">
 
-                            <input
+                            <input class="form-check-input"
                                 type="radio"
                                 name="profile"
                                 tal:attributes="id string:profile-${repeat/profile/index};
                                                 value profile/id"
                                 />
 
-                            <label
+                            <label class="form-check-label"
                                 tal:attributes="for string:profile-${repeat/profile/index}"
                                 tal:content="profile/title" i18n:translate=""
                                 />
@@ -110,12 +114,16 @@
                     </div>
 
                     <div class="formControls">
-                        <input
+                        <button
+                            class="btn btn-primary"
                             type="submit"
                             name="form.button.Import"
-                            class="destructive"
                             value="Import"
-                            i18n:attributes="value" />
+                            i18n:attributes="value"
+                            i18n:translate=""
+                        >
+                            Import
+                        </button>
                     </div>
 
                     <input tal:replace="structure context/@@authenticator/authenticator" />
