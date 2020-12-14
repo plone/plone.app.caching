@@ -3,6 +3,7 @@ from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
 from Products.CMFCore.utils import getToolByName
 from zope.component import adapter
+from zope.component.hooks import getSite
 from zope.component import queryMultiAdapter
 from zope.interface import implementer
 from zope.interface import Interface
@@ -21,14 +22,11 @@ class UserID:
         self.request = request
 
     def __call__(self):
-        context = getContext(self.published)
-        portal_state = queryMultiAdapter(
-            (context, self.request), name="plone_portal_state"
-        )
-        if portal_state is None:
+        tool = queryMultiAdapter((getSite(), self.request), name="portal_membership")
+        if tool is None:
             return None
 
-        member = portal_state.member()
+        member = tool.getAuthenticatedMember()
         if member is None:
             return None
 
@@ -47,21 +45,18 @@ class Roles:
         self.request = request
 
     def __call__(self):
-        context = getContext(self.published)
-        portal_state = queryMultiAdapter(
-            (context, self.request), name="plone_portal_state"
-        )
-        if portal_state is None:
+        tool = queryMultiAdapter((getSite(), self.request), name="portal_membership")
+        if tool is None:
             return None
 
-        if portal_state.anonymous():
+        if bool(tool.isAnonymousUser()):
             return "Anonymous"
 
-        member = portal_state.member()
+        member = tool.getAuthenticatedMember()
         if member is None:
             return None
 
-        return ";".join(sorted(member.getRolesInContext(context)))
+        return ";".join(sorted(member.getRolesInContext(getContext(self.published))))
 
 
 @implementer(IETagValue)
@@ -91,14 +86,19 @@ class UserLanguage:
         self.request = request
 
     def __call__(self):
+        language = self.request.get("LANGUAGE", None)
+        if language:
+            return language
         context = getContext(self.published)
+        language = aq_inner(context).Language()
+        if language:
+            return language
         portal_state = queryMultiAdapter(
             (context, self.request), name="plone_portal_state"
         )
         if portal_state is None:
             return None
-
-        return portal_state.language()
+        return portal_state.default_language()
 
 
 @implementer(IETagValue)
@@ -132,11 +132,10 @@ class CatalogCounter:
 
     def __call__(self):
         context = getContext(self.published)
-        tools = queryMultiAdapter((context, self.request), name="plone_tools")
-        if tools is None:
+        catalog = getToolByName(context, "portal_catalog", None)
+        if catalog is None:
             return None
-
-        return str(tools.catalog().getCounter())
+        return str(catalog.getCounter())
 
 
 @implementer(IETagValue)
@@ -157,7 +156,7 @@ class ObjectLocked:
         )
         if context_state is None:
             return None
-        return str(int(context_state.is_locked()))
+        return "1" if context_state.is_locked() else "0"
 
 
 @implementer(IETagValue)
@@ -197,13 +196,10 @@ class AnonymousOrRandom:
         self.request = request
 
     def __call__(self):
-        context = getContext(self.published)
-        portal_state = queryMultiAdapter(
-            (context, self.request), name="plone_portal_state"
-        )
-        if portal_state is None:
+        tool = queryMultiAdapter((getSite(), self.request), name="portal_membership")
+        if tool is None:
             return None
-        if portal_state.anonymous():
+        if bool(tool.isAnonymousUser()):
             return None
         return "{}{}".format(time.time(), random.randint(0, 1000))
 
@@ -220,4 +216,4 @@ class CopyCookie:
         self.request = request
 
     def __call__(self):
-        return self.request.get("__cp") and "1" or "0"
+        return "1" if self.request.get("__cp") or "0"

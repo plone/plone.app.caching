@@ -286,11 +286,7 @@ def cachedResponse(
             response.setHeader(k, v)
 
     response.setHeader("X-RAMCache", PAGE_CACHE_KEY, literal=1)
-
-    if not gzip:
-        response.enableHTTPCompression(request, disable=True)
-    else:
-        response.enableHTTPCompression(request)
+    response.enableHTTPCompression(request, disable=not gzip)
 
     return body
 
@@ -393,13 +389,11 @@ def isModified(request, etag=None, lastModified=None):
 
         etagMatched = True
 
-    """
-    If a site turns off etags after having them on, the pages previously
-    served will return an If-None-Match header, but the site will not be
-    configured for etags. In this case, force a refresh to load the
-    latest headers. I interpret this as the spec rule that the
-    etags do NOT match, and therefor we must not return a 304.
-    """
+    # If a site turns off etags after having them on, the pages previously
+    # served will return an If-None-Match header, but the site will not be
+    # configured for etags. In this case, force a refresh to load the
+    # latest headers. I interpret this as the spec rule that the
+    # etags do NOT match, and therefor we must not return a 304.
     if ifNoneMatch and etag is None:
         return True
 

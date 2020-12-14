@@ -72,10 +72,9 @@ class ContentItemLookup:
             return None
 
         # 3. Look up the published name in the page template mapping
-        if ploneCacheSettings.templateRulesetMapping is not None:
-            ruleset = ploneCacheSettings.templateRulesetMapping.get(name, None)
-            if ruleset is not None:
-                return ruleset
+        ruleset = ploneCacheSettings.templateRulesetMapping.get(name, None)
+        if ruleset is not None:
+            return ruleset
 
         # 4. Find the parent of the published object
         parent = getattr(self.published, "__parent__", None)
@@ -97,13 +96,11 @@ class ContentItemLookup:
 
         # 4.1.2.1. Look up the parent type in the content type
         # mapping
-        if ploneCacheSettings.contentTypeRulesetMapping is not None:
-            ruleset = ploneCacheSettings.contentTypeRulesetMapping.get(
-                parentPortalType,
-                None,
-            )
-            if ruleset is not None:
-                return ruleset
+        ruleset = ploneCacheSettings.contentTypeRulesetMapping.get(
+            parentPortalType, None
+        )
+        if ruleset is not None:
+            return ruleset
 
         # 4.1.2.2. Look up a ruleset on the parent object and
         # return
