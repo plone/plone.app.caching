@@ -98,7 +98,7 @@
   </record>
 
 
-  <!-- plone.content.dynamic -->
+  <!-- plone.content.file -->
   <record name="plone.app.caching.moderateCaching.plone.content.file.smaxage">
       <field ref="plone.app.caching.moderateCaching.smaxage" />
       <value>86400</value>

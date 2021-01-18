@@ -132,7 +132,7 @@ class DiscussionItemPurgePaths:
             return
 
         rewriter = IPurgePathRewriter(request, None)
-        for name, pathProvider in getAdapters((root,), IPurgePaths):
+        for _name, pathProvider in getAdapters((root,), IPurgePaths):
             # add relative paths, which are rewritten
             relativePaths = pathProvider.getRelativePaths()
             if relativePaths:
@@ -153,7 +153,7 @@ class DiscussionItemPurgePaths:
         if request is None:
             return
 
-        for name, pathProvider in getAdapters((root,), IPurgePaths):
+        for _name, pathProvider in getAdapters((root,), IPurgePaths):
             # add absoute paths, which are not
             absolutePaths = pathProvider.getAbsolutePaths()
             if absolutePaths:
@@ -203,7 +203,7 @@ class ScalesPurgePaths:
                     fields = fields + new_fields
 
             obj_fields = []
-            for key, value in fields:
+            for _key, value in fields:
                 is_image = INamedImageField.providedBy(value)
                 is_file = INamedBlobFileField.providedBy(value)
                 if is_image or is_file:
