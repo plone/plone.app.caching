@@ -216,4 +216,4 @@ class CopyCookie:
         self.request = request
 
     def __call__(self):
-        return "1" if self.request.get("__cp") or "0"
+        return "1" if self.request.get("__cp") else "0"
