@@ -2,7 +2,6 @@ from Acquisition import aq_base
 from datetime import datetime
 from dateutil.tz import tzlocal
 from OFS.Image import File
-from plone.app.caching.operations.utils import getContext
 from Products.CMFCore.FSObject import FSObject
 from Products.CMFCore.FSPageTemplate import FSPageTemplate
 from Products.CMFCore.interfaces import ICatalogableDublinCore

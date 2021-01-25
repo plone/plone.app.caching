@@ -35,7 +35,6 @@ from zope.component import provideUtility
 from zope.component import queryUtility
 from zope.component.event import objectEventNotify
 from zope.event import notify
-from zope.globalrequest import getRequest
 from zope.globalrequest import setRequest
 from zope.interface import implementer
 from zope.lifecycleevent import ObjectAddedEvent
