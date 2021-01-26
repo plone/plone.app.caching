@@ -3,6 +3,8 @@ from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
 from Products.CMFCore.utils import getToolByName
+from Products.CMFPlone.resources.browser.combine import get_override_directory
+from Products.CMFPlone.resources.browser.combine import PRODUCTION_RESOURCE_DIRECTORY
 from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.interface import implementer
@@ -219,3 +221,35 @@ class CopyCookie(object):
 
     def __call__(self):
         return self.request.get('__cp') and '1' or '0'
+
+
+@implementer(IETagValue)
+@adapter(Interface, Interface)
+class ResourceRegistries(object):
+    """The ``resourceRegistries`` etag component, returning a timestamp.
+
+    This is the last modified timestamp from the Plone 5+ Resource Registries.
+    This is useful for avoiding requests for expired resources from cached pages.
+    """
+
+    def __init__(self, published, request):
+        self.published = published
+        self.request = request
+
+    def __call__(self):
+        context = getContext(self.published)
+        container = get_override_directory(context)
+        if PRODUCTION_RESOURCE_DIRECTORY not in container:
+            return ''
+        production_folder = container[PRODUCTION_RESOURCE_DIRECTORY]
+        filename = 'timestamp.txt'
+        if filename not in production_folder:
+            return ''
+        timestamp = production_folder.readFile(filename)
+        if not timestamp:
+            return ''
+        # timestamp is in bytes, and we must return a string.
+        # On Python 2 this is the same, but not on Python 3.
+        if not isinstance(timestamp, str):
+            timestamp = timestamp.decode("utf-8")
+        return timestamp

@@ -21,6 +21,7 @@
           <element>userLanguage</element>
           <element>skin</element>
           <element>locked</element>
+          <element>resourceRegistries</element>
       </value>
   </record>
   <record name="plone.app.caching.weakCaching.plone.content.itemView.ramCache">
@@ -39,6 +40,7 @@
           <element>skin</element>
           <element>locked</element>
           <element>copy</element>
+          <element>resourceRegistries</element>
       </value>
   </record>
   <record name="plone.app.caching.weakCaching.plone.content.folderView.ramCache">
