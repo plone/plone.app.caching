@@ -1,10 +1,10 @@
 from Acquisition import aq_parent
 from plone.app.caching.utils import getObjectDefaultView
 from plone.app.caching.utils import isPurged
-from plone.behavior.interfaces import IBehaviorAssignable
 from plone.cachepurging.interfaces import IPurgePathRewriter
-from plone.dexterity.interfaces import IDexterityFTI
+from plone.dexterity.content import get_assignable
 from plone.dexterity.interfaces import IDexteritySchema
+from plone.dexterity.schema import SCHEMA_CACHE
 from plone.memoize.instance import memoize
 from plone.namedfile.interfaces import INamedBlobFileField
 from plone.namedfile.interfaces import INamedImageField
@@ -182,54 +182,41 @@ class ScalesPurgePaths:
         self.context = context
 
     def getScales(self):
-        registry = getUtility(IRegistry)
-        reg_list = registry["plone.allowed_sizes"]
-        sizes = [i.split(" ", 1)[0] for i in reg_list]
-        sizes.append("download")
-        return sizes
+        if getattr(self, "_sizes", None) is None:
+            reg_list = getUtility(IRegistry)["plone.allowed_sizes"]
+            self._sizes = [i.split(" ", 1)[0] for i in reg_list]
+        return self._sizes
 
     def getRelativePaths(self):
         prefix = "/" + self.context.virtual_url_path()
 
-        def fieldFilter():
-            portal_type = self.context.getPortalTypeName()
-            fti = getUtility(IDexterityFTI, name=portal_type)
-            schema = fti.lookupSchema()
-            fields = getFieldsInOrder(schema)
-            assignable = IBehaviorAssignable(self.context, None)
-            for behavior in assignable.enumerateBehaviors():
-                new_fields = getFieldsInOrder(behavior.interface)
-                if len(new_fields) > 0:
-                    fields = fields + new_fields
+        def schemas():
+            yield SCHEMA_CACHE.get(self.context.portal_type)
+            for behavior_registration in get_assignable(
+                self.context
+            ).enumerateBehaviors():
+                yield behavior_registration.interface
 
-            obj_fields = []
-            for _key, value in fields:
-                is_image = INamedImageField.providedBy(value)
-                is_file = INamedBlobFileField.providedBy(value)
-                if is_image or is_file:
-                    obj_fields.append(value)
-            return obj_fields
-
-        for item in fieldFilter():
-            field = item.getName()
-            value = item.get(self.context)
-            if not value:
-                continue
-
-            if INamedImageField.providedBy(item):
-                for size in self.getScales():
-                    yield "{}/@@images/{}/{}".format(
-                        prefix,
-                        field,
-                        size,
-                    )
-                    yield f"{prefix}/@@download/{field}"
-            else:
+        for schema in schemas():
+            for field_name, field in getFieldsInOrder(schema):
+                is_image = INamedImageField.providedBy(field)
+                is_file = INamedBlobFileField.providedBy(field)
+                if not (is_image or is_file):
+                    continue
+                value = field.get(self.context)
+                if not value:
+                    continue
                 filename = value.filename
-                yield "{}/view/{}.{}/@@download/{}".format(
-                    prefix, "++widget++form.widgets", field, filename
-                )
-                yield f"{prefix}/@@download/{field}/{filename}"
+                if is_image:
+                    for size in self.getScales():
+                        yield f"{prefix}/images/{field_name}/{size}"
+                        yield f"{prefix}/@@images/{field_name}/{size}"
+                if is_file:
+                    yield f"{prefix}/view/++widget++form.widgets.{field_name}/@@download/{filename}"
+                yield f"{prefix}/download/{field_name}"
+                yield f"{prefix}/download/{field_name}/{filename}"
+                yield f"{prefix}/@@download/{field_name}"
+                yield f"{prefix}/@@download/{field_name}/{filename}"
 
     def getAbsolutePaths(self):
         return []
