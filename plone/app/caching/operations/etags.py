@@ -2,12 +2,12 @@ from Acquisition import aq_inner
 from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
+from Products.CMFCore.interfaces import IMembershipTool
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.interfaces import IPloneCatalogTool
 from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
-from zope.component.hooks import getSite
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -25,7 +25,7 @@ class UserID:
         self.request = request
 
     def __call__(self):
-        tool = queryMultiAdapter((getSite(), self.request), name="portal_membership")
+        tool = queryUtility(IMembershipTool)
         if tool is None:
             return None
 
@@ -48,7 +48,7 @@ class Roles:
         self.request = request
 
     def __call__(self):
-        tool = queryMultiAdapter((getSite(), self.request), name="portal_membership")
+        tool = queryUtility(IMembershipTool)
         if tool is None:
             return None
 
@@ -198,7 +198,7 @@ class AnonymousOrRandom:
         self.request = request
 
     def __call__(self):
-        tool = queryMultiAdapter((getSite(), self.request), name="portal_membership")
+        tool = queryUtility(IMembershipTool)
         if tool is None:
             return None
         if bool(tool.isAnonymousUser()):

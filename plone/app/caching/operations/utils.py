@@ -631,7 +631,6 @@ def getETag(published, request, keys=(), extraTokens=()):
 
     All tokens will be concatenated into an ETag string, separated by pipes.
     """
-
     if not keys and not extraTokens:
         return None
 

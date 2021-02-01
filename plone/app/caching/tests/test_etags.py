@@ -45,13 +45,13 @@ class TestETags(unittest.TestCase):
         @adapter(Interface, Interface)
         @implementer(IMembershipTool)
         class DummyMembershipTool:
-            def __init__(self, one, two):
+            def __init__(self):
                 pass
 
             def getAuthenticatedMember(self):
                 return None
 
-        provideAdapter(DummyMembershipTool, name="portal_membership")
+        provideUtility(DummyMembershipTool())
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -72,13 +72,13 @@ class TestETags(unittest.TestCase):
         @adapter(Interface, Interface)
         @implementer(IMembershipTool)
         class DummyMembershipTool:
-            def __init__(self, one, two):
+            def __init__(self):
                 pass
 
             def getAuthenticatedMember(self):
                 return DummyMember()
 
-        provideAdapter(DummyMembershipTool, name="portal_membership")
+        provideUtility(DummyMembershipTool())
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -97,7 +97,7 @@ class TestETags(unittest.TestCase):
         @adapter(Interface, Interface)
         @implementer(IMembershipTool)
         class DummyMembershipTool:
-            def __init__(self, one, two):
+            def __init__(self):
                 pass
 
             def getAuthenticatedMember(self):
@@ -106,7 +106,7 @@ class TestETags(unittest.TestCase):
             def isAnonymousUser(self):
                 return True
 
-        provideAdapter(DummyMembershipTool, name="portal_membership")
+        provideUtility(DummyMembershipTool())
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -127,7 +127,7 @@ class TestETags(unittest.TestCase):
         @adapter(Interface, Interface)
         @implementer(IMembershipTool)
         class DummyMembershipTool:
-            def __init__(self, one, two):
+            def __init__(self):
                 pass
 
             def isAnonymousUser(self):
@@ -136,7 +136,7 @@ class TestETags(unittest.TestCase):
             def getAuthenticatedMember(self):
                 return DummyMember()
 
-        provideAdapter(DummyMembershipTool, name="portal_membership")
+        provideUtility(DummyMembershipTool())
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
