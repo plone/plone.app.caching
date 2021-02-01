@@ -5,9 +5,12 @@ from io import StringIO
 from plone.registry.fieldfactory import persistentFieldAdapter
 from plone.testing.zca import UNIT_TESTING
 from Products.CMFCore.interfaces import IContentish
+from Products.CMFCore.interfaces import IMembershipTool
 from z3c.caching.interfaces import ILastModified
 from zope.component import adapter
 from zope.component import provideAdapter
+from zope.component import provideUtility
+from zope.component.hooks import setSite
 from zope.interface import implementer
 from zope.interface import Interface
 from ZPublisher.HTTPRequest import HTTPRequest
@@ -39,16 +42,16 @@ class TestETags(unittest.TestCase):
     def test_UserID_anonymous(self):
         from plone.app.caching.operations.etags import UserID
 
-        @implementer(Interface)
-        @adapter(DummyContext, Interface)
-        class DummyPortalState:
-            def __init__(self, context, request):
+        @adapter(Interface, Interface)
+        @implementer(IMembershipTool)
+        class DummyMembershipTool:
+            def __init__(self, one, two):
                 pass
 
-            def member(self):
+            def getAuthenticatedMember(self):
                 return None
 
-        provideAdapter(DummyPortalState, name="plone_portal_state")
+        provideAdapter(DummyMembershipTool, name="portal_membership")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -66,16 +69,16 @@ class TestETags(unittest.TestCase):
             def getId(self):
                 return "bob"
 
-        @implementer(Interface)
-        @adapter(DummyContext, Interface)
-        class DummyPortalState:
-            def __init__(self, context, request):
+        @adapter(Interface, Interface)
+        @implementer(IMembershipTool)
+        class DummyMembershipTool:
+            def __init__(self, one, two):
                 pass
 
-            def member(self):
+            def getAuthenticatedMember(self):
                 return DummyMember()
 
-        provideAdapter(DummyPortalState, name="plone_portal_state")
+        provideAdapter(DummyMembershipTool, name="portal_membership")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -91,19 +94,19 @@ class TestETags(unittest.TestCase):
     def test_Roles_anonymous(self):
         from plone.app.caching.operations.etags import Roles
 
-        @implementer(Interface)
-        @adapter(DummyContext, Interface)
-        class DummyPortalState:
-            def __init__(self, context, request):
+        @adapter(Interface, Interface)
+        @implementer(IMembershipTool)
+        class DummyMembershipTool:
+            def __init__(self, one, two):
                 pass
 
-            def anonymous(self):
-                return True
-
-            def member(self):
+            def getAuthenticatedMember(self):
                 return None
 
-        provideAdapter(DummyPortalState, name="plone_portal_state")
+            def isAnonymousUser(self):
+                return True
+
+        provideAdapter(DummyMembershipTool, name="portal_membership")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -121,19 +124,19 @@ class TestETags(unittest.TestCase):
             def getRolesInContext(self, context):
                 return ["Member", "Manager"]
 
-        @implementer(Interface)
-        @adapter(DummyContext, Interface)
-        class DummyPortalState:
-            def __init__(self, context, request):
+        @adapter(Interface, Interface)
+        @implementer(IMembershipTool)
+        class DummyMembershipTool:
+            def __init__(self, one, two):
                 pass
 
-            def anonymous(self):
+            def isAnonymousUser(self):
                 return False
 
-            def member(self):
+            def getAuthenticatedMember(self):
                 return DummyMember()
 
-        provideAdapter(DummyPortalState, name="plone_portal_state")
+        provideAdapter(DummyMembershipTool, name="portal_membership")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -254,21 +257,14 @@ class TestETags(unittest.TestCase):
 
     def test_CatalogCounter(self):
         from plone.app.caching.operations.etags import CatalogCounter
+        from Products.CMFPlone.interfaces import IPloneCatalogTool
 
+        @implementer(IPloneCatalogTool)
         class DummyCatalog:
             def getCounter(self):
                 return 10
 
-        @implementer(Interface)
-        @adapter(DummyContext, Interface)
-        class DummyTools:
-            def __init__(self, context, request):
-                pass
-
-            def catalog(self):
-                return DummyCatalog()
-
-        provideAdapter(DummyTools, name="plone_tools")
+        provideUtility(DummyCatalog())
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()

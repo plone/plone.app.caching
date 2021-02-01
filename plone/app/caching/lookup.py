@@ -72,11 +72,10 @@ class ContentItemLookup:
             return None
 
         # 3. Look up the published name in the page template mapping
-        ploneCacheSettings.templateRulesetMapping
         ruleset = (
             ploneCacheSettings.templateRulesetMapping
             and ploneCacheSettings.templateRulesetMapping.get(name, None)
-        )
+        ) or None
         if ruleset is not None:
             return ruleset
 
@@ -103,7 +102,7 @@ class ContentItemLookup:
         ruleset = (
             ploneCacheSettings.contentTypeRulesetMapping
             and ploneCacheSettings.contentTypeRulesetMapping.get(parentPortalType, None)
-        )
+        ) or None
         if ruleset is not None:
             return ruleset
 

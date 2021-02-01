@@ -3,8 +3,10 @@ from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
 from Products.CMFCore.utils import getToolByName
+from Products.CMFPlone.interfaces import IPloneCatalogTool
 from zope.component import adapter
 from zope.component import queryMultiAdapter
+from zope.component import queryUtility
 from zope.component.hooks import getSite
 from zope.interface import implementer
 from zope.interface import Interface
@@ -132,8 +134,7 @@ class CatalogCounter:
         self.request = request
 
     def __call__(self):
-        context = getContext(self.published)
-        catalog = getToolByName(context, "portal_catalog", None)
+        catalog = queryUtility(IPloneCatalogTool)
         if catalog is None:
             return None
         return str(catalog.getCounter())
