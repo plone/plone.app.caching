@@ -1,3 +1,4 @@
+from Acquisition import aq_inner
 from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
