@@ -4,7 +4,7 @@ from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
 from Products.CMFCore.interfaces import IMembershipTool
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.interfaces import IPloneCatalogTool
+from Products.CMFCore.interfaces import ICatalogTool
 from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
@@ -134,7 +134,7 @@ class CatalogCounter:
         self.request = request
 
     def __call__(self):
-        catalog = queryUtility(IPloneCatalogTool)
+        catalog = queryUtility(ICatalogTool)
         if catalog is None:
             return None
         return str(catalog.getCounter())

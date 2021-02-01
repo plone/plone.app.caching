@@ -257,9 +257,9 @@ class TestETags(unittest.TestCase):
 
     def test_CatalogCounter(self):
         from plone.app.caching.operations.etags import CatalogCounter
-        from Products.CMFPlone.interfaces import IPloneCatalogTool
+        from Products.CMFCore.interfaces import ICatalogTool
 
-        @implementer(IPloneCatalogTool)
+        @implementer(ICatalogTool)
         class DummyCatalog:
             def getCounter(self):
                 return 10
