@@ -177,21 +177,12 @@ class TestETags(unittest.TestCase):
     def test_UserLanguage(self):
         from plone.app.caching.operations.etags import UserLanguage
 
-        @implementer(Interface)
-        @adapter(DummyContext, Interface)
-        class DummyPortalState:
-            def __init__(self, context, request):
-                pass
-
-            def language(self):
-                return "en"
-
-        provideAdapter(DummyPortalState, name="plone_portal_state")
-
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
-        published = DummyPublished(DummyContext())
+        context = DummyContext()
+        context.Language = lambda: 'en'
+        published = DummyPublished(context)
 
         etag = UserLanguage(published, request)
 
