@@ -181,7 +181,7 @@ class TestETags(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
         context = DummyContext()
-        context.Language = lambda: 'en'
+        context.Language = lambda: "en"
         published = DummyPublished(context)
 
         etag = UserLanguage(published, request)

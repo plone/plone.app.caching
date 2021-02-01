@@ -4,8 +4,8 @@ from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
 from Products.CMFCore.utils import getToolByName
 from zope.component import adapter
-from zope.component.hooks import getSite
 from zope.component import queryMultiAdapter
+from zope.component.hooks import getSite
 from zope.interface import implementer
 from zope.interface import Interface
 
