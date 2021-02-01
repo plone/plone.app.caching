@@ -1,7 +1,9 @@
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_RESTAPI_TESTING
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
+from plone.app.caching.tests.test_utils import normalize_etag
 from plone.app.caching.tests.test_utils import stable_now
+from plone.app.caching.tests.test_utils import test_image
 from plone.app.testing import applyProfile
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -23,29 +25,8 @@ import dateutil.parser
 import dateutil.tz
 import io
 import os
-import pkg_resources
 import transaction
 import unittest
-
-
-TEST_FILE = pkg_resources.resource_filename("plone.app.caching.tests", "test.gif")
-
-
-def test_image():
-    from plone.namedfile.file import NamedBlobImage
-
-    filename = pkg_resources.resource_filename("plone.app.caching.tests", "test.gif")
-    filename = os.path.join(os.path.dirname(__file__), "test.gif")
-    return NamedBlobImage(
-        data=open(filename, "rb").read(),
-        filename=filename,
-    )
-
-
-def _normalize_etag(s):
-    s = s.split("|")
-    s.pop()  # remove time-based component
-    return "|".join(s)
 
 
 class TestProfileWithoutCaching(unittest.TestCase):
@@ -132,32 +113,31 @@ class TestProfileWithoutCaching(unittest.TestCase):
             "plone.app.caching.weakCaching", browser.headers["X-Cache-Operation"]
         )
         # This should use cacheInBrowser
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        tag = '"|test_user_1_|{}|en|{}|0'.format(
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        tag = '"|test_user_1_|{0}|en|{1}|0|0'.format(
             catalog.getCounter(),
             default_skin,
         )
-        self.assertEqual(tag, _normalize_etag(browser.headers["ETag"]))
-        self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
+        self.assertGreater(now, dateutil.parser.parse(
+            browser.headers['Expires']))
 
         # Set the copy/cut cookie and then request the folder view again
         browser.cookies.create("__cp", "xxx")
         browser.open(self.portal["f1"].absolute_url())
         # The response should be the same as before except for the etag
-        self.assertEqual("plone.content.folderView", browser.headers["X-Cache-Rule"])
-        self.assertEqual(
-            "plone.app.caching.weakCaching", browser.headers["X-Cache-Operation"]
-        )
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        tag = '"|test_user_1_|{}|en|{}|0'.format(
+        self.assertEqual('plone.content.folderView',
+                         browser.headers['X-Cache-Rule'])
+        self.assertEqual('plone.app.caching.weakCaching',
+                         browser.headers['X-Cache-Operation'])
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        tag = '"|test_user_1_|{0}|en|{1}|0|1'.format(
             catalog.getCounter(),
             default_skin,
         )
-        self.assertEqual(tag, _normalize_etag(browser.headers["ETag"]))
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
 
         # Request the authenticated page
         now = stable_now()
@@ -176,15 +156,15 @@ class TestProfileWithoutCaching(unittest.TestCase):
             "plone.app.caching.weakCaching", browser.headers["X-Cache-Operation"]
         )
         # This should use cacheInBrowser
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        tag = '"|test_user_1_|{}|en|{}'.format(
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        tag = '"|test_user_1_|{0}|en|{1}|0'.format(
             catalog.getCounter(),
             default_skin,
         )
-        self.assertEqual(tag, _normalize_etag(browser.headers["ETag"]))
-        self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
+        self.assertGreater(now, dateutil.parser.parse(
+            browser.headers['Expires']))
 
         # Request the authenticated page again -- to test RAM cache.
         browser = Browser(self.app)
@@ -230,12 +210,12 @@ class TestProfileWithoutCaching(unittest.TestCase):
             "plone.app.caching.weakCaching", browser.headers["X-Cache-Operation"]
         )
         # This should use cacheInBrowser
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0'
-        self.assertEqual(tag, _normalize_etag(browser.headers["ETag"]))
-        self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        tag = '"||{0}|en|{1}|0|0'.format(catalog.getCounter(), default_skin)
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
+        self.assertGreater(now, dateutil.parser.parse(
+            browser.headers['Expires']))
 
         # Request the anonymous page
         now = stable_now()
@@ -247,12 +227,12 @@ class TestProfileWithoutCaching(unittest.TestCase):
         )
         self.assertIn(testText, browser.contents)
         # This should use cacheInBrowser
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        tag = f'"||{catalog.getCounter()}|en|{default_skin}'
-        self.assertEqual(tag, _normalize_etag(browser.headers["ETag"]))
-        self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        tag = '"||{0}|en|{1}|0'.format(catalog.getCounter(), default_skin)
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
+        self.assertGreater(now, dateutil.parser.parse(
+            browser.headers['Expires']))
 
         # Request the anonymous page again -- to test RAM cache.
         # Anonymous should be RAM cached
@@ -268,12 +248,12 @@ class TestProfileWithoutCaching(unittest.TestCase):
             "plone.app.caching.operations.ramcache", browser.headers["X-RAMCache"]
         )
         self.assertIn(testText, browser.contents)
-        self.assertEqual(
-            "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
-        )
-        tag = f'"||{catalog.getCounter()}|en|{default_skin}'
-        self.assertEqual(tag, _normalize_etag(browser.headers["ETag"]))
-        self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
+        self.assertEqual('max-age=0, must-revalidate, private',
+                         browser.headers['Cache-Control'])
+        tag = '"||{0}|en|{1}|0'.format(catalog.getCounter(), default_skin)
+        self.assertEqual(tag, normalize_etag(browser.headers['ETag']))
+        self.assertGreater(now, dateutil.parser.parse(
+            browser.headers['Expires']))
 
         # Request the anonymous page again -- with an INM header to test 304.
         etag = browser.headers["ETag"]

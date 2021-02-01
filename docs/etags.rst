@@ -42,6 +42,11 @@ The ETag names tokens supported by default are:
 * skin
     The name of the current skin (theme)
 
+* resourceRegistries
+    A timestamp indicating the last-modified timestamp for the
+    Resource Registries. This is useful for avoiding requests for expired
+    resources from cached pages.
+
 It is possible to provide additional tokens by registering an ``IETagValue``
 adapter. This should be a named adapter on the published object (typically a
 view, file resource or Zope page template object) and request, with a unique

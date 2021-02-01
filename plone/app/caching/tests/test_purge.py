@@ -35,7 +35,6 @@ from zope.component import provideUtility
 from zope.component import queryUtility
 from zope.component.event import objectEventNotify
 from zope.event import notify
-from zope.globalrequest import getRequest
 from zope.globalrequest import setRequest
 from zope.interface import implementer
 from zope.lifecycleevent import ObjectAddedEvent
@@ -50,9 +49,8 @@ def getData(filename):
     from plone.app.caching import tests
 
     filename = join(dirname(tests.__file__), filename)
-    with open(filename, "rb") as fh:
-        data = fh.read()
-    return data
+    with open(filename, 'rb') as myfile:
+        return myfile.read()
 
 
 class Handler:
