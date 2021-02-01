@@ -109,14 +109,14 @@
     </configure>
 
     <!-- Standard image content saved in an Archetype field, like ATImage scales-->
-    <configure zcml:condition="installed Products.Archetypes">
+    <configure zcml:condition="installed Products.Archetypes.atapi">
 
         <cache:ruleset ruleset="plone.content.file" for="Products.Archetypes.Field.Image" />
 
     </configure>
 
     <!-- Archetypes based folders and non-folderish content items -->
-    <configure zcml:condition="installed Products.Archetypes">
+    <configure zcml:condition="installed Products.Archetypes.atapi">
 
         <!-- These rely on the ContentItemLookup delegation -->
         <cache:ruleset ruleset="plone.content.itemView"   for="Products.Archetypes.BaseContent.BaseContent" />
@@ -162,7 +162,7 @@
 
     <!-- Archetypes object fields -->
     <configure zcml:condition="installed plone.app.blob">
-    <configure zcml:condition="installed Products.Archetypes">
+    <configure zcml:condition="installed Products.Archetypes.atapi">
         <adapter factory=".purge.ObjectFieldPurgePaths" name="plone.atobjectfields" />
     </configure>
     </configure>
