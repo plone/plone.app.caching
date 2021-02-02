@@ -8,6 +8,23 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a2 (2021-02-02)
+--------------------
+
+New features:
+
+
+- Restored ``resourceRegistries`` ETag, but now for Plone 5 resource registries.
+  Fixes warning "Could not find value adapter for ETag component resourceRegistries".
+  [maurits] (#61)
+
+
+Bug fixes:
+
+
+- Add more purge paths for images and downloads [jensens] (#71)
+
+
 3.0.0a1 (2020-12-03)
 --------------------
 
