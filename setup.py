@@ -28,7 +28,7 @@ setup(
     keywords="plone caching",
     author="Plone Foundation",
     author_email="plone-developers@lists.sourceforge.net",
-    url="https://pypi.org/project/plone.app.caching",
+    url="https://github.com/plone/plone.app.caching",
     license="GPL version 2",
     packages=find_packages(),
     namespace_packages=["plone", "plone.app"],
