@@ -20,9 +20,8 @@ import pytz
 import unittest
 
 
-TEST_TIMEZONE = 'Europe/Vienna'
-TEST_IMAGE = pkg_resources.resource_filename(
-    u'plone.app.caching.tests', u'test.gif')
+TEST_TIMEZONE = "Europe/Vienna"
+TEST_IMAGE = pkg_resources.resource_filename(u"plone.app.caching.tests", u"test.gif")
 
 
 def stable_now():
@@ -34,20 +33,21 @@ def stable_now():
 
 
 def normalize_etag(value):
-    split_value = value.split('|')
+    split_value = value.split("|")
     # The last component is expected to be the resourceRegistries ETag,
     # which is a time-based component, making it hard to test.
     last = split_value.pop()
     if str(date.today().year) in last:
         # yes, this is time based, remove it
-        return '|'.join(split_value)
+        return "|".join(split_value)
     # return original
     return value
 
 
 def test_image():
     from plone.namedfile.file import NamedBlobImage
-    with open(TEST_IMAGE, 'rb') as myfile:
+
+    with open(TEST_IMAGE, "rb") as myfile:
         return NamedBlobImage(
             data=myfile.read(),
             filename=TEST_IMAGE,

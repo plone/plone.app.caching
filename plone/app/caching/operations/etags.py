@@ -2,9 +2,9 @@ from Acquisition import aq_inner
 from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
+from Products.CMFCore.interfaces import ICatalogTool
 from Products.CMFCore.interfaces import IMembershipTool
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.interfaces import ICatalogTool
 from Products.CMFPlone.resources.browser.combine import get_override_directory
 from Products.CMFPlone.resources.browser.combine import PRODUCTION_RESOURCE_DIRECTORY
 from zope.component import adapter
@@ -240,14 +240,14 @@ class ResourceRegistries(object):
         context = getContext(self.published)
         container = get_override_directory(context)
         if PRODUCTION_RESOURCE_DIRECTORY not in container:
-            return ''
+            return ""
         production_folder = container[PRODUCTION_RESOURCE_DIRECTORY]
-        filename = 'timestamp.txt'
+        filename = "timestamp.txt"
         if filename not in production_folder:
-            return ''
+            return ""
         timestamp = production_folder.readFile(filename)
         if not timestamp:
-            return ''
+            return ""
         # timestamp is in bytes, and we must return a string.
         # On Python 2 this is the same, but not on Python 3.
         if not isinstance(timestamp, str):

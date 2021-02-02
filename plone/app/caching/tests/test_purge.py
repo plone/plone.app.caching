@@ -46,11 +46,10 @@ import unittest
 
 
 def getData(filename):
-    from plone.app.caching import tests
-
-    filename = join(dirname(tests.__file__), filename)
-    with open(filename, 'rb') as myfile:
-        return myfile.read()
+    filename = join(dirname(__file__), filename)
+    with open(filename, "rb") as fh:
+        data = fh.read()
+    return data
 
 
 class Handler:
@@ -374,28 +373,40 @@ class TestScalesPurgePaths(unittest.TestCase):
 
         setRoles(self.portal, TEST_USER_ID, TEST_USER_ROLES)
 
-    def test_scale_purge_paths(self):
+    def test_scale_purge_paths_image(self):
         prefix = "/".join(self.image_type.getPhysicalPath())
         purge = ScalesPurgePaths(self.image_type)
-        paths = purge.getRelativePaths()
+
         scales = purge.getScales()
         scalepaths = [prefix + "/@@images/image/" + str(i) for i in scales]
+        scalepaths += [prefix + "/images/image/" + str(i) for i in scales]
+
+        paths = [x for x in purge.getRelativePaths()]
         [self.assertIn(j, paths) for j in scalepaths]
-        # lead image scales (example for an image field of a behavior)
+
+
+    def test_scale_purge_paths_page(self):
         prefix = "/".join(self.page.getPhysicalPath())
         purge = ScalesPurgePaths(self.page)
-        paths = purge.getRelativePaths()
+
         scales = purge.getScales()
         scalepaths = [prefix + "/@@images/image/" + str(i) for i in scales]
+        scalepaths += [prefix + "/images/image/" + str(i) for i in scales]
+
+        paths = [x for x in purge.getRelativePaths()]
         [self.assertIn(j, paths) for j in scalepaths]
+
 
     def test_scale_purge_paths_unicode(self):
         purge = ScalesPurgePaths(self.file)
         expected = [
             "/plone/media/file/view/++widget++form.widgets.file/@@download/data/töstfile.csv",
+            "/plone/media/file/download/file",
+            "/plone/media/file/download/file/data/töstfile.csv",
+            "/plone/media/file/@@download/file",
             "/plone/media/file/@@download/file/data/töstfile.csv",
         ]
         self.assertListEqual(
-            list(purge.getRelativePaths()),
             expected,
+            list(purge.getRelativePaths()),
         )
