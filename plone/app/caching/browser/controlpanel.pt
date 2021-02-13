@@ -29,32 +29,36 @@
 </script>
 
     <div class="autotabs">
-        <ul class="formTabs autotoc-nav">
-            <li class="formTab firstFormTab">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
                 <a href=""
-                   class="active selected"
+                   class="nav-link active"
                    tal:attributes="href string:${portal_url}/@@caching-controlpanel"
                    i18n:translate="label_settings">Change settings</a>
               </li>
-              <li class="formTab">
-                <a href=""
+              <li class="nav-item">
+                <a class="nav-link"
+                   href=""
                    tal:attributes="href string:${portal_url}/@@caching-controlpanel-import"
                    i18n:translate="label_import">Import settings</a>
               </li>
-              <li tal:condition="view/purgingEnabled" class="formTab">
-                <a href=""
+              <li tal:condition="view/purgingEnabled" class="nav-item">
+                <a class="nav-link"
+                   href=""
                    tal:attributes="href string:${portal_url}/@@caching-controlpanel-purge"
                    i18n:translate="label_purging">Purge caching proxy</a>
               </li>
-              <li class="formTab lastFormTab">
-                <a href=""
+              <li class="nav-item">
+                <a class="nav-link"
+                   href=""
                    tal:attributes="href string:${portal_url}/@@caching-controlpanel-ramcache"
                    i18n:translate="label_ramcache">RAM cache</a>
               </li>
         </ul>
     </div>
 
-    <div class="portalMessage info"
+    <div class="alert alert-info"
+         role="alert"
         tal:condition="not: view/settings/enabled">
         <strong i18n:translate="">
             Info
@@ -104,15 +108,17 @@
                             i18n:translate="legend_global_settings">Global settings</legend>
 
                         <div
-                            class="field"
+                            class="form-check"
                             tal:define="selected python:request.get('enabled', view.settings.enabled)">
 
                             <input type="hidden" value="" name="enabled:boolean:default" />
-                            <input type="checkbox" value="1" name="enabled:boolean" id="enabled"
+                            <input class="form-check-input"
+                                type="checkbox" value="1" name="enabled:boolean" id="enabled"
                                 tal:attributes="checked python:'checked' if selected else None"
                                 />
-                            <label for="enabled" i18n:translate="label_enabled">Enable caching</label>
-                            <div class="formHelp" i18n:translate="help_enabled">
+                            <label class="form-check-label"
+                                   for="enabled" i18n:translate="label_enabled">Enable caching</label>
+                            <div class="form-text" i18n:translate="help_enabled">
                                 If this option is disabled, no caching will take place.
                             </div>
 
@@ -138,16 +144,17 @@
                             copy.
                         </div>
 
-                        <div
-                            class="field"
+                        <div class="mb-3 field form-check"
                             tal:define="selected python:request.get('purgingEnabled', view.purgingSettings.enabled)">
 
                             <input type="hidden" value="" name="purgingEnabled:boolean:default" />
-                            <input type="checkbox" value="1" name="purgingEnabled:boolean" id="purgingEnabled"
+                            <input class="form-check-input"
+                                   type="checkbox" value="1" name="purgingEnabled:boolean" id="purgingEnabled"
                                 tal:attributes="checked python:'checked' if selected else None"
                                 />
-                            <label for="purgingEnabled" i18n:translate="label_purging_enabled">Enable purging</label>
-                            <div class="formHelp" i18n:translate="help_purging_enabled">
+                            <label class="form-check-label"
+                                   for="purgingEnabled" i18n:translate="label_purging_enabled">Enable purging</label>
+                            <div class="form-text" i18n:translate="help_purging_enabled">
                                 Enable this option if you have configured a caching proxy
                                 in front of Plone, and the proxy supports HTTP
                                 <code>PURGE</code> requests.
@@ -155,13 +162,22 @@
 
                         </div>
 
-                        <div
-                            tal:define="error errors/cachingProxies | nothing;
+                        <div class="mb-3 field ${python:'error' if error else ''}"
+                             tal:define="error errors/cachingProxies | nothing;
                                         selected python:request.get('cachingProxies', view.purgingSettings.cachingProxies)"
-                            tal:attributes="class python:'field error' if error else 'field'">
+                        >
 
-                            <label for="cachingProxies" i18n:translate="label_caching_proxies">Caching proxies</label>
-                            <div class="formHelp" i18n:translate="help_caching_proxies">
+                            <label class="form-label"
+                                   for="cachingProxies" i18n:translate="label_caching_proxies">Caching proxies</label>
+
+                            <div tal:replace="error" tal:condition="error" />
+
+                            <textarea class="form-control"
+                                cols="40" rows="4" id="cachingProxies" name="cachingProxies:lines"
+                                tal:content="python:'\n'.join(selected or [])"
+                                ></textarea>
+
+                            <div class="form-text" i18n:translate="help_caching_proxies">
                                 Enter the domain name of each caching proxy, one per
                                 line. For example, if you have Varnish running on the
                                 local machine on port 1234, you could enter
@@ -170,22 +186,30 @@
                                 be reachable from users' local machines.
                             </div>
 
-                            <div tal:replace="error" tal:condition="error" />
-
-                            <textarea
-                                cols="40" rows="4" id="cachingProxies" name="cachingProxies:lines"
-                                tal:content="python:'\n'.join(selected or [])"
-                                ></textarea>
-
                         </div>
 
-                        <div
+                        <div class="mb-3 field ${python:'error' if error else ''}"
                             tal:define="error errors/purgedContentTypes | nothing;
                                         selected python:request.get('purgedContentTypes', view.ploneSettings.purgedContentTypes)"
-                            tal:attributes="class python:'field error' if error else 'field'">
+                        >
 
-                            <label for="purgedContentTypes" i18n:translate="label_purged_content_types">Content types to purge</label>
-                            <div class="formHelp" i18n:translate="help_purged_content_types">
+                            <label class="form-label"
+                                   for="purgedContentTypes" i18n:translate="label_purged_content_types">Content types to purge</label>
+
+                            <div tal:replace="error" tal:condition="error" />
+
+                            <select class="form-control"
+                                    size="6" multiple="multiple" id="purgedContentTypes" name="purgedContentTypes:list">
+                                <option
+                                    tal:repeat="contentType view/contentTypes"
+                                    tal:attributes="value    contentType/name;
+                                                    title    contentType/description;
+                                                    selected python:'selected' if contentType['name'] in selected else None;"
+                                    tal:content="contentType/title"
+                                    i18n:attributes="title" i18n:translate=""/>
+                            </select>
+
+                            <div class="form-text" i18n:translate="help_purged_content_types">
                                 If you have enabled purging, Plone can automatically purge
                                 the views of content items when they are modified or
                                 removed. Select the types to automatically purge below.
@@ -198,30 +222,19 @@
                                 items would appear.
                             </div>
 
-                            <div tal:replace="error" tal:condition="error" />
-
-                            <select size="6" multiple="multiple" id="purgedContentTypes" name="purgedContentTypes:list">
-                                <option
-                                    tal:repeat="contentType view/contentTypes"
-                                    tal:attributes="value    contentType/name;
-                                                    title    contentType/description;
-                                                    selected python:'selected' if contentType['name'] in selected else None;"
-                                    tal:content="contentType/title"
-                                    i18n:attributes="title" i18n:translate=""/>
-                            </select>
-
                         </div>
 
-                        <div
-                            class="field"
+                        <div class="mb-3 field form-check"
                             tal:define="selected python:request.get('virtualHosting', view.purgingSettings.virtualHosting)">
 
                             <input type="hidden" value="" name="virtualHosting:boolean:default" />
-                            <input type="checkbox" value="1" name="virtualHosting:boolean" id="virtualHosting"
+                            <input class="form-check-input"
+                                   type="checkbox" value="1" name="virtualHosting:boolean" id="virtualHosting"
                                 tal:attributes="checked python:'checked' if selected else None"
                                 />
-                            <label for="virtualHosting" i18n:translate="label_virtual_hosting">Virtual host rewriting takes place front of the caching proxy</label>
-                            <div class="formHelp" i18n:translate="help_virtual_hosting">
+                            <label class="form-check-label"
+                                   for="virtualHosting" i18n:translate="label_virtual_hosting">Virtual host rewriting takes place front of the caching proxy</label>
+                            <div class="form-text" i18n:translate="help_virtual_hosting">
                                 Enable this if you are using virtual hosting with Zope's
                                 VirtualHostMonster and you perform URL rewriting (to
                                 incorporate the special virtual hosting tokens such as
@@ -237,13 +250,22 @@
 
                         </div>
 
-                        <div
+                        <div class="mb-3 field ${python:'error' if error else ''}"
                             tal:define="error errors/domains | nothing;
                                         selected python:request.get('domains', view.purgingSettings.domains)"
-                            tal:attributes="class python:'field error' if error else 'field'">
+                        >
 
-                            <label for="domains" i18n:translate="label_domains">Externally facing domains</label>
-                            <div class="formHelp" i18n:translate="help_domains">
+                            <label class="form-label"
+                                   for="domains" i18n:translate="label_domains">Externally facing domains</label>
+
+                            <div tal:replace="error" tal:condition="error" />
+
+                            <textarea class="form-control"
+                                cols="40" rows="4" id="domains" name="domains:lines"
+                                tal:content="python:'\n'.join(selected or [])"
+                                ></textarea>
+
+                            <div class="form-text" i18n:translate="help_domains">
                                 <p>
                                 If you have enabled <em>Virtual host rewriting takes place
                                 front of the caching proxy</em> above, and your site is
@@ -264,13 +286,6 @@
                                 domain name.
                                 </p>
                             </div>
-
-                            <div tal:replace="error" tal:condition="error" />
-
-                            <textarea
-                                cols="40" rows="4" id="domains" name="domains:lines"
-                                tal:content="python:'\n'.join(selected or [])"
-                                ></textarea>
 
                         </div>
 
@@ -302,32 +317,33 @@
                             details.
                         </div>
 
-                        <div
+                        <div class="mb-3 field ${python:'error' if error else ''}"
                             tal:define="error errors/ramCacheMaxEntries | nothing"
-                            tal:attributes="class python:'field error' if error else 'field'">
+                        >
 
-                            <label
+                            <label class="form-label"
                                 for="ramCacheMaxEntries"
                                 i18n:translate="label_ram_max_entries">Maximum entries in the cache</label>
 
                             <span class="fieldRequired" i18n:translate="">(Required)</span>
 
-                            <div class="formHelp" i18n:translate="help_ram_max_entries">
+                            <div tal:condition="error" tal:content="error" />
+
+                            <input class="form-control"
+                                name="ramCacheMaxEntries" id="ramCacheMaxEntries" size="6"
+                                tal:attributes="value request/ramCacheMaxEntries | view/ramCache/maxEntries | nothing" />
+
+                            <div class="form-text" i18n:translate="help_ram_max_entries">
                                 Use this to control how many items can be
                                 placed in the cache. The more items you allow,
                                 the higher the potential memory consumption.
                             </div>
 
-                            <div tal:condition="error" tal:content="error" />
-
-                            <input name="ramCacheMaxEntries" id="ramCacheMaxEntries" size="6"
-                                tal:attributes="value request/ramCacheMaxEntries | view/ramCache/maxEntries | nothing" />
-
                         </div>
 
-                        <div
+                        <div class="mb-3 field ${python:'error' if error else ''}"
                             tal:define="error errors/ramCacheMaxAge | nothing"
-                            tal:attributes="class python:'field error' if error else 'field'">
+                        >
 
                             <label
                                 for="ramCacheMaxAge"
@@ -335,22 +351,22 @@
 
                             <span class="fieldRequired" i18n:translate="">(Required)</span>
 
-                            <div class="formHelp" i18n:translate="help_ram_max_age">
+                            <div tal:condition="error" tal:content="error" />
+
+                            <input class="form-control"
+                                name="ramCacheMaxAge" id="ramCacheMaxAge" size="6"
+                                tal:attributes="value request/ramCacheMaxAge | view/ramCache/maxAge | nothing" />
+
+                            <div class="form-text" i18n:translate="help_ram_max_age">
                                 Enter the maximum time, in seconds, that an item
                                 may remain in the cache before being purged.
                             </div>
 
-
-                            <div tal:condition="error" tal:content="error" />
-
-                            <input name="ramCacheMaxAge" id="ramCacheMaxAge" size="6"
-                                tal:attributes="value request/ramCacheMaxAge | view/ramCache/maxAge | nothing" />
-
                         </div>
 
-                        <div
+                        <div class="mb-3 field ${python:'error' if error else ''}"
                             tal:define="error errors/ramCacheCleanupInterval | nothing"
-                            tal:attributes="class python:'field error' if error else 'field'">
+                        >
 
                             <label
                                 for="ramCacheCleanupInterval"
@@ -358,18 +374,19 @@
 
                             <span class="fieldRequired" i18n:translate="">(Required)</span>
 
-                            <div class="formHelp" i18n:translate="help_ram_cleanup_interval">
+                            <div tal:condition="error" tal:content="error" />
+
+                            <input class="form-control"
+                                name="ramCacheCleanupInterval" id="ramCacheCleanupInterval" size="6"
+                                tal:attributes="value request/ramCacheCleanupInterval | view/ramCache/cleanupInterval | nothing" />
+
+                            <div class="form-text" i18n:translate="help_ram_cleanup_interval">
                                 Enter the time, in seconds, before attempts
                                 to clean up the cache. A lower value may reduce
                                 memory consumption by purging items frequently,
                                 but can also slow down the system by tying up
                                 the cache with maintenance tasks for too long.
                             </div>
-
-                            <div tal:condition="error" tal:content="error" />
-
-                            <input name="ramCacheCleanupInterval" id="ramCacheCleanupInterval" size="6"
-                                tal:attributes="value request/ramCacheCleanupInterval | view/ramCache/cleanupInterval | nothing" />
 
                         </div>
 
@@ -402,129 +419,138 @@
                             its own cached copy, if it is considered to be current.
                             </p>
                         </div>
+                        <div class="mb-3 field">
+                            <label i18n:translate="label_mappings">Ruleset mappings</label>
+                            <div class="form-text" i18n:translate="help_main_mappings">
+                                Use the table below to map rulesets to caching
+                                operations.
+                            </div>
 
-                        <label i18n:translate="label_mappings">Ruleset mappings</label>
-                        <div class="formHelp" i18n:translate="help_main_mappings">
-                            Use the table below to map rulesets to caching
-                            operations.
-                        </div>
-
-                        <table class="listing nosort" id="rulesetMappingsTable">
-                            <thead>
-                                <tr>
-                                    <th i18n:translate="heading_ruleset">Ruleset</th>
-                                    <th i18n:translate="heading_operation">Operation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr tal:repeat="ruleType view/ruleTypes">
-                                    <td>
-                                        <div tal:content="ruleType/title" i18n:translate=""/>
-                                        <p class="discreet" tal:content="ruleType/description" i18n:translate=""/>
-                                    </td>
-                                    <td tal:define="selected python:request.get('operations', view.operationMapping).get(ruleType['safeName'], None)">
-                                        <select
-                                            size="1"
-                                            tal:attributes="id   string:operation-${ruleType/name};
-                                                            name string:operations.${ruleType/safeName}:record;">
-                                            <option
-                                                value=""
-                                                tal:attributes="selected python:'selected' if selected is None else None"
-                                                i18n:translate="value_not_used"
-                                                >(Not used)</option>
-                                            <option
-                                                tal:repeat="operationType view/operationTypes"
-                                                tal:attributes="value    operationType/name;
-                                                                title    operationType/description;
-                                                                selected python:'selected' if operationType['name'] == selected else None;"
-                                                tal:content="operationType/title"
-                                                />
-                                        </select>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <label i18n:translate="label_template_mappings">Legacy template mappings</label>
-                        <div class="formHelp" i18n:translate="help_template_mappings">
-                            <p>
-                            Legacy page templates defined in the <em>portal_skins</em>
-                            tool in the ZMI, or created or customised through the web cannot be
-                            associated with rulesets in the usual way. There are two options:
-                            </p>
-                            <ul>
-                                <li>If the template is the <em>default type</em> of a content type
-                                     it is possible to associate the type class or an interface it
-                                     provides with a ruleset.</li>
-                                 <li>You can also associate a specific page template (by name) or
-                                      content type with a ruleset using the options below.</li>
-                            </ul>
-                            <p>
-                            <strong>Note:</strong> By default, folder-like content types are
-                            associated with the ruleset <code>plone.content.folderView</code>,
-                            and item-like content types are associated with the ruleset
-                            <code>plone.content.itemView</code>. Any settings entered below or
-                            set via an explicit cache ruleset (in a ZCML file) will override these
-                            defaults.
-                            </p>
-                            <p>
-                            <strong>Note:</strong> You can only use each template name or
-                            content type once!
-                            </p>
-                        </div>
-
-                        <table class="listing nosort" id="templateMappingsTable">
-                            <thead>
-                                <tr>
-                                    <th i18n:translate="heading_ruleset">Ruleset</th>
-                                    <th i18n:translate="heading_content_types">Content types</th>
-                                    <th i18n:translate="heading_templates">Templates</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tal:block repeat="ruleType view/ruleTypes">
-                                    <tr tal:define="contentTypeError python:errors.get('contenttypes', {}).get(ruleType['name'], None);
-                                                    templateError    python:errors.get('templates', {}).get(ruleType['name'], None);">
+                            <table class="table table-striped table-responsive" id="rulesetMappingsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="col-9"
+                                            i18n:translate="heading_ruleset">Ruleset</th>
+                                        <th class="col-3"
+                                            i18n:translate="heading_operation">Operation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr tal:repeat="ruleType view/ruleTypes">
                                         <td>
-                                            <div tal:content="ruleType/title" i18n:translate=""/>
-                                            <p class="discreet" tal:content="ruleType/description" i18n:translate=""/>
-                                            <div class="error" tal:condition="python:contentTypeError or templateError">
-                                                <div tal:content="contentTypeError" tal:condition="contentTypeError" />
-                                                <div tal:content="templateError" tal:condition="templateError" />
-                                            </div>
+                                            <label class="form-label"
+                                                tal:content="ruleType/title" i18n:translate=""/>
+                                            <p class="form-text" tal:content="ruleType/description" i18n:translate=""/>
                                         </td>
-                                        <td tal:define="selected python:request.get('contenttypes', view.reverseContentTypeMapping).get(ruleType['safeName'], [])">
-                                            <div class="error" tal:omit-tag="not:contentTypeError">
-                                                <select
-                                                    size="6"
-                                                    multiple="multiple"
-                                                    tal:attributes="id   string:contenttypes-${ruleType/name};
-                                                                    name string:contenttypes.${ruleType/safeName}:record:list;">
-                                                    <option
-                                                        tal:repeat="contentType view/contentTypes"
-                                                        tal:attributes="value    contentType/name;
-                                                                        title    contentType/description;
-                                                                        selected python:'selected' if contentType['name'] in selected else None;"
-                                                        tal:content="contentType/title"
-                                                        i18n:attributes="title" i18n:translate="" />
-                                                </select>
-                                            </div>
-                                        </td>
-                                        <td tal:define="selected python:request.get('templates', view.reverseTemplateMapping).get(ruleType['safeName'], '')">
-                                            <div class="error" tal:omit-tag="not:templateError">
-                                                <textarea
-                                                    cols="40" rows="4"
-                                                    tal:attributes="id   string:templates-${ruleType/name};
-                                                                    name string:templates.${ruleType/safeName}:record:lines"
-                                                    tal:content="python:'\n'.join(selected or [])"
-                                                    ></textarea>
-                                            </div>
+                                        <td tal:define="selected python:request.get('operations', view.operationMapping).get(ruleType['safeName'], None)">
+                                            <select class="form-control"
+                                                size="1"
+                                                tal:attributes="id   string:operation-${ruleType/name};
+                                                                name string:operations.${ruleType/safeName}:record;">
+                                                <option
+                                                    value=""
+                                                    tal:attributes="selected python:'selected' if selected is None else None"
+                                                    i18n:translate="value_not_used"
+                                                    >(Not used)</option>
+                                                <option
+                                                    tal:repeat="operationType view/operationTypes"
+                                                    tal:attributes="value    operationType/name;
+                                                                    title    operationType/description;
+                                                                    selected python:'selected' if operationType['name'] == selected else None;"
+                                                    tal:content="operationType/title"
+                                                    />
+                                            </select>
                                         </td>
                                     </tr>
-                                </tal:block>
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
 
+                        <div class="mb-3 field">
+                            <label class="form-label"
+                                i18n:translate="label_template_mappings">Legacy template mappings</label>
+                            <div class="form-text" i18n:translate="help_template_mappings">
+                                <p>
+                                Legacy page templates defined in the <em>portal_skins</em>
+                                tool in the ZMI, or created or customised through the web cannot be
+                                associated with rulesets in the usual way. There are two options:
+                                </p>
+                                <ul>
+                                    <li>If the template is the <em>default type</em> of a content type
+                                        it is possible to associate the type class or an interface it
+                                        provides with a ruleset.</li>
+                                    <li>You can also associate a specific page template (by name) or
+                                        content type with a ruleset using the options below.</li>
+                                </ul>
+                                <p>
+                                <strong>Note:</strong> By default, folder-like content types are
+                                associated with the ruleset <code>plone.content.folderView</code>,
+                                and item-like content types are associated with the ruleset
+                                <code>plone.content.itemView</code>. Any settings entered below or
+                                set via an explicit cache ruleset (in a ZCML file) will override these
+                                defaults.
+                                </p>
+                                <p>
+                                <strong>Note:</strong> You can only use each template name or
+                                content type once!
+                                </p>
+                            </div>
+
+                            <table class="table table-striped table-responsive" id="templateMappingsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="col-6"
+                                            i18n:translate="heading_ruleset">Ruleset</th>
+                                        <th class="col-3"
+                                            i18n:translate="heading_content_types">Content types</th>
+                                        <th class="col-3"
+                                            i18n:translate="heading_templates">Templates</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tal:block repeat="ruleType view/ruleTypes">
+                                        <tr tal:define="contentTypeError python:errors.get('contenttypes', {}).get(ruleType['name'], None);
+                                                        templateError    python:errors.get('templates', {}).get(ruleType['name'], None);">
+                                            <td>
+                                                <div tal:content="ruleType/title" i18n:translate=""/>
+                                                <p class="discreet" tal:content="ruleType/description" i18n:translate=""/>
+                                                <div class="invalid-feedback" tal:condition="python:contentTypeError or templateError">
+                                                    <div tal:content="contentTypeError" tal:condition="contentTypeError" />
+                                                    <div tal:content="templateError" tal:condition="templateError" />
+                                                </div>
+                                            </td>
+                                            <td tal:define="selected python:request.get('contenttypes', view.reverseContentTypeMapping).get(ruleType['safeName'], [])">
+                                                <div class="invalid-feedback" tal:omit-tag="not:contentTypeError">
+                                                    <select class="form-control"
+                                                        size="6"
+                                                        multiple="multiple"
+                                                        tal:attributes="id   string:contenttypes-${ruleType/name};
+                                                                        name string:contenttypes.${ruleType/safeName}:record:list;">
+                                                        <option
+                                                            tal:repeat="contentType view/contentTypes"
+                                                            tal:attributes="value    contentType/name;
+                                                                            title    contentType/description;
+                                                                            selected python:'selected' if contentType['name'] in selected else None;"
+                                                            tal:content="contentType/title"
+                                                            i18n:attributes="title" i18n:translate="" />
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td tal:define="selected python:request.get('templates', view.reverseTemplateMapping).get(ruleType['safeName'], '')">
+                                                <div class="invalid-feedback" tal:omit-tag="not:templateError">
+                                                    <textarea class="form-control"
+                                                        cols="40" rows="4"
+                                                        tal:attributes="id   string:templates-${ruleType/name};
+                                                                        name string:templates.${ruleType/safeName}:record:lines"
+                                                        tal:content="python:'\n'.join(selected or [])"
+                                                        ></textarea>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tal:block>
+                                </tbody>
+                            </table>
+                        </div>
                     </fieldset>
 
                     <!-- Field set: detailed settings -->
@@ -558,91 +584,106 @@
                             will lose your changes.
                             </p>
                         </div>
+                        <div class="mb-3 field">
+                            <label class="form-label"
+                                   i18n:translate="label_operation_parameters">Operation parameters</label>
+                            <div class="form-text" i18n:translate="help_operation_parameters">
+                                Use the table below to create, clear and edit operation
+                                parameters. If you clear the ruleset-specific parameters for
+                                a given operation, it will fall back on the global operation
+                                parameters.
+                            </div>
 
-                        <label i18n:translate="label_operation_parameters">Operation parameters</label>
-                        <div class="formHelp" i18n:translate="help_operation_parameters">
-                            Use the table below to create, clear and edit operation
-                            parameters. If you clear the ruleset-specific parameters for
-                            a given operation, it will fall back on the global operation
-                            parameters.
-                        </div>
-
-                        <table class="listing nosort" id="operationParametersTable">
-                            <thead>
-                                <tr>
-                                    <th i18n:translate="heading_ruleset">Ruleset</th>
-                                    <th i18n:translate="heading_operation">Operation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr tal:repeat="ruleType view/ruleTypes">
-                                    <td>
-                                        <div tal:content="ruleType/title" i18n:translate=""/>
-                                        <p class="discreet" tal:content="ruleType/description" i18n:translate=""/>
-                                    </td>
-                                    <td tal:define="operationName python:view.operationMapping.get(ruleType['safeName'], None)">
-                                        <tal:block condition="not:operationName" i18n:translate="help_not_mapped">
-                                            Not mapped
-                                        </tal:block>
-                                        <tal:block condition="operationName">
-                                            <tal:block
-                                                define="operationInfo python:view.operationTypesLookup.get(operationName, None)"
-                                                condition="operationInfo">
-                                                <div tal:content="operationInfo/title" />
-                                                <div
-                                                    class="discreet"
-                                                    tal:condition="not:operationInfo/hasOptions"
-                                                    i18n:translate="help_no_options">
-                                                    No parameters
-                                                </div>
-                                                <div style="white-space: nowrap" class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
-                                                    <a  class="editGlobalOperationParameters pat-plone-modal"
-                                                        data-pat-plone-modal='{"actionOptions": {"disableAjaxFormSubmit":true}}'
-                                                        i18n:translate="link_view_edit"
-                                                        tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-global/${operationName}"
-                                                        >View/edit</a>
-                                                    <span i18n:translate="label_global">global parameters</span>
-                                                </div>
-                                                <div style="white-space: nowrap" class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
-                                                    <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType['name'])">
-                                                        <a  class="editRulesetOperationParameters pat-plone-modal"
-                                                            data-pat-plone-modal='{"actionOptions": {"disableAjaxFormSubmit":true}}'
-                                                            tal:condition="hasRulesetOptions"
-                                                            i18n:translate="link_view_edit_clear"
-                                                            tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
-                                                            >View/edit/clear</a>
-                                                        <a  class="editRulesetOperationParameters pat-plone-modal"
-                                                            data-pat-plone-modal='{"actionOptions": {"disableAjaxFormSubmit":true}}'
-                                                            tal:condition="not:hasRulesetOptions"
-                                                            i18n:translate="link_create"
-                                                            tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
-                                                            >Create</a>
-                                                    </tal:block>
-                                                    <span i18n:translate="label_ruleset">per-ruleset parameters</span>
-                                                </div>
+                            <table class="table table-striped table-responsive" id="operationParametersTable">
+                                <thead>
+                                    <tr>
+                                        <th class="col-9"
+                                            i18n:translate="heading_ruleset">Ruleset</th>
+                                        <th class="col-3"
+                                            i18n:translate="heading_operation">Operation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr tal:repeat="ruleType view/ruleTypes">
+                                        <td>
+                                            <div class="form-label"
+                                                 tal:content="ruleType/title" i18n:translate=""/>
+                                            <p class="form-text"
+                                               tal:content="ruleType/description" i18n:translate=""/>
+                                        </td>
+                                        <td tal:define="operationName python:view.operationMapping.get(ruleType['safeName'], None)">
+                                            <tal:block condition="not:operationName" i18n:translate="help_not_mapped">
+                                                Not mapped
                                             </tal:block>
-                                        </tal:block>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                            <tal:block condition="operationName">
+                                                <tal:block
+                                                    define="operationInfo python:view.operationTypesLookup.get(operationName, None)"
+                                                    condition="operationInfo">
+                                                    <div tal:content="operationInfo/title" />
+                                                    <div
+                                                        class="discreet"
+                                                        tal:condition="not:operationInfo/hasOptions"
+                                                        i18n:translate="help_no_options">
+                                                        No parameters
+                                                    </div>
+                                                    <div style="white-space: nowrap" class="discreet rulesetParameterLink" tal:condition="operationInfo/hasOptions">
+                                                        <a  class="editGlobalOperationParameters pat-plone-modal"
+                                                            data-pat-plone-modal='{"actionOptions": {"disableAjaxFormSubmit":true}}'
+                                                            i18n:translate="link_view_edit"
+                                                            tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-global/${operationName}"
+                                                            >View/edit</a>
+                                                        <span i18n:translate="label_global">global parameters</span>
+                                                    </div>
+                                                    <div style="white-space: nowrap" class="discreet rulesetParameterLink"  tal:condition="operationInfo/hasOptions">
+                                                        <tal:block define="hasRulesetOptions python:view.hasRulesetOptions(operationInfo['type'], ruleType['name'])">
+                                                            <a  class="editRulesetOperationParameters pat-plone-modal"
+                                                                data-pat-plone-modal='{"actionOptions": {"disableAjaxFormSubmit":true}}'
+                                                                tal:condition="hasRulesetOptions"
+                                                                i18n:translate="link_view_edit_clear"
+                                                                tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
+                                                                >View/edit/clear</a>
+                                                            <a  class="editRulesetOperationParameters pat-plone-modal"
+                                                                data-pat-plone-modal='{"actionOptions": {"disableAjaxFormSubmit":true}}'
+                                                                tal:condition="not:hasRulesetOptions"
+                                                                i18n:translate="link_create"
+                                                                tal:attributes="href string:${context/absolute_url}/@@${view/__name__}/edit-operation-ruleset/${operationName}/${ruleType/name}"
+                                                                >Create</a>
+                                                        </tal:block>
+                                                        <span i18n:translate="label_ruleset">per-ruleset parameters</span>
+                                                    </div>
+                                                </tal:block>
+                                            </tal:block>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
                     </fieldset>
 
                     <div class="formControls">
-                        <input
+                        <button
                             type="submit"
                             name="form.button.Save"
-                            class="context"
+                            class="btn btn-primary"
                             value="Save"
-                            i18n:attributes="value" />
+                            i18n:attributes="value"
+                            i18n:translate=""
+                        >
+                            Save
+                        </button>
 
-                        <input
+                        <button
                             type="submit"
                             name="form.button.Cancel"
-                            class="standalone"
+                            class="btn btn-secondary"
                             value="Cancel"
-                            i18n:attributes="value" />
+                            i18n:attributes="value"
+                            i18n:translate=""
+                        >
+                            Cancel
+                        </button>
+
                     </div>
 
                     <input tal:replace="structure context/@@authenticator/authenticator" />
