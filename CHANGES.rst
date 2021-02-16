@@ -8,6 +8,23 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.0 (2021-02-16)
+------------------
+
+New features:
+
+
+- Restored ``resourceRegistries`` ETag, but now for Plone 5 resource registries.
+  Fixes warning "Could not find value adapter for ETag component resourceRegistries".
+  [maurits] (#61)
+
+
+Bug fixes:
+
+
+- Do not break if some custom code provides an alias for Products.Archetypes or plone.app.blob (#72)
+
+
 2.0.8 (2020-10-30)
 ------------------
 
