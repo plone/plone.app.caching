@@ -8,6 +8,23 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a3 (2021-02-25)
+--------------------
+
+Breaking changes:
+
+
+- Update for Plone 6 with Bootstrap markup
+  [ale-rt, jensens] (#63)
+
+
+Bug fixes:
+
+
+- Links with pat-modal:  Remove unused redirectOnResponse from data-pat-modal actionOptions.  (Products.CMFPlone#3197)
+  [fulv] (#3197)
+
+
 3.0.0a2 (2021-02-02)
 --------------------
 
