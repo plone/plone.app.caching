@@ -64,7 +64,7 @@ class TestOperationDefault(unittest.TestCase):
         browser.open('{0}/++add++Document'.format(
             self.portal['f1'].absolute_url()),)
         browser.getControl(
-            name='form.widgets.IDublinCore.title').value = 'dummy content'
+            name='form.widgets.title').value = 'dummy content'
         browser.getControl('Save').click()
         self.assertNotIn('Etag', browser.headers)
 
@@ -78,6 +78,6 @@ class TestOperationDefault(unittest.TestCase):
             self.portal['f1'].absolute_url(),
             getToken(TEST_USER_NAME)))
         browser.getControl(
-            name='form.widgets.IDublinCore.title').value = 'dummy content'
+            name='form.widgets.title').value = 'dummy content'
         browser.getControl('Save').click()
         self.assertIn('Etag', browser.headers)
