@@ -5,8 +5,8 @@ plone.app.caching
 Introduction
 ============
 
-``plone.app.caching`` provides a Plone UI and default rules for managing HTTP response caching in Plone.
-It builds on ``z3c.caching``, ``plone.caching`` and ``plone.cachepurging``.
+This package provides a Plone UI and default rules for managing HTTP response caching in Plone.
+It builds on `z3c.caching <https://github.com/zopefoundation/z3c.caching>`_, `plone.caching <https://github.com/plone/plone.caching>`_ and `plone.cachepurging <https://github.com/plone/plone.cachepurging>`_.
 
 
 Version information:
@@ -19,7 +19,7 @@ Version information:
 Installation
 ============
 
-``plone.app.caching`` is shipped as a dependency of the ``Plone`` package.
+*plone.app.caching* is shipped as a dependency of the *Plone* package.
 Caching is **not enabled by default**.
 It is highly recommended to configure caching.
 
