@@ -41,8 +41,8 @@ class Store:
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
             result = b"".join(result)
             storeResponseInRAMCache(self.request, self.request.response, result)
-            # as we have iterated the iterable, we must return a new one
-            return iter([result])
+            # ITransform contract allows to return an "encoded string" aka bytes
+            return result
         return None
 
     def responseIsSuccess(self):
