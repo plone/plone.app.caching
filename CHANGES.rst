@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a4 (2021-05-14)
+--------------------
+
+Bug fixes:
+
+
+- Fix ram-caching of binary files.
+  [agitator] (#79)
+
+
 3.0.0a3 (2021-02-25)
 --------------------
 
