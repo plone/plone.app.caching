@@ -1,3 +1,4 @@
+from Acquisition import aq_base
 from Acquisition import aq_inner
 from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.operations.utils import getContext
@@ -7,6 +8,7 @@ from Products.CMFCore.interfaces import IMembershipTool
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.resources.browser.combine import get_override_directory
 from Products.CMFPlone.resources.browser.combine import PRODUCTION_RESOURCE_DIRECTORY
+from Products.CMFPlone.utils import safe_hasattr
 from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
@@ -253,3 +255,19 @@ class ResourceRegistries(object):
         if not isinstance(timestamp, str):
             timestamp = timestamp.decode("utf-8")
         return timestamp
+
+
+@implementer(IETagValue)
+@adapter(Interface, Interface)
+class Layout(object):
+    """The 'layout' etag component, returning they layout of a content item."""
+
+    def __init__(self, published, request):
+        self.published = published
+        self.request = request
+
+    def __call__(self):
+        context = getContext(self.published)
+        if not safe_hasattr(aq_base(context), "getLayout"):
+            return
+        return context.getLayout()

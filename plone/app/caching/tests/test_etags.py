@@ -10,7 +10,6 @@ from z3c.caching.interfaces import ILastModified
 from zope.component import adapter
 from zope.component import provideAdapter
 from zope.component import provideUtility
-from zope.component.hooks import setSite
 from zope.interface import implementer
 from zope.interface import Interface
 from ZPublisher.HTTPRequest import HTTPRequest
@@ -22,7 +21,8 @@ import unittest
 
 @implementer(IContentish)
 class DummyContext(Explicit):
-    pass
+    def getLayout(self):
+        return getattr(self, "_layout", None)
 
 
 class DummyPublished:
@@ -367,3 +367,31 @@ class TestETags(unittest.TestCase):
         etag = Skin(published, request)
 
         self.assertEqual("defaultskin", etag())
+
+    # layout
+
+    def test_layout_none(self):
+        from plone.app.caching.operations.etags import Layout
+
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        published = DummyPublished(DummyContext())
+
+        etag = Layout(published, request)
+
+        self.assertIsNone(etag())
+
+    def test_layout_set(self):
+        from plone.app.caching.operations.etags import Layout
+
+        environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
+        response = HTTPResponse()
+        request = HTTPRequest(StringIO(), environ, response)
+        context = DummyContext()
+        context._layout = "hello_view"
+        published = DummyPublished(context)
+
+        etag = Layout(published, request)
+
+        self.assertEqual("hello_view", etag())
