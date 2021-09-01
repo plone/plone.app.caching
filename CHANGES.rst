@@ -8,6 +8,18 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a5 (2021-09-01)
+--------------------
+
+New features:
+
+
+- Add etag for layout property.
+  This is not yet added to a caching profile, but this can be done later.
+  Fixes `issue 80 <https://github.com/plone/plone.app.caching/issues/80>`_.
+  [maurits] (#80)
+
+
 3.0.0a4 (2021-05-14)
 --------------------
 
