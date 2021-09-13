@@ -1,0 +1,21 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="plone">
+
+    <genericsetup:registerProfile
+        name="default"
+        title="HTTP caching support"
+        directory="profiles/default"
+        description="Installs plone.app.caching"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+
+    <genericsetup:importStep
+        name="plone.app.caching"
+        title="Plone caching - additional installation steps"
+        description="Imperative configuration for plone.app.caching"
+        handler=".setuphandlers.importVarious"
+        />
+
+</configure>
