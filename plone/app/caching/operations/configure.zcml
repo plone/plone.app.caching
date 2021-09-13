@@ -24,7 +24,7 @@
     <adapter   factory=".default.NoCaching"             name="plone.app.caching.noCaching" />
     <utility component=".default.NoCaching"             name="plone.app.caching.noCaching" />
 
-    <!-- Uncomment to show the "Generic caching" in the UI (also see profiles/default/registry.xml)
+    <!-- Uncomment to show the "Generic caching" in the UI (also see profiles/default/registry/generic.xml)
     <adapter   factory=".default.BaseCaching"           name="plone.app.caching.baseCaching" />
     <utility component=".default.BaseCaching"           name="plone.app.caching.baseCaching" />
     -->

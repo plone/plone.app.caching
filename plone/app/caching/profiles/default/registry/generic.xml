@@ -1,0 +1,57 @@
+<registry>
+    <!-- Uncomment if showing "Generic caching" in the UI.
+         Also see operations/configure.zcml
+
+    <record name="plone.app.caching.baseCaching.maxage">
+        <field type="plone.registry.field.Int">
+            <title>Maximum age</title>
+            <description>Time (in seconds) to cache the response in the browser or caching proxy</description>
+            <required>False</required>
+        </field>
+        <value></value>
+    </record>
+    <record name="plone.app.caching.baseCaching.smaxage">
+        <field type="plone.registry.field.Int">
+            <title>Shared maximum age</title>
+            <description>Time (in seconds) to cache the response in the caching proxy. Leave blank to use value from "Maximum age" field.</description>
+            <required>False</required>
+        </field>
+        <value></value>
+    </record>
+    <record name="plone.app.caching.baseCaching.etags">
+        <field type="plone.registry.field.Tuple">
+            <title>ETags</title>
+            <description>A list of ETag component names to include</description>
+            <value_type type="plone.registry.field.ASCIILine" />
+            <required>False</required>
+        </field>
+        <value>
+        </value>
+    </record>
+    <record name="plone.app.caching.baseCaching.lastModified">
+        <field type="plone.registry.field.Bool">
+            <title>Last-modified validation</title>
+            <description>Turn on Last-Modified headers</description>
+            <required>False</required>
+        </field>
+        <value>False</value>
+    </record>
+    <record name="plone.app.caching.baseCaching.ramCache">
+        <field type="plone.registry.field.Bool">
+            <title>RAM cache</title>
+            <description>Turn on caching in Zope memory</description>
+            <required>False</required>
+        </field>
+        <value>False</value>
+    </record>
+    <record name="plone.app.caching.baseCaching.vary">
+        <field type="plone.registry.field.ASCIILine">
+            <title>Vary</title>
+            <description>Name(s) of HTTP headers that must match for the caching proxy to return a cached response</description>
+            <required>False</required>
+        </field>
+        <value></value>
+    </record>
+    -->
+
+</registry>
