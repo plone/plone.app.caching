@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a6 (2021-09-15)
+--------------------
+
+Bug fixes:
+
+
+- Add upgrade step to define the new base terse cache setting.
+  [maurits] (#82)
+
+
 3.0.0a5 (2021-09-01)
 --------------------
 
