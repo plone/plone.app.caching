@@ -233,7 +233,7 @@
                                 tal:attributes="checked python:'checked' if selected else None"
                                 />
                             <label class="form-check-label"
-                                   for="virtualHosting" i18n:translate="label_virtual_hosting">Virtual host rewriting takes place front of the caching proxy</label>
+                                   for="virtualHosting" i18n:translate="label_virtual_hosting">Virtual host rewriting takes place in front of the caching proxy</label>
                             <div class="form-text" i18n:translate="help_virtual_hosting">
                                 Enable this if you are using virtual hosting with Zope's
                                 VirtualHostMonster and you perform URL rewriting (to
