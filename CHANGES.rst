@@ -8,6 +8,15 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a7 (2021-10-13)
+--------------------
+
+Bug fixes:
+
+
+- Fix label in controlpanel.pt.  [brian.duncan] (#84)
+
+
 3.0.0a6 (2021-09-15)
 --------------------
 
