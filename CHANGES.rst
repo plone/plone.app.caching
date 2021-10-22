@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a8 (2021-10-22)
+--------------------
+
+Bug fixes:
+
+
+- fix deprecated imports
+  [petschki] (#86)
+
+
 3.0.0a7 (2021-10-13)
 --------------------
 
