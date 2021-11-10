@@ -729,15 +729,6 @@ class TestProfileWithCachingRestAPI(unittest.TestCase):
             response.headers["X-Cache-Operation"], "plone.app.caching.terseCaching"
         )
 
-    def test_restapi_translationinfo(self):
-        # plone.content.dynamic for plone.restapi.services.multilingual.pam.TranslationInfo
-        response = self.api_session.get("/f1/f2/@translations")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers["X-Cache-Rule"], "plone.content.dynamic")
-        self.assertEqual(
-            response.headers["X-Cache-Operation"], "plone.app.caching.terseCaching"
-        )
-
     def test_restapi_navigation(self):
         # plone.content.dynamic for plone.restapi.services.navigation.get.NavigationGet
         response = self.api_session.get("/f1/f2/@navigation")
