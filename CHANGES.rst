@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a9 (2021-11-23)
+--------------------
+
+Bug fixes:
+
+
+- Remove translations endpoint test because it does not have the correct fixture
+  [sneridagh] (#87)
+
+
 3.0.0a8 (2021-10-22)
 --------------------
 
