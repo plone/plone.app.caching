@@ -208,6 +208,7 @@ class ScalesPurgePaths:
                     continue
                 filename = value.filename
                 if is_image:
+                    yield f"{prefix}/@@images/{field_name}"
                     for size in self.getScales():
                         yield f"{prefix}/images/{field_name}/{size}"
                         yield f"{prefix}/@@images/{field_name}/{size}"
