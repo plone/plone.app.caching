@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a10 (2021-12-01)
+---------------------
+
+New features:
+
+
+- When purging images also purge the field WITHOUT a size parameter (e.g. ``[...]/@@images/image``).
+  [wolbernd] (#89)
+
+
 3.0.0a9 (2021-11-23)
 --------------------
 
