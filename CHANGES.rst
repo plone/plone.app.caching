@@ -13,8 +13,6 @@ Changelog
 
 Bug fixes:
 
-- When purging images also purge the field WITHOUT a size parameter (e.g. [...]/@@images/image)
-  [wolbernd] (#89)
 
 - Remove translations endpoint test because it does not have the correct fixture
   [sneridagh] (#87)
