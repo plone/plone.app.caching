@@ -10,7 +10,7 @@
         appId="plone.app.caching"
         category="plone-advanced"
         condition_expr=""
-        icon_expr="string:$portal_url/++resource++plone.app.caching.gif"
+        icon_expr="string:skip-forward"
         url_expr="string:${portal_url}/@@caching-controlpanel"
         visible="True"
         i18n:attributes="title">
