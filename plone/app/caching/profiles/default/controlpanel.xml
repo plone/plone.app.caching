@@ -10,7 +10,7 @@
         appId="plone.app.caching"
         category="plone-advanced"
         condition_expr=""
-        icon_expr="string:skip-forward"
+        icon_expr="string:speedometer2"
         url_expr="string:${portal_url}/@@caching-controlpanel"
         visible="True"
         i18n:attributes="title">
