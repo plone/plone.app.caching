@@ -36,4 +36,14 @@
             />
     </genericsetup:upgradeSteps>
 
+   <genericsetup:upgradeSteps
+        source="2"
+        destination="3"
+        profile="plone.app.caching:default">
+        <genericsetup:upgradeDepends
+            title="Upgrade plone.app.caching icon"
+            import_steps="controlpanel"
+            />
+    </genericsetup:upgradeSteps>
+
 </configure>
