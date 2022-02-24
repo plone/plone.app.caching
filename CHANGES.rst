@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a11 (2022-02-24)
+---------------------
+
+Bug fixes:
+
+
+- Updated control panel icon. Use iconresolver to get the proper svg icon.
+  [yurj] (#91)
+
+
 3.0.0a10 (2021-12-01)
 ---------------------
 
