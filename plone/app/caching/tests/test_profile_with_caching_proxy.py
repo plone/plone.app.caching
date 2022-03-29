@@ -133,7 +133,7 @@ class TestProfileWithCaching(unittest.TestCase):
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
         self.assertEqual(
-            '"|test_user_1_|%d|en|%s|0|0'
+            '"|test_user_1_|%d|en|%s|0|0|"'
             % (catalog.getCounter(), skins_tool.default_skin),
             normalize_etag(browser.headers["ETag"]),
         )
@@ -151,7 +151,7 @@ class TestProfileWithCaching(unittest.TestCase):
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
         self.assertEqual(
-            '"|test_user_1_|%d|en|%s|0|1'
+            '"|test_user_1_|%d|en|%s|0|1|"'
             % (catalog.getCounter(), skins_tool.default_skin),
             normalize_etag(browser.headers["ETag"]),
         )
@@ -177,7 +177,7 @@ class TestProfileWithCaching(unittest.TestCase):
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
         self.assertEqual(
-            '"|test_user_1_|%d|en|%s|0'
+            '"|test_user_1_|%d|en|%s|0|"'
             % (catalog.getCounter(), skins_tool.default_skin),
             normalize_etag(browser.headers["ETag"]),
         )
@@ -232,7 +232,7 @@ class TestProfileWithCaching(unittest.TestCase):
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
         self.assertEqual(
-            '"||%d|en|%s|0|0' % (catalog.getCounter(), skins_tool.default_skin),
+            '"||%d|en|%s|0|0|"' % (catalog.getCounter(), skins_tool.default_skin),
             normalize_etag(browser.headers["ETag"]),
         )
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
@@ -251,7 +251,7 @@ class TestProfileWithCaching(unittest.TestCase):
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
         self.assertEqual(
-            '"||%d|en|%s|0' % (catalog.getCounter(), skins_tool.default_skin),
+            '"||%d|en|%s|0|"' % (catalog.getCounter(), skins_tool.default_skin),
             normalize_etag(browser.headers["ETag"]),
         )
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
@@ -274,7 +274,7 @@ class TestProfileWithCaching(unittest.TestCase):
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
         self.assertEqual(
-            '"||%d|en|%s|0' % (catalog.getCounter(), skins_tool.default_skin),
+            '"||%d|en|%s|0|"' % (catalog.getCounter(), skins_tool.default_skin),
             normalize_etag(browser.headers["ETag"]),
         )
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
