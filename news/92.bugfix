@@ -1,3 +1,0 @@
-Test-only fix: caching checks for ``timestamp.txt`` in ``portal_resources`` which is no longer there.
-Update ETAG Headers accordingly.
-[pbauer]

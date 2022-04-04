@@ -8,6 +8,17 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a12 (2022-04-04)
+---------------------
+
+Bug fixes:
+
+
+- Test-only fix: caching checks for ``timestamp.txt`` in ``portal_resources`` which is no longer there.
+  Update ETAG Headers accordingly.
+  [pbauer] (#92)
+
+
 3.0.0a11 (2022-02-24)
 ---------------------
 
