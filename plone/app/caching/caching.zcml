@@ -1,139 +1,197 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:cache="http://namespaces.zope.org/cache"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:zcml="http://namespaces.zope.org/zcml"
-    i18n_domain="plone">
+    i18n_domain="plone"
+    >
 
-    <!-- Out-of-the-box cache profiles
+  <!-- Out-of-the-box cache profiles
          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-    <genericsetup:registerProfile
-        name="with-caching-proxy"
-        title="With caching proxy"
-        description="Settings useful for setups with a caching proxy such as Squid or Varnish"
-        directory="profiles/with-caching-proxy"
-        provides="Products.GenericSetup.interfaces.EXTENSION"
-        for="plone.app.caching.interfaces.ICacheProfiles"
-        />
+  <genericsetup:registerProfile
+      name="with-caching-proxy"
+      title="With caching proxy"
+      description="Settings useful for setups with a caching proxy such as Squid or Varnish"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="plone.app.caching.interfaces.ICacheProfiles"
+      directory="profiles/with-caching-proxy"
+      />
 
-    <genericsetup:registerProfile
-        name="without-caching-proxy"
-        title="Without caching proxy"
-        description="Settings useful for setups without a caching proxy such as Squid or Varnish"
-        directory="profiles/without-caching-proxy"
-        provides="Products.GenericSetup.interfaces.EXTENSION"
-        for="plone.app.caching.interfaces.ICacheProfiles"
-        />
+  <genericsetup:registerProfile
+      name="without-caching-proxy"
+      title="Without caching proxy"
+      description="Settings useful for setups without a caching proxy such as Squid or Varnish"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="plone.app.caching.interfaces.ICacheProfiles"
+      directory="profiles/without-caching-proxy"
+      />
 
-    <genericsetup:registerProfile
-        name="with-caching-proxy-splitviews"
-        title="With caching proxy (and split-view caching)"
-        description="An example profile for a caching proxy setup with split-view caching enabled."
-        directory="profiles/with-caching-proxy-splitviews"
-        provides="Products.GenericSetup.interfaces.EXTENSION"
-        for="plone.app.caching.interfaces.ICacheProfiles"
-        />
+  <genericsetup:registerProfile
+      name="with-caching-proxy-splitviews"
+      title="With caching proxy (and split-view caching)"
+      description="An example profile for a caching proxy setup with split-view caching enabled."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="plone.app.caching.interfaces.ICacheProfiles"
+      directory="profiles/with-caching-proxy-splitviews"
+      />
 
-    <!-- Default caching ruleset types
+  <!-- Default caching ruleset types
          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-    <cache:rulesetType
-        name="plone.resource"
-        title="File and image resources"
-        description="Includes images and files created or customised through the ZMI, those exposed in the portal_skins tool, and images registered in resource directories on the filesystem."
-        />
+  <cache:rulesetType
+      name="plone.resource"
+      title="File and image resources"
+      description="Includes images and files created or customised through the ZMI, those exposed in the portal_skins tool, and images registered in resource directories on the filesystem."
+      />
 
-    <cache:rulesetType
-        name="plone.stableResource"
-        title="Stable file and image resources"
-        description="These are resources which can be cached 'forever'. Normally this means that if the object does change, its URL changes too."
-        />
+  <cache:rulesetType
+      name="plone.stableResource"
+      title="Stable file and image resources"
+      description="These are resources which can be cached 'forever'. Normally this means that if the object does change, its URL changes too."
+      />
 
-    <cache:rulesetType
-        name="plone.content.file"
-        title="Content files and images"
-        description="Includes files and images in content space."
-        />
+  <cache:rulesetType
+      name="plone.content.file"
+      title="Content files and images"
+      description="Includes files and images in content space."
+      />
 
-    <cache:rulesetType
-        name="plone.content.itemView"
-        title="Content item view"
-        description="A public-facing view for a content item that is not a folder or container for other items"
-        />
+  <cache:rulesetType
+      name="plone.content.itemView"
+      title="Content item view"
+      description="A public-facing view for a content item that is not a folder or container for other items"
+      />
 
-    <cache:rulesetType
-        name="plone.content.folderView"
-        title="Content folder view"
-        description="A public-facing view for a content item that is a folder or container for other items"
-        />
+  <cache:rulesetType
+      name="plone.content.folderView"
+      title="Content folder view"
+      description="A public-facing view for a content item that is a folder or container for other items"
+      />
 
-    <cache:rulesetType
-        name="plone.content.feed"
-        title="Content feed"
-        description="A dynamic feed, e.g. using RSS or ATOM"
-        />
+  <cache:rulesetType
+      name="plone.content.feed"
+      title="Content feed"
+      description="A dynamic feed, e.g. using RSS or ATOM"
+      />
 
-    <cache:rulesetType
-        name="plone.content.dynamic"
-        title="Dynamic views, like collections, searches, ..."
-        description="A public-facing view for a contents that is collected dynamically from the whole site."
-        />
+  <cache:rulesetType
+      name="plone.content.dynamic"
+      title="Dynamic views, like collections, searches, ..."
+      description="A public-facing view for a contents that is collected dynamically from the whole site."
+      />
 
-    <!-- Default caching ruleset assignments
+  <!-- Default caching ruleset assignments
          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-    <!-- CMF filesystem (skin layer) files and images -->
-    <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSFile.FSFile" />
-    <cache:ruleset ruleset="plone.resource" for="Products.CMFCore.FSImage.FSImage" />
+  <!-- CMF filesystem (skin layer) files and images -->
+  <cache:ruleset
+      for="Products.CMFCore.FSFile.FSFile"
+      ruleset="plone.resource"
+      />
+  <cache:ruleset
+      for="Products.CMFCore.FSImage.FSImage"
+      ruleset="plone.resource"
+      />
 
-    <!-- OFS (in-ZODB) files, images -->
-    <cache:ruleset ruleset="plone.resource" for="OFS.Image.File" />
+  <!-- OFS (in-ZODB) files, images -->
+  <cache:ruleset
+      for="OFS.Image.File"
+      ruleset="plone.resource"
+      />
 
-    <!-- Automatically purge these always -->
-    <class class="OFS.Image.File">
-        <implements interface="z3c.caching.interfaces.IPurgeable" />
-    </class>
-
-
-    <!-- Zope resources (including those in resource directories) -->
-    <cache:ruleset ruleset="plone.resource" for="zope.browserresource.interfaces.IResource" />
-
-    <!-- These rely on the ContentItemLookup delegation -->
-    <cache:ruleset ruleset="plone.content.itemView"   for="plone.dexterity.interfaces.IDexterityItem" />
-    <cache:ruleset ruleset="plone.content.folderView" for="plone.dexterity.interfaces.IDexterityContainer" />
+  <!-- Automatically purge these always -->
+  <class class="OFS.Image.File">
+    <implements interface="z3c.caching.interfaces.IPurgeable" />
+  </class>
 
 
-    <!-- These rely on the ContentItemLookup delegation -->
-    <cache:ruleset ruleset="plone.content.file"   for="plone.namedfile.browser.Download" />
-    <cache:ruleset ruleset="plone.content.file" for="plone.namedfile.scaling.ImageScale" />
+  <!-- Zope resources (including those in resource directories) -->
+  <cache:ruleset
+      for="zope.browserresource.interfaces.IResource"
+      ruleset="plone.resource"
+      />
 
-    <!-- plone.restapi content -->
-    <configure zcml:condition="installed plone.restapi">
+  <!-- These rely on the ContentItemLookup delegation -->
+  <cache:ruleset
+      for="plone.dexterity.interfaces.IDexterityItem"
+      ruleset="plone.content.itemView"
+      />
+  <cache:ruleset
+      for="plone.dexterity.interfaces.IDexterityContainer"
+      ruleset="plone.content.folderView"
+      />
 
-        <include package="plone.restapi" />
 
-        <cache:ruleset ruleset="plone.content.itemView" for="plone.restapi.services.discussion.conversation.CommentsGet" />
+  <!-- These rely on the ContentItemLookup delegation -->
+  <cache:ruleset
+      for="plone.namedfile.browser.Download"
+      ruleset="plone.content.file"
+      />
+  <cache:ruleset
+      for="plone.namedfile.scaling.ImageScale"
+      ruleset="plone.content.file"
+      />
 
-        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.actions.get.ActionsGet" />
-        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.breadcrumbs.get.BreadcrumbsGet" />
-        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.content.get.ContentGet" />
-        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.multilingual.pam.TranslationInfo" />
-        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.navigation.get.NavigationGet" />
-        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.querystring.get.QuerystringGet" />
-        <cache:ruleset ruleset="plone.content.dynamic" for="plone.restapi.services.search.get.SearchGet" />
+  <!-- plone.restapi content -->
+  <configure zcml:condition="installed plone.restapi">
 
-    </configure>
+    <include package="plone.restapi" />
 
-    <!-- Paths to purge -->
+    <cache:ruleset
+        for="plone.restapi.services.discussion.conversation.CommentsGet"
+        ruleset="plone.content.itemView"
+        />
 
-    <!-- Standard CMF content -->
-    <adapter factory=".purge.ContentPurgePaths" name="plone.content" />
+    <cache:ruleset
+        for="plone.restapi.services.actions.get.ActionsGet"
+        ruleset="plone.content.dynamic"
+        />
+    <cache:ruleset
+        for="plone.restapi.services.breadcrumbs.get.BreadcrumbsGet"
+        ruleset="plone.content.dynamic"
+        />
+    <cache:ruleset
+        for="plone.restapi.services.content.get.ContentGet"
+        ruleset="plone.content.dynamic"
+        />
+    <cache:ruleset
+        for="plone.restapi.services.multilingual.pam.TranslationInfo"
+        ruleset="plone.content.dynamic"
+        />
+    <cache:ruleset
+        for="plone.restapi.services.navigation.get.NavigationGet"
+        ruleset="plone.content.dynamic"
+        />
+    <cache:ruleset
+        for="plone.restapi.services.querystring.get.QuerystringGet"
+        ruleset="plone.content.dynamic"
+        />
+    <cache:ruleset
+        for="plone.restapi.services.search.get.SearchGet"
+        ruleset="plone.content.dynamic"
+        />
 
-    <!-- Discussion items -->
-    <adapter factory=".purge.DiscussionItemPurgePaths" name="plone.discussion" />
+  </configure>
 
-    <!-- Image scales & file download paths -->
-    <adapter factory=".purge.ScalesPurgePaths" name="plone.files" />
+  <!-- Paths to purge -->
+
+  <!-- Standard CMF content -->
+  <adapter
+      factory=".purge.ContentPurgePaths"
+      name="plone.content"
+      />
+
+  <!-- Discussion items -->
+  <adapter
+      factory=".purge.DiscussionItemPurgePaths"
+      name="plone.discussion"
+      />
+
+  <!-- Image scales & file download paths -->
+  <adapter
+      factory=".purge.ScalesPurgePaths"
+      name="plone.files"
+      />
 
 </configure>

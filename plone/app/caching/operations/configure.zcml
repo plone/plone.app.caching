@@ -1,49 +1,119 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:zcml="http://namespaces.zope.org/zcml"
-    i18n_domain="plone.app.caching">
+    i18n_domain="plone.app.caching"
+    >
 
-    <include package="plone.caching" />
-    <include package="plone.app.registry" />
+  <include package="plone.caching" />
+  <include package="plone.app.registry" />
 
-    <!-- Caching operations
+  <!-- Caching operations
          ~~~~~~~~~~~~~~~~~~ -->
 
-    <adapter   factory=".default.StrongCaching"         name="plone.app.caching.strongCaching" />
-    <utility component=".default.StrongCaching"         name="plone.app.caching.strongCaching" />
+  <adapter
+      factory=".default.StrongCaching"
+      name="plone.app.caching.strongCaching"
+      />
+  <utility
+      name="plone.app.caching.strongCaching"
+      component=".default.StrongCaching"
+      />
 
-    <adapter   factory=".default.ModerateCaching"       name="plone.app.caching.moderateCaching" />
-    <utility component=".default.ModerateCaching"       name="plone.app.caching.moderateCaching" />
+  <adapter
+      factory=".default.ModerateCaching"
+      name="plone.app.caching.moderateCaching"
+      />
+  <utility
+      name="plone.app.caching.moderateCaching"
+      component=".default.ModerateCaching"
+      />
 
-    <adapter   factory=".default.WeakCaching"           name="plone.app.caching.weakCaching" />
-    <utility component=".default.WeakCaching"           name="plone.app.caching.weakCaching" />
+  <adapter
+      factory=".default.WeakCaching"
+      name="plone.app.caching.weakCaching"
+      />
+  <utility
+      name="plone.app.caching.weakCaching"
+      component=".default.WeakCaching"
+      />
 
-    <adapter   factory=".default.TerseCaching"          name="plone.app.caching.terseCaching" />
-    <utility component=".default.TerseCaching"          name="plone.app.caching.terseCaching" />
+  <adapter
+      factory=".default.TerseCaching"
+      name="plone.app.caching.terseCaching"
+      />
+  <utility
+      name="plone.app.caching.terseCaching"
+      component=".default.TerseCaching"
+      />
 
-    <adapter   factory=".default.NoCaching"             name="plone.app.caching.noCaching" />
-    <utility component=".default.NoCaching"             name="plone.app.caching.noCaching" />
+  <adapter
+      factory=".default.NoCaching"
+      name="plone.app.caching.noCaching"
+      />
+  <utility
+      name="plone.app.caching.noCaching"
+      component=".default.NoCaching"
+      />
 
-    <!-- Uncomment to show the "Generic caching" in the UI (also see profiles/default/registry/generic.xml)
+  <!-- Uncomment to show the "Generic caching" in the UI (also see profiles/default/registry/generic.xml)
     <adapter   factory=".default.BaseCaching"           name="plone.app.caching.baseCaching" />
     <utility component=".default.BaseCaching"           name="plone.app.caching.baseCaching" />
     -->
 
-    <!-- RAM cache storage: a transformation at the very end of the chain -->
-    <adapter factory=".ramcache.Store"                  name="plone.app.caching.operations.ramcache" />
+  <!-- RAM cache storage: a transformation at the very end of the chain -->
+  <adapter
+      factory=".ramcache.Store"
+      name="plone.app.caching.operations.ramcache"
+      />
 
-    <!-- ETag components -->
-    <adapter factory=".etags.UserID"                    name="userid" />
-    <adapter factory=".etags.Roles"                     name="roles" />
-    <adapter factory=".etags.Language"                  name="language" />
-    <adapter factory=".etags.UserLanguage"              name="userLanguage" />
-    <adapter factory=".etags.LastModified"              name="lastModified" />
-    <adapter factory=".etags.CatalogCounter"            name="catalogCounter" />
-    <adapter factory=".etags.ObjectLocked"              name="locked" />
-    <adapter factory=".etags.Skin"                      name="skin" />
-    <adapter factory=".etags.ResourceRegistries"        name="resourceRegistries" />
-    <adapter factory=".etags.AnonymousOrRandom"         name="anonymousOrRandom" />
-    <adapter factory=".etags.CopyCookie"                name="copy" />
-    <adapter factory=".etags.Layout"                    name="layout" />
+  <!-- ETag components -->
+  <adapter
+      factory=".etags.UserID"
+      name="userid"
+      />
+  <adapter
+      factory=".etags.Roles"
+      name="roles"
+      />
+  <adapter
+      factory=".etags.Language"
+      name="language"
+      />
+  <adapter
+      factory=".etags.UserLanguage"
+      name="userLanguage"
+      />
+  <adapter
+      factory=".etags.LastModified"
+      name="lastModified"
+      />
+  <adapter
+      factory=".etags.CatalogCounter"
+      name="catalogCounter"
+      />
+  <adapter
+      factory=".etags.ObjectLocked"
+      name="locked"
+      />
+  <adapter
+      factory=".etags.Skin"
+      name="skin"
+      />
+  <adapter
+      factory=".etags.ResourceRegistries"
+      name="resourceRegistries"
+      />
+  <adapter
+      factory=".etags.AnonymousOrRandom"
+      name="anonymousOrRandom"
+      />
+  <adapter
+      factory=".etags.CopyCookie"
+      name="copy"
+      />
+  <adapter
+      factory=".etags.Layout"
+      name="layout"
+      />
 
 </configure>

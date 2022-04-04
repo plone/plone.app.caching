@@ -30,11 +30,8 @@ jobs:
       - name: install zpretty
         run: pip install zpretty
 
-      # run zpretty
-      - name: run zpretty
-        run: find plone -name '*.zcml' | xargs zpretty -i
+      - name: run zpretty for zcml
+        run: find plone -name '*.zcml' | xargs zpretty -z --check
 
-      # XXX: this doesn't work on gh actions (https://github.com/plone/plone.restapi/pull/1119/checks?check_run_id=2686474411)
-      # run git diff
-      - name: run git diff
-        run: git diff --exit-code
+      - name: run zpretty for xml
+        run: find plone -name '*.xml' | xargs zpretty -x --check

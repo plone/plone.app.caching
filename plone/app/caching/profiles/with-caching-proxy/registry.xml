@@ -15,121 +15,121 @@
 
   <!-- plone.content.itemView -->
   <record name="plone.app.caching.weakCaching.plone.content.itemView.etags">
-      <field ref="plone.app.caching.weakCaching.etags" />
-      <value>
-          <element>userid</element>
-          <element>catalogCounter</element>
-          <element>userLanguage</element>
-          <element>skin</element>
-          <element>locked</element>
-          <element>resourceRegistries</element>
-      </value>
+    <field ref="plone.app.caching.weakCaching.etags" />
+    <value>
+      <element>userid</element>
+      <element>catalogCounter</element>
+      <element>userLanguage</element>
+      <element>skin</element>
+      <element>locked</element>
+      <element>resourceRegistries</element>
+    </value>
   </record>
   <record name="plone.app.caching.weakCaching.plone.content.itemView.ramCache">
-      <field ref="plone.app.caching.weakCaching.ramCache" />
-      <value>True</value>
+    <field ref="plone.app.caching.weakCaching.ramCache" />
+    <value>True</value>
   </record>
 
 
   <!-- plone.content.folderView -->
   <record name="plone.app.caching.weakCaching.plone.content.folderView.etags">
-      <field ref="plone.app.caching.weakCaching.etags" />
-      <value>
-          <element>userid</element>
-          <element>catalogCounter</element>
-          <element>userLanguage</element>
-          <element>skin</element>
-          <element>locked</element>
-          <element>copy</element>
-          <element>resourceRegistries</element>
-      </value>
+    <field ref="plone.app.caching.weakCaching.etags" />
+    <value>
+      <element>userid</element>
+      <element>catalogCounter</element>
+      <element>userLanguage</element>
+      <element>skin</element>
+      <element>locked</element>
+      <element>copy</element>
+      <element>resourceRegistries</element>
+    </value>
   </record>
   <record name="plone.app.caching.weakCaching.plone.content.folderView.ramCache">
-      <field ref="plone.app.caching.weakCaching.ramCache" />
-      <value>True</value>
+    <field ref="plone.app.caching.weakCaching.ramCache" />
+    <value>True</value>
   </record>
 
 
   <!-- plone.content.dynamic -->
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.etags">
-      <field ref="plone.app.caching.terseCaching.etags" />
-      <value>
-          <element>userid</element>
-          <element>catalogCounter</element>
-          <element>userLanguage</element>
-          <element>skin</element>
-          <element>locked</element>
-          <element>copy</element>
-      </value>
+    <field ref="plone.app.caching.terseCaching.etags" />
+    <value>
+      <element>userid</element>
+      <element>catalogCounter</element>
+      <element>userLanguage</element>
+      <element>skin</element>
+      <element>locked</element>
+      <element>copy</element>
+    </value>
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.ramCache">
-      <field ref="plone.app.caching.terseCaching.ramCache" />
-      <value>False</value>
+    <field ref="plone.app.caching.terseCaching.ramCache" />
+    <value>False</value>
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.vary">
-      <field ref="plone.app.caching.terseCaching.vary" />
-      <value>Accept</value>
+    <field ref="plone.app.caching.terseCaching.vary" />
+    <value>Accept</value>
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.maxage">
-      <field ref="plone.app.caching.terseCaching.maxage" />
-      <value>10</value>
+    <field ref="plone.app.caching.terseCaching.maxage" />
+    <value>10</value>
   </record>
   <record name="plone.app.caching.terseCaching.plone.content.dynamic.smaxage">
-      <field ref="plone.app.caching.terseCaching.smaxage" />
-      <value>60</value>
+    <field ref="plone.app.caching.terseCaching.smaxage" />
+    <value>60</value>
   </record>
 
 
   <!-- plone.content.feed -->
   <record name="plone.app.caching.moderateCaching.plone.content.feed.smaxage">
-      <field ref="plone.app.caching.moderateCaching.smaxage" />
-      <value>86400</value>
+    <field ref="plone.app.caching.moderateCaching.smaxage" />
+    <value>86400</value>
   </record>
   <record name="plone.app.caching.moderateCaching.plone.content.feed.etags">
-      <field ref="plone.app.caching.moderateCaching.etags" />
-      <value>
-          <element>userid</element>
-          <element>catalogCounter</element>
-          <element>userLanguage</element>
-          <element>skin</element>
-      </value>
+    <field ref="plone.app.caching.moderateCaching.etags" />
+    <value>
+      <element>userid</element>
+      <element>catalogCounter</element>
+      <element>userLanguage</element>
+      <element>skin</element>
+    </value>
   </record>
   <record name="plone.app.caching.moderateCaching.plone.content.feed.ramCache">
-      <field ref="plone.app.caching.moderateCaching.ramCache" />
-      <value>True</value>
+    <field ref="plone.app.caching.moderateCaching.ramCache" />
+    <value>True</value>
   </record>
 
 
   <!-- plone.content.file -->
   <record name="plone.app.caching.moderateCaching.plone.content.file.smaxage">
-      <field ref="plone.app.caching.moderateCaching.smaxage" />
-      <value>86400</value>
+    <field ref="plone.app.caching.moderateCaching.smaxage" />
+    <value>86400</value>
   </record>
   <record name="plone.app.caching.moderateCaching.plone.content.file.lastModified">
-      <field ref="plone.app.caching.moderateCaching.lastModified" />
-      <value>True</value>
+    <field ref="plone.app.caching.moderateCaching.lastModified" />
+    <value>True</value>
   </record>
 
 
   <!-- plone.resource-->
   <record name="plone.app.caching.strongCaching.plone.resource.maxage">
-      <field ref="plone.app.caching.strongCaching.maxage" />
-      <value>86400</value>
+    <field ref="plone.app.caching.strongCaching.maxage" />
+    <value>86400</value>
   </record>
   <record name="plone.app.caching.strongCaching.plone.resource.lastModified">
-      <field ref="plone.app.caching.strongCaching.lastModified" />
-      <value>True</value>
+    <field ref="plone.app.caching.strongCaching.lastModified" />
+    <value>True</value>
   </record>
 
 
   <!-- plone.stableResource-->
   <record name="plone.app.caching.strongCaching.plone.stableResource.maxage">
-      <field ref="plone.app.caching.strongCaching.maxage" />
-      <value>31536000</value>
+    <field ref="plone.app.caching.strongCaching.maxage" />
+    <value>31536000</value>
   </record>
   <record name="plone.app.caching.strongCaching.plone.stableResource.lastModified">
-      <field ref="plone.app.caching.strongCaching.lastModified" />
-      <value>True</value>
+    <field ref="plone.app.caching.strongCaching.lastModified" />
+    <value>True</value>
   </record>
 
 

@@ -1,49 +1,55 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:zcml="http://namespaces.zope.org/zcml"
-    i18n_domain="plone">
+    i18n_domain="plone"
+    >
 
-    <include package="z3c.zcmlhook" file="meta.zcml" />
+  <include
+      package="z3c.zcmlhook"
+      file="meta.zcml"
+      />
 
-    <include package="plone.caching" />
-    <include package="plone.cachepurging" />
-    <include package="plone.app.registry" />
-    <include package="plone.memoize" />
-    <include package="plone.protect" />
+  <include package="plone.caching" />
+  <include package="plone.cachepurging" />
+  <include package="plone.app.registry" />
+  <include package="plone.memoize" />
+  <include package="plone.protect" />
 
-    <include package=".browser" />
-    <include package=".operations" />
-    <include file="profiles.zcml" />
+  <include package=".browser" />
+  <include package=".operations" />
+  <include file="profiles.zcml" />
 
-    <zcml:customAction
-        handler=".setuphandlers.enableExplicitMode"
-        order="1000000"
-        />
+  <zcml:customAction
+      handler=".setuphandlers.enableExplicitMode"
+      order="1000000"
+      />
 
-    <!-- Default caching configuration -->
-    <include file="caching.zcml" />
+  <!-- Default caching configuration -->
+  <include file="caching.zcml" />
 
-    <!-- Lookup for content item views and page template resources -->
-    <adapter
-        for="zope.publisher.interfaces.browser.IBrowserView *"
-        factory=".lookup.ContentItemLookup"
-        />
-    <adapter
-        for="zope.pagetemplate.interfaces.IPageTemplate *"
-        factory=".lookup.ContentItemLookup"
-        />
+  <!-- Lookup for content item views and page template resources -->
+  <adapter
+      factory=".lookup.ContentItemLookup"
+      for="zope.publisher.interfaces.browser.IBrowserView
+           *"
+      />
+  <adapter
+      factory=".lookup.ContentItemLookup"
+      for="zope.pagetemplate.interfaces.IPageTemplate
+           *"
+      />
 
-    <!-- Purging -->
-    <subscriber handler=".purge.purgeOnModified" />
-    <subscriber handler=".purge.purgeOnMovedOrRemoved" />
+  <!-- Purging -->
+  <subscriber handler=".purge.purgeOnModified" />
+  <subscriber handler=".purge.purgeOnMovedOrRemoved" />
 
-    <!-- ILastModified adapters -->
-    <adapter factory=".lastmodified.PageTemplateDelegateLastModified" />
-    <adapter factory=".lastmodified.FSPageTemplateDelegateLastModified" />
-    <adapter factory=".lastmodified.OFSFileLastModified" />
-    <adapter factory=".lastmodified.FSObjectLastModified" />
-    <adapter factory=".lastmodified.CatalogableDublinCoreLastModified" />
-    <adapter factory=".lastmodified.DCTimesLastModified" />
-    <adapter factory=".lastmodified.ResourceLastModified" />
+  <!-- ILastModified adapters -->
+  <adapter factory=".lastmodified.PageTemplateDelegateLastModified" />
+  <adapter factory=".lastmodified.FSPageTemplateDelegateLastModified" />
+  <adapter factory=".lastmodified.OFSFileLastModified" />
+  <adapter factory=".lastmodified.FSObjectLastModified" />
+  <adapter factory=".lastmodified.CatalogableDublinCoreLastModified" />
+  <adapter factory=".lastmodified.DCTimesLastModified" />
+  <adapter factory=".lastmodified.ResourceLastModified" />
 
 </configure>
