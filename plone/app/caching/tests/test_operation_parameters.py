@@ -108,10 +108,7 @@ class TestOperationParameters(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                TEST_USER_NAME,
-                TEST_USER_PASSWORD,
-            ),
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
         )
         browser.open(self.portal["f1"]["d1"].absolute_url())
         self.assertEqual("plone.content.itemView", browser.headers["X-Cache-Rule"])
@@ -152,10 +149,7 @@ class TestOperationParameters(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                TEST_USER_NAME,
-                TEST_USER_PASSWORD,
-            ),
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
         )
         browser.open(self.portal["f1"]["d1"].absolute_url())
         self.assertEqual("plone.content.itemView", browser.headers["X-Cache-Rule"])

@@ -1,5 +1,6 @@
 from io import StringIO
 from OFS.SimpleItem import SimpleItem
+from plone.app.caching.tests import TZEnvContext
 from plone.memoize.interfaces import ICacheChooser
 from plone.testing.zca import UNIT_TESTING
 from Products.CMFCore.interfaces import IContentish
@@ -911,19 +912,22 @@ class MiscHelpersTest(unittest.TestCase):
     def test_formatDateTime_naive(self):
         from plone.app.caching.operations.utils import formatDateTime
 
-        dt = datetime.datetime(2010, 11, 24, 3, 4, 5, 6)
-        inGMT = formatDateTime(dt)
+        # We force CET, otherwise this test fails in regions with
+        # dst enabled in November, 2010
+        with TZEnvContext("CET"):
+            dt = datetime.datetime(2010, 11, 24, 3, 4, 5, 6)
+            inGMT = formatDateTime(dt)
 
-        # Who knows what your local timezone is :-)
-        self.assertTrue(inGMT.endswith(" GMT"))
-        self.assertIn("Nov 2010", inGMT)
+            # Who knows what your local timezone is :-)
+            self.assertTrue(inGMT.endswith(" GMT"))
+            self.assertIn("Nov 2010", inGMT)
 
-        # Can't compare offset aware and naive
-        p = dateutil.parser.parse(inGMT).astimezone(dateutil.tz.tzlocal())
-        self.assertEqual(
-            (2010, 11, 24, 3, 4, 5),
-            (p.year, p.month, p.day, p.hour, p.minute, p.second),
-        )
+            # Can't compare offset aware and naive
+            p = dateutil.parser.parse(inGMT).astimezone(dateutil.tz.tzlocal())
+            self.assertEqual(
+                (2010, 11, 24, 3, 4, 5),
+                (p.year, p.month, p.day, p.hour, p.minute, p.second),
+            )
 
     # parseDateTime()
 

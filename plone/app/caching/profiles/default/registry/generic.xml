@@ -1,5 +1,5 @@
 <registry>
-    <!-- Uncomment if showing "Generic caching" in the UI.
+  <!-- Uncomment if showing "Generic caching" in the UI.
          Also see operations/configure.zcml
 
     <record name="plone.app.caching.baseCaching.maxage">

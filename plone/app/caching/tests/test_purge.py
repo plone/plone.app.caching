@@ -384,7 +384,6 @@ class TestScalesPurgePaths(unittest.TestCase):
         paths = [x for x in purge.getRelativePaths()]
         [self.assertIn(j, paths) for j in scalepaths]
 
-
     def test_scale_purge_paths_page(self):
         prefix = "/".join(self.page.getPhysicalPath())
         purge = ScalesPurgePaths(self.page)
@@ -395,7 +394,6 @@ class TestScalesPurgePaths(unittest.TestCase):
 
         paths = [x for x in purge.getRelativePaths()]
         [self.assertIn(j, paths) for j in scalepaths]
-
 
     def test_scale_purge_paths_unicode(self):
         purge = ScalesPurgePaths(self.file)
