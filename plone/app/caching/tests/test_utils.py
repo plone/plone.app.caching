@@ -21,7 +21,7 @@ import unittest
 
 
 TEST_TIMEZONE = "Europe/Vienna"
-TEST_IMAGE = pkg_resources.resource_filename(u"plone.app.caching.tests", u"test.gif")
+TEST_IMAGE = pkg_resources.resource_filename("plone.app.caching.tests", "test.gif")
 
 
 def stable_now():
@@ -39,7 +39,8 @@ def normalize_etag(value):
     last = split_value.pop()
     if str(date.today().year) in last:
         # yes, this is time based, remove it
-        return "|".join(split_value)
+        value = "|".join(split_value)
+        return f'{value}|"'
     # return original
     return value
 

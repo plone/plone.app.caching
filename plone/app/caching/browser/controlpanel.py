@@ -159,9 +159,7 @@ class ControlPanel(BaseView):
                 self.processSave()
             elif "form.button.Cancel" in self.request.form:
                 self.request.response.redirect(
-                    "{}/@@overview-controlpanel".format(
-                        self.context.absolute_url(),
-                    ),
+                    f"{self.context.absolute_url()}/@@overview-controlpanel",
                 )
 
     def processSave(self):
@@ -209,18 +207,20 @@ class ControlPanel(BaseView):
                     continue
 
                 if contentType in contentTypeRulesetMapping:
+                    error_content_type = self.contentTypesLookup.get(
+                        contentType,
+                        {},
+                    ).get(
+                        "title",
+                        contentType,
+                    )
+                    error_ruleset = contentTypeRulesetMapping[contentType]
                     self.errors.setdefault("contenttypes", {},)[ruleset] = _(
-                        "Content type ${contentType} is already mapped to "
+                        "Content type ${error_content_type} is already mapped to "
                         "the rule ${ruleset}.",
                         mapping={
-                            "contentType": self.contentTypesLookup.get(
-                                contentType,
-                                {},
-                            ).get(
-                                "title",
-                                contentType,
-                            ),
-                            "ruleset": contentTypeRulesetMapping[contentType],
+                            "contentType": error_content_type,
+                            "ruleset": error_ruleset,
                         },
                     )
                 else:
@@ -470,13 +470,7 @@ class ControlPanel(BaseView):
             return False
 
         for option in options:
-            if (
-                "{}.{}".format(
-                    prefix,
-                    option,
-                )
-                in self.registry
-            ):
+            if f"{prefix}.{option}" in self.registry:
                 return True
 
         return False
@@ -520,9 +514,8 @@ class Import(BaseView):
 
         # Create a snapshot
         if snapshot:
-            snapshotId = "plone.app.caching.beforeimport.{}".format(
-                datetime.datetime.now().isoformat().replace(":", ".")
-            )
+            snapshot_date = datetime.datetime.now().isoformat().replace(":", ".")
+            snapshotId = f"plone.app.caching.beforeimport.{snapshot_date}"
             portal_setup.createSnapshot(snapshotId)
 
         # Import the new profile

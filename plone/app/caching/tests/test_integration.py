@@ -80,10 +80,7 @@ class TestOperations(unittest.TestCase):
         browser.handleErrors = False
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                SITE_OWNER_NAME,
-                SITE_OWNER_PASSWORD,
-            ),
+            f"Basic {SITE_OWNER_NAME}:{SITE_OWNER_PASSWORD}",
         )
 
         browser.open(f"{self.portal.absolute_url()}/@@caching-controlpanel")  # noqa
@@ -198,11 +195,9 @@ class TestOperations(unittest.TestCase):
         self.cachePurgingSettings.enabled = False
         self.cachePurgingSettings.cachingProxies = ()
         self.ploneCacheSettings.purgedContentTypes = ()
-
-        editURL = "{}/edit?_authenticator={}".format(
-            self.portal["d1"].absolute_url(),
-            getToken(TEST_USER_NAME),
-        )
+        url = self.portal["d1"].absolute_url()
+        token = getToken(TEST_USER_NAME)
+        editURL = f"{url}/edit?_authenticator={token}"
 
         import transaction
 
@@ -212,10 +207,7 @@ class TestOperations(unittest.TestCase):
         browser.handleErrors = False
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                TEST_USER_NAME,
-                TEST_USER_PASSWORD,
-            ),
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
         )
 
         browser.open(editURL)

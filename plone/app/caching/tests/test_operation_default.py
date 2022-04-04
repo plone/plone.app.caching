@@ -60,13 +60,10 @@ class TestOperationDefault(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                TEST_USER_NAME,
-                TEST_USER_PASSWORD,
-            ),
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
         )
         browser.open(
-            "{}/++add++Document".format(self.portal["f1"].absolute_url()),
+            f"{self.portal['f1'].absolute_url()}/++add++Document",
         )
         browser.getControl(
             name="form.widgets.IDublinCore.title"
@@ -79,11 +76,9 @@ class TestOperationDefault(unittest.TestCase):
         import transaction
 
         transaction.commit()
-        browser.open(
-            "{}/dummy-content/edit?_authenticator={}".format(
-                self.portal["f1"].absolute_url(), getToken(TEST_USER_NAME)
-            )
-        )
+        url = self.portal["f1"].absolute_url()
+        token = getToken(TEST_USER_NAME)
+        browser.open(f"{url}/dummy-content/edit?_authenticator={token}")
         browser.getControl(
             name="form.widgets.IDublinCore.title"
         ).value = "dummy content"

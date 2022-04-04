@@ -181,7 +181,7 @@ class BaseCaching:
         if cacheStop(self.request, rulename):
             # only stop with etags if configured
             if etags:
-                etag = "{}{}".format(time.time(), random.randint(0, 1000))
+                etag = f"{time.time()}{random.randint(0, 1000)}"
                 return setCacheHeaders(
                     self.published,
                     self.request,
@@ -330,15 +330,15 @@ class StrongCaching(BaseCaching):
 class TerseCaching(BaseCaching):
     """Terse caching operation."""
 
-    title = _(u"Terse caching")
+    title = _("Terse caching")
     description = _(
-        u"Cache in browser (default: 10s) and proxy (default: 1 min). "
-        u"Keep very short in cache to buffer hi-load scenarios ",
-        u"Use for very dynamic content, like collecting data from "
-        u"the whole portal. "
-        u"Temporary outdated is less important than performance."
-        u"Reduce in-cache time to just 3-10 seconds to only buffer peak load "
-        u"if behind a proxy",
+        "Cache in browser (default: 10s) and proxy (default: 1 min). "
+        "Keep very short in cache to buffer hi-load scenarios ",
+        "Use for very dynamic content, like collecting data from "
+        "the whole portal. "
+        "Temporary outdated is less important than performance."
+        "Reduce in-cache time to just 3-10 seconds to only buffer peak load "
+        "if behind a proxy",
     )
     prefix = "plone.app.caching.terseCaching"
     sort = 4

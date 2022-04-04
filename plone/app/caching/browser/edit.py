@@ -97,11 +97,7 @@ class EditForm(form.Form):
             fieldName = f"{prefix}.{option}"
 
             if self.rulesetName:
-                rulesetFieldName = "{}.{}.{}".format(
-                    prefix,
-                    self.rulesetName,
-                    option,
-                )
+                rulesetFieldName = f"{prefix}.{self.rulesetName}.{option}"
 
                 if rulesetFieldName in self.registry.records:
                     newField = self.cloneField(
@@ -150,21 +146,14 @@ class EditForm(form.Form):
         options = self.operation.options
 
         for option in options:
-            recordName = "{}.{}".format(
-                prefix,
-                option,
-            )
+            recordName = f"{prefix}.{option}"
 
             # If a ruleset-specific record does not exist, we can fall back on
             # a global record, since the per-ruleset records will be created
             # as necessary in applyChanges()
 
             if self.rulesetName:
-                rulesetRecordName = "{}.{}.{}".format(
-                    prefix,
-                    self.rulesetName,
-                    option,
-                )
+                rulesetRecordName = f"{prefix}.{self.rulesetName}.{option}"
 
                 if rulesetRecordName in self.registry.records:
                     context[rulesetRecordName] = self.registry[rulesetRecordName]
@@ -256,9 +245,7 @@ class EditForm(form.Form):
         self.applyChanges(data)
         IStatusMessage(self.request).addStatusMessage(_("Changes saved."), "info")
         self.request.response.redirect(
-            "{}/@@caching-controlpanel#detailed-settings".format(
-                self.context.absolute_url(),
-            ),
+            f"{self.context.absolute_url()}/@@caching-controlpanel#detailed-settings",
         )
         return ""
 
@@ -266,19 +253,14 @@ class EditForm(form.Form):
     def cancel(self, action):
         IStatusMessage(self.request).addStatusMessage(_("Edit cancelled."), type="info")
         self.request.response.redirect(
-            "{}/@@caching-controlpanel#detailed-settings".format(
-                self.context.absolute_url(),
-            ),
+            f"{self.context.absolute_url()}/@@caching-controlpanel#detailed-settings"
         )
         return ""
 
     @button.buttonAndHandler(_("Delete settings (use defaults)"), name="clear")
     def clear(self, action):
         for key in self.getContent().keys():
-            key_suffix = "{}.{}.".format(
-                self.operation.prefix,
-                self.rulesetName,
-            )
+            key_suffix = f"{self.operation.prefix}.{self.rulesetName}."
             assert key.startswith(key_suffix)
 
             if key in self.registry.records:
@@ -288,8 +270,6 @@ class EditForm(form.Form):
             _("Ruleset-specific settings removed."), type="info"
         )
         self.request.response.redirect(
-            "{}/@@caching-controlpanel#detailed-settings".format(
-                self.context.absolute_url(),
-            ),
+            f"{self.context.absolute_url()}/@@caching-controlpanel#detailed-settings",
         )
         return ""

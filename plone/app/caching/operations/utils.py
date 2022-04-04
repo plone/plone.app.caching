@@ -746,12 +746,10 @@ def getRAMCacheKey(request, etag=None, lastModified=None):
     optional but in most cases that are worth caching in RAM, the etag
     is needed to ensure the key changes when the resource view changes.
     """
-
-    resourceKey = "{}{}?{}".format(
-        request.get("SERVER_URL", ""),
-        request.get("PATH_INFO", ""),
-        request.get("QUERY_STRING", ""),
-    )
+    server_url = request.get("SERVER_URL", "")
+    path_info = request.get("PATH_INFO", "")
+    query_string = request.get("QUERY_STRING", "")
+    resourceKey = f"{server_url}{path_info}?{query_string}"
     if etag:
         resourceKey = "|" + etag + "||" + resourceKey
     if lastModified:

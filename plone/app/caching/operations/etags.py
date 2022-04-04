@@ -13,13 +13,16 @@ from zope.component import queryUtility
 from zope.interface import implementer
 from zope.interface import Interface
 
+
 try:
     from Products.CMFPlone.resources.utils import get_override_directory
     from Products.CMFPlone.resources.utils import PRODUCTION_RESOURCE_DIRECTORY
 except ImportError:
     # Plone < 6
     from Products.CMFPlone.resources.browser.combine import get_override_directory
-    from Products.CMFPlone.resources.browser.combine import PRODUCTION_RESOURCE_DIRECTORY
+    from Products.CMFPlone.resources.browser.combine import (
+        PRODUCTION_RESOURCE_DIRECTORY,
+    )
 
 import random
 import time
@@ -213,7 +216,7 @@ class AnonymousOrRandom:
             return None
         if bool(tool.isAnonymousUser()):
             return None
-        return "{}{}".format(time.time(), random.randint(0, 1000))
+        return f"{time.time()}{random.randint(0, 1000)}"
 
 
 @implementer(IETagValue)

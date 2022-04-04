@@ -102,10 +102,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                TEST_USER_NAME,
-                TEST_USER_PASSWORD,
-            ),
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
         )
         browser.open(self.portal["f1"].absolute_url())
         self.assertEqual("plone.content.folderView", browser.headers["X-Cache-Rule"])
@@ -116,10 +113,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = '"|test_user_1_|{0}|en|{1}|0|0|"'.format(
-            catalog.getCounter(),
-            default_skin,
-        )
+        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|0|"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
@@ -134,10 +128,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = '"|test_user_1_|{0}|en|{1}|0|1|"'.format(
-            catalog.getCounter(),
-            default_skin,
-        )
+        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|1|"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
 
         # Request the authenticated page
@@ -145,10 +136,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                TEST_USER_NAME,
-                TEST_USER_PASSWORD,
-            ),
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
         )
         browser.open(self.portal["f1"]["d1"].absolute_url())
         self.assertIn(testText, browser.contents)
@@ -160,10 +148,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = '"|test_user_1_|{0}|en|{1}|0|"'.format(
-            catalog.getCounter(),
-            default_skin,
-        )
+        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
@@ -171,10 +156,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                TEST_USER_NAME,
-                TEST_USER_PASSWORD,
-            ),
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
         )
         browser.open(self.portal["f1"]["d1"].absolute_url())
         self.assertEqual("plone.content.itemView", browser.headers["X-Cache-Rule"])
@@ -191,10 +173,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         browser.raiseHttpErrors = False  # we really do want to see the 304
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                TEST_USER_NAME,
-                TEST_USER_PASSWORD,
-            ),
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
         )
         browser.addHeader("If-None-Match", etag)
         browser.open(self.portal["f1"]["d1"].absolute_url())
@@ -214,7 +193,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = '"||{0}|en|{1}|0|0|"'.format(catalog.getCounter(), default_skin)
+        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|0|"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
@@ -231,7 +210,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = '"||{0}|en|{1}|0|"'.format(catalog.getCounter(), default_skin)
+        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
@@ -252,7 +231,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = '"||{0}|en|{1}|0|"'.format(catalog.getCounter(), default_skin)
+        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
@@ -364,10 +343,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                TEST_USER_NAME,
-                TEST_USER_PASSWORD,
-            ),
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
         )
         browser.open(self.portal.absolute_url() + "/RSS")
         self.assertEqual("plone.content.feed", browser.headers["X-Cache-Rule"])
@@ -388,10 +364,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         browser = Browser(self.app)
         browser.addHeader(
             "Authorization",
-            "Basic {}:{}".format(
-                TEST_USER_NAME,
-                TEST_USER_PASSWORD,
-            ),
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
         )
         browser.open(self.portal.absolute_url() + "/RSS")
         self.assertEqual("plone.content.feed", browser.headers["X-Cache-Rule"])
