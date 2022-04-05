@@ -8,6 +8,15 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a13 (2022-04-05)
+---------------------
+
+Bug fixes:
+
+
+- Apply black to the codebase, format it to be Python 3 only (#94)
+
+
 3.0.0a12 (2022-04-04)
 ---------------------
 
