@@ -6,23 +6,14 @@ from plone.app.caching.operations.utils import getLastModifiedAnnotation
 from Products.CMFCore.interfaces import ICatalogTool
 from Products.CMFCore.interfaces import IMembershipTool
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.utils import safe_hasattr
+from plone.base.utils import safe_hasattr
 from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.interface import implementer
 from zope.interface import Interface
-
-
-try:
-    from Products.CMFPlone.resources.utils import get_override_directory
-    from Products.CMFPlone.resources.utils import PRODUCTION_RESOURCE_DIRECTORY
-except ImportError:
-    # Plone < 6
-    from Products.CMFPlone.resources.browser.combine import get_override_directory
-    from Products.CMFPlone.resources.browser.combine import (
-        PRODUCTION_RESOURCE_DIRECTORY,
-    )
+from Products.CMFPlone.resources.utils import get_override_directory
+from Products.CMFPlone.resources.utils import PRODUCTION_RESOURCE_DIRECTORY
 
 import random
 import time
@@ -236,7 +227,7 @@ class CopyCookie:
 
 @implementer(IETagValue)
 @adapter(Interface, Interface)
-class ResourceRegistries(object):
+class ResourceRegistries:
     """The ``resourceRegistries`` etag component, returning a timestamp.
 
     This is the last modified timestamp from the Plone 5+ Resource Registries.
@@ -268,7 +259,7 @@ class ResourceRegistries(object):
 
 @implementer(IETagValue)
 @adapter(Interface, Interface)
-class Layout(object):
+class Layout:
     """The 'layout' etag component, returning they layout of a content item."""
 
     def __init__(self, published, request):
