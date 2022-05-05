@@ -141,8 +141,7 @@ class DiscussionItemPurgePaths:
                         yield relativePath
                         continue
                     rewrittenPaths = rewriter(relativePath) or []
-                    for rewrittenPath in rewrittenPaths:
-                        yield rewrittenPath
+                    yield from rewrittenPaths
 
     def getAbsolutePaths(self):
         root = self._getRoot()
