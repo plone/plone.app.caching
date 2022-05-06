@@ -30,12 +30,10 @@ class Store:
             storeResponseInRAMCache(
                 self.request, self.request.response, result.encode(encoding)
             )
-        return None
 
     def transformBytes(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
             storeResponseInRAMCache(self.request, self.request.response, result)
-        return None
 
     def transformIterable(self, result, encoding):
         if self.responseIsSuccess() and IRAMCached.providedBy(self.request):
@@ -43,8 +41,6 @@ class Store:
             storeResponseInRAMCache(self.request, self.request.response, result)
             # ITransform contract allows to return an "encoded string" aka bytes
             return result
-        return None
 
     def responseIsSuccess(self):
-        status = self.request.response.getStatus()
-        return status == 200
+        return self.request.response.getStatus() == 200

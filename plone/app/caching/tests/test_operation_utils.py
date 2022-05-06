@@ -967,7 +967,7 @@ class MiscHelpersTest(unittest.TestCase):
                 self.context = context
 
             def __call__(self):
-                return None
+                return
 
         provideAdapter(DummyLastModified)
 
@@ -1117,7 +1117,7 @@ class MiscHelpersTest(unittest.TestCase):
                 self.request = request
 
             def __call__(self):
-                return None
+                return
 
         provideAdapter(BarETag, name="bar")
 

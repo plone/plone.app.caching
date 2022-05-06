@@ -31,11 +31,11 @@ class UserID:
     def __call__(self):
         tool = queryUtility(IMembershipTool)
         if tool is None:
-            return None
+            return
 
         member = tool.getAuthenticatedMember()
         if member is None:
-            return None
+            return
 
         return member.getId()
 
@@ -54,14 +54,14 @@ class Roles:
     def __call__(self):
         tool = queryUtility(IMembershipTool)
         if tool is None:
-            return None
+            return
 
         if bool(tool.isAnonymousUser()):
             return "Anonymous"
 
         member = tool.getAuthenticatedMember()
         if member is None:
-            return None
+            return
 
         return ";".join(sorted(member.getRolesInContext(getContext(self.published))))
 
@@ -104,7 +104,7 @@ class UserLanguage:
             (context, self.request), name="plone_portal_state"
         )
         if portal_state is None:
-            return None
+            return
         return portal_state.default_language()
 
 
@@ -122,7 +122,7 @@ class LastModified:
     def __call__(self):
         lastModified = getLastModifiedAnnotation(self.published, self.request)
         if lastModified is None:
-            return None
+            return
         return str(time.mktime(lastModified.utctimetuple()))
 
 
@@ -140,7 +140,7 @@ class CatalogCounter:
     def __call__(self):
         catalog = queryUtility(ICatalogTool)
         if catalog is None:
-            return None
+            return
         return str(catalog.getCounter())
 
 
@@ -161,7 +161,7 @@ class ObjectLocked:
             (context, self.request), name="plone_context_state"
         )
         if context_state is None:
-            return None
+            return
         return "1" if context_state.is_locked() else "0"
 
 
@@ -179,7 +179,7 @@ class Skin:
 
         portal_skins = getToolByName(context, "portal_skins", None)
         if portal_skins is None:
-            return None
+            return
 
         requestVariable = portal_skins.getRequestVarname()
         if requestVariable in self.request:
@@ -192,7 +192,7 @@ class Skin:
 @adapter(Interface, Interface)
 class AnonymousOrRandom:
     """The ``anonymousOrRandom`` etag component. This is normally added
-    implicitly by the ``anonOnly`` setting. It will return None for anonymous
+    implicitly by the ``anonOnly`` setting. It will return for anonymous
     users, but a random number for logged-in ones. The idea is to force a
     re-fetch of a page every time for logged-in users.
     """
@@ -204,9 +204,9 @@ class AnonymousOrRandom:
     def __call__(self):
         tool = queryUtility(IMembershipTool)
         if tool is None:
-            return None
+            return
         if bool(tool.isAnonymousUser()):
-            return None
+            return
         return f"{time.time()}{random.randint(0, 1000)}"
 
 

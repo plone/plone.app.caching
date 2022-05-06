@@ -163,11 +163,11 @@ class DiscussionItemPurgePaths:
 
         plone_utils = getToolByName(self.context, "plone_utils", None)
         if plone_utils is None:
-            return None
+            return
 
         thread = plone_utils.getDiscussionThread(self.context)
         if not thread:
-            return None
+            return
 
         return thread[0]
 

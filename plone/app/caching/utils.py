@@ -53,7 +53,7 @@ def getObjectDefaultView(context):
             pass
 
     if not IDynamicType.providedBy(context):
-        return None
+        return
 
     fti = context.getTypeInfo()
     try:
@@ -62,7 +62,7 @@ def getObjectDefaultView(context):
         action = fti.getActionInfo("object/view")["url"].split("/")[-1]
     except ValueError:
         # If the action doesn't exist, stop
-        return None
+        return
 
     # Try resolving method aliases because we need a real template_id here
     if action:
