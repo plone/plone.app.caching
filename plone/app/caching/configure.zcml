@@ -1,8 +1,11 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:zcml="http://namespaces.zope.org/zcml"
+    xmlns:meta="http://namespaces.zope.org/meta"
     i18n_domain="plone"
     >
+
+  <meta:provides feature="plone-app-caching-3" />
 
   <include
       package="z3c.zcmlhook"

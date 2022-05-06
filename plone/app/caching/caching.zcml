@@ -133,47 +133,6 @@
       ruleset="plone.content.file"
       />
 
-  <!-- plone.restapi content -->
-  <configure zcml:condition="installed plone.restapi">
-
-    <include package="plone.restapi" />
-
-    <cache:ruleset
-        for="plone.restapi.services.discussion.conversation.CommentsGet"
-        ruleset="plone.content.itemView"
-        />
-
-    <cache:ruleset
-        for="plone.restapi.services.actions.get.ActionsGet"
-        ruleset="plone.content.dynamic"
-        />
-    <cache:ruleset
-        for="plone.restapi.services.breadcrumbs.get.BreadcrumbsGet"
-        ruleset="plone.content.dynamic"
-        />
-    <cache:ruleset
-        for="plone.restapi.services.content.get.ContentGet"
-        ruleset="plone.content.dynamic"
-        />
-    <cache:ruleset
-        for="plone.restapi.services.multilingual.pam.TranslationInfo"
-        ruleset="plone.content.dynamic"
-        />
-    <cache:ruleset
-        for="plone.restapi.services.navigation.get.NavigationGet"
-        ruleset="plone.content.dynamic"
-        />
-    <cache:ruleset
-        for="plone.restapi.services.querystring.get.QuerystringGet"
-        ruleset="plone.content.dynamic"
-        />
-    <cache:ruleset
-        for="plone.restapi.services.search.get.SearchGet"
-        ruleset="plone.content.dynamic"
-        />
-
-  </configure>
-
   <!-- Paths to purge -->
 
   <!-- Standard CMF content -->
