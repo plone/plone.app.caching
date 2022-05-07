@@ -6,7 +6,6 @@ from plone.app.testing import IntegrationTesting
 from plone.app.testing import PloneSandboxLayer
 from plone.cachepurging.interfaces import IPurger
 from plone.protect.authenticator import _getKeyring
-from plone.restapi.testing import PLONE_RESTAPI_DX_PAM_FIXTURE
 from plone.testing import z2
 from zope.component import getUtility
 from zope.component import provideUtility
@@ -63,13 +62,7 @@ class PloneAppCaching(PloneAppCachingBase):
     defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
 
-class PloneAppCachingRestAPI(PloneAppCachingBase):
-
-    defaultBases = (PLONE_RESTAPI_DX_PAM_FIXTURE,)
-
-
 PLONE_APP_CACHING_FIXTURE = PloneAppCaching()
-PLONE_APP_CACHING_RESTAPI_FIXTURE = PloneAppCachingRestAPI()
 PLONE_APP_CACHING_INTEGRATION_TESTING = IntegrationTesting(
     bases=(PLONE_APP_CACHING_FIXTURE,),
     name="PloneAppCaching:Integration",
@@ -77,11 +70,6 @@ PLONE_APP_CACHING_INTEGRATION_TESTING = IntegrationTesting(
 PLONE_APP_CACHING_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(PLONE_APP_CACHING_FIXTURE,),
     name="PloneAppCaching:Functional",
-)
-
-PLONE_APP_CACHING_FUNCTIONAL_RESTAPI_TESTING = FunctionalTesting(
-    bases=(PLONE_APP_CACHING_RESTAPI_FIXTURE, z2.ZSERVER_FIXTURE),
-    name="PloneAppCachingRestAPI:Functional",
 )
 
 
