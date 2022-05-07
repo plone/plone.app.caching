@@ -154,7 +154,7 @@ class TestLastModified(unittest.TestCase):
             def modified(self):
                 if self._mod is not None:
                     return DateTime.DateTime(self._mod)
-                return None
+                return
 
         d = Dummy()
 

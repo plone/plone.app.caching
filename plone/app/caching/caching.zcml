@@ -27,15 +27,6 @@
       directory="profiles/without-caching-proxy"
       />
 
-  <genericsetup:registerProfile
-      name="with-caching-proxy-splitviews"
-      title="With caching proxy (and split-view caching)"
-      description="An example profile for a caching proxy setup with split-view caching enabled."
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      for="plone.app.caching.interfaces.ICacheProfiles"
-      directory="profiles/with-caching-proxy-splitviews"
-      />
-
   <!-- Default caching ruleset types
          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 

@@ -12,11 +12,12 @@ We have endpoints following classic `plone.content.itemView` content and do not 
 Those can be handled with the default rules, including purge.
 
 There are others delivering dynamic content, like search, impossible to purge.
-Those shall be cached using a shorttime cache (like some seconds to some minutes.
+Those shall be cached using a shorttime cache (like some seconds to some minutes).
 
-A rulesetType will be introduced called `plone.content.dynamic`.
-It will is similar to  be configured to cache by default in browser 15sec, in caching-proxy 60 seconds.
-Its goal is primary to reduce the load/peak-load on the server. Also, it reduces the impact of loading the same endpoint more than one time.
+This get covered by the rulesetType `plone.content.dynamic`.
+It is configured to cache by default in browser 10sec, in caching-proxy 60 seconds.
+Its goal is primary to reduce the load/peak-load on the server.
+Also, it reduces the impact of loading the same endpoint more than one time in one page.
 
 
 plone.restapi GET endpoints

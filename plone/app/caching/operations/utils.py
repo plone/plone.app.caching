@@ -251,7 +251,7 @@ def cacheInRAM(
 
     annotations = IAnnotations(request, None)
     if annotations is None:
-        return None
+        return
 
     key = getRAMCacheKey(request, etag=etag, lastModified=lastModified)
 
@@ -479,7 +479,7 @@ def getContext(
         published = published.__parent__
 
     if not checkType(published):
-        return None
+        return
 
     return published
 
@@ -508,10 +508,10 @@ def parseDateTime(str):
     try:
         dt = dateutil.parser.parse(str)
     except ValueError:
-        return None
+        return
 
     if not dt:
-        return None
+        return
 
     if dt.tzinfo is None:
         dt = datetime.datetime(
@@ -534,7 +534,7 @@ def getLastModifiedAnnotation(published, request, lastModified=True):
     """
 
     if not lastModified:
-        return None
+        return
 
     annotations = IAnnotations(request, None)
     if annotations is not None:
@@ -558,15 +558,15 @@ def getLastModified(published, lastModified=True):
     """
 
     if not lastModified:
-        return None
+        return
 
     lastModified = ILastModified(published, None)
     if lastModified is None:
-        return None
+        return
 
     dt = lastModified()
     if dt is None:
-        return None
+        return
 
     if dt.tzinfo is None:
         dt = datetime.datetime(
@@ -593,8 +593,7 @@ def getExpiration(maxage):
     now = datetime.datetime.now()
     if maxage > 0:
         return now + datetime.timedelta(seconds=maxage)
-    else:
-        return now - datetime.timedelta(days=3650)
+    return now - datetime.timedelta(days=3650)
 
 
 def getETagAnnotation(published, request, keys=(), extraTokens=()):
@@ -603,7 +602,7 @@ def getETagAnnotation(published, request, keys=(), extraTokens=()):
     """
 
     if not keys and not extraTokens:
-        return None
+        return
 
     annotations = IAnnotations(request, None)
     if annotations is not None:
@@ -632,7 +631,7 @@ def getETag(published, request, keys=(), extraTokens=()):
     All tokens will be concatenated into an ETag string, separated by pipes.
     """
     if not keys and not extraTokens:
-        return None
+        return
 
     tokens = []
     noTokens = True
@@ -654,7 +653,7 @@ def getETag(published, request, keys=(), extraTokens=()):
         tokens.append(token)
 
     if noTokens:
-        return None
+        return
 
     etag = "|" + "|".join(tokens)
     etag = etag.replace(",", ";")  # commas are bad in etags
@@ -727,10 +726,8 @@ def getRAMCache(globalKey=PAGE_CACHE_KEY):
     """
 
     chooser = queryUtility(ICacheChooser)
-    if chooser is None:
-        return None
-
-    return chooser(globalKey)
+    if chooser is not None:
+        return chooser(globalKey)
 
 
 def getRAMCacheKey(request, etag=None, lastModified=None):
@@ -835,10 +832,10 @@ def fetchFromRAMCache(
 
     cache = getRAMCache(globalKey)
     if cache is None:
-        return None
+        return
 
     key = getRAMCacheKey(request, etag=etag, lastModified=lastModified)
     if key is None:
-        return None
+        return
 
     return cache.get(key, default)

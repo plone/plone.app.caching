@@ -49,7 +49,7 @@ class TestETags(unittest.TestCase):
                 pass
 
             def getAuthenticatedMember(self):
-                return None
+                return
 
         provideUtility(DummyMembershipTool())
 
@@ -101,7 +101,7 @@ class TestETags(unittest.TestCase):
                 pass
 
             def getAuthenticatedMember(self):
-                return None
+                return
 
             def isAnonymousUser(self):
                 return True
@@ -215,7 +215,7 @@ class TestETags(unittest.TestCase):
                 self.context = context
 
             def __call__(self):
-                return None
+                return
 
         provideAdapter(DummyLastModified)
 

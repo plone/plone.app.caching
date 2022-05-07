@@ -124,7 +124,7 @@ class BaseCaching:
 
         # Check for cache stop request variables
         if cacheStop(self.request, rulename):
-            return None
+            return
 
         # Check if this should be a 304 response
         if not isModified(self.request, etag=etag, lastModified=lastModified):
@@ -151,8 +151,6 @@ class BaseCaching:
                     return cachedResponse(
                         self.published, self.request, response, *cached
                     )
-
-        return None
 
     def modifyResponse(self, rulename, response, class_=None):
         options = lookupOptions(class_ or self.__class__, rulename)
@@ -381,7 +379,7 @@ class NoCaching:
         self.request = request
 
     def interceptResponse(self, rulename, response):
-        return None
+        return
 
     def modifyResponse(self, rulename, response):
         doNotCache(self.published, self.request, response)

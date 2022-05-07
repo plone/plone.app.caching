@@ -1,21 +1,16 @@
 Caching profiles
 ----------------
 
-All persistent configuration for the caching machinery is stored in the
-configuration registry, as managed by ``plone.app.registry``. This can be
-modified using the ``registry.xml`` GenericSetup import step. The *Import
-settings* tab of the control panel allows you to import these caching
-profiles.
+All persistent configuration for the caching machinery is stored in the configuration registry, as managed by ``plone.app.registry``.
+This can be modified using the ``registry.xml`` GenericSetup import step.
+The *Import settings* tab of the control panel allows you to import these caching profiles.
 
 
 Default caching profiles
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-``plone.app.caching`` includes three default caching profiles. Two of these
-profiles encapsulate the cache settings that are known to work well with a
-typical default Plone installation. The third is an example profile for a
-"split-view" caching setup (see the split-view discussion later in this
-document).
+``plone.app.caching`` includes three default caching profiles.
+Two of these  profiles encapsulate the cache settings that are known to work well with a typical default Plone installation.
 
 The three default caching profiles:
 
@@ -27,11 +22,6 @@ The three default caching profiles:
       Varnish.  The only difference from the "without caching proxy"
       profile are some settings to enable proxy caching of files/images
       in content space and content feeds.
-
-* **With caching proxy (and split-view caching)**
-      An example profile for a caching proxy setup with split-view
-      caching enabled.  This example requires a special proxy setup.
-
 
 Custom caching profiles
 ~~~~~~~~~~~~~~~~~~~~~~~
