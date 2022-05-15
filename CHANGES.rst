@@ -8,6 +8,32 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a14 (2022-05-15)
+---------------------
+
+Breaking changes:
+
+
+- Remove unmaintained Split-View profile.
+  [jensens] (#99)
+
+
+New features:
+
+
+- Move caching ruleset assignments from here to plone.restapi and add ZCML feature here.
+  [jensens] (#100)
+
+
+Bug fixes:
+
+
+- Minor overhaul, use plone.base, remove some Plone 5.2 imports, ...
+  [jensens] (#98)
+- Minor code cleanup and review/overhaul docs.
+  [jensens] (#99)
+
+
 3.0.0a13 (2022-04-05)
 ---------------------
 
