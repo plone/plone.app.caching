@@ -294,9 +294,7 @@ class ControlPanel(BaseView):
             ValueError,
             TypeError,
         ):
-            self.errors["ramCacheCleanupInterval"] = _(
-                "An integer is required.",
-            )
+            self.errors["ramCacheCleanupInterval"] = _("An integer is required.")
         else:
             if ramCacheMaxAge < 0:
                 self.errors["ramCacheCleanupInterval"] = _(
