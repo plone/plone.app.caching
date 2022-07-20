@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0b2 (2022-07-20)
+--------------------
+
+Bug fixes:
+
+
+- Remove trailing comma to avoid different default messages for the same msgid
+  [erral] (#102)
+
+
 3.0.0b1 (2022-06-23)
 --------------------
 
