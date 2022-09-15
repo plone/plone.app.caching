@@ -11,7 +11,7 @@ It builds on `z3c.caching <https://github.com/zopefoundation/z3c.caching>`_, `pl
 
 Version information:
 
-- Version 3.x requires Plone 6.0 or later. Plone 5.2 with Python 3 should work too.
+- Version 3.x requires Plone 6.0 or later.
 - Plone 5.2 release uses the version 2.x series.
 - Earlier Plone versions: use a release from 1.x series.
 
