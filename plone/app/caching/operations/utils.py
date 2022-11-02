@@ -302,7 +302,7 @@ def notModified(published, request, response, etag=None, lastModified=None):
     """
 
     if etag is not None:
-        response.setHeader("ETag", etag, literal=1)
+        response.setHeader("ETag", f'"{etag}"', literal=1)
 
     # Specs say that Last-Modified MUST NOT be included in a 304
     # and Cache-Control/Expires MUST NOT be included unless they
