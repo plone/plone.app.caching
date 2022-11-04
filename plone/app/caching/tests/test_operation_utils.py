@@ -529,7 +529,7 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
         body = notModified(published, request, response, etag=etag, lastModified=now)
 
         self.assertEqual("", body)
-        self.assertEqual(etag, response.getHeader("ETag", literal=1))
+        self.assertEqual('"|foo|bar|"', response.getHeader("ETag", literal=1))
         self.assertIsNone(response.getHeader("Last-Modified"))
         self.assertIsNone(response.getHeader("Expires"))
         self.assertIsNone(response.getHeader("Cache-Control"))
