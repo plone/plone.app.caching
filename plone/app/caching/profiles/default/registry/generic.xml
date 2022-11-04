@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
   <!-- Uncomment if showing "Generic caching" in the UI.
          Also see operations/configure.zcml

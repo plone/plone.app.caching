@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
   <!-- Weak caching -->
   <record name="plone.app.caching.weakCaching.etags">
@@ -7,8 +8,7 @@
       <value_type type="plone.registry.field.ASCIILine" />
       <required>False</required>
     </field>
-    <value>
-    </value>
+    <value />
   </record>
   <record name="plone.app.caching.weakCaching.lastModified">
     <field type="plone.registry.field.Bool">

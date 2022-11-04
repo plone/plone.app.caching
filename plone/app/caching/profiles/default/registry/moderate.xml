@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
   <!-- Moderate caching -->
   <record name="plone.app.caching.moderateCaching.smaxage">
@@ -15,8 +16,7 @@
       <value_type type="plone.registry.field.ASCIILine" />
       <required>False</required>
     </field>
-    <value>
-    </value>
+    <value />
   </record>
   <record name="plone.app.caching.moderateCaching.lastModified">
     <field type="plone.registry.field.Bool">
