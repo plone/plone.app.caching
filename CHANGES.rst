@@ -8,6 +8,15 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0 (2022-11-14)
+------------------
+
+Bug fixes:
+
+
+- Add missing quotation mark in Etag 304 Response [sverbois] (#104)
+
+
 3.0.0b2 (2022-07-20)
 --------------------
 
