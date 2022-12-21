@@ -177,7 +177,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         browser.open(self.portal["f1"]["d1"].absolute_url())
         # This should be a 304 response
         self.assertEqual("304 Not Modified", browser.headers["Status"])
-        self.assertEqual(b"", browser.contents)
+        self.assertEqual("", browser.contents)
 
         # Request the anonymous folder
         now = stable_now()
@@ -245,7 +245,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         )
         # This should be a 304 response
         self.assertEqual("304 Not Modified", browser.headers["Status"])
-        self.assertEqual(b"", browser.contents)
+        self.assertEqual("", browser.contents)
 
         # Edit the page to update the etag
         testText2 = "Testing... body two"
@@ -334,7 +334,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         )
         # This should be a 304 response
         self.assertEqual("304 Not Modified", browser.headers["Status"])
-        self.assertEqual(b"", browser.contents)
+        self.assertEqual("", browser.contents)
 
         # Request the authenticated rss feed
         now = stable_now()
@@ -421,7 +421,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         )
         # This should be a 304 response
         self.assertEqual("304 Not Modified", browser.headers["Status"])
-        self.assertEqual(b"", browser.contents)
+        self.assertEqual("", browser.contents)
 
         # Request an image scale
         now = stable_now()
@@ -471,7 +471,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         )
         # This should be a 304 response
         self.assertEqual("304 Not Modified", browser.headers["Status"])
-        self.assertEqual(b"", browser.contents)
+        self.assertEqual("", browser.contents)
 
         # Request a large datafile (over 64K) to test files that use
         # the "response.write()" function to initiate a streamed response.
