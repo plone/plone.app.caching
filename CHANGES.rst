@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.1 (2022-12-21)
+------------------
+
+Bug fixes:
+
+
+- Fix tests to work with the Zope security fix.
+  [maurits] (#106)
+
+
 2.1.0 (2021-02-16)
 ------------------
 
