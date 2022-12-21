@@ -69,6 +69,11 @@ class TestProfileWithCaching(unittest.TestCase):
     def tearDown(self):
         setRequest(None)
 
+    def assertBrowserEmpty(self, browser):
+        # assert that browser.contents is an empty bytes/string/unicode.
+        self.assertIsInstance(browser.contents, (six.binary_type, six.text_type))
+        self.assertFalse(browser.contents)
+
     def test_composite_viewsxx(self):
         # This is a clone of the same test for 'without-caching-proxy'
         # Can we just call that test from this context?
@@ -193,7 +198,7 @@ class TestProfileWithCaching(unittest.TestCase):
         browser.open(self.portal['f1']['d1'].absolute_url())
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual(b'', browser.contents)
+        self.assertBrowserEmpty(browser)
 
         # Request the anonymous folder
         now = stable_now()
@@ -261,7 +266,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual(b'', browser.contents)
+        self.assertBrowserEmpty(browser)
 
         # Edit the page to update the etag
         testText2 = 'Testing... body two'
@@ -354,7 +359,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual(b'', browser.contents)
+        self.assertBrowserEmpty(browser)
 
         # Request the authenticated rss feed
         now = stable_now()
@@ -484,7 +489,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual(b'', browser.contents)
+        self.assertBrowserEmpty(browser)
 
         # Request an image scale
         now = stable_now()
@@ -535,7 +540,7 @@ class TestProfileWithCaching(unittest.TestCase):
                          browser.headers['X-Cache-Operation'])
         # This should be a 304 response
         self.assertEqual('304 Not Modified', browser.headers['Status'])
-        self.assertEqual(b'', browser.contents)
+        self.assertBrowserEmpty(browser)
 
         # Request a large datafile (over 64K) to test files that use
         # the "response.write()" function to initiate a streamed response.
