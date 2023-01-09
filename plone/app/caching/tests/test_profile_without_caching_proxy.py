@@ -177,7 +177,11 @@ class TestProfileWithoutCaching(unittest.TestCase):
         browser.open(self.portal["f1"]["d1"].absolute_url())
         # This should be a 304 response
         self.assertEqual("304 Not Modified", browser.headers["Status"])
-        self.assertEqual("", browser.contents)
+        # We MUST have an empty byte, not text, otherwise it is an indication that we
+        # get a possibly wrong Content-Type in a 304 status.
+        # See https://github.com/zopefoundation/Zope/issues/1089.
+        self.assertEqual(b"", browser.contents)
+        self.assertFalse(browser.headers["Content-Type"])
 
         # Request the anonymous folder
         now = stable_now()
@@ -245,7 +249,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
         )
         # This should be a 304 response
         self.assertEqual("304 Not Modified", browser.headers["Status"])
-        self.assertEqual("", browser.contents)
+        self.assertEqual(b"", browser.contents)
+        self.assertFalse(browser.headers["Content-Type"])
 
         # Edit the page to update the etag
         testText2 = "Testing... body two"
@@ -334,7 +339,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
         )
         # This should be a 304 response
         self.assertEqual("304 Not Modified", browser.headers["Status"])
-        self.assertEqual("", browser.contents)
+        self.assertEqual(b"", browser.contents)
+        self.assertFalse(browser.headers["Content-Type"])
 
         # Request the authenticated rss feed
         now = stable_now()
@@ -421,7 +427,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
         )
         # This should be a 304 response
         self.assertEqual("304 Not Modified", browser.headers["Status"])
-        self.assertEqual("", browser.contents)
+        self.assertEqual(b"", browser.contents)
+        self.assertFalse(browser.headers["Content-Type"])
 
         # Request an image scale
         now = stable_now()
@@ -471,7 +478,8 @@ class TestProfileWithoutCaching(unittest.TestCase):
         )
         # This should be a 304 response
         self.assertEqual("304 Not Modified", browser.headers["Status"])
-        self.assertEqual("", browser.contents)
+        self.assertEqual(b"", browser.contents)
+        self.assertFalse(browser.headers["Content-Type"])
 
         # Request a large datafile (over 64K) to test files that use
         # the "response.write()" function to initiate a streamed response.
