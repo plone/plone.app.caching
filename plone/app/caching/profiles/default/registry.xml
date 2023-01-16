@@ -29,6 +29,7 @@
           <element key="file_view">plone.content.itemView</element>
           <element key="image_view">plone.content.itemView</element>
           <element key="image_view_fullscreen">plone.content.itemView</element>
+          <element key="GET_application_json_">plone.content.folderView</element>
         </value>
     </record>
 
