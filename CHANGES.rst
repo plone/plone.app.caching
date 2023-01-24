@@ -8,6 +8,28 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0 (2023-01-24)
+------------------
+2.2.0 (2023-01-24)
+------------------
+
+New features:
+
+
+- Apply weak caching to GET requests of content with application/json.
+  See `plone.rest issue 73 <https://github.com/plone/plone.rest/issues/73>`_.
+  [maurits] (#73)
+
+
+Bug fixes:
+
+
+- Revert changes to tests to work with the Zope security fix.
+  We must have an empty byte, not text, otherwise it is an indication that we get a possibly wrong Content-Type in a 304 status.
+  See `Zope issue 1089 <https://github.com/zopefoundation/Zope/issues/1089>`_.
+  [maurits] (#1089)
+
+
 2.1.1 (2022-12-21)
 ------------------
 
