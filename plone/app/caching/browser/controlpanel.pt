@@ -199,7 +199,7 @@
 
                             <div tal:replace="error" tal:condition="error" />
 
-                            <select class="form-control"
+                            <select class="form-select"
                                     size="6" multiple="multiple" id="purgedContentTypes" name="purgedContentTypes:list">
                                 <option
                                     tal:repeat="contentType view/contentTypes"
@@ -444,7 +444,7 @@
                                             <p class="form-text" tal:content="ruleType/description" i18n:translate=""/>
                                         </td>
                                         <td tal:define="selected python:request.get('operations', view.operationMapping).get(ruleType['safeName'], None)">
-                                            <select class="form-control"
+                                            <select class="form-select"
                                                 size="1"
                                                 tal:attributes="id   string:operation-${ruleType/name};
                                                                 name string:operations.${ruleType/safeName}:record;">
@@ -522,7 +522,7 @@
                                             </td>
                                             <td tal:define="selected python:request.get('contenttypes', view.reverseContentTypeMapping).get(ruleType['safeName'], [])">
                                                 <div class="invalid-feedback" tal:omit-tag="not:contentTypeError">
-                                                    <select class="form-control"
+                                                    <select class="form-select"
                                                         size="6"
                                                         multiple="multiple"
                                                         tal:attributes="id   string:contenttypes-${ruleType/name};
