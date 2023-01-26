@@ -8,6 +8,20 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.2 (2023-01-26)
+------------------
+
+Bug fixes:
+
+
+- Correct Bootstrap classes for `<select />` in controlpanel.
+  [petschki] (#112)
+- Revert changes to tests to work with the Zope security fix.
+  We must have an empty byte, not text, otherwise it is an indication that we get a possibly wrong Content-Type in a 304 status.
+  See `Zope issue 1089 <https://github.com/zopefoundation/Zope/issues/1089>`_.
+  [maurits] (#1089)
+
+
 3.0.1 (2022-12-21)
 ------------------
 
