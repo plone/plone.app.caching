@@ -13,7 +13,6 @@ from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.caching.interfaces import ICacheSettings
 from plone.registry.interfaces import IRegistry
 from plone.testing.z2 import Browser
-from Products.CMFCore.FSFile import FSFile
 from Products.CMFCore.utils import getToolByName
 from zope.component import getUtility
 from zope.globalrequest import setRequest
@@ -22,7 +21,6 @@ import datetime
 import dateutil.parser
 import dateutil.tz
 import io
-import os
 import transaction
 import unittest
 
