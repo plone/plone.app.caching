@@ -3,3 +3,10 @@
 [meta]
 template = "default"
 commit-id = "78307cdf"
+
+[dependencies]
+mappings = [
+    "Zope = ['OFS', 'Products.Five', 'Products.PageTemplates', 'ZPublisher']",
+    "python-dateutil = ['dateutil']",
+    ]
+ignores = "['zope.dublincore']"
