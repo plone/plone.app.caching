@@ -2,7 +2,7 @@
 # https://github.com/plone/meta/tree/master/config/default
 [meta]
 template = "default"
-commit-id = "78307cdf"
+commit-id = "0e4e67b6"
 
 [dependencies]
 mappings = [
