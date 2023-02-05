@@ -720,7 +720,7 @@ class CacheCheckHelpersTest(unittest.TestCase):
         headers need to be updated with the new config. Additionally,
         last modified may be attached to the request header, but
         If-None-Match always takes precedence over these headers and
-        therefor they should be ignored.
+        therefore they should be ignored.
         """
         from plone.app.caching.operations.utils import isModified
 

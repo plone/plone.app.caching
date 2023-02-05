@@ -245,7 +245,7 @@ New features:
   [jensens] (66-1)
 - Support for *plone.restapi*.
   Define `cache:ruleset` assignments for anonymous accessible endpoints.
-  Attention: Relies on *Vary* header unless *plone.restapi* gives up content negotation.
+  Attention: Relies on *Vary* header unless *plone.restapi* gives up content negotiation.
   Latter may conflict with edge side cache not supporting the Vary header.
   [jensens] (66-2)
 
@@ -317,7 +317,7 @@ Bug fixes:
 Bug fixes:
 
 
-- fix typo "Purging is" and not "Purging ist" [vincentfretin] (#47)
+- fix typo [vincentfretin] (#47)
 - Fix controlpanel for Python 3
   [petschki] (#48)
 

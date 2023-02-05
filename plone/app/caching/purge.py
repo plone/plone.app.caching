@@ -153,7 +153,7 @@ class DiscussionItemPurgePaths:
             return
 
         for _name, pathProvider in getAdapters((root,), IPurgePaths):
-            # add absoute paths, which are not
+            # add absolute paths, which are not
             absolutePaths = pathProvider.getAbsolutePaths()
             if absolutePaths:
                 yield from absolutePaths

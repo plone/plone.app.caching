@@ -14,7 +14,7 @@ Introduction
 Installation
 ============
 
-From Plone 4.1 onwards, ``plone.app.caching`` is shipped as a dependancy of Plone. It is available from the Control Panel, but not enabled by default. You can enable it from the "add-ons" menu option.
+From Plone 4.1 onwards, ``plone.app.caching`` is shipped as a dependency of Plone. It is available from the Control Panel, but not enabled by default. You can enable it from the "add-ons" menu option.
 
 Installation on Plone 4.0
 =========================
