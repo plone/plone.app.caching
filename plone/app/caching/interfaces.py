@@ -76,7 +76,7 @@ class IETagValue(Interface):
     """ETag component builder
 
     Register a named multi-adapter from ``(published, request)`` to this
-    interface to provide the values for ETag compnents. Various caching
+    interface to provide the values for ETag components. Various caching
     operations will look up such adapters to compose an ETag value. The
     adapter name is used in options configuring those components.
     """

@@ -6,7 +6,6 @@ from plone.app.testing import IntegrationTesting
 from plone.app.testing import PloneSandboxLayer
 from plone.cachepurging.interfaces import IPurger
 from plone.protect.authenticator import _getKeyring
-from plone.testing import z2
 from zope.component import getUtility
 from zope.component import provideUtility
 from zope.interface import implementer

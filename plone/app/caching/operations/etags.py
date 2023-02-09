@@ -3,17 +3,17 @@ from Acquisition import aq_inner
 from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
+from plone.base.utils import safe_hasattr
 from Products.CMFCore.interfaces import ICatalogTool
 from Products.CMFCore.interfaces import IMembershipTool
 from Products.CMFCore.utils import getToolByName
-from plone.base.utils import safe_hasattr
+from Products.CMFPlone.resources.utils import get_override_directory
+from Products.CMFPlone.resources.utils import PRODUCTION_RESOURCE_DIRECTORY
 from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.interface import implementer
 from zope.interface import Interface
-from Products.CMFPlone.resources.utils import get_override_directory
-from Products.CMFPlone.resources.utils import PRODUCTION_RESOURCE_DIRECTORY
 
 import random
 import time

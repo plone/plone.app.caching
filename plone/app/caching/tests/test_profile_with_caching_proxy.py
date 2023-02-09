@@ -106,9 +106,6 @@ class TestProfileWithCaching(unittest.TestCase):
         # - set skin?  Maybe
         # - leave status unlocked
         #
-
-        import transaction
-
         transaction.commit()
 
         # Request the authenticated folder
@@ -290,8 +287,6 @@ class TestProfileWithCaching(unittest.TestCase):
         )
         self.portal["f1"]["d1"].reindexObject()
 
-        import transaction
-
         transaction.commit()
 
         # Request the anonymous page again -- to test expiration of 304 and
@@ -318,8 +313,6 @@ class TestProfileWithCaching(unittest.TestCase):
         self.syndication = getToolByName(self.portal, "portal_syndication")
         self.syndication.editProperties(isAllowed=True)
         self.syndication.enableSyndication(self.portal)
-
-        import transaction
 
         transaction.commit()
 
@@ -427,8 +420,6 @@ class TestProfileWithCaching(unittest.TestCase):
         self.portal["f1"]["i1"].image = test_image()
         self.portal["f1"]["i1"].reindexObject()
 
-        import transaction
-
         transaction.commit()
 
         # Request the image with Manager role
@@ -476,8 +467,6 @@ class TestProfileWithCaching(unittest.TestCase):
 
         # Publish the folder
         self.portal.portal_workflow.doActionFor(self.portal["f1"], "publish")
-
-        import transaction
 
         transaction.commit()
 
@@ -534,8 +523,6 @@ class TestProfileWithCaching(unittest.TestCase):
         # This is a clone of the same test for 'without-caching-proxy'
         # Can we just call that test from this context?
 
-        import transaction
-
         transaction.commit()
 
         # Request a skin image
@@ -580,8 +567,6 @@ class TestProfileWithCaching(unittest.TestCase):
         self.portal.manage_addFile(
             "bigfile", file=BytesIO(s), content_type="application/octet-stream"
         )
-
-        import transaction
 
         transaction.commit()
 

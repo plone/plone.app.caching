@@ -2,7 +2,7 @@ from Products.CMFCore.utils import getToolByName
 
 
 def enableExplicitMode():
-    """ZCML startup hook to put the ruleset registry into explict mode.
+    """ZCML startup hook to put the ruleset registry into explicit mode.
     This means we require people to declare ruleset types before using them.
     """
     from z3c.caching.registry import getGlobalRulesetRegistry

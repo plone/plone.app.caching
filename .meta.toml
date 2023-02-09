@@ -1,0 +1,12 @@
+# Generated from:
+# https://github.com/plone/meta/tree/master/config/default
+[meta]
+template = "default"
+commit-id = "0e4e67b6"
+
+[dependencies]
+mappings = [
+    "Zope = ['OFS', 'Products.Five', 'Products.PageTemplates', 'ZPublisher']",
+    "python-dateutil = ['dateutil']",
+    ]
+ignores = "['zope.dublincore']"

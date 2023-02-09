@@ -393,7 +393,7 @@ def isModified(request, etag=None, lastModified=None):
     # served will return an If-None-Match header, but the site will not be
     # configured for etags. In this case, force a refresh to load the
     # latest headers. I interpret this as the spec rule that the
-    # etags do NOT match, and therefor we must not return a 304.
+    # etags do NOT match, and therefore we must not return a 304.
     if ifNoneMatch and etag is None:
         return True
 
@@ -821,7 +821,7 @@ def fetchFromRAMCache(
 
     ``lastModified`` is the last modified date for the content, which can
     potentially be used instead of etag if sufficient to ensure freshness.
-    Perhaps a rare occurance but it's here in case someone needs it.
+    Perhaps a rare occurrence but it's here in case someone needs it.
     Do not use this to cache binary responses (like images and file downloads)
     as Zope already caches most of the payload of these.
 
