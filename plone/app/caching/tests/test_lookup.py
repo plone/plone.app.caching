@@ -76,7 +76,6 @@ class DummyView(BrowserView):
 
 
 class TestContentItemLookup(unittest.TestCase):
-
     layer = IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
 
     def setUp(self):

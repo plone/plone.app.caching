@@ -40,7 +40,6 @@ def normalize_response_cache(value):
 
 
 class ResponseModificationHelpersTest(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def setUp(self):
@@ -392,7 +391,6 @@ class ResponseModificationHelpersTest(unittest.TestCase):
 
 
 class ResponseInterceptorHelpersTest(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def setUp(self):
@@ -537,7 +535,6 @@ class ResponseInterceptorHelpersTest(unittest.TestCase):
 
 
 class CacheCheckHelpersTest(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def setUp(self):
@@ -841,7 +838,6 @@ class CacheCheckHelpersTest(unittest.TestCase):
 
 
 class MiscHelpersTest(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def setUp(self):
@@ -1264,7 +1260,6 @@ class MiscHelpersTest(unittest.TestCase):
 
 
 class RAMCacheTest(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def setUp(self):

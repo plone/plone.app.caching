@@ -98,7 +98,6 @@ class DummyNotBrowserDefault(Explicit):
 
 
 class TestIsPurged(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def setUp(self):
@@ -155,7 +154,6 @@ class TestIsPurged(unittest.TestCase):
 
 
 class TestGetObjectDefaultPath(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def test_not_content(self):

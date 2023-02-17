@@ -399,7 +399,6 @@ def isModified(request, etag=None, lastModified=None):
 
     # Check the modification date
     if ifModifiedSince and lastModified is not None:
-
         # Attempt to get a date
 
         ifModifiedSince = ifModifiedSince.split(";")[0]

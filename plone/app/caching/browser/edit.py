@@ -75,7 +75,6 @@ class EditForm(form.Form):
         self.ruleset = ruleset
 
     def update(self):
-
         self.registry = getUtility(IRegistry)
 
         # If we were using plone.z3cform, this would be done with
@@ -170,10 +169,8 @@ class EditForm(form.Form):
         """Save changes in the given data dictionary to the registry."""
 
         for key, value in data.items():
-
             # Lazily create per-ruleset records if necessary
             if key not in self.registry.records:
-
                 # This should only ever happen if we have a not-yet-creted
                 # ruleset-specific record
                 assert self.rulesetName in key
@@ -195,7 +192,6 @@ class EditForm(form.Form):
                 self.registry[key] = value
 
     def cloneField(self, field):
-
         # XXX: The field may sometimes not have data for reasons known only
         # to Jim.
         try:

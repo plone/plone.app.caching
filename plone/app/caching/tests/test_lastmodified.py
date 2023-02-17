@@ -24,7 +24,6 @@ class FauxDataManager:
 
 
 class TestLastModified(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def setUp(self):
@@ -148,7 +147,6 @@ class TestLastModified(unittest.TestCase):
 
         @implementer(ICatalogableDublinCore)
         class Dummy:
-
             _mod = None
 
             def modified(self):
@@ -172,7 +170,6 @@ class TestLastModified(unittest.TestCase):
 
         @implementer(IDCTimes)
         class Dummy:
-
             _mod = None
 
             @property

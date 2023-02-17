@@ -37,7 +37,6 @@ class FauxPurger:
 
 class PloneAppCachingBase(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
-
         # Load ZCML
         import plone.app.caching
 
@@ -57,7 +56,6 @@ class PloneAppCachingBase(PloneSandboxLayer):
 
 
 class PloneAppCaching(PloneAppCachingBase):
-
     defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
 

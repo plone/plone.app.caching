@@ -304,7 +304,6 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual("200 OK", browser.headers["Status"].upper())
 
     def test_content_feeds(self):
-
         catalog = self.portal["portal_catalog"]
         skins_tool = self.portal["portal_skins"]
 
@@ -405,7 +404,6 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertIsNone(browser.headers.get("X-RAMCache"))
 
     def test_content_files(self):
-
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ("Manager",))
         self.portal.invokeFactory("Folder", "f1")
