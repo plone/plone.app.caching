@@ -59,9 +59,9 @@ If you want to install it in an existing Plone Site:
 
 ## Source Code
 
-Contributors, please read the document [Process for Plone core's development](https://docs.plone.org/develop/coredev/docs/index.html)
+Contributors, please read the document [Process for Plone core's development](https://5.docs.plone.org/develop/coredev/docs/index.html)
 
-Sources are at the [Plone code repository hosted at Github <https://github.com/plone/plone.app.caching>`_.
+Sources are at the [Plone code repository hosted at Github ](https://github.com/plone/plone.app.caching).
 
 ## This project is supported by
 
