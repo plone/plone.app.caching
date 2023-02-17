@@ -75,18 +75,3 @@ start: ## Start a Plone instance on localhost:8080
 .PHONY: lint
 lint: bin/pip  ## Lint codebase
 	bin/tox -e lint
-
-# Docs
-bin/sphinx-build: bin/pip
-	bin/pip install -r requirements-docs.txt
-
-.PHONY: build-docs
-build-docs: bin/sphinx-build  ## Build the documentation
-	./bin/sphinx-build \
-		-b html $(DOCS_DIR) "$(DOCS_DIR)/_build/html"
-
-.PHONY: livehtml
-livehtml: bin/sphinx-build  ## Rebuild Sphinx documentation on changes, with live-reload in the browser
-	./bin/sphinx-autobuild \
-		--ignore "*.swp" \
-		-b html $(DOCS_DIR) "$(DOCS_DIR)/_build/html"
