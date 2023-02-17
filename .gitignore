@@ -8,11 +8,14 @@ develop-eggs/
 downloads/
 eggs/
 include/
+instance/
 lib/
 parts/
 var/
 docs/Makefile
 docs/make.bat
 docs/doctrees
-docs/html
-
+docs/_build
+# mxdev
+constraints-mxdev.txt
+requirements-mxdev.txt

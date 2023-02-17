@@ -1,0 +1,49 @@
+# Control panel
+
+After installation, you will find a Caching control panel in Plone's site setup (Currently this panel is only available in the Classic UI).
+
+## Main Tabs
+
+This consists of four main tabs:
+
+### Change settings
+
+Where you can control caching behaviour
+
+### Import settings
+
+Where you can import pre-defined profiles of cache settings
+
+### Purge caching proxy
+
+Where you can manually purge content from a caching proxy.
+
+This tab only appears if you have purging enabled under *Change settings*.
+
+### RAM cache
+
+Where you can view statistics about and purge the RAM cache.
+
+## Settings Tab
+
+Under the settings tab, you will find four fieldsets:
+
+### General settings
+
+For global options such as turning caching on or off.
+
+### Caching proxies
+
+Where you can control Plone's use of a caching proxy such or Varnish or a CDN.
+
+### Caching operation mappings
+
+Where caching rulesets (hints about views and resources used for caching purposes) can be associated with caching operations.
+
+Those either intercept a request to return a cached response, or modifies a response to add cache control headers.
+
+This is also where rulesets for legacy page templates (created through the web or the  portal_skins tool) are configured.
+
+### Detailed settings
+
+Where you can configure parameters for individual caching operations.

@@ -1,10 +1,9 @@
-The RAM cache
--------------
+# The RAM cache
 
 In addition to caching content in users' browsers (through setting appropriate response headers) and a caching proxy, Plone can cache certain information in memory.
 This is done in two main ways:
 
-* Developers may use the ``plone.memoize`` package's ``ram`` module to cache the results of certain functions in RAM.
+* Developers may use the `plone.memoize` package's `ram` module to cache the results of certain functions in RAM.
   For example, some viewlets and portlets cache their rendered output in RAM for a time, alleviating the need to calculate them every time.
 
 * Some caching operations may cache an entire response in memory, so that  they can later intercept the request to return a cached response.
@@ -24,18 +23,18 @@ You can use the *RAM cache* tab in the caching control panel to view statistics 
 On the *Change settings* tab, you can also control the size of the cache, and the frequency with which it is purged of old items.
 
 
-Alternative RAM cache implementations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Alternative RAM cache implementations
 
-The RAM cache exposed through ``plone.memoize.ram`` is looked up via an ``ICacheChoser`` utility.
-The default implementation looks up a ``zope.ramcache.interfaces.ram.IRAMCache`` utility.
+The RAM cache exposed through `plone.memoize.ram` is looked up via an `ICacheChoser` utility.
+The default implementation looks up a `zope.ramcache.interfaces.ram.IRAMCache` utility.
 Plone installs a local such utility (to allows its settings to be persisted - the cache itself is not persistent), which is shared by all users of the cache.
 
-You can provide your own ``ICacheChooser`` utility to change this policy, by installing this as a local utility or overriding it in ``overrides.zcml``.
-One reason to do this may be to back the cache with a `memcached`_ server, which would allow a single cache to be shared among multiple Zope clients.
+You can provide your own `ICacheChooser` utility to change this policy, by installing this as a local utility or overriding it in `overrides.zcml`.
+One reason to do this may be to back the cache with a [memcached](https://memcached.org/) server, which would allow a single cache to be shared among multiple Zope clients.
 
-Below is a sketch of such a cache chooser, courtesy of Wojciech Lichota::
+Below is a sketch of such a cache chooser, courtesy of Wojciech Lichota:
 
+```python
     from plone.memoize.interfaces import ICacheChooser
     from plone.memoize.ram import MemcacheAdapter
     from pylibmc import Client
@@ -43,7 +42,7 @@ Below is a sketch of such a cache chooser, courtesy of Wojciech Lichota::
     from zope.interface import implementer
 
     @implementer(ICacheChooser)
-    class MemcachedCacheChooser(object):
+    class MemcachedCacheChooser():
         _v_thread_local = local()
 
         def getClient(self):
@@ -62,9 +61,10 @@ Below is a sketch of such a cache chooser, courtesy of Wojciech Lichota::
             Create new adapter for plone.memoize.ram.
             """
             return MemcacheAdapter(client=self.getClient(), globalkey=fun_name)
+```
 
-You could install this with the following lines in an overrides.zcml::
+You could install this with the following lines in an overrides.zcml:
 
+```xml
     <utility factory=".memcached.MemcachedCacheChooser" />
-
-.. _memcached: http://memcached.org
+```
