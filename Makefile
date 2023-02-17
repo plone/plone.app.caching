@@ -46,7 +46,7 @@ help: ## This help message
 bin/pip:
 	@echo "$(GREEN)==> Setup Virtual Env$(RESET)"
 	$(PYTHON) -m venv .
-	bin/pip install -U "pip" "wheel" "cookiecutter" "mxdev"
+	bin/pip install -U "pip" "wheel" "cookiecutter" "mxdev" "tox"
 
 .PHONY: config
 config: bin/pip  ## Create instance configuration
@@ -71,10 +71,10 @@ clean: ## Remove old virtualenv and creates a new one
 start: ## Start a Plone instance on localhost:8080
 	PYTHONWARNINGS=ignore ./bin/runwsgi instance/etc/zope.ini
 
-# Tests
-.PHONY: test
-test: ## run tests
-	bin/pytest --disable-warnings
+# Lint
+.PHONY: lint
+lint: bin/pip  ## Lint codebase
+	bin/tox -e lint
 
 # Docs
 bin/sphinx-build: bin/pip

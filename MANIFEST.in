@@ -1,6 +1,9 @@
 include *.txt
-include *.rst
+include *.md
+include *.yaml
 include pyproject.toml
+include Makefile
+include mx.ini
 
 recursive-include docs *
 recursive-include plone *
@@ -8,4 +11,7 @@ recursive-include plone *
 global-exclude *pyc
 
 recursive-exclude news *
+recursive-exclude docs/_build *
 exclude news
+exclude constraints-mxdev.txt
+exclude requirements-mxdev.txt
