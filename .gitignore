@@ -12,11 +12,6 @@ instance/
 lib/
 parts/
 var/
-# Docs
-docs/Makefile
-docs/make.bat
-docs/doctrees
-docs/_build
 # Tox
 .tox
 # mxdev
