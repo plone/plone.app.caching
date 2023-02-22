@@ -9,6 +9,20 @@
 
 <!-- towncrier release notes start -->
 
+## 3.0.3 (2023-02-22)
+
+
+### Bug fixes:
+
+- Declare dependencies.
+  [gforcada] #1
+
+
+### Documentation:
+
+- Convert README and CHANGES to markdown.  [ericof] #114
+
+
 ## 3.0.2 (2023-01-26)
 
 ### Bug fixes:
