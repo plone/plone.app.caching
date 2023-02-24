@@ -10,3 +10,6 @@ mappings = [
     "python-dateutil = ['dateutil']",
     ]
 ignores = "['zope.dublincore']"
+
+[codespell]
+additional-ignores = "discreet,ordner"

@@ -46,3 +46,6 @@ target-version = ["py38"]
 ignore-packages = ['zope.dublincore']
 Zope = ['OFS', 'Products.Five', 'Products.PageTemplates', 'ZPublisher']
 python-dateutil = ['dateutil']
+
+[tool.codespell]
+ignore-words-list = "discreet,ordner"
