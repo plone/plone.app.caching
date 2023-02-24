@@ -1,14 +1,21 @@
+from pathlib import Path
 from setuptools import find_packages
 from setuptools import setup
 
 
-version = "3.0.3.dev0"
+version = "3.0.4.dev0"
+
+long_description = f"""
+{Path("README.md").read_text()}\n
+{Path("CHANGES.md").read_text()}\n
+"""
 
 setup(
     name="plone.app.caching",
     version=version,
     description="Plone UI and default rules for plone.caching/z3c.caching",
-    long_description=(open("README.rst").read() + "\n" + open("CHANGES.rst").read()),
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",

@@ -8,11 +8,12 @@ develop-eggs/
 downloads/
 eggs/
 include/
+instance/
 lib/
 parts/
 var/
-docs/Makefile
-docs/make.bat
-docs/doctrees
-docs/html
-
+# Tox
+.tox
+# mxdev
+constraints-mxdev.txt
+requirements-mxdev.txt

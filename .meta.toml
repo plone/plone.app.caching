@@ -15,7 +15,9 @@ ignores = "['zope.dublincore']"
 additional-ignores = [
     ".tox",
     "constraints-mxdev.txt",
-    "instance",
+    "instance.yaml",
+    "Makefile",
+    "mx.ini",
     "requirements-mxdev.txt",
     ]
 
