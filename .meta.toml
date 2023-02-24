@@ -11,5 +11,13 @@ mappings = [
     ]
 ignores = "['zope.dublincore']"
 
+[check-manifest]
+additional-ignores = [
+    ".tox",
+    "constraints-mxdev.txt",
+    "instance",
+    "requirements-mxdev.txt",
+    ]
+
 [codespell]
 additional-ignores = "discreet,ordner"
