@@ -42,10 +42,10 @@ profile = "plone"
 [tool.black]
 target-version = ["py38"]
 
+[tool.codespell]
+ignore-words-list = "discreet,ordner"
+
 [tool.dependencychecker]
 ignore-packages = ['zope.dublincore']
 Zope = ['OFS', 'Products.Five', 'Products.PageTemplates', 'ZPublisher']
 python-dateutil = ['dateutil']
-
-[tool.codespell]
-ignore-words-list = "discreet,ordner"
