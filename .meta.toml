@@ -2,7 +2,7 @@
 # https://github.com/plone/meta/tree/master/config/default
 [meta]
 template = "default"
-commit-id = "0e4e67b6"
+commit-id = "cbbcff93"
 
 [dependencies]
 mappings = [
@@ -10,3 +10,16 @@ mappings = [
     "python-dateutil = ['dateutil']",
     ]
 ignores = "['zope.dublincore']"
+
+[check-manifest]
+additional-ignores = [
+    ".tox",
+    "constraints-mxdev.txt",
+    "instance.yaml",
+    "Makefile",
+    "mx.ini",
+    "requirements-mxdev.txt",
+    ]
+
+[codespell]
+additional-ignores = "discreet,ordner"

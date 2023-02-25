@@ -175,7 +175,6 @@ class TestOperations(unittest.TestCase):
         # self.assertTrue('Cache-Control' in browser.headers)
 
     def test_auto_purge_content_types(self):
-
         setRoles(self.portal, TEST_USER_ID, ("Manager",))
 
         # Non-folder content

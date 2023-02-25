@@ -54,7 +54,6 @@ class ContentItemLookup:
         self.request = request
 
     def __call__(self):
-
         # 1. Attempt to look up a ruleset using the default lookup
         ruleset = lookup(self.published)
         if ruleset is not None:

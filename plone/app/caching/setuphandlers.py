@@ -13,7 +13,6 @@ def enableExplicitMode():
 
 
 def importVarious(context):
-
     if not context.readDataFile("plone.app.caching.txt"):
         return
 

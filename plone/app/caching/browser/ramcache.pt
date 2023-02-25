@@ -1,110 +1,143 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
-      xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-    lang="en"
-    metal:use-macro="context/prefs_main_template/macros/master"
-    i18n:domain="plone">
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      lang="en"
+      metal:use-macro="context/prefs_main_template/macros/master"
+      xml:lang="en"
+      i18n:domain="plone"
+>
 
-<body>
+  <body>
 
-<div metal:fill-slot="prefs_configlet_main">
+    <div metal:fill-slot="prefs_configlet_main">
 
-            <div class="autotabs">
-                <ul class="nav nav-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href=""
-                           tal:attributes="href string:${portal_url}/@@caching-controlpanel"
-                           i18n:translate="label_settings">Change settings</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link"
-                           href=""
-                           tal:attributes="href string:${portal_url}/@@caching-controlpanel-import"
-                           i18n:translate="label_import">Import settings</a>
-                      </li>
-                      <li tal:condition="view/purgingEnabled" class="nav-item">
-                        <a class="nav-link"
-                           href=""
-                           tal:attributes="href string:${portal_url}/@@caching-controlpanel-purge"
-                           i18n:translate="label_purging">Purge caching proxy</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link active"
-                           href=""
-                           tal:attributes="href string:${portal_url}/@@caching-controlpanel-ramcache"
-                           i18n:translate="label_ramcache">RAM cache</a>
-                      </li>
-                </ul>
-            </div>
+      <div class="autotabs">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link"
+               href=""
+               tal:attributes="
+                 href string:${portal_url}/@@caching-controlpanel;
+               "
+               i18n:translate="label_settings"
+            >Change settings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link"
+               href=""
+               tal:attributes="
+                 href string:${portal_url}/@@caching-controlpanel-import;
+               "
+               i18n:translate="label_import"
+            >Import settings</a>
+          </li>
+          <li class="nav-item"
+              tal:condition="view/purgingEnabled"
+          >
+            <a class="nav-link"
+               href=""
+               tal:attributes="
+                 href string:${portal_url}/@@caching-controlpanel-purge;
+               "
+               i18n:translate="label_purging"
+            >Purge caching proxy</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active"
+               href=""
+               tal:attributes="
+                 href string:${portal_url}/@@caching-controlpanel-ramcache;
+               "
+               i18n:translate="label_ramcache"
+            >RAM cache</a>
+          </li>
+        </ul>
+      </div>
 
-            <div metal:use-macro="context/global_statusmessage/macros/portal_message">
+      <div metal:use-macro="context/global_statusmessage/macros/portal_message">
             Portal status message
-            </div>
+      </div>
 
-            <div class="configlet">
+      <div class="configlet">
 
-                <h1 class="documentFirstHeading"
-                    i18n:translate="heading_ramcache_stats">RAM cache statistics</h1>
+        <h1 class="documentFirstHeading"
+            i18n:translate="heading_ramcache_stats"
+        >RAM cache statistics</h1>
 
-                <a id="setup-link" class="link-parent"
-                    tal:attributes="href string:${portal_url}/@@overview-controlpanel"
-                    i18n:translate="label_up_to_plone_setup">
+        <a class="link-parent"
+           id="setup-link"
+           tal:attributes="
+             href string:${portal_url}/@@overview-controlpanel;
+           "
+           i18n:translate="label_up_to_plone_setup"
+        >
                         Up to Site Setup
-                </a>
+        </a>
 
-                <p class="form-text"
-                    i18n:translate="description_ramcache_stats">
+        <p class="form-text"
+           i18n:translate="description_ramcache_stats"
+        >
                     The table below shows statistics for the default RAM
-                    cache. You can use the <em>Purge</em> button to manually
+                    cache. You can use the
+          <em>Purge</em>
+           button to manually
                     clear the cache if you suspect there are stale items there.
-                </p>
+        </p>
 
-                <form name="purge" tal:attributes="action string:${request/URL}" method="post"
-                    class="pat-formunloadalert"
-                    tal:define="errors view/errors">
+        <form class="pat-formunloadalert"
+              method="post"
+              name="purge"
+              tal:define="
+                errors view/errors;
+              "
+              tal:attributes="
+                action string:${request/URL};
+              "
+        >
 
-                  <table class="table table-striped table-responsive"
-                         tal:define="stats view/ramCache/getStatistics"
-                         summary="RAM cache statistics"
-                         i18n:attributes="summary heading_ramcache_stats;">
-                    <thead>
-                      <th i18n:translate="label_cache_key">Key</th>
-                      <th i18n:translate="label_cache_hits">Hits</th>
-                      <th i18n:translate="label_cache_misses">Misses</th>
-                      <th i18n:translate="label_cache_size_bytes">Size (bytes)</th>
-                      <th i18n:translate="label_cache_entries">Entries</th>
-                    </thead>
-                    <tbody>
-                      <tr tal:repeat="data stats">
-                        <td><span tal:content="data/path">&nbsp;</span></td>
-                        <td><span tal:content="data/hits">&nbsp;</span></td>
-                        <td><span tal:content="data/misses">&nbsp;</span></td>
-                        <td><span tal:content="data/size">&nbsp;</span></td>
-                        <td><span tal:content="data/entries">&nbsp;</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
+          <table class="table table-striped table-responsive"
+                 summary="RAM cache statistics"
+                 tal:define="
+                   stats view/ramCache/getStatistics;
+                 "
+                 i18n:attributes="summary heading_ramcache_stats;"
+          >
+            <thead>
+              <th i18n:translate="label_cache_key">Key</th>
+              <th i18n:translate="label_cache_hits">Hits</th>
+              <th i18n:translate="label_cache_misses">Misses</th>
+              <th i18n:translate="label_cache_size_bytes">Size (bytes)</th>
+              <th i18n:translate="label_cache_entries">Entries</th>
+            </thead>
+            <tbody>
+              <tr tal:repeat="data stats">
+                <td><span tal:content="data/path">&nbsp;</span></td>
+                <td><span tal:content="data/hits">&nbsp;</span></td>
+                <td><span tal:content="data/misses">&nbsp;</span></td>
+                <td><span tal:content="data/size">&nbsp;</span></td>
+                <td><span tal:content="data/entries">&nbsp;</span></td>
+              </tr>
+            </tbody>
+          </table>
 
-                    <div class="formControls">
-                        <button
-                            class="btn btn-primary"
-                            type="submit"
-                            name="form.button.Purge"
-                            value="Purge"
-                            i18n:attributes="value"
-                            i18n:translate=""
-                        >
+          <div class="formControls">
+            <button class="btn btn-primary"
+                    name="form.button.Purge"
+                    type="submit"
+                    value="Purge"
+                    i18n:attributes="value"
+                    i18n:translate=""
+            >
                           Purge
-                        </button>
-                    </div>
+            </button>
+          </div>
 
-                    <input tal:replace="structure context/@@authenticator/authenticator" />
+          <input tal:replace="structure context/@@authenticator/authenticator" />
 
-                </form>
-            </div>
+        </form>
+      </div>
 
-</div>
-</body>
+    </div>
+  </body>
 </html>

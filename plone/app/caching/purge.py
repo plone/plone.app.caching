@@ -160,7 +160,6 @@ class DiscussionItemPurgePaths:
 
     @memoize
     def _getRoot(self):
-
         plone_utils = getToolByName(self.context, "plone_utils", None)
         if plone_utils is None:
             return

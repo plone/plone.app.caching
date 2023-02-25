@@ -35,7 +35,6 @@ class TestOperationParameters(unittest.TestCase):
         setRequest(None)
 
     def test_anon_only(self):
-
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ("Manager",))
         self.portal.invokeFactory("Folder", "f1")

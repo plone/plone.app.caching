@@ -110,7 +110,6 @@ class ControlPanel(BaseView):
             self.editOperationName = name
 
             if self.editGlobal:
-
                 operation = queryUtility(
                     ICachingOperationType, name=self.editOperationName
                 )
@@ -163,7 +162,6 @@ class ControlPanel(BaseView):
                 )
 
     def processSave(self):
-
         form = self.request.form
 
         # Form data
@@ -215,7 +213,10 @@ class ControlPanel(BaseView):
                         contentType,
                     )
                     error_ruleset = contentTypeRulesetMapping[contentType]
-                    self.errors.setdefault("contenttypes", {},)[ruleset] = _(
+                    self.errors.setdefault(
+                        "contenttypes",
+                        {},
+                    )[ruleset] = _(
                         "Content type ${error_content_type} is already mapped to "
                         "the rule ${ruleset}.",
                         mapping={
@@ -237,7 +238,10 @@ class ControlPanel(BaseView):
                     continue
 
                 if template in templateRulesetMapping:
-                    self.errors.setdefault("templates", {},)[ruleset] = _(
+                    self.errors.setdefault(
+                        "templates",
+                        {},
+                    )[ruleset] = _(
                         "Template ${template} is already mapped to the rule "
                         "${ruleset}.",
                         mapping={
@@ -630,7 +634,6 @@ class RAMCache(BaseView):
                 self.processPurge()
 
     def processPurge(self):
-
         if self.ramCache is None:
             IStatusMessage(self.request).addStatusMessage(
                 _("RAM cache not installed."), "error"

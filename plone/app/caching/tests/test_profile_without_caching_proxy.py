@@ -56,7 +56,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         setRequest(None)
 
     def test_composite_views(self):
-
         catalog = self.portal["portal_catalog"]
         default_skin = self.portal["portal_skins"].default_skin
 
@@ -276,7 +275,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual("200 OK", browser.headers["Status"].upper())
 
     def test_content_feeds(self):
-
         catalog = self.portal["portal_catalog"]
         default_skin = self.portal["portal_skins"].default_skin
 
@@ -377,7 +375,6 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertIsNone(browser.headers.get("X-RAMCache"))
 
     def test_content_files(self):
-
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ("Manager",))
         self.portal.invokeFactory("Folder", "f1")

@@ -92,7 +92,6 @@ class FauxNonContent(Explicit):
 
 @implementer(IBrowserDefault)
 class FauxContent(FauxNonContent):
-
     portal_type = "testtype"
 
     def defaultView(self):
@@ -105,7 +104,6 @@ class FauxDiscussable(Explicit):
 
 
 class TestPurgeRedispatch(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def setUp(self):
@@ -182,7 +180,6 @@ class TestPurgeRedispatch(unittest.TestCase):
 
 
 class TestContentPurgePaths(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def test_no_default_view(self):
@@ -230,7 +227,6 @@ class TestContentPurgePaths(unittest.TestCase):
 
 
 class TestDiscussionItemPurgePaths(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def setUp(self):
@@ -319,11 +315,9 @@ class TestDiscussionItemPurgePaths(unittest.TestCase):
 
 
 class TestScalesPurgePaths(unittest.TestCase):
-
     layer = PLONE_APP_CACHING_FUNCTIONAL_TESTING
 
     def setUp(self):
-
         self.portal = self.layer["portal"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
         self.portal.invokeFactory("Folder", "media")
@@ -346,7 +340,6 @@ class TestScalesPurgePaths(unittest.TestCase):
         @implementer(IBehaviorAssignable)
         @adapter(IDocument)
         class TestingAssignable:
-
             enabled = [ILeadImageBehavior]
             name = "plone.leadimage"
 

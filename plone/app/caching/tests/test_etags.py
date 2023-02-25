@@ -31,7 +31,6 @@ class DummyPublished:
 
 
 class TestETags(unittest.TestCase):
-
     layer = UNIT_TESTING
 
     def setUp(self):
