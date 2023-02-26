@@ -178,7 +178,7 @@
                  i18n:translate="description_caching_proxies"
             >
                             High-performance sites will often place a caching reverse
-                            proxy such as Varnish or Squid in front of Zope. The caching
+                            proxy such as Varnish or a CDN in front of Zope. The caching
                             operations configured elsewhere on this screen can often take
                             advantage of such a proxy by instructing it to cache certain
                             content in a certain way, whilst passing requests for other
