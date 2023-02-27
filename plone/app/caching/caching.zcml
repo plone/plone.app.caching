@@ -12,7 +12,7 @@
   <genericsetup:registerProfile
       name="with-caching-proxy"
       title="With caching proxy"
-      description="Settings useful for setups with a caching proxy such as Squid or Varnish"
+      description="Settings useful for setups with a caching proxy such as Varnish or a CDN"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       for="plone.app.caching.interfaces.ICacheProfiles"
       directory="profiles/with-caching-proxy"
@@ -21,7 +21,7 @@
   <genericsetup:registerProfile
       name="without-caching-proxy"
       title="Without caching proxy"
-      description="Settings useful for setups without a caching proxy such as Squid or Varnish"
+      description="Settings useful for setups without a caching proxy such as Varnish or a CDN"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       for="plone.app.caching.interfaces.ICacheProfiles"
       directory="profiles/without-caching-proxy"
