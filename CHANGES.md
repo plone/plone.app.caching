@@ -9,6 +9,20 @@
 
 <!-- towncrier release notes start -->
 
+## 3.0.4 (2023-03-14)
+
+
+### Bug fixes:
+
+- Do not mention Squid but mentions CDNs in the descriptions. [jensens] #119
+
+
+### Internal:
+
+- Update configuration files.
+  [plone devs] 13d8d6c0, cbbcff93
+
+
 ## 3.0.3 (2023-02-22)
 
 
