@@ -4,6 +4,7 @@ from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
 from plone.base.utils import safe_hasattr
+from plone.locking.interfaces import ILockable
 from Products.CMFCore.interfaces import ICatalogTool
 from Products.CMFCore.interfaces import IMembershipTool
 from Products.CMFCore.utils import getToolByName
@@ -157,12 +158,16 @@ class ObjectLocked:
 
     def __call__(self):
         context = getContext(self.published)
-        context_state = queryMultiAdapter(
-            (context, self.request), name="plone_context_state"
-        )
-        if context_state is None:
-            return
-        return "1" if context_state.is_locked() else "0"
+        lock = ILockable(context)
+
+        if not lock or not lock.lock_info():
+            return "0"
+        lock_info = lock.lock_info()
+
+        if not lock_info:
+            return "0"
+
+        return lock_info[0]['token']
 
 
 @implementer(IETagValue)
