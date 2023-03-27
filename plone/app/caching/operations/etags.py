@@ -167,7 +167,7 @@ class ObjectLocked:
         if not lock_info:
             return "0"
 
-        return lock_info[0]['token']
+        return lock_info[0]["token"]
 
 
 @implementer(IETagValue)
