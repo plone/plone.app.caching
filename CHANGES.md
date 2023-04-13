@@ -9,6 +9,15 @@
 
 <!-- towncrier release notes start -->
 
+## 3.0.5 (2023-04-14)
+
+
+### Bug fixes:
+
+- Fix spelling error.
+  [gforcada] #124
+
+
 ## 3.0.4 (2023-03-14)
 
 
