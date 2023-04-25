@@ -92,6 +92,13 @@ class TestProfileWithoutCaching(unittest.TestCase):
         # - set the mod date on the resource registries?  Probably.
         transaction.commit()
 
+        # Since Plone 6.0.4 we have a modification date on the registry.
+        from Products.CMFPlone.resources.browser.resource import (
+            _RESOURCE_REGISTRY_MTIME,
+        )
+
+        mtime = str(getattr(self.registry, _RESOURCE_REGISTRY_MTIME))
+
         # Request the authenticated folder
         now = stable_now()
         browser = Browser(self.app)
@@ -108,7 +115,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|0|"'
+        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|0|{mtime}"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
@@ -123,7 +130,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|1|"'
+        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|1|{mtime}"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
 
         # Request the authenticated page
@@ -143,7 +150,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|"'
+        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|{mtime}"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
@@ -192,7 +199,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|0|"'
+        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|0|{mtime}"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
@@ -209,7 +216,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|"'
+        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|{mtime}"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
@@ -230,7 +237,7 @@ class TestProfileWithoutCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|"'
+        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|{mtime}"'
         self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
