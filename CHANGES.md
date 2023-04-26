@@ -9,6 +9,17 @@
 
 <!-- towncrier release notes start -->
 
+## 3.1.0 (2023-04-26)
+
+
+### New features:
+
+- Update the resourceRegistries ETag to use the config registry modification time.
+  This time is set since Plone 6.0.4.
+  Fixes `issue 93 <https://github.com/plone/plone.app.caching/issues/93>`_.
+  [maurits] #93
+
+
 ## 3.0.5 (2023-04-14)
 
 
