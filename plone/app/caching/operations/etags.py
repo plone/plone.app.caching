@@ -4,11 +4,10 @@ from plone.app.caching.interfaces import IETagValue
 from plone.app.caching.operations.utils import getContext
 from plone.app.caching.operations.utils import getLastModifiedAnnotation
 from plone.base.utils import safe_hasattr
+from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import ICatalogTool
 from Products.CMFCore.interfaces import IMembershipTool
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.resources.utils import get_override_directory
-from Products.CMFPlone.resources.utils import PRODUCTION_RESOURCE_DIRECTORY
 from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
@@ -17,6 +16,13 @@ from zope.interface import Interface
 
 import random
 import time
+
+
+try:
+    # available since Plone 6.0.4
+    from Products.CMFPlone.resources.browser.resource import _RESOURCE_REGISTRY_MTIME
+except ImportError:
+    _RESOURCE_REGISTRY_MTIME = None
 
 
 @implementer(IETagValue)
@@ -239,22 +245,15 @@ class ResourceRegistries:
         self.request = request
 
     def __call__(self):
-        context = getContext(self.published)
-        container = get_override_directory(context)
-        if PRODUCTION_RESOURCE_DIRECTORY not in container:
+        if _RESOURCE_REGISTRY_MTIME is None:
             return ""
-        production_folder = container[PRODUCTION_RESOURCE_DIRECTORY]
-        filename = "timestamp.txt"
-        if filename not in production_folder:
+        registry = queryUtility(IRegistry)
+        if registry is None:
             return ""
-        timestamp = production_folder.readFile(filename)
-        if not timestamp:
+        mtime = getattr(registry, _RESOURCE_REGISTRY_MTIME, None)
+        if mtime is None:
             return ""
-        # timestamp is in bytes, and we must return a string.
-        # On Python 2 this is the same, but not on Python 3.
-        if not isinstance(timestamp, str):
-            timestamp = timestamp.decode("utf-8")
-        return timestamp
+        return str(mtime)
 
 
 @implementer(IETagValue)

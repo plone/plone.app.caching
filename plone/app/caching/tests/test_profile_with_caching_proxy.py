@@ -73,12 +73,12 @@ class TestProfileWithCaching(unittest.TestCase):
         # Can we just call that test from this context?
 
         catalog = self.portal["portal_catalog"]
-        skins_tool = self.portal["portal_skins"]
+        default_skin = self.portal["portal_skins"].default_skin
 
         # Add folder content
         setRoles(self.portal, TEST_USER_ID, ("Manager",))
         self.portal.invokeFactory("Folder", "f1")
-        self.portal["f1"].title = "one"
+        self.portal["f1"].title = "Folder one"
         self.portal["f1"].description = "Folder one description"
         self.portal["f1"].reindexObject()
 
@@ -105,8 +105,15 @@ class TestProfileWithCaching(unittest.TestCase):
         # - turn on gzip?
         # - set skin?  Maybe
         # - leave status unlocked
-        #
+        # - set the mod date on the resource registries?  Probably.
         transaction.commit()
+
+        # Since Plone 6.0.4 we have a modification date on the registry.
+        from Products.CMFPlone.resources.browser.resource import (
+            _RESOURCE_REGISTRY_MTIME,
+        )
+
+        mtime = str(getattr(self.registry, _RESOURCE_REGISTRY_MTIME))
 
         # Request the authenticated folder
         now = stable_now()
@@ -124,10 +131,8 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        self.assertEqual(
-            f'"|test_user_1_|{catalog.getCounter()}|en|{skins_tool.default_skin}|0|0|"',
-            normalize_etag(browser.headers["ETag"]),
-        )
+        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|0|{mtime}"'
+        self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
         # Set the copy/cut cookie and then request the folder view again
@@ -141,10 +146,8 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        self.assertEqual(
-            f'"|test_user_1_|{catalog.getCounter()}|en|{skins_tool.default_skin}|0|1|"',
-            normalize_etag(browser.headers["ETag"]),
-        )
+        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|1|{mtime}"'
+        self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
 
         # Request the authenticated page
         now = stable_now()
@@ -163,10 +166,8 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        self.assertEqual(
-            f'"|test_user_1_|{catalog.getCounter()}|en|{skins_tool.default_skin}|0|"',
-            normalize_etag(browser.headers["ETag"]),
-        )
+        tag = f'"|test_user_1_|{catalog.getCounter()}|en|{default_skin}|0|{mtime}"'
+        self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
         # Request the authenticated page again -- to test RAM cache.
@@ -205,7 +206,6 @@ class TestProfileWithCaching(unittest.TestCase):
         # Request the anonymous folder
         now = stable_now()
         browser = Browser(self.app)
-        browser.handleErrors = False
         browser.open(self.portal["f1"].absolute_url())
         self.assertEqual("plone.content.folderView", browser.headers["X-Cache-Rule"])
         self.assertEqual(
@@ -215,10 +215,8 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        self.assertEqual(
-            f'"||{catalog.getCounter()}|en|{skins_tool.default_skin}|0|0|"',
-            normalize_etag(browser.headers["ETag"]),
-        )
+        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|0|{mtime}"'
+        self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
         # Request the anonymous page
@@ -234,10 +232,8 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        self.assertEqual(
-            f'"||{catalog.getCounter()}|en|{skins_tool.default_skin}|0|"',
-            normalize_etag(browser.headers["ETag"]),
-        )
+        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|{mtime}"'
+        self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
         # Request the anonymous page again -- to test RAM cache.
@@ -257,10 +253,8 @@ class TestProfileWithCaching(unittest.TestCase):
         self.assertEqual(
             "max-age=0, must-revalidate, private", browser.headers["Cache-Control"]
         )
-        self.assertEqual(
-            f'"||{catalog.getCounter()}|en|{skins_tool.default_skin}|0|"',
-            normalize_etag(browser.headers["ETag"]),
-        )
+        tag = f'"||{catalog.getCounter()}|en|{default_skin}|0|{mtime}"'
+        self.assertEqual(tag, normalize_etag(browser.headers["ETag"]))
         self.assertGreater(now, dateutil.parser.parse(browser.headers["Expires"]))
 
         # Request the anonymous page again -- with an INM header to test 304.
