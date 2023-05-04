@@ -30,7 +30,7 @@ def stable_now():
     """Patch localized_now to allow stable results in tests.
     """
     tzinfo = pytz.timezone(TEST_TIMEZONE)
-    now = datetime(2013, 5, 5, 10, 0, 0).replace(microsecond=0)
+    now = datetime(2013, 6, 5, 10, 0, 0).replace(microsecond=0)
     now = tzinfo.localize(now)  # set tzinfo with correct DST offset
     return now
 
