@@ -1,0 +1,4 @@
+Changed hardcoded test date to June instead of May to temporarily fix a testing error.
+See `issue 127 <https://github.com/plone/plone.app.caching/issues/127>`_.
+Needs a proper fix within a month.
+[maurits]
