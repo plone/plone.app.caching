@@ -9,6 +9,17 @@
 
 <!-- towncrier release notes start -->
 
+## 3.1.1 (2023-05-15)
+
+
+### Tests
+
+- Changed hardcoded test date to June instead of May to temporarily fix a testing error.
+  See `issue 127 <https://github.com/plone/plone.app.caching/issues/127>`_.
+  Needs a proper fix within a month.
+  [maurits] #127
+
+
 ## 3.1.0 (2023-04-26)
 
 
