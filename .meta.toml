@@ -5,10 +5,6 @@ template = "default"
 commit-id = "13d8d6c0"
 
 [dependencies]
-mappings = [
-    "Zope = ['OFS', 'Products.Five', 'Products.PageTemplates', 'ZPublisher']",
-    "python-dateutil = ['dateutil']",
-    ]
 ignores = "['zope.dublincore']"
 
 [check-manifest]
