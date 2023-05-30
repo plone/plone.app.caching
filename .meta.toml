@@ -18,4 +18,4 @@ additional-ignores = [
     ]
 
 [codespell]
-additional-ignores = "discreet,ordner"
+additional-ignores = "ordner"

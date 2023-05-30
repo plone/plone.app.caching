@@ -45,7 +45,7 @@ profile = "plone"
 target-version = ["py38"]
 
 [tool.codespell]
-ignore-words-list = "discreet,discreet,ordner"
+ignore-words-list = "discreet,ordner"
 skip = "*.po,"
 
 [tool.dependencychecker]
