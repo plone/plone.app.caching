@@ -7,15 +7,15 @@ commit-id = "fb4615d7"
 [dependencies]
 ignores = "['zope.dublincore']"
 
-[check-manifest]
-additional-ignores = [
-    ".tox",
-    "constraints-mxdev.txt",
-    "instance.yaml",
-    "Makefile",
-    "mx.ini",
-    "requirements-mxdev.txt",
-    ]
+[setup]
+check_manifest_ignore = """
+    .tox
+    constraints-mxdev.txt
+    instance.yaml
+    Makefile
+    mx.ini
+    requirements-mxdev.txt
+"""
 
 [codespell]
 additional-ignores = "ordner"
