@@ -15,7 +15,7 @@ from plone.cachepurging.interfaces import IPurger
 from plone.caching.interfaces import ICacheSettings
 from plone.namedfile.file import NamedImage
 from plone.registry.interfaces import IRegistry
-from plone.testing.z2 import Browser
+from plone.testing.zope import Browser
 from zope.component import getUtility
 from zope.globalrequest import setRequest
 
