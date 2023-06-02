@@ -69,7 +69,7 @@ class TestProfileWithCaching(unittest.TestCase):
     def tearDown(self):
         setRequest(None)
 
-    def test_composite_viewsxx(self):
+    def test_composite_views(self):
         # This is a clone of the same test for 'without-caching-proxy'
         # Can we just call that test from this context?
 
