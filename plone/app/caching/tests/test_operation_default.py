@@ -6,7 +6,7 @@ from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import TEST_USER_PASSWORD
 from plone.caching.interfaces import ICacheSettings
 from plone.registry.interfaces import IRegistry
-from plone.testing.z2 import Browser
+from plone.testing.zope import Browser
 from zope.component import getUtility
 from zope.globalrequest import setRequest
 

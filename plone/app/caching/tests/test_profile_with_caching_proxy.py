@@ -16,7 +16,7 @@ from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.cachepurging.interfaces import IPurger
 from plone.caching.interfaces import ICacheSettings
 from plone.registry.interfaces import IRegistry
-from plone.testing.z2 import Browser
+from plone.testing.zope import Browser
 from Products.CMFCore.FSFile import FSFile
 from Products.CMFCore.utils import getToolByName
 from zope.component import getUtility
