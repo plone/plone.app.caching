@@ -12,7 +12,7 @@ from plone.app.textfield.value import RichTextValue
 from plone.cachepurging.interfaces import ICachePurgingSettings
 from plone.caching.interfaces import ICacheSettings
 from plone.registry.interfaces import IRegistry
-from plone.testing.z2 import Browser
+from plone.testing.zope import Browser
 from Products.CMFCore.utils import getToolByName
 from zope.component import getUtility
 from zope.globalrequest import setRequest
