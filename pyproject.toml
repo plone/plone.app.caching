@@ -1,5 +1,6 @@
 # Generated from:
 # https://github.com/plone/meta/tree/master/config/default
+# See the inline comments on how to expand/tweak this configuration file
 [tool.towncrier]
 directory = "news/"
 filename = "CHANGES.md"
@@ -47,6 +48,12 @@ target-version = ["py38"]
 [tool.codespell]
 ignore-words-list = "discreet,ordner"
 skip = "*.po,"
+##
+# Add extra configuration options in .meta.toml:
+#  [pyproject]
+#  codespell_ignores = "foo,bar"
+#  codespell_skip = "*.po,*.map,package-lock.json"
+##
 
 [tool.dependencychecker]
 Zope = [
@@ -88,3 +95,47 @@ Zope = [
 ]
 python-dateutil = ['dateutil']
 ignore-packages = ['zope.dublincore']
+
+##
+# Add extra configuration options in .meta.toml:
+#  [pyproject]
+#  dependencies_ignores = "['zestreleaser.towncrier']"
+#  dependencies_mappings = [
+#    "gitpython = ['git']",
+#    "pygithub = ['github']",
+#  ]
+#  """
+##
+
+[tool.check-manifest]
+ignore = [
+    ".editorconfig",
+    ".meta.toml",
+    ".pre-commit-config.yaml",
+    "tox.ini",
+    ".flake8",
+    "mx.ini",
+    ".tox",
+    "constraints-mxdev.txt",
+    "instance.yaml",
+    "Makefile",
+    "requirements-mxdev.txt",
+
+]
+##
+# Add extra configuration options in .meta.toml:
+#  [pyproject]
+#  check_manifest_ignores = """
+#      "*.map.js",
+#      "*.pyc",
+#  """
+##
+
+
+##
+# Add extra configuration options in .meta.toml:
+#  [pyproject]
+#  extra_lines = """
+#  _your own configuration lines_
+#  """
+##

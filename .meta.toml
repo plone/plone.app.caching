@@ -1,21 +1,17 @@
 # Generated from:
 # https://github.com/plone/meta/tree/master/config/default
+# See the inline comments on how to expand/tweak this configuration file
 [meta]
 template = "default"
-commit-id = "fb4615d7"
+commit-id = "e08b1234"
 
-[dependencies]
-ignores = "['zope.dublincore']"
-
-[setup]
-check_manifest_ignore = """
-    .tox
-    constraints-mxdev.txt
-    instance.yaml
-    Makefile
-    mx.ini
-    requirements-mxdev.txt
+[pyproject]
+check_manifest_ignores = """
+    ".tox",
+    "constraints-mxdev.txt",
+    "instance.yaml",
+    "Makefile",
+    "requirements-mxdev.txt",
 """
-
-[codespell]
-additional-ignores = "ordner"
+codespell_ignores = "ordner"
+dependencies_ignores = "['zope.dublincore']"
