@@ -9,6 +9,21 @@
 
 <!-- towncrier release notes start -->
 
+## 3.1.2 (2023-06-16)
+
+
+### Internal:
+
+- Update configuration files.
+  [plone devs] e08b1234, fb4615d7
+
+
+### Tests
+
+- Fixed tests that compared a stable time with a ten year old Expires handler.
+  [maurits] #127
+
+
 ## 3.1.1 (2023-05-15)
 
 
