@@ -3,7 +3,7 @@
 # See the inline comments on how to expand/tweak this configuration file
 [meta]
 template = "default"
-commit-id = "e08b1234"
+commit-id = "68cda6e4"
 
 [pyproject]
 check_manifest_ignores = """
@@ -15,3 +15,12 @@ check_manifest_ignores = """
 """
 codespell_ignores = "ordner"
 dependencies_ignores = "['zope.dublincore']"
+
+[github]
+jobs = [
+    "qa",
+    "test",
+    "coverage",
+    "dependencies",
+    "release_ready",
+    ]
