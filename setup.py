@@ -16,6 +16,8 @@ setup(
     description="Plone UI and default rules for plone.caching/z3c.caching",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    # Get more strings from
+    # https://pypi.org/classifiers/
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
