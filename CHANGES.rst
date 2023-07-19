@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.1 (2023-07-20)
+------------------
+
+Bug fixes:
+
+
+- Fixed tests that compared a stable time with a ten year old Expires handler.
+  [maurits] (#127)
+
+
 2.2.0 (2023-01-24)
 ------------------
 
