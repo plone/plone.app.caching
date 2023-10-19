@@ -209,18 +209,22 @@ class TestContentPurgePaths(unittest.TestCase):
         self.assertEqual([], list(purger.getAbsolutePaths()))
 
     def test_parent_default_view(self):
+        from plone.app.caching.purge import HAS_RESTAPI
+
         context = FauxContent("default-view").__of__(FauxContent("bar"))
         purger = ContentPurgePaths(context)
+        expected = [
+            "/bar/default-view/",
+            "/bar/default-view/view",
+            "/bar/default-view/default-view",
+            "/bar",
+            "/bar/",
+            "/bar/view",
+        ]
+        if HAS_RESTAPI:
+            expected.append("/bar/@comments")
         self.assertEqual(
-            [
-                "/bar/default-view/",
-                "/bar/default-view/view",
-                "/bar/default-view/default-view",
-                "/bar",
-                "/bar/",
-                "/bar/view",
-                "/bar/@comments",
-            ],
+            expected,
             list(purger.getRelativePaths()),
         )
         self.assertEqual([], list(purger.getAbsolutePaths()))

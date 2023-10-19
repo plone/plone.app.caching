@@ -1,6 +1,7 @@
 from Acquisition import Explicit
 from datetime import date
 from datetime import datetime
+from datetime import timedelta
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.utils import getObjectDefaultView
 from plone.app.caching.utils import isPurged
@@ -25,9 +26,14 @@ TEST_IMAGE = pkg_resources.resource_filename("plone.app.caching.tests", "test.gi
 
 
 def stable_now():
-    """Patch localized_now to allow stable results in tests."""
+    """Patch localized_now to allow stable results in tests.
+
+    Note that a fixed date is not good enough:
+    several tests compare this date with an Expires header,
+    and this header may be set to ten years ago.
+    """
     tzinfo = pytz.timezone(TEST_TIMEZONE)
-    now = datetime(2013, 5, 5, 10, 0, 0).replace(microsecond=0)
+    now = datetime.now() - timedelta(days=1000)
     now = tzinfo.localize(now)  # set tzinfo with correct DST offset
     return now
 

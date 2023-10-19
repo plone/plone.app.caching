@@ -9,6 +9,52 @@
 
 <!-- towncrier release notes start -->
 
+## 3.1.2 (2023-06-16)
+
+
+### Internal:
+
+- Update configuration files.
+  [plone devs] e08b1234, fb4615d7
+
+
+### Tests
+
+- Fixed tests that compared a stable time with a ten year old Expires handler.
+  [maurits] #127
+
+
+## 3.1.1 (2023-05-15)
+
+
+### Tests
+
+- Changed hardcoded test date to June instead of May to temporarily fix a testing error.
+  See `issue 127 <https://github.com/plone/plone.app.caching/issues/127>`_.
+  Needs a proper fix within a month.
+  [maurits] #127
+
+
+## 3.1.0 (2023-04-26)
+
+
+### New features:
+
+- Update the resourceRegistries ETag to use the config registry modification time.
+  This time is set since Plone 6.0.4.
+  Fixes `issue 93 <https://github.com/plone/plone.app.caching/issues/93>`_.
+  [maurits] #93
+
+
+## 3.0.5 (2023-04-14)
+
+
+### Bug fixes:
+
+- Fix spelling error.
+  [gforcada] #124
+
+
 ## 3.0.4 (2023-03-14)
 
 
