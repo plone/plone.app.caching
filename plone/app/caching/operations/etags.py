@@ -165,7 +165,7 @@ class ObjectLocked:
         context = getContext(self.published)
         lock = queryMultiAdapter((context, self.request), name="plone_lock_info")
 
-        if not lock or not lock.lock_info():
+        if not lock:
             return "0"
 
         lock_info = lock.lock_info()
