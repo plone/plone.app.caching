@@ -1,0 +1,1 @@
+Fix `locked` component of ETag to discriminate between different locks. @JeffersonBledsoe, @davisagli

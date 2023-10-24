@@ -281,14 +281,14 @@ class TestETags(unittest.TestCase):
 
         @implementer(Interface)
         @adapter(DummyContext, Interface)
-        class DummyContextState:
+        class DummyLockInfo:
             def __init__(self, context, request):
                 pass
 
-            def is_locked(self):
-                return True
+            def lock_info(self):
+                return {"token": "lock-token-1234"}
 
-        provideAdapter(DummyContextState, name="plone_context_state")
+        provideAdapter(DummyLockInfo, name="plone_lock_info")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()
@@ -297,21 +297,21 @@ class TestETags(unittest.TestCase):
 
         etag = ObjectLocked(published, request)
 
-        self.assertEqual("1", etag())
+        self.assertEqual("lock-token-1234", etag())
 
     def test_ObjectLocked_false(self):
         from plone.app.caching.operations.etags import ObjectLocked
 
         @implementer(Interface)
         @adapter(DummyContext, Interface)
-        class DummyContextState:
+        class DummyLockInfo:
             def __init__(self, context, request):
                 pass
 
-            def is_locked(self):
-                return False
+            def lock_info(self):
+                return None
 
-        provideAdapter(DummyContextState, name="plone_context_state")
+        provideAdapter(DummyLockInfo, name="plone_lock_info")
 
         environ = {"SERVER_NAME": "example.com", "SERVER_PORT": "80"}
         response = HTTPResponse()

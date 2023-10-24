@@ -163,12 +163,16 @@ class ObjectLocked:
 
     def __call__(self):
         context = getContext(self.published)
-        context_state = queryMultiAdapter(
-            (context, self.request), name="plone_context_state"
-        )
-        if context_state is None:
-            return
-        return "1" if context_state.is_locked() else "0"
+        lock = queryMultiAdapter((context, self.request), name="plone_lock_info")
+
+        if not lock:
+            return "0"
+
+        lock_info = lock.lock_info()
+        if not lock_info:
+            return "0"
+
+        return lock_info["token"]
 
 
 @implementer(IETagValue)
