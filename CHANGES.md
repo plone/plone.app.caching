@@ -9,6 +9,14 @@
 
 <!-- towncrier release notes start -->
 
+## 3.1.3 (2023-10-25)
+
+
+### Bug fixes:
+
+- Fix `locked` component of ETag to discriminate between different locks. @JeffersonBledsoe, @davisagli #122
+
+
 ## 3.1.2 (2023-06-16)
 
 
