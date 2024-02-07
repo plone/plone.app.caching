@@ -1,3 +1,3 @@
-Change PurgePath adapter registration to IDexterityContent
+Fix purging of image scale paths for Dexterity content.
 [erral]
 
