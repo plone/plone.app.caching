@@ -3,7 +3,7 @@ from plone.app.caching.utils import getObjectDefaultView
 from plone.app.caching.utils import isPurged
 from plone.cachepurging.interfaces import IPurgePathRewriter
 from plone.dexterity.content import get_assignable
-from plone.dexterity.interfaces import IDexteritySchema
+from plone.dexterity.interfaces import IDexterityContent
 from plone.dexterity.schema import SCHEMA_CACHE
 from plone.memoize.instance import memoize
 from plone.namedfile.interfaces import INamedBlobFileField
@@ -172,7 +172,7 @@ class DiscussionItemPurgePaths:
 
 
 @implementer(IPurgePaths)
-@adapter(IDexteritySchema)
+@adapter(IDexterityContent)
 class ScalesPurgePaths:
     """Paths to purge for Dexterity object fields"""
 
