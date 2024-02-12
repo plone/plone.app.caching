@@ -9,6 +9,20 @@
 
 <!-- towncrier release notes start -->
 
+## 3.1.4 (2024-02-12)
+
+
+### Bug fixes:
+
+- Fix purging of image scale paths for Dexterity content.
+  [erral] #136
+
+
+### Internal:
+
+- Update configuration files.
+  [plone devs] cfffba8c
+
 ## 3.1.3 (2023-10-25)
 
 
