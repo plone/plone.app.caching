@@ -12,12 +12,12 @@ from plone.registry.interfaces import IRegistry
 from plone.testing.zca import UNIT_TESTING
 from Products.CMFCore.interfaces import IDynamicType
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
+from zoneinfo import ZoneInfo
 from zope.component import getUtility
 from zope.component import provideAdapter
 from zope.component import provideUtility
 from zope.interface import implementer
 
-import pytz
 import unittest
 
 TEST_TIMEZONE = "Europe/Vienna"
@@ -31,9 +31,8 @@ def stable_now():
     several tests compare this date with an Expires header,
     and this header may be set to ten years ago.
     """
-    tzinfo = pytz.timezone(TEST_TIMEZONE)
-    now = datetime.now() - timedelta(days=1000)
-    now = tzinfo.localize(now)  # set tzinfo with correct DST offset
+    tzinfo = ZoneInfo(TEST_TIMEZONE)
+    now = datetime.now(tzinfo) - timedelta(days=1000)
     return now
 
 
