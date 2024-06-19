@@ -76,7 +76,6 @@ setup(
             "plone.app.textfield",
             "plone.behavior",
             "plone.testing",
-            "pytz",
             "transaction",
         ]
     },
