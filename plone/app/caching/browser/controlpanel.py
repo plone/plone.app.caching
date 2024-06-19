@@ -34,7 +34,10 @@ import re
 
 # Borrowed from zope.schema to avoid an import of a private name
 _isuri = re.compile(
-    r"[a-zA-z0-9+.-]+:" r"\S*$"  # scheme  # non space (should be pickier)
+    # scheme
+    r"[a-zA-z0-9+.-]+:"
+    # non space (should be pickier)
+    r"\S*$"
 ).match
 
 
