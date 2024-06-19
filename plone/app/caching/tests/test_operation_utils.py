@@ -610,9 +610,9 @@ class CacheCheckHelpersTest(unittest.TestCase):
         response = HTTPResponse()
         request = HTTPRequest(StringIO(), environ, response)
 
-        request.environ[
-            "HTTP_IF_MODIFIED_SINCE"
-        ] = "Thu, 24 Nov 2011 03:04:05 GMT; Thu, 24 Nov 2011 03:04:05"
+        request.environ["HTTP_IF_MODIFIED_SINCE"] = (
+            "Thu, 24 Nov 2011 03:04:05 GMT; Thu, 24 Nov 2011 03:04:05"
+        )
 
         lastModified = datetime.datetime(2010, 11, 24, 3, 4, 5, 6, dateutil.tz.tzutc())
 
