@@ -9,6 +9,14 @@
 
 <!-- towncrier release notes start -->
 
+## 3.1.5 (2024-06-26)
+
+
+### Bug fixes:
+
+- Add Zope to dependencies.  Update config files with plone/meta.
+  [maurits] #1
+
 ## 3.1.4 (2024-02-12)
 
 
