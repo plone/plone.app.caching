@@ -24,10 +24,8 @@ def enableExplicitMode():
         registry.explicit = True
 
 
-def importVarious(context):
-    site = context.getSite()
-
-    error_log = getToolByName(site, "error_log")
+def post_handler(context):
+    error_log = getToolByName(context, "error_log")
 
     properties = error_log.getProperties()
     ignored = properties.get("ignored_exceptions", ())

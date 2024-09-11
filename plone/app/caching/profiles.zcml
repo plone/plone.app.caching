@@ -15,7 +15,7 @@
       description="Installs plone.app.caching"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       directory="profiles/default"
-      post_handler=".setuphandlers.importVarious"
+      post_handler=".setuphandlers.post_handler"
       />
 
   <genericsetup:registerProfile
