@@ -4,12 +4,24 @@
     i18n_domain="plone"
     >
 
+  <utility
+      factory=".setuphandlers.NonInstallable"
+      name="plone.app.caching"
+      />
+
   <genericsetup:registerProfile
       name="default"
       title="HTTP caching support"
       description="Installs plone.app.caching"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       directory="profiles/default"
+      />
+
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="Uninstall HTTP caching support"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/uninstall"
       />
 
   <genericsetup:registerProfile

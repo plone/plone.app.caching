@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<registry>
+  <record name="plone.app.caching.terseCaching.maxage"
+          remove="true"
+  />
+  <record name="plone.app.caching.terseCaching.smaxage"
+          remove="true"
+  />
+  <record name="plone.app.caching.terseCaching.etags"
+          remove="true"
+  />
+  <record name="plone.app.caching.terseCaching.lastModified"
+          remove="true"
+  />
+  <record name="plone.app.caching.terseCaching.ramCache"
+          remove="true"
+  />
+  <record name="plone.app.caching.terseCaching.vary"
+          remove="true"
+  />
+  <record name="plone.app.caching.terseCaching.anonOnly"
+          remove="true"
+  />
+</registry>

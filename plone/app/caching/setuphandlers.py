@@ -1,4 +1,16 @@
+from plone.base.interfaces import INonInstallable
 from Products.CMFCore.utils import getToolByName
+from zope.interface import implementer
+
+
+@implementer(INonInstallable)
+class NonInstallable:
+
+    def getNonInstallableProfiles(self):
+        return [
+            "plone.app.caching:uninstall",
+            "plone.app.caching:v2",
+        ]
 
 
 def enableExplicitMode():

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<registry>
+
+  <records interface="plone.caching.interfaces.ICacheSettings"
+           remove="true"
+  />
+  <records interface="plone.cachepurging.interfaces.ICachePurgingSettings"
+           remove="true"
+  />
+  <records interface="plone.app.caching.interfaces.IPloneCacheSettings"
+           remove="true"
+  />
+  <record name="plone.caching.operations.chain.operations"
+          remove="true"
+  />
+
+</registry>
