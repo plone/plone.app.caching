@@ -25,9 +25,6 @@ def enableExplicitMode():
 
 
 def importVarious(context):
-    if not context.readDataFile("plone.app.caching.txt"):
-        return
-
     site = context.getSite()
 
     error_log = getToolByName(site, "error_log")
