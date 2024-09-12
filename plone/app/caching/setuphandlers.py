@@ -1,4 +1,16 @@
+from plone.base.interfaces import INonInstallable
 from Products.CMFCore.utils import getToolByName
+from zope.interface import implementer
+
+
+@implementer(INonInstallable)
+class NonInstallable:
+
+    def getNonInstallableProfiles(self):
+        return [
+            "plone.app.caching:uninstall",
+            "plone.app.caching:v2",
+        ]
 
 
 def enableExplicitMode():
@@ -12,13 +24,8 @@ def enableExplicitMode():
         registry.explicit = True
 
 
-def importVarious(context):
-    if not context.readDataFile("plone.app.caching.txt"):
-        return
-
-    site = context.getSite()
-
-    error_log = getToolByName(site, "error_log")
+def post_handler(context):
+    error_log = getToolByName(context, "error_log")
 
     properties = error_log.getProperties()
     ignored = properties.get("ignored_exceptions", ())
