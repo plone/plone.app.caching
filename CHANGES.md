@@ -9,6 +9,21 @@
 
 <!-- towncrier release notes start -->
 
+## 4.0.0 (2024-09-24)
+
+
+### Breaking changes:
+
+- Replace `plone.app.caching` import step with a post handler.
+  Removed the `plone.app.caching.txt` Generic Setup flag file that was needed by the import step.
+  [maurits] #139
+
+
+### New features:
+
+- Add uninstall profile.
+  [maurits] #139
+
 ## 3.1.5 (2024-06-26)
 
 
