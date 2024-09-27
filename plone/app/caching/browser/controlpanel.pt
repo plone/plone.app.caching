@@ -694,11 +694,13 @@
                 <p>
                   You can also configure ruleset for Plone REST API endpoints,
                   where the endpoint names follow a specific naming, explicit structure: &lt;method&gt;_&lt;media type&gt;_@&lt;name&gt;.
-                  Example: <code>GET_application_json_@service_name</code>
+                  Example:
+                  <code>GET_application_json_@service_name</code>
                 </p>
                 <p>
                   <strong>Note:</strong>
-                   Endpoints with no name zcml registration, like content GET are named in this way: <code>GET_application_json_</code>
+                   Endpoints with no name zcml registration, like content GET are named in this way:
+                  <code>GET_application_json_</code>
                 </p>
               </div>
 
