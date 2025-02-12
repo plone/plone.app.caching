@@ -276,11 +276,12 @@ class TestOperations(unittest.TestCase):
     def test_purge_on_changeworkflow(self):
         setRoles(self.portal, TEST_USER_ID, ("Manager",))
 
-        # Non-folder content
-        self.portal.invokeFactory("Document", "d1")
-        self.portal["d1"].title = "Document one"
-        self.portal["d1"].description = "Document one description"
-        self.portal.portal_workflow.doActionFor(self.portal["d1"], "publish")
+        # folder
+        self.portal.invokeFactory("Folder", "f1")
+        self.portal.portal_workflow.doActionFor(self.portal["f1"], "publish")
+        # document
+        self.portal["f1"].invokeFactory("Document", "d1")
+        self.portal.portal_workflow.doActionFor(self.portal["f1"]["d1"], "publish")
 
         self.assertEqual([], self.purger._sync)
         self.assertEqual([], self.purger._async)
@@ -288,9 +289,12 @@ class TestOperations(unittest.TestCase):
         # Enable purge
         self.cachePurgingSettings.enabled = True
         self.cachePurgingSettings.cachingProxies = ("http://localhost:1234",)
-        self.ploneCacheSettings.purgedContentTypes = ("Document",)
+        self.ploneCacheSettings.purgedContentTypes = (
+            "Document",
+            "Folder",
+        )
 
-        url = self.portal["d1"].absolute_url()
+        url = self.portal["f1"]["d1"].absolute_url()
         token = getToken(TEST_USER_NAME)
         retractURL = f"{url}/content_status_modify?workflow_action=retract&_authenticator={token}"
 
@@ -309,12 +313,17 @@ class TestOperations(unittest.TestCase):
         browser.open(retractURL)
 
         self.assertEqual([], self.purger._sync)
+        # purged the document d1, and the parent folder f1
         self.assertEqual(
-            {
-                "http://localhost:1234/plone/d1",
-                "http://localhost:1234/plone/d1/document_view",
-                "http://localhost:1234/plone/d1/",
-                "http://localhost:1234/plone/d1/view",
-            },
-            set(self.purger._async),
+            [
+                "http://localhost:1234/plone/f1",
+                "http://localhost:1234/plone/f1/",
+                "http://localhost:1234/plone/f1/d1",
+                "http://localhost:1234/plone/f1/d1/",
+                "http://localhost:1234/plone/f1/d1/document_view",
+                "http://localhost:1234/plone/f1/d1/view",
+                "http://localhost:1234/plone/f1/listing_view",
+                "http://localhost:1234/plone/f1/view",
+            ],
+            sorted(self.purger._async),
         )

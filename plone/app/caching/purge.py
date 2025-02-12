@@ -259,3 +259,6 @@ def purgeOnMovedOrRemoved(object, event):
 def purgeOnWorkflow(object, event):
     if isPurged(object):
         notify(Purge(object))
+    parent = object.getParentNode()
+    if parent and isPurged(parent):
+        notify(Purge(parent))
