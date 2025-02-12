@@ -7,6 +7,7 @@ from plone.app.caching.purge import ContentPurgePaths
 from plone.app.caching.purge import DiscussionItemPurgePaths
 from plone.app.caching.purge import purgeOnModified
 from plone.app.caching.purge import purgeOnMovedOrRemoved
+from plone.app.caching.purge import purgeOnWorkflow
 from plone.app.caching.purge import ScalesPurgePaths
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
 from plone.app.contenttypes.behaviors.leadimage import ILeadImageBehavior
@@ -24,6 +25,7 @@ from plone.registry.interfaces import IRegistry
 from plone.testing.zca import UNIT_TESTING
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import IDiscussionResponse
+from Products.CMFCore.WorkflowCore import ActionSucceededEvent
 from Products.CMFDynamicViewFTI.interfaces import IBrowserDefault
 from z3c.caching.interfaces import IPurgeEvent
 from z3c.caching.interfaces import IPurgePaths
@@ -97,6 +99,9 @@ class FauxContent(FauxNonContent):
     def defaultView(self):
         return "default-view"
 
+    def getParentNode(self):
+        return getattr(self, "__parent__", None)
+
 
 @implementer(IDiscussionResponse)
 class FauxDiscussable(Explicit):
@@ -112,6 +117,7 @@ class TestPurgeRedispatch(unittest.TestCase):
         provideHandler(objectEventNotify)
         provideHandler(purgeOnModified)
         provideHandler(purgeOnMovedOrRemoved)
+        provideHandler(purgeOnWorkflow)
         provideAdapter(persistentFieldAdapter)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
@@ -175,6 +181,14 @@ class TestPurgeRedispatch(unittest.TestCase):
 
         notify(ObjectRemovedEvent(context, context.__parent__, "new"))
 
+        self.assertEqual(2, len(self.handler.invocations))
+        self.assertEqual(context, self.handler.invocations[0].object)
+
+    def test_workflow_transitions(self):
+        context = FauxContent("new").__of__(FauxContent())
+        context.getParentNode()
+        notify(ActionSucceededEvent(context, "dummy_workflow", "publish", None))
+        # XXX: actual 2, when also purging the parent!
         self.assertEqual(2, len(self.handler.invocations))
         self.assertEqual(context, self.handler.invocations[0].object)
 
