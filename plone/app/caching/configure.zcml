@@ -45,6 +45,8 @@
   <!-- Purging -->
   <subscriber handler=".purge.purgeOnModified" />
   <subscriber handler=".purge.purgeOnMovedOrRemoved" />
+  <subscriber handler=".purge.purgeOnWorkflow" />
+
 
   <!-- ILastModified adapters -->
   <adapter factory=".lastmodified.PageTemplateDelegateLastModified" />

@@ -9,6 +9,7 @@ from plone.memoize.instance import memoize
 from plone.namedfile.interfaces import INamedBlobFileField
 from plone.namedfile.interfaces import INamedImageField
 from plone.registry.interfaces import IRegistry
+from Products.CMFCore.interfaces import IActionSucceededEvent
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.interfaces import IDiscussionResponse
 from Products.CMFCore.interfaces import IDynamicType
@@ -252,3 +253,9 @@ def purgeOnMovedOrRemoved(object, event):
     parent = object.getParentNode()
     if parent:
         notify(Purge(parent))
+
+
+@adapter(IContentish, IActionSucceededEvent)
+def purgeOnWorkflow(object, event):
+    if isPurged(object):
+        notify(Purge(object))
