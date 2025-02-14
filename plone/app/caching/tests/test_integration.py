@@ -357,7 +357,10 @@ class TestOperations(unittest.TestCase):
         # Enable purge
         self.cachePurgingSettings.enabled = True
         self.cachePurgingSettings.cachingProxies = ("http://localhost:1234",)
-        self.ploneCacheSettings.purgedContentTypes = ("Document",)
+        self.ploneCacheSettings.purgedContentTypes = (
+            "Document",
+            "Folder",
+        )
 
         # Execute delete request (via @@fc-delete)
         selection = [self.portal["f1"]["d1"].UID()]
