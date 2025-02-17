@@ -6,7 +6,8 @@ from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.purge import ContentPurgePaths
 from plone.app.caching.purge import DiscussionItemPurgePaths
 from plone.app.caching.purge import purgeOnModified
-from plone.app.caching.purge import purgeOnMovedOrRemoved
+from plone.app.caching.purge import purgeOnMoved
+from plone.app.caching.purge import purgeOnRemoved
 from plone.app.caching.purge import purgeOnWorkflow
 from plone.app.caching.purge import ScalesPurgePaths
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
@@ -116,7 +117,8 @@ class TestPurgeRedispatch(unittest.TestCase):
         provideHandler(self.handler.handler)
         provideHandler(objectEventNotify)
         provideHandler(purgeOnModified)
-        provideHandler(purgeOnMovedOrRemoved)
+        provideHandler(purgeOnMoved)
+        provideHandler(purgeOnRemoved)
         provideHandler(purgeOnWorkflow)
         provideAdapter(persistentFieldAdapter)
         provideUtility(Registry(), IRegistry)
@@ -130,7 +132,6 @@ class TestPurgeRedispatch(unittest.TestCase):
 
         notify(ObjectModifiedEvent(context))
         notify(ObjectAddedEvent(context))
-        notify(ObjectRemovedEvent(context))
 
         self.assertEqual(0, len(self.handler.invocations))
 
@@ -175,9 +176,6 @@ class TestPurgeRedispatch(unittest.TestCase):
 
     def test_removed(self):
         context = FauxContent("new").__of__(FauxContent())
-        request = FauxRequest()
-        request.URL = "http://nohost/delete_confirmation"
-        setRequest(request)
 
         notify(ObjectRemovedEvent(context, context.__parent__, "new"))
 

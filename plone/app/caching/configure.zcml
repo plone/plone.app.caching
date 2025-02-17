@@ -44,7 +44,8 @@
 
   <!-- Purging -->
   <subscriber handler=".purge.purgeOnModified" />
-  <subscriber handler=".purge.purgeOnMovedOrRemoved" />
+  <subscriber handler=".purge.purgeOnMoved" />
+  <subscriber handler=".purge.purgeOnRemoved" />
   <subscriber handler=".purge.purgeOnWorkflow" />
 
 

@@ -233,25 +233,31 @@ def purgeOnModified(object, event):
 
 
 @adapter(IContentish, IObjectMovedEvent)
-def purgeOnMovedOrRemoved(object, event):
-    request = getRequest()
-    confirmed_delete = (
-        request is not None
-        and getattr(request, "URL", None)
-        and "delete_confirmation" in request.URL
-        and request.REQUEST_METHOD == "POST"
-        and "form.submitted" in request.form
-    )
-    if not confirmed_delete and IObjectRemovedEvent.providedBy(event):
-        # ignore extra delete events
+def purgeOnMoved(object, event):
+    """Purge after object was moved."""
+
+    # Purge on removal is handled elsewhere
+    if IObjectRemovedEvent.providedBy(event):
         return
     # Don't purge when added
     if IObjectAddedEvent.providedBy(event):
         return
-    if isPurged(object) and "portal_factory" not in request.URL:
+    # check to not include move-events during content creation
+    if isPurged(object):
+        notify(Purge(object))
+
+    parent = object.getParentNode()
+    if parent and isPurged(parent):
+        notify(Purge(parent))
+
+
+@adapter(IContentish, IObjectRemovedEvent)
+def purgeOnRemoved(object, event):
+    """Purge after object was deleted."""
+    if isPurged(object):
         notify(Purge(object))
     parent = object.getParentNode()
-    if parent:
+    if parent and isPurged(parent):
         notify(Purge(parent))
 
 
