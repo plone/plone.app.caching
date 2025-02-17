@@ -2,6 +2,7 @@ from Acquisition import Explicit
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from datetime import timezone
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.utils import getObjectDefaultView
 from plone.app.caching.utils import isPurged
@@ -17,11 +18,9 @@ from zope.component import provideUtility
 from zope.interface import implementer
 
 import pkg_resources
-import pytz
 import unittest
 
 
-TEST_TIMEZONE = "Europe/Vienna"
 TEST_IMAGE = pkg_resources.resource_filename("plone.app.caching.tests", "test.gif")
 
 
@@ -32,7 +31,7 @@ def stable_now():
     several tests compare this date with an Expires header,
     and this header may be set to ten years ago.
     """
-    tzinfo = pytz.timezone(TEST_TIMEZONE)
+    tzinfo = timezone(timedelta(hours=1), "Europe/Vienna")
     now = datetime.now() - timedelta(days=1000)
     now = tzinfo.localize(now)  # set tzinfo with correct DST offset
     return now
