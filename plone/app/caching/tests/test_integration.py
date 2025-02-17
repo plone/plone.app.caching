@@ -272,3 +272,58 @@ class TestOperations(unittest.TestCase):
             },
             set(self.purger._async),
         )
+
+    def test_purge_on_changeworkflow(self):
+        setRoles(self.portal, TEST_USER_ID, ("Manager",))
+
+        # folder
+        self.portal.invokeFactory("Folder", "f1")
+        self.portal.portal_workflow.doActionFor(self.portal["f1"], "publish")
+        # document
+        self.portal["f1"].invokeFactory("Document", "d1")
+        self.portal.portal_workflow.doActionFor(self.portal["f1"]["d1"], "publish")
+
+        self.assertEqual([], self.purger._sync)
+        self.assertEqual([], self.purger._async)
+
+        # Enable purge
+        self.cachePurgingSettings.enabled = True
+        self.cachePurgingSettings.cachingProxies = ("http://localhost:1234",)
+        self.ploneCacheSettings.purgedContentTypes = (
+            "Document",
+            "Folder",
+        )
+
+        url = self.portal["f1"]["d1"].absolute_url()
+        token = getToken(TEST_USER_NAME)
+        retractURL = f"{url}/content_status_modify?workflow_action=retract&_authenticator={token}"
+
+        import transaction
+
+        transaction.commit()
+
+        browser = Browser(self.app)
+        browser.handleErrors = False
+        browser.addHeader(
+            "Authorization",
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
+        )
+
+        # Retract the document
+        browser.open(retractURL)
+
+        self.assertEqual([], self.purger._sync)
+        # purged the document d1, and the parent folder f1
+        self.assertEqual(
+            [
+                "http://localhost:1234/plone/f1",
+                "http://localhost:1234/plone/f1/",
+                "http://localhost:1234/plone/f1/d1",
+                "http://localhost:1234/plone/f1/d1/",
+                "http://localhost:1234/plone/f1/d1/document_view",
+                "http://localhost:1234/plone/f1/d1/view",
+                "http://localhost:1234/plone/f1/listing_view",
+                "http://localhost:1234/plone/f1/view",
+            ],
+            sorted(self.purger._async),
+        )
