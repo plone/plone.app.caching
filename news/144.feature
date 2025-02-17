@@ -1,1 +1,1 @@
-trigger purge on workflow change @mamico
+Trigger purge on workflow change. @mamico
