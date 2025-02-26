@@ -15,9 +15,13 @@ from plone.caching.interfaces import ICacheSettings
 from plone.namedfile.file import NamedImage
 from plone.registry.interfaces import IRegistry
 from plone.testing.zope import Browser
+from unittest import mock
 from zope.component import getUtility
+from zope.event import notify
 from zope.globalrequest import setRequest
+from ZPublisher.pubevents import PubSuccess
 
+import json
 import OFS.Image
 import pkg_resources
 import unittest
@@ -326,4 +330,101 @@ class TestOperations(unittest.TestCase):
                 "http://localhost:1234/plone/f1/view",
             ],
             sorted(self.purger._async),
+        )
+
+    @mock.patch(
+        "plone.app.content.browser.contents.ContentsBaseAction.protect", lambda x: True
+    )  # noqa
+    def test_delete_via_different_ways(self):
+        """We test the different sorts of removal."""
+        setRoles(self.portal, TEST_USER_ID, ("Manager",))
+
+        # folder
+        self.portal.invokeFactory("Folder", "f1")
+        self.portal.portal_workflow.doActionFor(self.portal["f1"], "publish")
+        # Non-folder contents
+        self.portal["f1"].invokeFactory("Document", "d1")
+        self.portal["f1"]["d1"].title = "Document one"
+        self.portal["f1"]["d1"].description = "Document one description"
+
+        self.portal["f1"].invokeFactory("Document", "d2")
+        self.portal["f1"]["d2"].title = "Document two"
+        self.portal["f1"]["d2"].description = "Document two description"
+
+        self.assertEqual([], self.purger._sync)
+        self.assertEqual([], self.purger._async)
+
+        # Enable purge
+        self.cachePurgingSettings.enabled = True
+        self.cachePurgingSettings.cachingProxies = ("http://localhost:1234",)
+        self.ploneCacheSettings.purgedContentTypes = (
+            "Document",
+            "Folder",
+        )
+
+        # Execute delete request (via @@fc-delete)
+        selection = [self.portal["f1"]["d1"].UID()]
+        request = self.layer["request"]
+        request.form["folder"] = "/f1"
+        request.form["selection"] = json.dumps(selection)
+        res = self.portal.restrictedTraverse("@@fc-delete")()
+
+        import transaction
+
+        transaction.commit()
+
+        notify(PubSuccess(request))
+
+        self.assertEqual([], self.purger._sync)
+        self.assertEqual(
+            {
+                "http://localhost:1234/plone/f1/d1/document_view",
+                "http://localhost:1234/plone/f1/d1/",
+                "http://localhost:1234/plone/f1/view",
+                "http://localhost:1234/plone/f1/d1",
+                "http://localhost:1234/plone/f1/",
+                "http://localhost:1234/plone/f1/d1/view",
+                "http://localhost:1234/plone/f1",
+                "http://localhost:1234/plone/f1/listing_view",
+            },
+            set(self.purger._async),
+        )
+
+        # Check for successful deletion
+        res = json.loads(res)
+        self.assertEqual(res["status"], "success")
+        self.assertEqual(len(self.portal["f1"].contentIds()), 1)
+
+        # Clear purge URLs
+        self.purger.reset()
+
+        # Execute delete request (via delete_confirmation)
+
+        browser = Browser(self.app)
+        browser.handleErrors = False
+        browser.addHeader(
+            "Authorization",
+            f"Basic {TEST_USER_NAME}:{TEST_USER_PASSWORD}",
+        )
+
+        delete_url = self.portal["f1"]["d2"].absolute_url() + "/delete_confirmation"
+        browser.open(delete_url)
+        browser.open(delete_url)
+
+        # Try to delete in both browsers
+        browser.getControl(name="form.buttons.Delete").click()
+
+        self.assertEqual([], self.purger._sync)
+        self.assertEqual(
+            {
+                "http://localhost:1234/plone/f1/d2/document_view",
+                "http://localhost:1234/plone/f1/d2/",
+                "http://localhost:1234/plone/f1/view",
+                "http://localhost:1234/plone/f1/d2",
+                "http://localhost:1234/plone/f1/",
+                "http://localhost:1234/plone/f1/d2/view",
+                "http://localhost:1234/plone/f1",
+                "http://localhost:1234/plone/f1/listing_view",
+            },
+            set(self.purger._async),
         )
