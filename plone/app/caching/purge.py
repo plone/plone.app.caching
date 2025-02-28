@@ -1,4 +1,6 @@
 from Acquisition import aq_parent
+from importlib.metadata import distribution
+from importlib.metadata import PackageNotFoundError
 from plone.app.caching.utils import getObjectDefaultView
 from plone.app.caching.utils import isPurged
 from plone.cachepurging.interfaces import IPurgePathRewriter
@@ -27,13 +29,11 @@ from zope.lifecycleevent.interfaces import IObjectMovedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from zope.schema import getFieldsInOrder
 
-import pkg_resources
-
 
 try:
-    pkg_resources.get_distribution("plone.restapi")
+    distribution("plone.restapi")
     HAS_RESTAPI = True
-except pkg_resources.DistributionNotFound:
+except PackageNotFoundError:
     HAS_RESTAPI = False
 
 CONTENT_PATHS_POSTFIXES = [
