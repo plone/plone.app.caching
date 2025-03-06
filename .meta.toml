@@ -15,12 +15,3 @@ check_manifest_ignores = """
 """
 codespell_ignores = "ordner"
 dependencies_ignores = "['zope.dublincore']"
-
-[github]
-jobs = [
-    "qa",
-    "test",
-    "coverage",
-    "dependencies",
-    "release_ready",
-    ]
