@@ -3,7 +3,6 @@
 # See the inline comments on how to expand/tweak this configuration file
 [build-system]
 requires = ["setuptools>=68.2,<=75.8.0", "wheel"]
-build-backend = "setuptools.build_meta"
 
 [tool.towncrier]
 directory = "news/"
