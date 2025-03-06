@@ -9,6 +9,20 @@
 
 <!-- towncrier release notes start -->
 
+## 4.1.0 (2025-03-07)
+
+
+### New features:
+
+- Trigger purge on workflow change. @mamico #144
+
+
+### Bug fixes:
+
+- Fix purging for deleted content.
+  [pgrunewald] #145
+- Replace `pkg_resources` with `importlib.metadata`/`importlib.resources` @gforcada #4126
+
 ## 4.0.0 (2024-09-24)
 
 
