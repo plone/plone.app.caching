@@ -2,6 +2,7 @@ from Acquisition import Explicit
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from importlib.resources import files
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.utils import getObjectDefaultView
 from plone.app.caching.utils import isPurged
@@ -16,13 +17,12 @@ from zope.component import provideAdapter
 from zope.component import provideUtility
 from zope.interface import implementer
 
-import pkg_resources
 import pytz
 import unittest
 
 
 TEST_TIMEZONE = "Europe/Vienna"
-TEST_IMAGE = pkg_resources.resource_filename("plone.app.caching.tests", "test.gif")
+TEST_IMAGE = str(files("plone.app.caching") / "tests" / "test.gif")
 
 
 def stable_now():

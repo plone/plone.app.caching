@@ -1,3 +1,4 @@
+from importlib.resources import files
 from plone.app.caching.interfaces import IPloneCacheSettings
 from plone.app.caching.testing import getToken
 from plone.app.caching.testing import PLONE_APP_CACHING_FUNCTIONAL_TESTING
@@ -19,12 +20,11 @@ from zope.component import getUtility
 from zope.globalrequest import setRequest
 
 import OFS.Image
-import pkg_resources
 import unittest
 
 
-TEST_IMAGE = pkg_resources.resource_filename("plone.app.caching.tests", "test.gif")
-TEST_FILE = pkg_resources.resource_filename("plone.app.caching.tests", "test.gif")
+TEST_IMAGE = str(files("plone.app.caching") / "tests" / "test.gif")
+TEST_FILE = str(files("plone.app.caching") / "tests" / "test.gif")
 
 
 class TestOperations(unittest.TestCase):
