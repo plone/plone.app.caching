@@ -9,6 +9,13 @@
 
 <!-- towncrier release notes start -->
 
+## 4.1.1 (2025-09-10)
+
+
+### Internal:
+
+- Move distribution to src layout @gforcada #4217
+
 ## 4.1.0 (2025-03-07)
 
 
