@@ -45,7 +45,6 @@ setup(
         "Products.GenericSetup",
         "Products.statusmessages",
         "Zope",
-        "setuptools",
         "python-dateutil",
         "plone.app.registry",
         "plone.base",
