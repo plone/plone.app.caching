@@ -26,7 +26,6 @@ import json
 import OFS.Image
 import unittest
 
-
 TEST_IMAGE = str(files("plone.app.caching") / "tests" / "test.gif")
 TEST_FILE = str(files("plone.app.caching") / "tests" / "test.gif")
 
