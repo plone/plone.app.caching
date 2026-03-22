@@ -3,7 +3,6 @@ from zope.interface import Interface
 
 import zope.i18nmessageid
 
-
 _ = zope.i18nmessageid.MessageFactory("plone.app.caching")
 
 

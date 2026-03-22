@@ -12,7 +12,6 @@ from zope.interface import implementer
 from zope.interface import Interface
 from zope.pagetemplate.interfaces import IPageTemplate
 
-
 try:
     # zope.dublincore is not partof Plone core, but might get used by addons
     from zope.dublincore.interfaces import IDCTimes

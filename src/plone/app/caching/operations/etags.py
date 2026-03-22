@@ -17,7 +17,6 @@ from zope.interface import Interface
 import random
 import time
 
-
 try:
     # available since Plone 6.0.4
     from Products.CMFPlone.resources.browser.resource import _RESOURCE_REGISTRY_MTIME

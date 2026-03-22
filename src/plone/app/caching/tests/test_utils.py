@@ -20,7 +20,6 @@ from zope.interface import implementer
 import pytz
 import unittest
 
-
 TEST_TIMEZONE = "Europe/Vienna"
 TEST_IMAGE = str(files("plone.app.caching") / "tests" / "test.gif")
 

@@ -22,7 +22,6 @@ import re
 import time
 import wsgiref.handlers
 
-
 PAGE_CACHE_KEY = "plone.app.caching.operations.ramcache"
 PAGE_CACHE_ANNOTATION_KEY = "plone.app.caching.operations.ramcache.key"
 ETAG_ANNOTATION_KEY = "plone.app.caching.operations.etag"

@@ -30,7 +30,6 @@ from zope.lifecycleevent.interfaces import IObjectMovedEvent
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 from zope.schema import getFieldsInOrder
 
-
 try:
     distribution("plone.restapi")
     HAS_RESTAPI = True

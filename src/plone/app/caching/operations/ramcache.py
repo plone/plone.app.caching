@@ -5,7 +5,6 @@ from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
 
-
 GLOBAL_KEY = "plone.app.caching.operations.ramcache"
 
 

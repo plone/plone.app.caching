@@ -31,7 +31,6 @@ from zope.ramcache.interfaces.ram import IRAMCache
 import datetime
 import re
 
-
 # Borrowed from zope.schema to avoid an import of a private name
 _isuri = re.compile(
     # scheme
