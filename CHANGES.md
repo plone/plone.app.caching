@@ -9,6 +9,17 @@
 
 <!-- towncrier release notes start -->
 
+## 5.0.0a2 (2026-03-23)
+
+
+### Internal
+
+- Remove pytz as test dependency.
+  [thet] #141
+- Metadata: Add full list of supported Python versions to setup.py.
+  [thet] 
+- Update configuration files @plone 
+
 ## 5.0.0a1 (2025-11-19)
 
 
