@@ -1,7 +1,7 @@
 from pathlib import Path
 from setuptools import setup
 
-version = "5.0.0"
+version = "5.0.1.dev0"
 
 long_description = f"""
 {Path("README.md").read_text()}\n
