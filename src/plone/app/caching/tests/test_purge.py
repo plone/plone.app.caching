@@ -390,7 +390,7 @@ class TestScalesPurgePaths(unittest.TestCase):
         scalepaths = [prefix + "/@@images/image/" + str(i) for i in scales]
         scalepaths += [prefix + "/images/image/" + str(i) for i in scales]
 
-        paths = [x for x in purge.getRelativePaths()]
+        paths = [*purge.getRelativePaths()]
         [self.assertIn(j, paths) for j in scalepaths]
 
     def test_scale_purge_paths_page(self):
@@ -401,7 +401,7 @@ class TestScalesPurgePaths(unittest.TestCase):
         scalepaths = [prefix + "/@@images/image/" + str(i) for i in scales]
         scalepaths += [prefix + "/images/image/" + str(i) for i in scales]
 
-        paths = [x for x in purge.getRelativePaths()]
+        paths = [*purge.getRelativePaths()]
         [self.assertIn(j, paths) for j in scalepaths]
 
     def test_scale_purge_paths_unicode(self):
